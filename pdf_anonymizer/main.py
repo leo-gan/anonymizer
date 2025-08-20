@@ -1,5 +1,6 @@
 import sys
 import json
+from pathlib import Path
 from PyPDF2 import PdfReader
 import google.generativeai as genai
 import os
@@ -43,7 +44,7 @@ def anonymize_text_with_gemini(text, existing_mapping):
     Returns:
         tuple: A tuple containing the anonymized text and the updated mapping.
     """
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     prompt = f"""
     You are an expert in text anonymization. Your task is to identify and replace Personally Identifiable Information (PII) in the given text.
@@ -115,15 +116,18 @@ def main():
     # Save the results
     full_anonymized_text = "\n\n--- Page Break ---\n\n".join(anonymized_pages)
 
-    with open("anonymized_output.txt", "w") as f:
+    pdf_file_name = Path(pdf_path).stem
+    anonymized_output_file = f"{pdf_file_name}.anonymized_output.txt"
+    with open(anonymized_output_file, "w") as f:
         f.write(full_anonymized_text)
 
-    with open("mapping.json", "w") as f:
+    mapping_file = f"{pdf_file_name}.sample.2506.16406v1.mapping.json"
+    with open(mapping_file, "w") as f:
         json.dump(final_mapping, f, indent=4)
 
     print("\nAnonymization complete!")
-    print("Anonymized text saved to 'anonymized_output.txt'")
-    print("Mapping vocabulary saved to 'mapping.json'")
+    print(f"Anonymized text saved to '{anonymized_output_file}'")
+    print(f"Mapping vocabulary saved to '{mapping_file}'")
 
 
 if __name__ == "__main__":

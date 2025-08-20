@@ -6,9 +6,13 @@ import sys
 # Add the parent directory to the path so we can import main
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from main import anonymize_text_with_gemini, load_and_extract_text
+from pdf_anonymizer.main import anonymize_text_with_gemini, load_and_extract_text
 
 class TestAnonymizer(unittest.TestCase):
+    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'pdf_anonymizer', 'tests', 'data')
+    sample_pdf_path = os.path.join(data_path, 'sample.pdf')
+    output_txt_path = os.path.join(data_path, 'sample.2506.16406v1.anonymized_output.txt')
+    mapping_path = os.path.join(data_path, 'sample.2506.16406v1.mapping.json')
 
     @patch('main.genai.GenerativeModel')
     def test_anonymize_text_with_gemini(self, MockGenerativeModel):
@@ -48,7 +52,7 @@ class TestAnonymizer(unittest.TestCase):
         This test relies on the 'sample.pdf' file being present in the root directory.
         """
         # Path to the sample PDF file (assuming it's in the root of the project)
-        pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'sample.pdf')
+        pdf_path = self.sample_pdf_path
 
         # Check if the sample file exists before running the test
         if not os.path.exists(pdf_path):
@@ -60,6 +64,10 @@ class TestAnonymizer(unittest.TestCase):
         self.assertEqual(len(text_pages), 1)
         # Check if the extracted text contains the expected "Lorem ipsum"
         self.assertIn("Lorem ipsum", text_pages[0])
+
+        # check if the output file exists
+        self.assertTrue(os.path.exists(self.output_txt_path))
+        self.assertTrue(os.path.exists(self.mapping_path))
 
 if __name__ == '__main__':
     unittest.main()

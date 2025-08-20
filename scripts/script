@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Move to repo root (script is in scripts/)
+cd "$(dirname "$0")/.."
+
+# Run the anonymizer main module on the sample PDF
+# Download sample PDF from https://arxiv.org/pdf/2506.16406v1.pdf
+
+python3 -m pdf_anonymizer.main pdf_anonymizer/tests/data/2506.16406v1.pdf

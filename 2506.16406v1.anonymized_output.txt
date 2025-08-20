@@ -1,0 +1,943 @@
+arXiv:2506.16406v1 [cs.LG] 19 Jun 2025Drag-and-Drop LLMs: Zero-Shot Prompt-to-Weights
+PERSON_11∗PERSON_21PERSON_31PERSON_41PERSON_51
+PERSON_61PERSON_71PERSON_82PERSON_93PERSON_103
+PERSON_114PERSON_121PERSON_132∗PERSON_141∗
+1ORGANIZATION_1,2ORGANIZATION_2,3ORGANIZATION_3,4ORGANIZATION_4
+Abstract
+Modern Parameter-Efficient Fine-Tuning (PEFT) methods such as low-rank adap-
+tation (LoRA) reduce the cost of customizing large language models (LLMs), yet
+still require a separate optimization run for every downstream dataset. We intro-
+duce Drag-and-Drop LLMs ( DnD ), a prompt-conditioned parameter generator
+that eliminates per-task training by mapping a handful of unlabeled task prompts
+directly to LoRA weight updates. A lightweight text encoder distills each prompt
+batch into condition embeddings, which are then transformed by a cascaded hyper-
+convolutional decoder into the full set of LoRA matrices. Once trained in a diverse
+collection of prompt-checkpoint pairs, DnD produces task-specific parameters in
+seconds, yielding i) up to 12,000×lower overhead than full fine-tuning, ii) average
+gains up to 30% in performance over the strongest training LoRAs on unseen
+common-sense reasoning, math, coding, and multimodal benchmarks, and iii)
+robust cross-domain generalization despite never seeing the target data or labels.
+Our results demonstrate that prompt-conditioned parameter generation is a viable
+alternative to gradient-based adaptation for rapidly specializing LLMs. Our project
+is available at URL_1.
+1 Introduction
+Large Language Models (LLMs) such as GPT-4, Llama 2/3, Qwen2.5, and DeepSeek have rapidly
+become the backbone of contemporary natural-language processing and artificial intelligence more
+broadly, thanks to their Internet-scale pre-training and transformer architectures [ 1,18,62,35]. This
+pre-training endows a single model with broad zero-shot competence across mathematics, coding,
+reasoning, and even multimodal understanding [ 23,11,61,28]. Yet, real-world deployments rarely
+stop at zero-shot use; they demand task-specific behavior that reflects internal data, domain jargon,
+or bespoke response styles. Parameter-Efficient Fine-Tuning (PEFT) aims to satisfy this demand
+by inserting a small set of trainable weights, most prominently the low-rank adapters of LoRA [ 24].
+While LoRA allows to maintain the number of trainable parameters and storage overhead small by
+keeping the model frozen, the wall-clock cost remains very high: for example, adapting the lightest
+0.5 B-parameter Qwen2.5 with LoRA still occupies four A100 GPUs for half a day [ 62]. Moreover,
+each downstream user or dataset requires its own optimization run, which quickly becomes the
+computational bottleneck for practitioners when deploying PEFT at massive scales.
+We observe that a LoRA adapter is nothing more than a function of its training data : gradient
+descent “drags” the base weights towards a task-specific optimum (Figure 1). If that mapping from
+prompts toweights can be learned directly , we could bypass gradient descent altogether. Early
+work on parameter generation has shown that hyper-networks can synthesize billions of weights in
+minutes [ 50,42,57,48,52]. Yet they either ignore task conditioning or use simple binary embeddings.
+*PERSON_1, PERSON_13, and PERSON_14 are core contributors.
+Preprint. Under review.
+
+--- Page Break ---
+
+novel dataset 1novel model 1tuning with LLMsnovel dataset inovel model ituning with LLMs
+hours
+hours……(a) Parameter-Efficient-Fine-Tuning
+novel dataset 1novel dataset i…DnD
+novel model 1novel model i…w/o tuning
+seconds (b) Drag-and-Drop
+Figure 1: Left: Parameter-efficient methods such as LoRA need hours to optimize LLMs in order to
+adapt them to novel datasets. Right : Our method adapts LLMs by directly generating LoRA matrices
+for novel datasets in seconds without any tuning .
+Recent progress makes this goal attainable. RPG [ 58] is one of the first approaches to condition on
+task information and generate an entire classifier in a single pass, matching from-scratch training on
+previously unseen image classes in zero-shot. Translating that success to language, however, raises
+new obstacles. First, linguistic prompts carry orders of magnitude more semantic variation than the
+binary embeddings used by RPG. A practical generator must therefore ingest rich task descriptors
+and preserve their nuances. Second, an LLM in production may face hundreds of heterogeneous
+workloads, so the conditioning mechanism must scale gracefully while injecting task-specific cues
+with high fidelity. These challenges bring the need for a compact yet expressive representation that
+both captures salient features of the input texts and steers the hyper-network towards the corresponding
+region of LoRA weight space. Designing such a representation is the central challenge that our
+method, introduced next, is built to address.
+We introduce Drag-and-Drop LLMs (DnD) , a prompt-conditioned hyper-generator that converts a
+handful of unlabeled task prompts into a complete set of LoRA adapters in seconds, eliminating any
+per-task optimization. DnD employs an off-the-shelf, lightweight text encoder to compress a given
+batch of prompts into conditional embeddings, which a cascaded hyper-convolutional decoder then
+expands into LoRA updates for every transformer layer.
+On common-sense reasoning, mathematics, code-generation, and multimodal benchmarks, DnD
+cuts adaptation overhead by up to 12,000 ×while yielding up to 30% increased performance on
+unseen datasets compared with the strongest training LoRAs, and transfers seamlessly from 0.5B
+to 7B parameter backbones. By collapsing the classical “data →gradients →weights” loop into a
+single forward step, DnD challenges the notion that gradient descent is indispensable for model
+specialization and opens a new path where weights themselves become a new data modality and
+generative target conditioned on concise task descriptors.
+Our main contributions are outlined as follows:
+New LLM adaptation paradigm. We cast LoRA adaptation as direct generation of task-specific
+weights from raw prompts in a novel dataset and realize this mapping with a scalable hyper-generator,
+which is way more efficient than traditional tuning.
+Practical Architecture. A frozen text encoder coupled with a hyper-convolutional decoder is able to
+generate large scale parameters while reducing adaptation overhead by four orders of magnitude.
+Comprehensive evaluation. Experiments across reasoning, math, coding, and multimodal show
+up to 30% zero-shot gains on unseen datasets and smooth transfer across model sizes, highlighting
+DnD’s impressive efficiency and versatility.
+2 Drag-and-Drop Your LLMs
+2.1 Preliminary
+Parameter-Efficient Fine-Tuning. Parameter-Efficient Fine-Tuning (PEFT) saves training costs via
+introducing and tuning only a small number of additional parameters while keeping the original model
+weights frozen. This approach has been applied to LLMs and other foundation models, particularly
+in Low-Rank Adaptation (LoRA) manner, such as LLaMA [ 18] and Stable Diffusion [ 47]. The
+optimization process can be formulated as:
+2
+
+--- Page Break ---
+
+LLMRossettaLLMAlpacaLLMShareGPTcheckpointstuning with foundation model1.training data preparationprompt-ckptpairstext encoderlossembeddingparametergenerator2.training of DnDShareGPT
+Alpaca
+Rossetta
+datasets
+GlaiveAs
+DnDLLMGlaiveAsScience
+DnDLLMSciencein-domain dragcross-domain drag3.evaluating DnDon novel datasets  
+Figure 2: Our approach obtains dragging ability via two processes: prepare training data ( upper
+left) and training the parameter generator ( upper right ). When preparing training data, we explicitly
+pair parameters with dataset-specific conditions. During training, DnD takes condition as input and
+generate parameters, using original parameters as supervision.
+min
+A,BL(W0+BA,D), (1)
+where W0is the frozen original weight matrix, low-rank matrices B∈Rd×randA∈Rr×kwith
+r≪min(d, k)are the only trainable parameters and Drepresents the fine-tuning dataset. Based on
+Equation 1, we can conclude that LoRA uses data Das raw material and optimization as the driving
+force to obtain weight space shift ∆W=BA, thus making ∆WandDstrongly associated.
+Parameter generation. This approach treats models or trained weights as data, aiming to synthesize
+high-performing neural network parameters without conventional training. Recent advances, such as
+COND P-DIFF [ 26], RPG [ 58], SANE [ 52], and ORAL [ 27] have achieved controllable generation
+by incorporating conditioning mechanisms, allowing primitive personalized generation of parameters
+for simple datasets. The parameter generation process shares fundamental commonalities with PEFT,
+where conditions serve as raw materials and the parameter generator provides the driving force to
+produce target weights with specific properties.
+One questions remains: Can we utilize parameter generation to effectively “drag-and-drop” LLMs’
+weights towards configurations better suited for a given novel task? By “drag-and-drop”, we draw an
+analogy to our simple, tuning-free process that directly generates task-specific weights , associating it
+to the intuitive action of dragging a file and dropping it into place without further configuration.
+Key challenges. Before addressing the above question, we analyze the potential challenges.
+Challenge 1: How to equip the parameter generator with effective “drag-and-drop” ability? The
+generator should produce parameters that can effectively adapt LLMs towards specific tasks.
+Challenge 2: How to enable adaptation without task-specific training? Traditional PEFT methods
+typically require training on new tasks, but can we achieve comparable performance by directly
+generating parameters without any fine-tuning on the target task?
+Challenge 3: How to make the drag-and-drop function user-friendly and accessible? The generation
+mechanism should be simple and intuitive, enabling broader adoption and practical deployment.
+2.2 Overview of DnD
+To address the identified challenges, we present DnD as illustrated in Figure 2. As preparation, we
+first train and save LoRA adapters on various datasets. To develop the “drag-and-drop” capability,
+our approach should be aware of parameters’ correlations with datasets. Consequently, we randomly
+pair collected checkpoints with prompt batches from their training data. A pre-trained text encoder
+then extracts embeddings from the prompts and feed them to our parameter generator. The generator
+features a simple architecture of cascaded pure convolutional decoder blocks (details in Section 2.5
+and Appendix A.3). We optimize this generator using mean squared error (MSE) loss between the
+generated and original tokenized model weights. During inference, we evaluate our approach in both
+3
+
+--- Page Break ---
+
+in-domain and cross-domain scenarios: simply feeding prompts from novel datasets (not seen during
+training) to DnD to obtain tailored model parameters with one single forward pass.
+2.3 Data Preparation of DnD.
+Checkpoint collection. We collect the checkpoints across various datasets, i.e., serving as diverse
+supervisions, to equip the capability of DnD. The collection process follows previous parameter
+generation works [ 57,58]: training for specified epochs, then performing iterative fine-tuning while
+preserving checkpoints at each iteration (more details in Appendix A.1).
+The role of prompts. Recent studies [ 37,65] demonstrate that samples from different datasets
+exhibit distinct features, i.e., samples could be considered as “fingerprints” of specified datasets
+(tasks). Based on this observation, we utilize data samples (prompts) as representative proxies for
+their respective datasets (tasks). To establish data-parameter mapping, we incorporate prompts from
+the datasets used to train these checkpoints. These prompts contain dataset-specific features, enabling
+the generator to infer appropriate “dragging” directions for models across various tasks.
+Prompt-checkpoint pairing. Based on the above analysis, the next important question is: how to
+utilize these elements to equip DnD with “drag-and-drop” ability in training? Given a dataset P, we
+first divide it into non-overlapping prompt batches [p1,···, pi,···, pI]. We note the trained LLM
+checkpoints of this dataset as M= [m1,···, mj,···, mJ]. We randomly pick a batch of prompts
+and a corresponding checkpoint. The process can be formulated as,
+[p1,···, pi,···, pI]randomly pick− − − − − − − → { pi, mj}randomly pick← − − − − − − − [m1,···, mj,···, mJ], (2)
+where{pi, mj}serves as a pair for parameter generator training. Prompt piand checkpoint mjserve
+as the input and supervision, respectively.
+2.4 Prompt Embedding.
+For each batch of prompts, we employ a open-sourced text encoder to extract embeddings that serve
+as inputs for the parameter generator. This extraction process can be formally represented as:
+ci= Encoder( pi, θ), (3)
+where Encoder( ·,·)denotes the embedding extraction function parameterized by θ, andcirepresents
+the extracted embedding corresponding to prompt pi. By default, we leverage an encoder-based
+language model architecture [ 13] for prompt embedding. In the experimental section, we further
+explore and quantitatively evaluate alternative embedding approaches, including word2vec represen-
+tations [43], encoder-decoder architecture [45], and decoder-only language models [62].
+2.5 Training and Inference of DnD.
+Figure 3: Block details of parameter genera-
+tor. Each block of hyper-convolution contains
+three hyper-convolution modules, extracting
+and fusing features in different dimensions.
+More details are in Appendix A.3.
+Structure of parameter generator. Different from diffusion-based parameter generation [ 57,26,58],
+we use a hyper-convolutional decoder to learn the mapping between input prompts and parameters.
+That design mainly considers efficiency, as the decoder-only structure has shown its superiority
+in LLMs [ 1,18,62,21]. We show the block details of the decoder in the right part (Figure 3).
+We assume the dimension of input prompt embeddings is [B, N, L, C ], where B,N,L, and C
+denote batch size, length of prompt batch ( i.e., number of prompts), sequence length, and hidden
+dimension, respectively. The cascaded convolutional blocks transform prompt embeddings to match
+the dimensions of tokenized weights. Here, we refer the output of the last block as [B, N w, Lw, Cw].
+Learning objective. The learning objective is simple: we calculate the mean squared error (MSE)
+loss between the output of the last block of the parameter generator and the corresponding tokenized
+checkpoints. Similar to RPG [ 58], we tokenize each layer’s parameters into non-overlapping segments
+and apply padding, ensuring checkpoints have a consistent shape of [B, N w, Lw, Cw]. Formally, we
+write the MSE loss below,
+4
+
+--- Page Break ---
+
+prompt embeddingsparameter generator− − − − − − − − − − → LMSEtokenization [58]← − − − − − − − − − corresponding checkpoints .(4)
+Inference. We expect the parameter generator to develop effective “drag-and-drop” ability, particu-
+larly for novel datasets or tasks not encountered during training. Therefore, our evaluation primarily
+focuses on performance across novel datasets. The inference process consists of four steps: 1)
+sampling prompts from novel datasets, 2) extracting embeddings from these prompts, 3) feeding the
+embeddings into the parameter generator, and 4) evaluating the generated parameters on the novel
+datasets. To comprehensively demonstrate the “drag-and-drop” ability of our approach, we examine
+performance in both in-domain scenarios ( e.g., common sense-to-common sense) and cross-domain
+scenarios ( e.g., common sense-to-science).
+3 Experiments
+3.1 Implementation Details
+We choose MODEL_1 [ 62] series as foundation model and conduct experiments on common sense
+reasoning, coding, math, and multimodal tasks. The details of involved model sizes and datasets for
+each task are listed in the table below. The default text encoder is MODEL_2 [ 46], and length of
+prompt batch is set to 128, 64, 64 and 32 for common sense reasoning, math, coding, and multimodal
+task, respectively. For other hyper-parameter settings, please refer to Appendix A.1.
+task #model size (B) datasets
+common sense 0.5 DATASET_1 [10], DATASET_2 [10], DATASET_3 [9], DATASET_4 [40],
+DATASET_5 [64], DATASET_6 [5], DATASET_7 [49]
+coding 1.5, 7 DATASET_8 [39], DATASET_9 [17],
+DATASET_10 [15], DATASET_11 [2], DATASET_12 [12],
+DATASET_13 [14], DATASET_14 [7]
+math 1.5 DATASET_15 [23], DATASET_16 [3], DATASET_17 [44]
+DATASET_18 [55], DATASET_19 [63], DATASET_20 [41]
+multimodal 3 DATASET_21 [54]
+3.2 Common Sense Reasoning
+Evaluating setting. We employ LoRA [ 24] to fine-tune MODEL_1-0.5B on seven common sense
+reasoning datasets and save the checkpoints as training data. In every column of Table 1, we use the
+specified dataset as test set ( i.e., not used in training) and train PROJECT_1 on other datasets’ LoRAs.
+method \ test set DATASET_1 DATASET_4 DATASET_2 DATASET_6 DATASET_5 DATASET_3 DATASET_7
+training LoRAs 37.5 30.2 39.5 40.5 22.4 13.5 38.8
+PROJECT_1 68.6 40.8 51.6 87.9 25.9 44.9 50.0
+average accuracy improvement: 21.0 on training LoRAs
+Table 1: Generalization on novel (test) datasets . Our approach significantly outperforms LoRAs
+used in training in terms of accuracy (%) across allunseen datasets. Bold entries are the best results.
+Analysis. We report the average accuracy of training LoRAs and our generated ones in Table 1.
+Several observations can be made from these results: i) Our method consistently outperforms LoRAs
+used for training on unseen datasets, indicating it manages to drag-and-drop LLM parameters to
+task-specific distribution specified via condition. ii) This drag-and-drop ability holds across different
+datasets, showing strong robustness towards various data inspirations.
+testset training LoRAs PROJECT_1 improvement ( ↑)
+science 35.6 45.3 8.7
+Table 2: Our approach also succeeds on cross-
+domain scenario ( i.e., both novel data and task).Cross-domain Drag-and-Drop. To further ex-
+plore PROJECT_1’s zero-shot ability, we not only use
+in-domain novel datasets in inference, but also
+test it on cross-domain task. In this part, we
+use the checkpoint trained on common sense
+reasoning tasks and feed it with prompts from
+science-dataset [ 33]. The generated parameters are compared with training LoRAs on the science
+dataset. From Table 2, we can observe that PROJECT_1 surpasses its training LoRAs’ average accuracy,
+5
+
+--- Page Break ---
+
+indicating our method manages to drag-and-drop LLMs for cross-domain tasks ( i.e., from common sense reasoning to science).
+method \ taskCoding (DATASET_22) Math Multimodal
+pass@1 pass@5 pass@10 DATASET_23 DATASET_16 DATASET_24 DATASET_25
+training LoRAs 17.6 28.6 33.2 42.9 14.8 23.0 61.5
+PROJECT_1 32.7 55.3 64.1 66.3 23.9 24.3 62.3
+improvement ( ↑) 15.1 26.7 30.9 23.4 9.1 1.3 0.8
+Table 3: PROJECT_1 can generate parameters for more complex tasks like math, code and multimodal
+question answering. Our method continues to show strong zero-shot ability on these tasks.
+3.3 Generalization to coding, math, and multimodal tasks
+To further validate our method’s applicability in more complex scenarios, we also employ PROJECT_1 for
+coding, math, and multimodal tasks. The empirical results and findings are as belows.
+Coding. Similar to common sense reasoning task, we use LoRA to fine-tune MODEL_3 on seven
+coding datasets and save the checkpoints as training data. Evaluation is carried out on DATASET_22 [ 8]
+benchmark using pass@k [ 32] score (k = 1, 5, 10). Note that neither LoRA fine-tuned models nor
+PROJECT_1 has seen any samples of the benchmark in their training . Therefore, we directly test training
+LoRAs and our synthesized ones on DATASET_22. From Table 3, we can draw some findings: i) Our
+method yields promising results, with improvement over average pass@1 = 15.1, pass@5 = 26.7,
+pass@10 = 30.9 . ii) Despite training LoRAs perform poorly on the test set, PROJECT_1 still obtains good
+performance. This means instead of memorizing parameters seen in training, it learns to fit novel
+datasets given condition as inspirations .
+Math. We fine-tune MODEL_3 on six math datasets and save the checkpoints. We adopt
+DATASET_23 [ 11] and DATASET_16 [ 23] as our benchmarks and accuracy as evaluation metrics. Results listed
+in Table 3 show commonalities with those regarding common sense reasoning and coding tasks,
+underscoring the superiority of our method across a wide range of scenarios.
+Multimodal. The above results confirm our method’s effectiveness in text modality. In the following,
+we explore its greater potential by pacing towards other modalities. We fine-tune MODEL_4 [ 4]
+on DATASET_21 [ 54], save the checkpoints, and evaluate using DATASET_24 [ 59] and DATASET_25 [ 38].
+Results in Table 3 show that PROJECT_1 perform well in multimodal tasks, revealing that our method can
+be adapted to modalities other than texts and has promising application potential.
+Takeaway: Based on the above results and comparisons, PROJECT_1 is a high-performing zero-shot learner
+with strong robustness and wide applicability, as reflected by the significant improvements compared
+to its training data and its promising performance across various scenarios . In the following, we
+continue to explore more interesting features of our proposed approach.
+3.4 Ablation Studies
+This section mainly aims at exploring a series of interesting features about our approach. For those
+exploring various settings in our experiment, we report them in Appendix B.3 for thoroughness. If
+not stated, we use DATASET_2 as the test set and other common sense reasoning datasets for training.
+What types of data will help Drag-and-Drop LLMs better? As introduced in Section 2.3, we use
+prompts as conditions to inspire PROJECT_1. Can this drag-and-drop ability holds when condition types
+changes ( e.g., answers)? We carry out ablation studies by changing condition types as prompt, prompt
++ answer and their mixture (prompt : answer=4 : 1) and report the results in Table 4a.
+It can be observed that the prompt + answer group surprisingly lead to poor performance. We
+conclude that it is because answers in common sense reasoning datasets lack diversity ( i.e., A/B/C/D)
+and combining them with prompts may detriment dataset-specific representations. This shall hinder
+generator to distinguish different datasets and generate specific parameters. Consequently, we advise
+not to use answer alone as inspirations. However, conclusions may be different for some tasks where
+answers are more complicated and diverse and we show the results on these tasks in Appendix B.3.
+How does the choice of condition extractor affect PROJECT_1’s performance? Our default condition
+extractor is MODEL_2 [ 46], yet it is interesting to explore other models’ potentials.
+
+--- Page Break ---
+
+condition type accuracy
+prompt 51.6
+prompt + answer 27.0
+mix 49.7
+training LoRAs 39.5
+(a)Condition types. Pure prompts
+used as inspirations yield the best
+results compared to other formats.condition extractor accuracy
+MODEL_6 50.8
+MODEL_2 51.6
+MODEL_7 50.2
+MODEL_5 fail
+(b)Extractor structure. Several
+encoder-based extractors perform
+better than decoder-only ones.dataset arrangement improves.
+6∈train, 1 ∈test 12.1
+4∈train, 3 ∈test 11.4
+3∈train, 4 ∈test 0.8
+2∈train, 5 ∈test -1.4
+(c)Train-test set arrangements.
+More diverse training data intro-
+duces higher improvements.
+Table 4: Ablation studies about condition types, condition extractor’s type, and train-test set arrange-
+ment. This series of explorations validate several designs of PROJECT_1.
+thorough comparisons, we include classical word2vector method MODEL_6 [ 43], the default encoder-only
+MODEL_2 [46], encoder-decoder model MODEL_7 [45] and decoder-only MODEL_5 [62].
+Results in Table 4b reveal several insights: i) Even traditional methods such as MODEL_6 can help PROJECT_1
+to obtain promising result, indicating our method can fit plenty of text encoders. ii) MODEL_5
+performs not as good as expect, which has two possible causes: First, its heaviness limits the number
+of conditions paired with parameters per iteration, leading to poor awareness of novel datasets.
+Similar conclusions can be drawn from our experiments in Appendix B.3. Second, MODEL_5’s
+decoder-only architecture may constraint conditions’ diversity, since it encodes prompts to answers.
+What property of training data equips our method with drag-and-drop ability? By default, we
+train on several datasets and test on 1 novel dataset. In this part, we explore PROJECT_1’s robustness by
+shrinking the number of train sets and test on more datasets. Train-test set arrangements are: 6-1,
+4-3, 3-4 and 2-5. Generated parameters are compared with training LoRAs’ average accuracy on the
+unseen datasets and their average improvements in accuracy are reported in Table 4c.
+It can be observed that: i) Generally, more training datasets lead to better performance improvement.
+This is expected since more data ensures better coverage of condition-parameter correlations and
+lead to better robustness for novel data. ii) PROJECT_1 fails to drag-and-drop LLMs to novel datasets when
+training samples are few. As datasets used for training lessen, the average improvement of PROJECT_1 drops
+accordingly. It hardly improves over training LoRAs for the 2-5 case. We can conclude that basic
+amount of training samples are needed for PROJECT_1 to learn condition-parameter correlations.
+testset \ method foundation LLM PROJECT_1 improves. ( ↑)
+DATASET_2 38.3 51.6 13.3
+DATASET_22 32.3 64.1 31.8
+DATASET_23 64.4 66.3 1.9
+DATASET_24 22.7 24.3 1.6
+Table 5: PROJECT_1 surpasses foundation LLMs across
+various tasks, showing the “drag-and-drop” effect.How does PROJECT_1’s performance compared with
+foundation LLMs? Given massive pretraining
+LLMs often take, fine-tuning on a small down-
+stream dataset may detriment their zero-shot per-
+formance on novel test sets. Aware of this phe-
+nomenon, we compare PROJECT_1 generated weights’
+performance with foundation LLMs across all
+tasks involved in our experiment. Specifically,
+for foundation LLMs, we adopt MODEL_8
+for common sense reasoning, MODEL_3 for math and coding, and MODEL_4 for multimodal task.
+Results in Table 5 again show our approach’s superiority: PROJECT_1 outperforms foundation LLMs across
+all tasks. Its “drag-and-drop” ability can generate task-specific parameters, with performance better
+than foundation LLMs that go through abundant pretraining.
+3.5 Open Explorations and Analysis
+Condition-Parameter Pairing. In this part, we explore other pairing strategies’ influence on
+performance than that introduced in Section 2.3. We test 2 condition pairing strategies:
+•Strategy 1: We fix the total number of prompts to be 128, 256, 512, 1024, 2048, 5000 and
+use all those prompts to pair with parameters every iteration ( x←x).
+•Strategy 2: We fix the length of prompt batch to be 128 in every iteration and randomly
+picks these prompts from 128, 256, 512, 1024, 2048, 5000 candidate prompts ( 128←x).
+Based on the results in Figure 4a, we can draw several conclusions: i) With limited number of
+conditions, PROJECT_1 fails to generalize over novel data, since it can hardly learn comprehensive knowledge
+about condition-parameter mapping’s landscape. ii) As number of condition increases, Strategy 2 ’s
+performance skyrockets since PROJECT_1 is exposed to sufficient condition-parameter pairs. This indicates
+Strategy 2 may help PROJECT_1 to converge efficiently. iii) Strategy 1 needs more conditions to reach
+7
+
+--- Page Break ---
+
+x=128x=256x=512x=1024x=5000010203040506070accuracy (%)
+1 246
+out of memory
+out of memory 12648 4951strategy1:xx
+strategy2:128x
+(a) Random selection and pairing
+is better than using the same condi-
+tions for all parameters.
+performance overhead020406080accuracy (%)51
+4155PROJECT_1
+full-shot
+full-shot (more iteration)
+05001.0K1.5K2.0K
+overhead (s)
+0.12501200
+2.5~12K x faster(b) PROJECT_1 can reach comparable or
+even better performance than full-
+shot while being 2.5 ∼12K×faster.
+1 16 64 25620304050accuracy (%)
+PROJECT_1: acc=51.6%, overhead=0.11s
+saving 120~60000x overhead
+FS acc.
+ICL acc.
+PROJECT_1FS overhead
+ICL overhead
+02K4K6K8K
+overhead (s)
+12 16 56 204 2605968646056(c) PROJECT_1 outperforms popular few-
+shot tuning and ICL before 256
+shots while avoiding using answers.
+Figure 4: Explorations about PROJECT_1’s condition-parameter pairing strategy, compare PROJECT_1 with state-
+of-the-art methods, and its superiority over few-shot tuning and in-context learning.
+comparable performance as Strategy 2 . With large number of conditions, Strategy 1 suffers from
+out of memory issues. The same-condition-per-parameter strategy may hinder PROJECT_1 to associate
+conditions with specific datasets. Conclusively, Strategy 2 is superior than Strategy 1 both in model
+generality, convergence speed, and memory consumption. These conclusions are consistent with
+findings in Table 4c: Diversity of training data equips our method with drag-and-drop ability .
+PROJECT_1 vs full-shot tuning. In this part, we compare PROJECT_1 with full-shot tuning in accuracy and overhead.
+Specifically, we test DATASET_2 tuned METHOD_1’s ( ≈75 iterations for DATASET_2, detailed in Appendix A.4)
+full-shot performance using DATASET_2’s test set. Since METHOD_1’s performance might improve with more
+iterations, we fine-tune METHOD_1 on DATASET_2 for 300 iterations and test its performance as well. These
+results are compared with zero-shot PROJECT_1 in Figure 4b: i) using mild tuned checkpoints for training,
+PROJECT_1 already yields better results than full-shot tuning. This showcases PROJECT_1’s impressive zero-shot
+ability even surpasses full-shot tuning . ii) PROJECT_1 is incredibly efficient, with better performance than
+full-shot tuning while being 2500×faster. Moreover, as training continues, though full-shot prevails,
+our method shows minimal performance gap with it while being 12,000 ×more efficient.
+Efficiency analysis of PROJECT_1. In additional to full-shot tuning, in-context learning (ICL) and few-shot
+tuning (FS) are also popular methods in LLM fine-tuning. In Figure 4c, we conduct experiments
+investigating the performance-efficiency trade-off of them. Several observations can be drawn: i)
+Both ICL and FS’ results are poor when shots are few, but their overhead rises as shots increase. ii)
+PROJECT_1 can reach better performance than FS and ICL before 256 shots with negligible overhead. iii)
+It is noteworthy that both few-shot and ICL use answers for instructing the LLM to obtain better
+performance. On the contrary, PROJECT_1 relies on only 128 unlabeled prompts. Based on the above results,
+we anticipate PROJECT_1 is a powerful and efficient zero-shot learner .
+testset \ method training METHOD_1 PROJECT_1 improves ( ↑)
+DATASET_26 13.0 33.3 20.3
+DATASET_23 65.9 83.1 17.2
+Table 6: PROJECT_1 scales well with larger 7B foundation
+models, and maintains strong performance in more
+complex benchmark DATASET_26.Scalability of PROJECT_1. In this part, we explore
+PROJECT_1’s scalability. Since common sense reason-
+ing is simple and 0.5B model suffices, we fo-
+cus on math and coding tasks while increasing
+foundation model size from 1.5B to 7B. We use
+original math and coding datasets in Section 3.3,
+evaluate using DATASET_23 for math and more diffi-
+cult benchmark DATASET_26 [ 25] for coding. We report accuracy on math task and pass@1 for
+coding in Table 6. It can be observed that: i) PROJECT_1 consistently surpasses training METHOD_1 in both
+tasks under 7B model setting, underscoring its eminent scalability for larger foundation LLMs. ii)
+With more difficult coding benchmark, PROJECT_1 maintains superior performance with training METHOD_1,
+i.e., improvement over average pass@1 = 20.3 . It reveals PROJECT_1’s capacity for generalizing to more
+complex benchmarks, showing promising application potential and robustness.
+DATASET_1 DATASET_4 DATASET_3 DATASET_7 DATASET_6 DATASET_5 DATASET_220406080100accuracy (%)close-set tests open-set test
+67
+444681
+3051
+4673
+51
+25
+4 450
+2169
+5164
+383651 51base METHOD_2 PROJECT_1
+Figure 5: PROJECT_1 and METHOD_2 perform well in most close-set tests.
+However, METHOD_2 can hardly generate parameters for novel dataset
+while PROJECT_1 still presents strong zero-shot ability on open-set test.Comparisons with previous
+methods. We compare our
+method with most recent parame-
+ter generation method METHOD_2 [ 58].
+We explore both methods’ perfor-
+mance in two scenarios: Close
+set generation: generate param-
+eters seen in training. Open set
+generation: generate parameters
+for unseen datasets. Figure 5 shows both methods work well on close set generation, but METHOD_2 fails on
+8
+
+--- Page Break ---
+
+open set generation, showing that our designs (prompts as conditions, condition-parameter pairing)
+have certain robustness and generality towards novel datasets.
+Acc: 49.7% - 51.3%Acc: 47.6% - 50.1%Acc: 24.5% - 27.3%Acc: 19.1% - 46.7% Acc: 49.4% -51.6%
+Acc: 40.1% -40.7%
+training METHOD_1 (except DATASET_2)
+full-shot training on DATASET_2
+PROJECT_1 generated DATASET_2
+Figure 6: PROJECT_1 generates parameters with close distribution to
+original ones in the weight space and promising performance.Visualization for the effect of
+drag-and-drop. In this part, we
+visualize original and generated
+parameters in Figure 6. It can
+be seen that original parameters
+exhibit diverse patterns in the
+weight space, forming different
+clusters. Moreover, even param-
+eters close to those tuned on the
+target dataset ( i.e., DATASET_2) can
+have large performance gap ( i.e.,
+19.1% compared with 40.7%).
+After training on these models
+that have distinct features, PROJECT_1
+can generate parameters for the target dataset in a zero-shot manner. The generated parameters are
+close to the original ones in the weight space and with even superior performance than full-shot
+tuning ( i.e., 51.6% compared with 40.7%). This brings the “drag-and-drop” effect to life.
+4 Related Works
+Parameter-Efficient-Fine-Tuning (PEFT). LLMs’ size rapidly scales up in the 2020s, making
+full parameter fine-tuning infeasible. To address this, Low-Rank Adaptation (METHOD_1) [ 24] has
+been proposed, leveraging LLMs’ inherent sparsity and substantially reduces fine-tuning costs by
+optimizing two low rank matrices instead of the original weights. Multiple variants of METHOD_1 emerge
+afterwards, such as METHOD_3 [ 36], METHOD_4 [ 22], METHOD_5 [ 30], and METHOD_6 [ 56]. However, all of them
+have one potential flaw: they requires tuning model parameters for every novel dataset, therefore
+lacks generality. This can still induce extra costs as model size enlarges and training data increases.
+Parameter generation. Parameter generation trains on model checkpoints and aims at generate
+high-performing parameters, both seen and unseen in training. Previous works [ 6,19,29,16] focuses
+on learning distributions over the parameters, yet struggle to reconstruct original models’ performance.
+With the development of diffusion models, METHOD_7 [ 50,51,53] and METHOD_8 [ 57], use
+the latent diffusion architecture to generate high-performing parameters. Armed with MODEL_9 [ 20] and
+appropriate tokenization strategy, METHOD_2 [ 58] can generate 200M of parameters in minutes. Regarding
+conditional generation, METHOD_9 [ 26], METHOD_10 [ 34] and METHOD_11 [ 27] explores text-controlled
+parameter generation method. METHOD_2 even generate parameters for novel datasets on binary embedding
+classification task for DATASET_27 [ 31]. However, these methods can hardly keep promising zero-shot
+ability on more complex tasks, hindering parameter generation’s greater potential. On the other hand,
+our method use prompts in novel datasets as conditions, captures parameters’ relations with datasets
+better, and is able to generate competent parameters for novel datasets.
+5 Discussion and Conclusion
+PEFT offers an efficient solution to reduce costs when customizing LLMs/VLLMs for downstream
+tasks, yet it is still expensive when models are large and tasks are diverse. In our study, we train a
+parameter generator to map prompt-weight pairs, which can produce customized weights for novel
+tasks by processing unlabeled task prompts. Notably, our approach can transform unlabeled task
+prompts directly to METHOD_1 weights update in seconds . This prompt-to-weight paradigm, which can
+generate task-specific weights without further tuning , sheds lights on a promising new direction for
+efficient LLM and VLLM customization.
+Previous research [ 50,57,58] and our approach demonstrate that neural network weights can be
+effectively synthesized. It appears that network parameters can be viewed as a new form of data
+modality. To excavate this emerging field’s potential, several challenges remain to be tackled. First,
+scaling parameter generation to larger models (7B-70B parameters) requires novel architectural
+and algorithmic advances. Second, leveraging existing pre-trained checkpoints from the Internet
+could enhance the practicality of parameter generators. Third, generating structurally diverse models
+adaptable to various hardware configurations would improve deployment flexibility.
+9
+
+--- Page Break ---
+
+
+Ackonwledgement. We sincerely appreciate PERSON_15, PERSON_16, PERSON_17, PERSON_18,
+PERSON_19, PERSON_20, PERSON_21, PERSON_22, PERSON_23, and PERSON_24 for valuable
+discussions and feedbacks during this work.
+References
+[1]PERSON_25, PERSON_26, PERSON_27, PERSON_28, PERSON_29, PERSON_30,
+PERSON_31, PERSON_32, PERSON_33, PERSON_34, et al. MODEL_10
+technical report. ARXIV_ID_1 , 2023.
+[2] PERSON_35 2023. REPO_1. DATASET_11, 2023.
+[3]PERSON_36, PERSON_37, PERSON_38, PERSON_39, PERSON_40, and PERSON_41.
+DATASET_16: Towards interpretable math word problem solving with operation-based
+formalisms. In CONFERENCE_1 , 2019.
+[4]PERSON_42, PERSON_43, PERSON_44, PERSON_45, PERSON_46, PERSON_47, PERSON_48, PERSON_49,
+PERSON_50, PERSON_51, et al. MODEL_4 technical report. ARXIV_ID_2 ,
+2025.
+[5]PERSON_52, PERSON_53, PERSON_54, PERSON_40, et al. DATASET_6: Reasoning about physical
+commonsense in natural language. In CONFERENCE_2 , 2020.
+[6] PERSON_55 et al. Stochastic gradient learning in neural networks. CONFERENCE_3 , 1991.
+[7]PERSON_56. MODEL_11: An instruction-following llama model for code generation.
+URL_2 , 2023.
+[8]PERSON_57, PERSON_58, PERSON_59, PERSON_60, PERSON_61, PERSON_62,
+PERSON_63, PERSON_64, PERSON_65, PERSON_66, et al. Evaluating large
+language models trained on code. ARXIV_ID_3 , 2021.
+[9]PERSON_67, PERSON_68, PERSON_69, PERSON_70, PERSON_71, and
+PERSON_72. DATASET_3: Exploring the surprising difficulty of natural yes/no questions. In
+CONFERENCE_1 , 2019.
+[10] PERSON_73, PERSON_74, PERSON_75, PERSON_76, PERSON_77, PERSON_78,
+and PERSON_79. Think you have solved question answering? try DATASET_28, the ORGANIZATION_5 reasoning
+challenge. ARXIV_ID_4 , 2018.
+[11] PERSON_80, PERSON_81, PERSON_82, PERSON_57, PERSON_59, PERSON_83,
+PERSON_84, PERSON_58, PERSON_85, PERSON_86, et al. Training verifiers to
+solve math word problems. ARXIV_ID_5 , 2021.
+[12] DATASET_12. DATASET_12 — DATASET_12,, 2022. [Online; accessed 8-December-2022].
+[13] PERSON_87, PERSON_69, PERSON_68, and PERSON_72. MODEL_12: Pre-training of
+deep bidirectional transformers for language understanding. In CONFERENCE_1 , 2019.
+[14] PERSON_88. DATASET_13. DATASET_13, 2023.
+[15] PERSON_88. REPO_2. DATASET_10, 2024.
+[16] PERSON_89 and PERSON_90. Dropout as a bayesian approximation: Representing model
+uncertainty in deep learning. In CONFERENCE_4 , 2016.
+[17] ORGANIZATION_6. REPO_3. DATASET_9, 2024.
+[18] PERSON_91, PERSON_92, PERSON_93, PERSON_94, PERSON_95,
+PERSON_96, PERSON_97, PERSON_98, PERSON_99, PERSON_100, et al. The MODEL_13
+herd of models. ARXIV_ID_6 , 2024.
+[19] PERSON_101. Practical variational inference for neural networks. CONFERENCE_5 , 2011.
+10
+
+
+--- Page Break ---
+
+
+[20] PERSON_102 and PERSON_103. MODEL_9: Linear-time sequence modeling with selective state spaces. In
+CONFERENCE_6 , 2024.
+[21] PERSON_104, PERSON_105, PERSON_106, PERSON_107, PERSON_108, PERSON_109, PERSON_110,
+PERSON_111, PERSON_112, PERSON_113, et al. MODEL_14: Incentivizing reasoning capability in
+llms via reinforcement learning. arXiv preprint ARXIV_ID_7 , 2025.
+[22] PERSON_114, PERSON_115, and PERSON_116. METHOD_4: Efficient low rank adaptation of large
+models. In CONFERENCE_4 . ORGANIZATION_7, 2024.
+[23] PERSON_117, PERSON_118, PERSON_119, PERSON_120, PERSON_121, PERSON_122, PERSON_123,
+and PERSON_124. Measuring mathematical problem solving with the DATASET_29. In
+CONFERENCE_5 , 2021.
+[24] PERSON_125, PERSON_126, PERSON_127, PERSON_128, PERSON_129, PERSON_130, PERSON_131,
+et al. METHOD_1: Low-rank adaptation of large language models. In CONFERENCE_7 , 2022.
+[25] PERSON_132, PERSON_133, PERSON_134, PERSON_135, PERSON_136, PERSON_137, PERSON_138, PERSON_139, PERSON_140, and PERSON_141. DATASET_26: Holistic and contamination
+free evaluation of large language models for code. In CONFERENCE_7 , 2024.
+[26] PERSON_142, PERSON_14, PERSON_2, PERSON_6, PERSON_143, PERSON_144, and PERSON_12.
+Conditional METHOD_1 parameter generation. arXiv preprint ARXIV_ID_8 , 2024.
+[27] PERSON_145, PERSON_2, PERSON_146, PERSON_14, and PERSON_147.
+METHOD_11: Prompting your large-scale METHOD_1 via conditional recurrent diffusion. arXiv preprint
+ARXIV_ID_9 , 2025.
+[28] PERSON_148, PERSON_149, and PERSON_150. MODEL_15: Vision-and-language transformer without
+convolution or region supervision. In CONFERENCE_4 , 2021.
+[29] PERSON_151 and PERSON_152. Auto-encoding variational bayes. arXiv preprint
+ARXIV_ID_10 , 2013.
+[30] PERSON_153, PERSON_154, and PERSON_155. METHOD_5: Vector-based random
+matrix adaptation. In CONFERENCE_7 , 2024.
+[31] PERSON_156 et al. Learning multiple layers of features from DATASET_30. 2009.
+[32] PERSON_157, PERSON_158, PERSON_159, PERSON_160, PERSON_161, PERSON_162, and
+PERSON_163. PROJECT_2: Search-based pseudocode to code. In CONFERENCE_5 , 2019.
+[33] PERSON_164. REPO_4. , 2023.
+[34] PERSON_21, PERSON_165, and PERSON_166. PROJECT_3: Text-conditioned neural network diffusion
+for train-once-for-all personalization. arXiv preprint ARXIV_ID_11 , 2024.
+[35] PERSON_167, PERSON_168, PERSON_169, PERSON_170, PERSON_171, PERSON_172, PERSON_173,
+PERSON_174, PERSON_175, PERSON_176, et al. MODEL_16 technical report. arXiv preprint
+ARXIV_ID_12 , 2024.
+[36] PERSON_177, PERSON_178, PERSON_179, PERSON_180, PERSON_181,
+PERSON_182, and PERSON_183. METHOD_3: Weight-decomposed low-rank adaptation. In
+CONFERENCE_4 , 2024.
+[37] PERSON_184 and PERSON_185. A decade’s battle on dataset bias: Are we there yet? In CONFERENCE_7 ,
+2025.
+[38] PERSON_186, PERSON_187, PERSON_188, PERSON_189, PERSON_190, PERSON_41, PERSON_191,
+PERSON_192, PERSON_193, and PERSON_54. DATASET_25: Evaluating mathematical
+reasoning of foundation models in visual contexts. In CONFERENCE_7 , 2024.
+[39] PERSON_194, PERSON_195, PERSON_196, PERSON_197, PERSON_198, PERSON_199, PERSON_200, PERSON_201,
+PERSON_202, and PERSON_203. MODEL_17: Empowering code large language models
+with METHOD_12. In CONFERENCE_7 , 2024.
+11
+
+
+--- Page Break ---
+
+[40] PERSON_204, PERSON_73, PERSON_76, and PERSON_77. Can a suit of armor conduct
+electricity? a new dataset for open book question answering. In CONFERENCE_8 , 2018.
+[41] ORGANIZATION_8. DATASET_20. DATASET_20, 2023.
+[42] PERSON_205, PERSON_206, PERSON_207, PERSON_208, and PERSON_209. Learning
+to learn with generative models of neural network checkpoints. arXiv preprint ARXIV_ID_13 ,
+2022.
+[43] PERSON_210, PERSON_211, and PERSON_212. MODEL_6: Global vectors for
+word representation. In CONFERENCE_8 , 2014.
+[44] ORGANIZATION_9. DATASET_17. DATASET_17, 2023.
+[45] PERSON_213, PERSON_214, PERSON_215, PERSON_216, PERSON_217, PERSON_218,
+PERSON_219, PERSON_220, and PERSON_221. Exploring the limits of transfer learning with a unified
+text-to-text transformer. JOURNAL_1 , 21(140):1–67, 2020.
+[46] PERSON_222 and PERSON_223. MODEL_2: Sentence embeddings using siamese bert-
+networks. In CONFERENCE_8 , 2019.
+[47] PERSON_224, PERSON_225, PERSON_226, PERSON_227, and PERSON_228.
+High-resolution image synthesis with latent diffusion models. In CONFERENCE_9 , 2022.
+[48] PERSON_229, PERSON_230, PERSON_231, PERSON_232, PERSON_233, PERSON_234, PERSON_235,
+PERSON_236, and PERSON_237. PROJECT_4: Hypernetworks for fast
+personalization of text-to-image models. In CONFERENCE_9 , 2024.
+[49] PERSON_238, PERSON_239, PERSON_240, and PERSON_40. DATASET_7: An
+adversarial winograd schema challenge at scale. In CONFERENCE_2 , 2020.
+[50] PERSON_9, PERSON_241, PERSON_242, and PERSON_10. METHOD_7
+for pre-training and transfer learning. In CONFERENCE_5 , 2022.
+[51] PERSON_9, PERSON_241, PERSON_242, and PERSON_10. METHOD_7
+for pre-training and transfer learning. arXiv preprint ARXIV_ID_14 , 2022.
+[52] PERSON_9, PERSON_243, and PERSON_10. Towards scalable and versatile
+weight space learning. CONFERENCE_4 , 2024.
+[53] PERSON_9, PERSON_243, and PERSON_10. Towards scalable and versatile
+weight space learning. arXiv preprint ARXIV_ID_15 , 2024.
+[54] PERSON_244, PERSON_245, PERSON_246, PERSON_247, PERSON_248, PERSON_249, PERSON_250, and
+PERSON_251. MODEL_18: Bootstrapping mathematical reasoning for multimodal large language
+models. In CONFERENCE_8 , 2024.
+[55] ORGANIZATION_10. DATASET_18. DATASET_18, 2023.
+[56] PERSON_252, PERSON_253, PERSON_254, and PERSON_255. METHOD_6: Parameter-
+efficient tuning of pre-trained models using dynamic search-free low-rank adaptation. In CONFERENCE_10,
+2023.
+[57] PERSON_14, PERSON_2, PERSON_256, PERSON_257, PERSON_258, PERSON_143, PERSON_259, PERSON_260, PERSON_184,
+and PERSON_12. Neural network diffusion. arXiv preprint ARXIV_ID_16 ,
+2024.
+[58] PERSON_14, PERSON_2, PERSON_6, PERSON_9, PERSON_13, and PERSON_12. Recurrent diffusion for large-scale parameter generation. arXiv preprint ARXIV_ID_17 ,
+2025.
+[59] PERSON_261, PERSON_262, PERSON_263, PERSON_264, PERSON_265, PERSON_266, PERSON_267, and
+PERSON_268. Measuring multimodal mathematical reasoning with DATASET_24. In
+CONFERENCE_5 , 2024.
+12
+
+--- Page Break ---
+
+[60] PERSON_269, PERSON_270, PERSON_271, PERSON_272, PERSON_273, PERSON_274, and PERSON_41. Self-instruct: Aligning language models with self-generated instruc- tions. In CONFERENCE_10, pages 13484–13508, 2023.
+[61] PERSON_275, PERSON_276, PERSON_277, PERSON_278, PERSON_279, PERSON_280, PERSON_281, PERSON_282, et al. Chain-of-thought prompting elicits reasoning in large language models. In CONFERENCE_5 , 2022.
+[62] PERSON_283, PERSON_284, PERSON_285, PERSON_286, PERSON_287, PERSON_288, PERSON_289, PERSON_290, PERSON_291, PERSON_292, et al. MODEL_1 technical report. arXiv preprint ARXIV_ID_18 , 2024.
+[63] PERSON_293, PERSON_294, PERSON_295, PERSON_296, and PERSON_297. PROJECT_5: Combin- ing tool-use large language models with multi-perspective data augmentation for mathematical reasoning. arXiv preprint ARXIV_ID_19 , 2024.
+[64] PERSON_53, PERSON_298, PERSON_52, PERSON_299, and PERSON_40. DATASET_5: Can a machine really finish your sentence? In CONFERENCE_10, 2019.
+[65] PERSON_256, PERSON_257, and PERSON_184. Understanding bias in large-scale visual datasets. In CONFERENCE_5 , 2024.
+13
+
+--- Page Break ---
+
+We organize our appendix as follows.
+Hyper-parameter Settings
+Section A.1: Training Recipe.
+Section A.2: Description of Datasets.
+Section A.3: Detailed Structure of Hyper-Convolutional Decoder.
+Additional Experiment Results
+Section B.1: More Results of Common Sense Reasoning, Math, and Coding.
+Section B.2: Inference Efficiency Analysis.
+Section B.3: More Ablation Studies.
+A Hyper-parameter Settings
+A.1 Training Recipe
+In this section, we provide details of our training recipe and various hyper-parameter settings. We
+incorporate multiple tasks in language models, each involves different foundation model sizes,
+different generator architecture, and training schedules. We report settings for every task in Table 7.
+training setting common sense coding math multimodal
+batch size 128 (0.5B) 128 (1.5B), 48 (7B) 128 (1.5B), 48 (7B) 64 (3B)
+optimizer AdamW AdamW AdamW AdamW
+learning rate 3e-5 3e-5 3e-5 3e-5
+length of prompt batch 128 16 32 16
+training step 5,000 5,000 5,000 5,000
+weight decay 0.1 0.1 0.1 0.1
+max grad norm 1.0 1.0 1.0 1.0
+noise aug. amplitude 1e-4 1e-4 1e-4 1e-4
+Table 7: Training recipe for different tasks in Section 3.2 and Section 3.3.
+Length of prompt batch. It has been introduced in Section 2.3 that every parameter is grouped with
+certain amount of texts each iteration. Due to the length of prompt in different datasets varies and
+induces variable training costs, the length of prompt batch also varies.
+A.2 Description of Datasets
+In this section, we introduce the datasets used in the paper, including those for common sense
+reasoning, math, coding, and multimodal tasks.
+Common sense reasoning. DATASET_28 [ARXIV_ID_4] contains grade-school level, multiple-choice science
+questions and is splited into easy and challenge sets. DATASET_4 [ARXIV_ID_3] aims to promote research in
+advanced question-answering with salient facts summarized as an open book. DATASET_6 [ARXIV_ID_2] focuses
+on everyday situations with a preference for atypical solutions. DATASET_5 [ARXIV_ID_6] instructs models
+to select from choices that best finish the sentence among ground truth and an adversarial set of
+machine-generated wrong answers. DATASET_7 [ARXIV_ID_18] features a fill-in-a-blank task with binary
+options for commonsense reasoning questions. DATASET_3 [ARXIV_ID_8] is a question answering dataset for yes/no
+questions containing various factual problems.
+Coding. DATASET_8 [ARXIV_ID_12] contains evolutionary prompts tailored for code-related tasks and
+incorporates code debugging and time-space complexity constraints. DATASET_9 [ARXIV_ID_15] is a
+dataset of code problems and solutions generated using ORGANIZATION_6’s synthetic data generation platform.
+DATASET_10 [ARXIV_ID_9] is a cleaned Python dataset covering instructional tasks. DATASET_11 [ARXIV_ID_1]
+consists of conversations along with detailed Python code explanations. It is generated using MODEL_19,
+MODEL_10 etc. DATASET_12 [ARXIV_ID_14] presents solutions to the same task in as many different languages as
+possible, to aid a person with a grounding in one approach to a problem in learning another. DATASET_13 [ARXIV_ID_16]
+primarily focuses on instructional tasks in Python, tokenized specifically for the
+14
+
+
+--- Page Break ---
+
+Llama architecture. It is a blend of MODEL_10 generated content, custom codes, behavioral approaches
+and tasks. DATASET_14 [7] dataset is generated by the techniques in [ 60], with some modifications.
+Math. DATASET_15 [23] consists of problems from math competitions, including the COMPETITION_1
+10, COMPETITION_2 12, COMPETITION_3, and more. DATASET_17 [44] mathematical questions and with corre-
+sponding step-by-step solutions. DATASET_16 [3] is a large-scale dataset of math word problems that
+are densely annotated with operation programs. DATASET_18 [55] is a augmented dataset with MODEL_10.
+DATASET_19 [63] is a meta-evaluation dataset derived from the DATASET_31 [ 63] benchmark, intended to
+assess the ability of LLMs to judge free-form mathematical solutions. DATASET_20 [41] prioritizes
+reasoning and explanatory problem-solving over provided answers.
+Multimodal. DATASET_21 [ 54] consists 40K images from 24 datasets and 360K question-answer
+pairs. It is used to enhance the multimodal mathematical reasoning capabilities of MLLMs.
+A.3 Detailed Structure of Hyper-Convolutional Decoder
+Details of condition extractor. As introduced in Section 3, we use MODEL_2 [ 46] as our
+condition extractor in default (MODEL_20 specifically). Since MODEL_21’s supported sequence
+length is only 512, for longer sequences, we need to preprocess the input sequences. Specifically, we
+first pad the sequence to the length that can be divided by 512, slice it into multiple sub-strings, and
+encode the sub-strings respectively. The input length for different tasks is in the table below.
+common sense coding math multimodal
+length 384 26624 4608 1536
+Details of hyper-convolutional decoder.
+In this part, we delve into hyper-convolutional decoder’s inner architecture introduced in Section 2.5.
+The decoder consists of multiple cascading hyper-convolutional blocks, each containing 5 2D
+convolution modules. Specifically, we divide convolutions into three categories: i) width convolution
+that operates on (C, L)dimension, ii) height convolution that operates on (L, N)dimension) iii)
+layer-wise convolution that on (N, L)dimension) , with notations Conv W,Conv H, and Conv L. In
+the above convolution modules, the input tensor is transposed to the shape that specified dimensions
+act as feature maps, the remaining dimension act as channel dimension like conventional convolution.
+Each hyper-convolutional block consists of two Conv W, two Conv Hand one Conv L. Given this, the
+forward operation of a hyper-convolutional block can be formulated as:
+cl
+W=Conv1
+H(Conv1
+W(cl−1));
+cl
+H=Conv2
+W(Conv2
+H(cl−1));
+cl=Conv L(cl
+W+cl
+H+b
+3),(5)
+where clis hidden state output by the lth layer, c0is prompt embedding encoded by the condition
+extractor, and bis learnable bias. Through this process, it transforms the input with shape of
+[B, N, L, C ]to[B, N′, L′, C′].
+Model architecture used in different tasks. In this part, we show the architecture of hyper-
+convolutional decoders. We use the three element tuple (N, L, C )to represent decoder structure since
+it reflects input conditions’ changes in the network. Also, Bdimension is omitted since it doesn’t
+affect the model architecture. Note that for math and coding tasks, we first project the Ldimension to
+1000 to reduce overwhelming memory costs induced by giant convolution kernels.
+A.4 Details of trained checkpoints collection
+In this section, we discuss how we collect checkpoints in detail. It is noteworthy that all checkpoint
+collection process go through two phases: i) Pretraining on the target dataset for specified steps. ii)
+Fine-tuning on the target dataset for certain additional steps, while saving a checkpoint at each step.
+Therefor, the essence of checkpoint collection is the pretrain and fine-tune phase’s learning rate,
+training steps, number of samples, and batch size. Note that except for learning rate and training steps,
+all other hyper-parameters are kept the same. Detailed settings are in Table 9. For those datasets
+contain less samples than the number specified below, we use the entire dataset for training.
+15
+
+--- Page Break ---
+
+task foundation model channel
+common sense 0.5B (128, 384, 384) →(128, 200, 300) →(128, 100, 256)
+(256, 50, 200) →(512, 50, 200) →(1024, 25, 200)
+(1024, 10, 200) →(2048, 10, 200) →(4296, 8, 128)
+coding 1.5B (32, 1000, 384) →(64, 500, 300) →(256, 500, 300) →(512, 125, 300)
+(1024, 64, 256) →(2048, 32, 256) →(4508, 16, 256)
+7B (16, 1000, 384) →(64, 500, 384) →(256, 125, 400) →(512, 64, 400)
+(1024, 64, 400) →(2048, 32, 400), (4928, 16, 512)
+math 1.5B (16, 1000, 384) →(64, 500, 300) →(256, 125, 300) →(512, 64, 300)
+(1024, 64, 256) →(2048, 32, 256) →(4508, 16, 256),
+7B (16, 1000, 384) →(64, 500, 384) →(256, 125, 400) →(512, 64, 400)
+(1024, 64, 400) →(2048, 32, 400), (4928, 16, 512)
+multimodal 3B (16, 1536, 384) →(64, 500, 300) →(256, 125, 300)
+(1024, 64, 300) →(2048, 16, 256) →(7308, 16, 256)
+Table 8: Model architectures for different tasks.
+task \ settingpretrain finetune
+lr. training step batch size #num. samples lr. training step
+common sense 1e-4 75 32 5000 1e-5 50
+coding 1e-4 4000 64 10000 1e-6 100
+math 1e-4 4000 64 10000 1e-6 100
+multimodal 1e-4 8000 64 100000 1e-6 200
+Table 9: Details for checkpoint collection.
+B Additional Experiment Results
+B.1 More Results of Common Sense Reasoning, Math, and Coding
+In this section, we delve into details about each group of training METHOD_1’ performance on test sets,
+report their performance and discuss further findings.
+train set \ test set DATASET_1 DATASET_4 DATASET_2 DATASET_6 DATASET_5 DATASET_3 DATASET_7
+training METHOD_1 of DATASET_1 59.4 46.2 46.7 80.4 30.6 44.6 52.2
+of DATASET_4 64.3 38.4 53.4 56.1 29.0 1.3 -
+of DATASET_2 57.2 38.2 40.7 65.9 46.7 23.6 -
+of DATASET_6 27.9 27.0 24.7 66.2 24.4 9.2 50.3
+of DATASET_5 57.2 43.2 41.0 40.4 23.4 0.5 52.8
+of DATASET_3 fail fail 52.0 fail fail 22.11 fail
+of DATASET_7 18.6 26.8 19.1 0.1 3.8 1.6 50.5
+MODEL_8 54.8 16.6 38.3 16.6 26.5 37.0 50.2
+average of training METHOD_1 37.5 30.2 39.5 40.5 22.4 13.5 38.8
+PROJECT_1 68.6 40.8 51.6 87.9 25.9 44.9 50.0
+Table 10: More results for common sense reasoning task. Red marks full-shot results, gray shows
+the average of training METHOD_1, and green marks the results of PROJECT_1. PROJECT_1 not only consistently
+surpasses average of training METHOD_1, but also outperform their full-shot performance in most cases.
+Common sense reasoning. In this part, we show training METHOD_1’ performance on each test set in
+Table 10. Each row specifies the dataset METHOD_1 is trained on, and each column denotes the dataset
+used for testing. Consequently, the diagonal elements are full-shot results of training METHOD_1, which
+are marked in red. We also incorporate their average accuracy (exclude diagonal elements, marked
+ingray ), MODEL_8’s performance, and PROJECT_1’s zero-shot results (marked in green ).
+It can be observed that: i) original METHOD_1 generally perform poorly on novel datasets, e.g., METHOD_1
+tuned on DATASET_3 fail (accuracy=0.0) on half of zero-shot datasets, this may because training on one
+specific dataset will fit the parameters for this dataset (binary True/False in DATASET_3’s case) and limit
+16
+
+--- Page Break ---
+
+their generality (multiple choices question of other datasets). ii) PROJECT_1 even outperforms training
+METHOD_1’ full-shot performances in most cases, showing it has incredible zero-shot ability with great
+efficiency. These findings further illustrates that: fitting parameters for certain data may lack
+generality, learning the correlations between data and parameters may be better.
+Coding. In this part, we elaborate on training METHOD_1’ performance on coding datasets, along with
+their average (marked in gray ), MODEL_3/MODEL_5, and PROJECT_1’s performance (marked in green ).
+test set \ train setDATASET_11 DATASET_8 DATASET_33 DATASET_12 DATASET_32 MODEL_1 train set avg. PROJECT_1
+GPT Instruct Assistant Python 1.5B
+pass@1 28.8 40.0 14.0 9.8 17.6 13.7 23.2 14.7 17.6 32.7
+pass@5 46.2 53.4 27.8 19.1 28.6 25.5 31.0 26.5 28.6 55.3
+pass@10 52.9 56.4 35.0 23.8 33.2 29.9 34.1 32.3 33.2 64.1
+testset: DATASET_22 , average improvement: pass@1 = 15.1, pass@5 = 26.7, pass@10 = 30.9
+(a) pass@k (k = 1, 5, 10) scores of foundation LLM, original and generated METHOD_1 for MODEL_3 on DATASET_22.
+PROJECT_1 shows improves largely over its training data and base MODEL_1, validating its effectiveness.
+test set \ train setDATASET_11 DATASET_8 DATASET_33 DATASET_12 DATASET_32 MODEL_1 train set avg. PROJECT_1
+GPT Instruct Assistant Python 7B
+pass@1 22.4 23.2 24.6 fail fail fail fail 34.1 13.0 33.4
+pass@5 28.4 28.2 32.7 fail fail fail fail 41.6 16.4 42.1
+pass@10 30.8 30.3 35.8 fail fail fail fail 43.8 17.6 46.0
+testset: DATASET_26 , average improvement: pass@1 = 20.3, pass@5 = 25.7, pass@10 = 28.4
+(b) PROJECT_1 constantly present promising results at more complex benchmarks ( i.e., DATASET_26), even when
+over half of its training METHOD_1 fail (pass@k = 0.0) on this dataset.
+Table 11: PROJECT_1 surpasses the average pass@k score of training data on zero-shot coding benchmarks.
+Empirical results in Table 11 indicates that: i) our approach is able to generalize to complex real-
+world problems, generating parameters for zero-shot benchmarks with promising results (reflected
+in improvement over training data). ii) PROJECT_1’s good performance on the 7B group, despite poor
+performance of training METHOD_1 (pass@k=0.0), stressing that our method is not simply memorizing
+seen parameters, but learn to establish data-parameter mappings and adapt LLMs for novel datasets.
+test set \ train set DATASET_17 DATASET_20 DATASET_18 DATASET_19 DATASET_15 DATASET_16 MODEL_1 train set avg. PROJECT_1
+DATASET_23 68.6 35.4 68.3 22.8 31.0 31.4 64.4 42.9 66.3
+DATASET_29 30.0 1.5 30.2 7.2 16.5 3.5 29.3 14.8 23.9
+average accuracy improvement: 23.4 on DATASET_23, 9.1on DATASET_29.
+(a) Even with some low-performing training METHOD_1 ( i.e., accuracy less than 50% of base MODEL_1), PROJECT_1 still
+maintains good zero-shot performance, showing the drag-and-drop ability to fit LLMs for novel datasets.
+test set \ train set DATASET_17 DATASET_20 DATASET_18 DATASET_19 DATASET_15 DATASET_16 MODEL_1 train set avg. PROJECT_1
+DATASET_23 88.3 50.7 68.3 61.1 88.3 60.7 81.2 65.9 83.1
+average accuracy improvement: 17.2 on DATASET_23.
+(b) Using larger MODEL_5, PROJECT_1 continues to drag-and-drop it, indicating our method has good scalability.
+Table 12: PROJECT_1 continues to work well on math tasks, showing our method has broad applicability.
+Math. In this part, we report more results for math experiments in Table 12. Similar to common sense
+reasoning and coding tasks, PROJECT_1 continues to work well on math datasets, improving largely over
+the average accuracy of training data on zero-shot benchmarks. This showcases its drag-and-drop
+ability has wide application scenarios. Also, results on MODEL_5 prove its promising scalability.
+B.2 Inference Efficiency Analysis
+In this part,we further analyze PROJECT_1’s efficiency by presenting its memory usage and inference time
+for generating various LLMs on respective tasks. We show the cost of generating one single model
+on a ORGANIZATION_11 A100 80G GPU in Table 13.
+
+--- Page Break ---
+
+metrics common sense math coding multimodal
+time (second) 0.110.53 (1.5B) 0.70 (1.5B)0.610.55 (7B) 0.73 (7B)
+memory cost (GB) 9.5915.43 (1.5B) 19.17 (1.5B)20.3116.22 (7B) 20.48 (7B)
+Table 13: Inference time and memory cost for different LLMs generation. All metrics are measured
+on a single ORGANIZATION_11 DEVICE_1. The time and memory is the cost to generate a single model.
+B.3 More Ablation Studies
+Can answer serve as condition in more complex scenarios? In Section 3.4, we’ve explored
+different condition types and come up with the conclusion: simple, identical answers will limit the
+diversity of conditions. In this part, we explore using more complex answers from math datasets in
+Section 3.3 as conditions for building condition-parameter pairs and training PROJECT_1.
+condition type accuracy on DATASET_23(%)
+answer 64.0
+prompt 66.3
+Table 14: Answer in math task can serve as
+conditions, but prompts still work better.From results in Table 14, we can observe that more
+complex, diverse answers can lead to better perfor-
+mance. This may because their diversity is able to
+provide PROJECT_1 with a comprehensive view of condition-
+parameter mapping. However, as answers are typi-
+cally much longer than prompts in math and coding
+datasets due to problem complexity, we still recom-
+mend to use prompts as conditions for PROJECT_1.
+18
