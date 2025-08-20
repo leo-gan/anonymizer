@@ -48,6 +48,7 @@ def load_and_extract_text(pdf_path):
 def anonymize_text_with_gemini(text, existing_mapping):
     """
     Anonymizes a text chunk using Google Gemini and updates the mapping.
+    It retries on failure up to a maximum of 3 times.
 
     Args:
         text (str): The text to anonymize.
@@ -57,7 +58,6 @@ def anonymize_text_with_gemini(text, existing_mapping):
         tuple: A tuple containing the anonymized text and the updated mapping.
     """
     model = genai.GenerativeModel('gemini-2.5-flash')
-
     prompt = f"""
     You are an expert in text anonymization. Your task is to identify and replace Personally Identifiable Information (PII) in the given text.
     PII includes names, locations, organizations, phone numbers, email addresses, etc.
@@ -83,16 +83,29 @@ def anonymize_text_with_gemini(text, existing_mapping):
     Respond with ONLY the JSON object.
     """
 
-    try:
-        response = model.generate_content(prompt)
-        # It's better to clean the response from markdown code block markers
-        cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
-        result = json.loads(cleaned_response)
-        return result.get("anonymized_text", ""), result.get("mapping", {})
-    except Exception as e:
-        logging.error(f"An error occurred during anonymization: {e}")
-        # In case of error, return the original text and existing mapping
-        return text, existing_mapping
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = model.generate_content(prompt)
+            # It's better to clean the response from markdown code block markers
+            cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
+            result = json.loads(cleaned_response)
+            return result.get("anonymized_text", ""), result.get("mapping", {})
+        except json.JSONDecodeError as e:
+            logging.error(f"Attempt {attempt + 1} failed with JSON decode error: {e}")
+            if attempt + 1 == max_retries:
+                logging.error("Max retries reached. Returning original text.")
+                return text, existing_mapping
+            time.sleep(1)  # Wait for 1 second before retrying
+        except Exception as e:
+            logging.error(f"Attempt {attempt + 1} failed with an error: {e}")
+            if attempt + 1 == max_retries:
+                logging.error("Max retries reached. Returning original text.")
+                return text, existing_mapping
+            time.sleep(1)
+
+    # This part should not be reached if the loop is exited correctly.
+    return text, existing_mapping
 
 def main():
     """

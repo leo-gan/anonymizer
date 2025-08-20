@@ -1,7 +1,7 @@
 arXiv:2506.16406v1  [cs.LG]  19 Jun 2025Drag-and-Drop LLMs: Zero-Shot Prompt-to-Weights
-PERSON_11∗PERSON_21PERSON_31PERSON_41PERSON_51
-PERSON_61PERSON_71PERSON_82PERSON_93PERSON_103
-PERSON_114PERSON_121PERSON_132∗PERSON_141∗
+PERSON_1 1*PERSON_2 1PERSON_3 1PERSON_4 1PERSON_5 1
+PERSON_6 1PERSON_7 1PERSON_8 2PERSON_9 3PERSON_10 3
+PERSON_11 4PERSON_12 1PERSON_13 2*PERSON_14 1*
 1ORGANIZATION_1,2ORGANIZATION_2,3ORGANIZATION_3,4ORGANIZATION_4
 Abstract
 Modern Parameter-Efficient Fine-Tuning (PEFT) methods such as low-rank adap-
@@ -181,7 +181,15 @@ tor. Each block of hyper-convolution contains
 three hyper-convolution modules, extracting
 and fusing features in different dimensions.
 More details are in Appendix A.3.
-The learning objective is simple: we calculate the mean squared error (MSE)
+Structure of parameter generator. Different from diffusion-based parameter generation [ 57,26,58],
+we use a hyper-convolutional decoder to learn the mapping between input prompts and parameters.
+That design mainly considers efficiency, as the decoder-only structure has shown its superiority
+in LLMs [ 1,18,62,21]. We show the block details of the decoder in the right part (Figure 3).
+We assume the dimension of input prompt embeddings is [B, N, L, C ], where B,N,L, and C
+denote batch size, length of prompt batch ( i.e., number of prompts), sequence length, and hidden
+dimension, respectively. The cascaded convolutional blocks transform prompt embeddings to match
+the dimensions of tokenized weights. Here, we refer the output of the last block as [B, N w, Lw, Cw].
+Learning objective. The learning objective is simple: we calculate the mean squared error (MSE)
 loss between the output of the last block of the parameter generator and the corresponding tokenized
 checkpoints. Similar to RPG [ 58], we tokenize each layer’s parameters into non-overlapping segments
 and apply padding, ensuring checkpoints have a consistent shape of [B, N w, Lw, Cw]. Formally, we
@@ -209,11 +217,11 @@ task, respectively. For other hyper-parameter settings, please refer to Appendix
 task #model size (B) datasets
 common sense 0.5 ARC-e [10], ARC-c [10], BoolQ [9], OBQA [40],
 HelaSwag [64], PIQA [5], WinoGrande [49]
-coding 1.5, 7 Evol-Instruct-68K-V1 [39], Glaive-Assistant-V2 [ORGANIZATION_7],
-Python-Codes-25K [ORGANIZATION_6], Code-74k-ShareGPT [ORGANIZATION_5], Rosetta-Code [12],
-LLaMA-Python-Codes-30K [ORGANIZATION_6], CodeAlpaca-20K [7]
-math 1.5 Competition-Math[23], Math-QA[3], Math-IIO-68K-Mini [ORGANIZATION_10]
-Math-Plus [ORGANIZATION_11], Mu-Math [63], ToT-Math-V1 [ORGANIZATION_9]
+coding 1.5, 7 Evol-Instruct-68K-V1 [39], Glaive-Assistant-V2 [17],
+Python-Codes-25K [15], Code-74k-ShareGPT [2], Rosetta-Code [12],
+LLaMA-Python-Codes-30K [14], CodeAlpaca-20K [7]
+math 1.5 Competition-Math[23], Math-QA[3], Math-IIO-68K-Mini [44]
+Math-Plus [55], Mu-Math [63], ToT-Math-V1 [41]
 multimodal 3 MathV360K [54]
 3.2 Common Sense Reasoning
 Evaluating setting. We employ LoRA [ 24] to fine-tune Qwen2.5-0.5B on seven common sense
@@ -239,7 +247,7 @@ in-domain novel datasets in inference, but also
 test it on cross-domain task. In this part, we
 use the checkpoint trained on common sense
 reasoning tasks and feed it with prompts from
-science-dataset [ ORGANIZATION_8]. The generated parameters are compared with training LoRAs on the science
+science-dataset [ 33]. The generated parameters are compared with training LoRAs on the science
 dataset. From Table 2, we can observe that DnD surpasses its training LoRAs’ average accuracy,
 5
 
@@ -484,7 +492,8 @@ training LoRAs (except ARC-c)
 full-shot training on ARC-c
 DnD generated ARC-c
 Figure 6: DnD generates parameters with close distribution to
-original ones in the weight space and promising performance.Visualization for the effect of
+original ones in the weight space and promising performance.
+Visualization for the effect of
 drag-and-drop. In this part, we
 visualize original and generated
 parameters in Figure 6. It can
@@ -544,158 +553,151 @@ Ackonwledgement. We sincerely appreciate PERSON_15, PERSON_16, PERSON_17, PERSON
 PERSON_19, PERSON_20, PERSON_21, PERSON_22, PERSON_23, and PERSON_24 for valuable
 discussions and feedbacks during this work.
 References
-[1]Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni
-Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4
-technical report. arXiv preprint arXiv:2303.08774 , 2023.
-[2] ORGANIZATION_5 2023. ORGANIZATION_5-2023/code-74k-sharegpt. Code-74k-ShareGPT, 2023.
-[3]Aida Amini, Saadia Gabriel, Shanchuan Lin, Rik Koncel-Kedziorski, Yejin Choi, and Hannaneh
-Hajishirzi. Mathqa: Towards interpretable math word problem solving with operation-based
+[1]PERSON_25, PERSON_26, PERSON_27, PERSON_28, PERSON_29, PERSON_30
+PERSON_31, PERSON_32, PERSON_33, PERSON_34, et al. Gpt-4 technical report. arXiv preprint arXiv:2303.08774 , 2023.
+[2] PERSON_35 2023. PERSON_35-2023/code-74k-sharegpt. Code-74k-ShareGPT, 2023.
+[3]PERSON_36, PERSON_37, PERSON_38, PERSON_39, PERSON_40, and PERSON_41.
+Mathqa: Towards interpretable math word problem solving with operation-based
 formalisms. In NAACL , 2019.
-[4]Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang,
-Shijie Wang, Jun Tang, et al. Qwen2. 5-vl technical report. arXiv preprint arXiv:2502.13923 ,
-2025.
-[5]Yonatan Bisk, Rowan Zellers, Jianfeng Gao, Yejin Choi, et al. Piqa: Reasoning about physical
+[4]PERSON_42, PERSON_43, PERSON_44, PERSON_45, PERSON_46, PERSON_47, PERSON_48, PERSON_49,
+PERSON_50, PERSON_51, et al. Qwen2. 5-vl technical report. arXiv preprint arXiv:2502.13923 , 2025.
+[5]PERSON_52, PERSON_53, PERSON_54, PERSON_40, et al. Piqa: Reasoning about physical
 commonsense in natural language. In AAAI , 2020.
-[6] Léon Bottou et al. Stochastic gradient learning in neural networks. NeuroNîmes , 1991.
-[7]Sahil Chaudhary. Code alpaca: An instruction-following llama model for code generation.
-https://github.com/sahil280114/codealpaca , 2023.
-[8]Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde De Oliveira Pinto, Jared
-Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. Evaluating large
+[6] PERSON_55 et al. Stochastic gradient learning in neural networks. NeuroNîmes , 1991.
+[7]PERSON_56. Code alpaca: An instruction-following llama model for code generation.
+URL_2 , 2023.
+[8]PERSON_57, PERSON_58, PERSON_59, PERSON_60, PERSON_61, PERSON_62,
+PERSON_63, PERSON_64, PERSON_65, PERSON_66, et al. Evaluating large
 language models trained on code. arXiv preprint arXiv:2107.03374 , 2021.
-[9]Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and
-Kristina Toutanova. Boolq: Exploring the surprising difficulty of natural yes/no questions. In
+[9]PERSON_67, PERSON_68, PERSON_69, PERSON_70, PERSON_71, and
+PERSON_72. Boolq: Exploring the surprising difficulty of natural yes/no questions. In
 NAACL , 2019.
-[10] Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick,
-and Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning
+[10] PERSON_73, PERSON_74, PERSON_75, PERSON_76, PERSON_77, PERSON_78,
+and PERSON_79. Think you have solved question answering? try arc, the ai2 reasoning
 challenge. arXiv preprint arXiv:1803.05457 , 2018.
-[11] Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser,
-Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, et al. Training verifiers to
+[11] PERSON_80, PERSON_81, PERSON_82, PERSON_57, PERSON_59, PERSON_83,
+PERSON_84, PERSON_58, PERSON_85, PERSON_86, et al. Training verifiers to
 solve math word problems. arXiv preprint arXiv:2110.14168 , 2021.
 [12] Rosetta Code. Rosetta code — rosetta code,, 2022. [Online; accessed 8-December-2022].
-[13] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of
+[13] PERSON_87, PERSON_69, PERSON_68, and PERSON_72. Bert: Pre-training of
 deep bidirectional transformers for language understanding. In NAACL , 2019.
-[14] ORGANIZATION_6. llama-python-codes-30k. llama-python-codes-30k, 2023.
-[15] ORGANIZATION_6. ORGANIZATION_6/python-codes-25k. python-codes-25k, 2024.
-[16] Yarin Gal and Zoubin Ghahramani. Dropout as a bayesian approximation: Representing model
+[14] PERSON_88. llama-python-codes-30k. llama-python-codes-30k, 2023.
+[15] PERSON_88. PERSON_88/python-codes-25k. python-codes-25k, 2024.
+[16] PERSON_89 and PERSON_90. Dropout as a bayesian approximation: Representing model
 uncertainty in deep learning. In ICML , 2016.
-[17] ORGANIZATION_7. ORGANIZATION_7/glaive-code-assistant-v2. glaive-code-assistant-v2, 2024.
-[18] Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian,
-Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, et al. The llama
+[17] PERSON_91. PERSON_91/glaive-code-assistant-v2. glaive-code-assistant-v2, 2024.
+[18] PERSON_92, PERSON_93, PERSON_94, PERSON_95, PERSON_96, PERSON_97,
+PERSON_98, PERSON_99, PERSON_100, PERSON_101, et al. The llama
 3 herd of models. arXiv preprint arXiv:2407.21783 , 2024.
-[19] Alex Graves. Practical variational inference for neural networks. In NeurIPS , 2011.
+[19] PERSON_102. Practical variational inference for neural networks. In NeurIPS , 2011.
 10
 
 --- Page Break ---
 
-[20] Albert Gu and Tri Dao. Mamba: Linear-time sequence modeling with selective state spaces. In
+[20] PERSON_103 and PERSON_104. Mamba: Linear-time sequence modeling with selective state spaces. In
 COLM , 2024.
-[21] Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu,
-Shirong Ma, Peiyi Wang, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in
+[21] PERSON_105, PERSON_106, PERSON_107, PERSON_108, PERSON_109, PERSON_110, PERSON_111,
+PERSON_112, PERSON_113, PERSON_114, et al. Deepseek-r1: Incentivizing reasoning capability in
 llms via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025.
-[22] Soufiane Hayou, Nikhil Ghosh, and Bin Yu. Lora+: Efficient low rank adaptation of large
+[22] PERSON_115, PERSON_116, and PERSON_117. Lora+: Efficient low rank adaptation of large
 models. In ICML . PMLR, 2024.
-[23] Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn
-Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. In
+[23] PERSON_118, PERSON_119, PERSON_120, PERSON_121, PERSON_122, PERSON_123, PERSON_124,
+and PERSON_125. Measuring mathematical problem solving with the math dataset. In
 NeurIPS , 2021.
-[24] Edward J Hu, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu
-Chen, et al. Lora: Low-rank adaptation of large language models. In ICLR , 2022.
-[25] Naman Jain, King Han, Alex Gu, Wen-Ding Li, Fanjia Yan, Tianjun Zhang, Sida Wang, Ar-
-mando Solar-Lezama, Koushik Sen, and Ion Stoica. Livecodebench: Holistic and contamination
+[24] PERSON_126, PERSON_127, PERSON_128, PERSON_129, PERSON_130, PERSON_131, PERSON_132,
+et al. Lora: Low-rank adaptation of large language models. In ICLR , 2022.
+[25] PERSON_133, PERSON_134, PERSON_135, PERSON_136, PERSON_137, PERSON_138, PERSON_139,
+PERSON_140, PERSON_141, and PERSON_142. Livecodebench: Holistic and contamination
 free evaluation of large language models for code. In ICLR , 2024.
-[26] Xiaolong Jin, Kai Wang, Dongwen Tang, Wangbo Zhao, Yukun Zhou, Junshu Tang, and Yang
-You. Conditional lora parameter generation. arXiv preprint arXiv:2408.01415 , 2024.
-[27] Rana Muhammad Shahroz Khan, Dongwen Tang, Pingzhi Li, Kai Wang, and Tianlong Chen.
+[26] PERSON_143, PERSON_14, PERSON_2, PERSON_6, PERSON_144, PERSON_145, and PERSON_12. Conditional lora parameter generation. arXiv preprint arXiv:2408.01415 , 2024.
+[27] PERSON_146, PERSON_2, PERSON_147, PERSON_14, and PERSON_148.
 Oral: Prompting your large-scale loras via conditional recurrent diffusion. arXiv preprint
 arXiv:2503.24354 , 2025.
-[28] Wonjae Kim, Bokyung Son, and Ildoo Kim. Vilt: Vision-and-language transformer without
+[28] PERSON_149, PERSON_150, and PERSON_151. Vilt: Vision-and-language transformer without
 convolution or region supervision. In ICML , 2021.
-[29] Diederik P Kingma and Max Welling. Auto-encoding variational bayes. arXiv preprint
+[29] PERSON_152 and PERSON_153. Auto-encoding variational bayes. arXiv preprint
 arXiv:1312.6114 , 2013.
-[30] Dawid Jan Kopiczko, Tijmen Blankevoort, and Yuki M Asano. Vera: Vector-based random
+[30] PERSON_154, PERSON_155, and PERSON_156. Vera: Vector-based random
 matrix adaptation. In ICLR , 2024.
-[31] Alex Krizhevsky et al. Learning multiple layers of features from tiny images. 2009.
-[32] Sumith Kulal, Panupong Pasupat, Kartik Chandra, Mina Lee, Oded Padon, Alex Aiken, and
-Percy S Liang. Spoc: Search-based pseudocode to code. In NeurIPS , 2019.
-[33] ORGANIZATION_8. ORGANIZATION_8/science-dataset. , 2023.
-[34] Zexi Li, Lingzhi Gao, and Chao Wu. Text-to-model: Text-conditioned neural network diffusion
+[31] PERSON_157 et al. Learning multiple layers of features from tiny images. 2009.
+[32] PERSON_158, PERSON_159, PERSON_160, PERSON_161, PERSON_162, PERSON_163, and
+PERSON_164. Spoc: Search-based pseudocode to code. In NeurIPS , 2019.
+[33] PERSON_165. PERSON_165/science-dataset. , 2023.
+[34] PERSON_21, PERSON_166, and PERSON_167. Text-to-model: Text-conditioned neural network diffusion
 for train-once-for-all personalization. arXiv preprint arXiv:2405.14132 , 2024.
-[35] Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao,
-Chengqi Deng, Chenyu Zhang, Chong Ruan, et al. Deepseek-v3 technical report. arXiv preprint
+[35] PERSON_168, PERSON_169, PERSON_170, PERSON_171, PERSON_172, PERSON_173, PERSON_174,
+PERSON_175, PERSON_176, PERSON_177, et al. Deepseek-v3 technical report. arXiv preprint
 arXiv:2412.19437 , 2024.
-[36] Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang,
-Kwang-Ting Cheng, and Min-Hung Chen. Dora: Weight-decomposed low-rank adaptation. In
+[36] PERSON_178, PERSON_179, PERSON_180, PERSON_181, PERSON_182,
+PERSON_183, and PERSON_184. Dora: Weight-decomposed low-rank adaptation. In
 ICML , 2024.
-[37] Zhuang Liu and Kaiming He. A decade’s battle on dataset bias: Are we there yet? In ICLR ,
+[37] PERSON_185 and PERSON_186. A decade’s battle on dataset bias: Are we there yet? In ICLR ,
 2025.
-[38] Pan Lu, Hritik Bansal, Tony Xia, Jiacheng Liu, Chunyuan Li, Hannaneh Hajishirzi, Hao
-Cheng, Kai-Wei Chang, Michel Galley, and Jianfeng Gao. Mathvista: Evaluating mathematical
+[38] PERSON_187, PERSON_188, PERSON_189, PERSON_190, PERSON_191, PERSON_41, PERSON_192,
+PERSON_193, PERSON_194, and PERSON_54. Mathvista: Evaluating mathematical
 reasoning of foundation models in visual contexts. In ICLR , 2024.
-[39] Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing
-Ma, Qingwei Lin, and Daxin Jiang. Wizardcoder: Empowering code large language models
+[39] PERSON_195, PERSON_196, PERSON_197, PERSON_198, PERSON_199, PERSON_200, PERSON_201, PERSON_202,
+PERSON_203, and PERSON_204. Wizardcoder: Empowering code large language models
 with evol-instruct. In ICLR , 2024.
-11
-
---- Page Break ---
-
-[40] Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. Can a suit of armor conduct
+[40] PERSON_205, PERSON_73, PERSON_76, and PERSON_77. Can a suit of armor conduct
 electricity? a new dataset for open book question answering. In EMNLP , 2018.
-[41] ORGANIZATION_9. Tot-math-v1. ToT-Math-V1, 2023.
-[42] William Peebles, Ilija Radosavovic, Tim Brooks, Alexei A Efros, and Jitendra Malik. Learning
+[41] PERSON_206. Tot-math-v1. ToT-Math-V1, 2023.
+[42] PERSON_207, PERSON_208, PERSON_209, PERSON_210, and PERSON_211. Learning
 to learn with generative models of neural network checkpoints. arXiv preprint arXiv:2209.12892 ,
 2022.
-[43] Jeffrey Pennington, Richard Socher, and Christopher D Manning. Glove: Global vectors for
+[43] PERSON_212, PERSON_213, and PERSON_214. Glove: Global vectors for
 word representation. In EMNLP , 2014.
-[44] ORGANIZATION_10. Math-iio-68k-mini. Math-IIO-68K-Mini, 2023.
-[45] Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena,
-Yanqi Zhou, Wei Li, and Peter J Liu. Exploring the limits of transfer learning with a unified
+[44] PERSON_215. Math-iio-68k-mini. Math-IIO-68K-Mini, 2023.
+[45] PERSON_216, PERSON_217, PERSON_218, PERSON_219, PERSON_220, PERSON_221,
+PERSON_222, PERSON_223, and PERSON_224. Exploring the limits of transfer learning with a unified
 text-to-text transformer. JMLR , 21(140):1–67, 2020.
-[46] Nils Reimers and Iryna Gurevych. Sentence-bert: Sentence embeddings using siamese bert-
+[46] PERSON_225 and PERSON_226. Sentence-bert: Sentence embeddings using siamese bert-
 networks. In EMNLP , 2019.
-[47] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer.
+[47] PERSON_227, PERSON_228, PERSON_229, PERSON_230, and PERSON_231.
 High-resolution image synthesis with latent diffusion models. In CVPR , 2022.
-[48] Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Wei Wei, Tingbo Hou, Yael Pritch, Neal Wad-
-hwa, Michael Rubinstein, and Kfir Aberman. Hyperdreambooth: Hypernetworks for fast
+[48] PERSON_232, PERSON_129, PERSON_233, PERSON_234, PERSON_235, PERSON_236, PERSON_237,
+PERSON_238, and PERSON_239. Hyperdreambooth: Hypernetworks for fast
 personalization of text-to-image models. In CVPR , 2024.
-[49] Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. Winogrande: An
+[49] PERSON_240, PERSON_241, PERSON_242, and PERSON_40. Winogrande: An
 adversarial winograd schema challenge at scale. In AAAI , 2020.
-[50] Konstantin Schürholt, Boris Knyazev, Xavier Giró-i Nieto, and Damian Borth. Hyper-
+[50] PERSON_9, PERSON_243, PERSON_244, and PERSON_10. Hyper-
 representations for pre-training and transfer learning. In NeurIPS , 2022.
-[51] Konstantin Schürholt, Boris Knyazev, Xavier Giró-i Nieto, and Damian Borth. Hyper-
+[51] PERSON_9, PERSON_243, PERSON_244, and PERSON_10. Hyper-
 representations for pre-training and transfer learning. arXiv preprint arXiv:2207.10951 , 2022.
-[52] Konstantin Schürholt, Michael W Mahoney, and Damian Borth. Towards scalable and versatile
+[52] PERSON_9, PERSON_245, and PERSON_10. Towards scalable and versatile
 weight space learning. ICML , 2024.
-[53] Konstantin Schürholt, Michael W Mahoney, and Damian Borth. Towards scalable and versatile
+[53] PERSON_9, PERSON_245, and PERSON_10. Towards scalable and versatile
 weight space learning. arXiv preprint arXiv:2406.09997 , 2024.
-[54] Wenhao Shi, Zhiqiang Hu, Yi Bin, Junhua Liu, Yang Yang, See Kiong Ng, Lidong Bing, and
-Roy Lee. Math-llava: Bootstrapping mathematical reasoning for multimodal large language
+[54] PERSON_246, PERSON_247, PERSON_248, PERSON_249, PERSON_250, PERSON_251, PERSON_252, and
+PERSON_253. Math-llava: Bootstrapping mathematical reasoning for multimodal large language
 models. In EMNLP , 2024.
-[55] ORGANIZATION_11. Math-plus. MATH-plus, 2023.
-[56] Mojtaba Valipour, Mehdi Rezagholizadeh, Ivan Kobyzev, and Ali Ghodsi. Dylora: Parameter-
+[55] ORGANIZATION_5. Math-plus. MATH-plus, 2023.
+[56] PERSON_254, PERSON_255, PERSON_256, and PERSON_257. Dylora: Parameter-
 efficient tuning of pre-trained models using dynamic search-free low-rank adaptation. In ACL,
 2023.
-[57] Kai Wang, Dongwen Tang, Boya Zeng, Yida Yin, Zhaopan Xu, Yukun Zhou, Zelin Zang, Trevor
-Darrell, Zhuang Liu, and Yang You. Neural network diffusion. arXiv preprint arXiv:2402.13144 ,
+[57] PERSON_14, PERSON_2, PERSON_258, PERSON_259, PERSON_260, PERSON_144, PERSON_261, PERSON_262,
+PERSON_185, and PERSON_12. Neural network diffusion. arXiv preprint arXiv:2402.13144 ,
 2024.
-[58] Kai Wang, Dongwen Tang, Wangbo Zhao, Konstantin Schürholt, Zhangyang Wang, and Yang
-You. Recurrent diffusion for large-scale parameter generation. arXiv preprint arXiv:2501.11587 ,
+[58] PERSON_14, PERSON_2, PERSON_6, PERSON_9, PERSON_13, and PERSON_12. Recurrent diffusion for large-scale parameter generation. arXiv preprint arXiv:2501.11587 ,
 2025.
-[59] Ke Wang, Junting Pan, Weikang Shi, Zimu Lu, Houxing Ren, Aojun Zhou, Mingjie Zhan, and
-Hongsheng Li. Measuring multimodal mathematical reasoning with math-vision dataset. In
+[59] PERSON_263, PERSON_264, PERSON_265, PERSON_266, PERSON_267, PERSON_268, PERSON_269, and
+PERSON_270. Measuring multimodal mathematical reasoning with math-vision dataset. In
 NeurIPS , 2024.
-[60] Yizhong Wang, Yeganeh Kordi, Swaroop Mishra, Alisa Liu, Noah A Smith, Daniel Khashabi,
-and Hannaneh Hajishirzi. Self-instruct: Aligning language models with self-generated instruc-
+[60] PERSON_271, PERSON_272, PERSON_273, PERSON_274, PERSON_275, PERSON_276,
+and PERSON_41. Self-instruct: Aligning language models with self-generated instruc-
 tions. In ACL, pages 13484–13508, 2023.
-[61] Jason Wei, Xuezhi Wang, Dale Schuurmans, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
-Chain-of-thought prompting elicits reasoning in large language models. In NeurIPS , 2022.
-[62] An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan
-Li, Dayiheng Liu, Fei Huang, Haoran Wei, et al. Qwen2. 5 technical report. arXiv preprint
+[61] PERSON_277, PERSON_278, PERSON_279, PERSON_280, PERSON_281, PERSON_282, PERSON_283,
+PERSON_284, et al. Chain-of-thought prompting elicits reasoning in large language models. In
+NeurIPS , 2022.
+[62] PERSON_285, PERSON_286, PERSON_287, PERSON_288, PERSON_289, PERSON_290, PERSON_291,
+PERSON_292, PERSON_293, PERSON_294, et al. Qwen2. 5 technical report. arXiv preprint
 arXiv:2412.15115 , 2024.
-[63] Shuo Yin, Weihao You, Zhilong Ji, Guoqiang Zhong, and Jinfeng Bai. Mumath-code: Combin-
+[63] PERSON_295, PERSON_296, PERSON_297, PERSON_298, and PERSON_299. Mumath-code: Combin-
 ing tool-use large language models with multi-perspective data augmentation for mathematical
 reasoning. arXiv preprint arXiv:2405.07551 , 2024.
-[64] Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. Hellaswag: Can a
+[64] PERSON_53, PERSON_300, PERSON_52, PERSON_301, and PERSON_40. Hellaswag: Can a
 machine really finish your sentence? In ACL, 2019.
-[65] Boya Zeng, Yida Yin, and Zhuang Liu. Understanding bias in large-scale visual datasets. In
+[65] PERSON_258, PERSON_259, and PERSON_185. Understanding bias in large-scale visual datasets. In
 NeurIPS , 2024.
 13
 
@@ -740,13 +742,13 @@ machine-generated wrong answers. WinoGrande [49] features a fill-in-a-blank task
 options for commonsense reasoning questions. BoolQ [9] is a question answering dataset for yes/no
 questions containing various factual problems.
 Coding. Evol-Instruct [39] contains evolutionary prompts tailored for code-related tasks and
-incorporates code debugging and time-space complexity constraints. Glaive-Assistant [ORGANIZATION_7] is a
-dataset of code problems and solutions generated using ORGANIZATION_7’s synthetic data generation platform.
-Python-Codes [ORGANIZATION_6] is a cleaned Python dataset covering instructional tasks. Code-ShareGPT [ORGANIZATION_5]
+incorporates code debugging and time-space complexity constraints. Glaive-Assistant [17] is a
+dataset of code problems and solutions generated using Glaive’s synthetic data generation platform.
+Python-Codes [15] is a cleaned Python dataset covering instructional tasks. Code-ShareGPT [2]
 consists of conversations along with detailed Python code explanations. It is generated using GPT-3.5,
 GPT-4 etc. Rosetta-Code [12] presents solutions to the same task in as many different languages as
 possible, to aid a person with a grounding in one approach to a problem in learning another. LLaMA-
-Python-Codes [ORGANIZATION_6] primarily focuses on instructional tasks in Python, tokenized specifically for the
+Python-Codes [14] primarily focuses on instructional tasks in Python, tokenized specifically for the
 14
 
 --- Page Break ---
@@ -754,11 +756,11 @@ Python-Codes [ORGANIZATION_6] primarily focuses on instructional tasks in Python
 Llama architecture. It is a blend of GPT-4 generated content, custom codes, behavioral approaches
 and tasks. Code-Alpaca [7] dataset is generated by the techniques in [ 60], with some modifications.
 Math. Competition-Math [23] consists of problems from math competitions, including the AMC
-10, AMC 12, AIME, and more. Math-IIO-68K-Mini [ORGANIZATION_10] mathematical questions and with corre-
+10, AMC 12, AIME, and more. Math-IIO-68K-Mini [44] mathematical questions and with corre-
 sponding step-by-step solutions. MathQA [3] is a large-scale dataset of math word problems that
-are densely annotated with operation programs. Math-Plus [ORGANIZATION_11] is a augmented dataset with GPT-4.
+are densely annotated with operation programs. Math-Plus [55] is a augmented dataset with GPT-4.
 Mu-Math [63] is a meta-evaluation dataset derived from the U-MATH [ 63] benchmark, intended to
-assess the ability of LLMs to judge free-form mathematical solutions. ToT-Math-V1 [ORGANIZATION_9] prioritizes
+assess the ability of LLMs to judge free-form mathematical solutions. ToT-Math-V1 [41] prioritizes
 reasoning and explanatory problem-solving over provided answers.
 Multimodal. MathV360K [ 54] consists 40K images from 24 datasets and 360K question-answer
 pairs. It is used to enhance the multimodal mathematical reasoning capabilities of MLLMs.
