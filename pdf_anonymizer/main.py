@@ -57,7 +57,7 @@ def anonymize_text_with_gemini(text, existing_mapping):
     Returns:
         tuple: A tuple containing the anonymized text and the updated mapping.
     """
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     You are an expert in text anonymization. Your task is to identify and replace Personally Identifiable Information (PII) in the given text.
     PII includes names, locations, organizations, phone numbers, email addresses, etc.
