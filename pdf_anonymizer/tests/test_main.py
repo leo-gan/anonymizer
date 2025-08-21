@@ -6,13 +6,16 @@ import sys
 # Add the parent directory to the path so we can import main
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdf_anonymizer.main import anonymize_text_with_gemini, load_and_extract_text
+from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
+from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+from pdf_anonymizer.prompts import simple
+
 
 class TestAnonymizer(unittest.TestCase):
     data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'pdf_anonymizer', 'tests', 'data')
     sample_pdf_path = os.path.join(data_path, 'sample.pdf')
-    output_txt_path = os.path.join(data_path, 'sample.2506.16406v1.anonymized_output.txt')
-    mapping_path = os.path.join(data_path, 'sample.2506.16406v1.mapping.json')
+    output_txt_path = os.path.join(data_path, 'sample.anonymized_output.txt')
+    mapping_path = os.path.join(data_path, 'sample.mapping.json')
 
     @patch('main.genai.GenerativeModel')
     def test_anonymize_text_with_gemini(self, MockGenerativeModel):
@@ -40,7 +43,7 @@ class TestAnonymizer(unittest.TestCase):
         existing_mapping = {}
 
         # Call the function
-        anonymized_text, new_mapping = anonymize_text_with_gemini(text, existing_mapping)
+        anonymized_text, new_mapping = anonymize_text_with_gemini(text, existing_mapping, prompt_template=simple.prompt_template)
 
         # Asserts
         self.assertEqual(anonymized_text, "My name is PERSON_1 and I live in LOCATION_1.")
@@ -62,8 +65,8 @@ class TestAnonymizer(unittest.TestCase):
 
         # The sample PDF has one page
         self.assertEqual(len(text_pages), 1)
-        # Check if the extracted text contains the expected "Lorem ipsum"
-        self.assertIn("Lorem ipsum", text_pages[0])
+        # Check if the extracted text contains the expected "who lives at"
+        self.assertIn("who lives at", text_pages[0])
 
         # check if the output file exists
         self.assertTrue(os.path.exists(self.output_txt_path))

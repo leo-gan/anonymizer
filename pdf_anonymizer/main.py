@@ -1,13 +1,16 @@
 import sys
 import json
 from pathlib import Path
-from PyPDF2 import PdfReader
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 import argparse
 import logging
 import time
+
+from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
+from pdf_anonymizer.prompts import detailed, simple
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,94 +21,6 @@ logging.basicConfig(
     ]
 )
 
-
-def load_and_extract_text(pdf_path):
-    """
-    Loads a PDF file and extracts text from each page.
-
-    Args:
-        pdf_path (str): The path to the PDF file.
-
-    Returns:
-        list: A list of strings, where each string is the text of a page.
-    """
-    try:
-        reader = PdfReader(pdf_path)
-        text_pages = []
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                text_pages.append(text)
-        return text_pages
-    except FileNotFoundError:
-        logging.error(f"Error: The file at {pdf_path} was not found.")
-        sys.exit(1)
-    except Exception as e:
-        logging.error(f"An error occurred while reading the PDF: {e}")
-        sys.exit(1)
-
-
-def anonymize_text_with_gemini(text, existing_mapping):
-    """
-    Anonymizes a text chunk using Google Gemini and updates the mapping.
-    It retries on failure up to a maximum of 3 times.
-
-    Args:
-        text (str): The text to anonymize.
-        existing_mapping (dict): The existing mapping of original to anonymized entities.
-
-    Returns:
-        tuple: A tuple containing the anonymized text and the updated mapping.
-    """
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    prompt = f"""
-    You are an expert in text anonymization. Your task is to identify and replace Personally Identifiable Information (PII) in the given text.
-    PII includes names, locations, organizations, phone numbers, email addresses, etc.
-
-    Instructions:
-    1.  Read the text and the provided JSON mapping of existing anonymized entities.
-    2.  Identify all PII in the text.
-    3.  If a PII entity is already in the mapping, replace it with its existing anonymized value.
-    4.  If a new PII entity is found, create a new anonymized placeholder for it (e.g., PERSON_1, LOCATION_1). The number should be incremented for each new entity of the same type.
-    5.  Update the mapping with any new entities you find.
-    6.  Return a single JSON object with two keys:
-        - "anonymized_text": The text with all PII replaced by placeholders.
-        - "mapping": The complete and updated JSON mapping.
-
-    Existing mapping:
-    {json.dumps(existing_mapping)}
-
-    Text to anonymize:
-    ---
-    {text}
-    ---
-
-    Respond with ONLY the JSON object.
-    """
-
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            response = model.generate_content(prompt)
-            # It's better to clean the response from markdown code block markers
-            cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
-            result = json.loads(cleaned_response)
-            return result.get("anonymized_text", ""), result.get("mapping", {})
-        except json.JSONDecodeError as e:
-            logging.error(f"Attempt {attempt + 1} failed with JSON decode error: {e}")
-            if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
-            time.sleep(1)  # Wait for 1 second before retrying
-        except Exception as e:
-            logging.error(f"Attempt {attempt + 1} failed with an error: {e}")
-            if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
-            time.sleep(1)
-
-    # This part should not be reached if the loop is exited correctly.
-    return text, existing_mapping
 
 def main():
     """
@@ -127,11 +42,25 @@ def main():
         default=100,
         help="Number of pages to group together for anonymization.",
     )
+
+    parser.add_argument(
+        "--prompt_name",
+        type=str,
+        default="simple",
+        help="Can be 'simple' or 'detailed'.",
+    )
     args = parser.parse_args()
 
     pdf_path = args.pdf_path
+    logging.info(f"  --pdf_path: {pdf_path}")
     pages_in_group = args.pages_in_group
+    logging.info(f"  --pages_in_group: {pages_in_group}")
 
+    prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
+    prompt_template = prompt_mapping[args.prompt_name]
+    logging.info(f"  --prompt_name: {args.prompt_name}")
+
+    # PDF file: chunk and convert to text
     pdf_file_size = os.path.getsize(pdf_path)
     text_pages = load_and_extract_text(pdf_path)
 
@@ -145,6 +74,7 @@ def main():
     logging.info(f"  - PDF file size: {pdf_file_size / 1024:.2f} KB")
     logging.info(f"  - Extracted text size: {extracted_text_size / 1024:.2f} KB")
 
+    # Anonymization:
     anonymized_chunks = []
     final_mapping = {}
     num_pages = len(text_pages)
@@ -159,7 +89,7 @@ def main():
         text_chunk = "\n\n--- Page Break ---\n\n".join(page_group)
 
         start_time = time.time()
-        anonymized_text, final_mapping = anonymize_text_with_gemini(text_chunk, final_mapping)
+        anonymized_text, final_mapping = anonymize_text_with_gemini(text_chunk, final_mapping, prompt_template)
         end_time = time.time()
         duration = end_time - start_time
         minutes = int(duration // 60)

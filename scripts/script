@@ -5,11 +5,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Run the anonymizer main module on the sample PDF
-#python3 -m pdf_anonymizer.main pdf_anonymizer/tests/data/sample.pdf
+#python3 -m pdf_anonymizer.main pdf_anonymizer/tests/data/sample.pdf --pages_in_group=100 --prompt_name=simple
 
 # Download sample PDF from https://arxiv.org/pdf/2506.16406v1.pdf
+python3 -m pdf_anonymizer.main pdf_anonymizer/tests/data/2506.16406v1.pdf
 
-#python3 -m pdf_anonymizer.main pdf_anonymizer/tests/data/2506.16406v1.pdf
 #python3 -m pdf_anonymizer.main ../LegaLaid/case_bundle/data/example_1/example_1.pdf
-python3 -m pdf_anonymizer.main ../LegaLaid/case_bundle/case_bundle/data/index_to_B12/index_to_B12.pdf --pages_in_group=30
+#python3 -m pdf_anonymizer.main ../LegaLaid/case_bundle/case_bundle/data/index_to_B12/index_to_B12.pdf --pages_in_group=30
 
