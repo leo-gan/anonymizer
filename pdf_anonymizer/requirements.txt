@@ -2,3 +2,4 @@ python-dotenv
 pymupdf4llm
 langchain-text-splitters
 google-generativeai
+typer[all]

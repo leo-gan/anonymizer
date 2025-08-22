@@ -4,9 +4,11 @@ from pathlib import Path
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-import argparse
 import logging
 import time
+import typer
+from typing_extensions import Annotated
+from enum import Enum
 
 from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
@@ -21,8 +23,40 @@ logging.basicConfig(
     ]
 )
 
+app = typer.Typer()
 
-def main():
+
+class PromptEnum(str, Enum):
+    simple = "simple"
+    detailed = "detailed"
+
+
+def main(
+    pdf_path: Annotated[
+        Path,
+        typer.Argument(
+            help="The path to the PDF file to anonymize.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+    characters_to_anonymize: Annotated[
+        int,
+        typer.Option(
+            help="Number of characters to send for anonymization in one go."
+        ),
+    ] = 100000,
+    prompt_name: Annotated[
+        PromptEnum,
+        typer.Option(
+            help="Can be 'simple' or 'detailed'.",
+        ),
+    ] = PromptEnum.simple,
+):
     """
     Main function to run the PDF anonymization process.
     """
@@ -34,32 +68,12 @@ def main():
 
     genai.configure(api_key=api_key)
 
-    parser = argparse.ArgumentParser(description="Anonymize a PDF file.")
-    parser.add_argument("pdf_path", help="The path to the PDF file to anonymize.")
-    parser.add_argument(
-        "--characters_to_anonymize",
-        type=int,
-        default=100000,
-        help="Number of characters to send for anonymization in one go.",
-    )
-
-    parser.add_argument(
-        "--prompt_name",
-        type=str,
-        default="simple",
-        choices=["simple", "detailed"],
-        help="Can be 'simple' or 'detailed'.",
-    )
-    args = parser.parse_args()
-
-    pdf_path = args.pdf_path
     logging.info(f"  --pdf_path: {pdf_path}")
-    characters_to_anonymize = args.characters_to_anonymize
     logging.info(f"  --characters_to_anonymize: {characters_to_anonymize}")
 
     prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
-    prompt_template = prompt_mapping[args.prompt_name]
-    logging.info(f"  --prompt_name: {args.prompt_name}")
+    prompt_template = prompt_mapping[prompt_name.value]
+    logging.info(f"  --prompt_name: {prompt_name.value}")
 
     # PDF file: chunk and convert to text
     pdf_file_size = os.path.getsize(pdf_path)
@@ -78,9 +92,8 @@ def main():
     # Anonymization:
     anonymized_chunks = []
     final_mapping = {}
-    num_pages = len(text_pages)
 
-    for i, text_page in enumerate (text_pages):
+    for i, text_page in enumerate(text_pages):
         logging.info(f"Anonymizing part {i+1}/{len(text_pages)}...")
         start_time = time.time()
 
@@ -116,4 +129,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app.command()(main)
+    app()

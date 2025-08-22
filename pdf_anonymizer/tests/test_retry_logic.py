@@ -1,17 +1,25 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import json
-import time
 
 from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+from pdf_anonymizer.prompts import simple
 
 
 class TestAnonymizeTextWithGemini(unittest.TestCase):
 
-    @patch('pdf_anonymizer.main.genai.GenerativeModel')
+    def setUp(self):
+        self.prompt_template = simple.prompt_template
+
+    @patch('pdf_anonymizer.call_gemini.genai.GenerativeModel')
     def test_anonymize_text_with_gemini_success_on_first_try(self, mock_generative_model):
         # Mock the response from the generative model
         mock_response = MagicMock()
+        # Add the usage_metadata attribute to the mock_response
+        mock_response.usage_metadata = MagicMock()
+        mock_response.usage_metadata.prompt_token_count = 10
+        mock_response.usage_metadata.candidates_token_count = 20
+        mock_response.usage_metadata.total_token_count = 30
         mock_response.text = json.dumps({
             "anonymized_text": "This is an anonymized text.",
             "mapping": {"person": "PERSON_1"}
@@ -22,18 +30,28 @@ class TestAnonymizeTextWithGemini(unittest.TestCase):
 
         text = "This is a test text."
         existing_mapping = {}
-        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping)
+        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping, self.prompt_template)
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
         self.assertEqual(mapping, {"person": "PERSON_1"})
         mock_model_instance.generate_content.assert_called_once()
 
-    @patch('pdf_anonymizer.main.genai.GenerativeModel')
+    @patch('pdf_anonymizer.call_gemini.genai.GenerativeModel')
     def test_anonymize_text_with_gemini_retry_on_json_decode_error(self, mock_generative_model):
         # Mock the response to fail twice with JSONDecodeError, then succeed
         mock_response_fail = MagicMock()
         mock_response_fail.text = "this is not a valid json"
+        # Add the usage_metadata attribute to the mock_response
+        mock_response_fail.usage_metadata = MagicMock()
+        mock_response_fail.usage_metadata.prompt_token_count = 10
+        mock_response_fail.usage_metadata.candidates_token_count = 20
+        mock_response_fail.usage_metadata.total_token_count = 30
         mock_response_success = MagicMock()
+        # Add the usage_metadata attribute to the mock_response
+        mock_response_success.usage_metadata = MagicMock()
+        mock_response_success.usage_metadata.prompt_token_count = 10
+        mock_response_success.usage_metadata.candidates_token_count = 20
+        mock_response_success.usage_metadata.total_token_count = 30
         mock_response_success.text = json.dumps({
             "anonymized_text": "This is an anonymized text.",
             "mapping": {"person": "PERSON_1"}
@@ -45,16 +63,21 @@ class TestAnonymizeTextWithGemini(unittest.TestCase):
 
         text = "This is a test text."
         existing_mapping = {}
-        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping)
+        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping, self.prompt_template)
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
         self.assertEqual(mapping, {"person": "PERSON_1"})
         self.assertEqual(mock_model_instance.generate_content.call_count, 3)
 
-    @patch('pdf_anonymizer.main.genai.GenerativeModel')
+    @patch('pdf_anonymizer.call_gemini.genai.GenerativeModel')
     def test_anonymize_text_with_gemini_retry_on_exception(self, mock_generative_model):
         # Mock the response to fail twice with a generic Exception, then succeed
         mock_response_success = MagicMock()
+        # Add the usage_metadata attribute to the mock_response
+        mock_response_success.usage_metadata = MagicMock()
+        mock_response_success.usage_metadata.prompt_token_count = 10
+        mock_response_success.usage_metadata.candidates_token_count = 20
+        mock_response_success.usage_metadata.total_token_count = 30
         mock_response_success.text = json.dumps({
             "anonymized_text": "This is an anonymized text.",
             "mapping": {"person": "PERSON_1"}
@@ -66,13 +89,13 @@ class TestAnonymizeTextWithGemini(unittest.TestCase):
 
         text = "This is a test text."
         existing_mapping = {}
-        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping)
+        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping, self.prompt_template)
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
         self.assertEqual(mapping, {"person": "PERSON_1"})
         self.assertEqual(mock_model_instance.generate_content.call_count, 3)
 
-    @patch('pdf_anonymizer.main.genai.GenerativeModel')
+    @patch('pdf_anonymizer.call_gemini.genai.GenerativeModel')
     def test_anonymize_text_with_gemini_max_retries_reached(self, mock_generative_model):
         # Mock the response to fail on all attempts
         mock_model_instance = MagicMock()
@@ -81,7 +104,7 @@ class TestAnonymizeTextWithGemini(unittest.TestCase):
 
         text = "This is a test text."
         existing_mapping = {}
-        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping)
+        anonymized_text, mapping = anonymize_text_with_gemini(text, existing_mapping, self.prompt_template)
 
         self.assertEqual(anonymized_text, text)
         self.assertEqual(mapping, existing_mapping)
