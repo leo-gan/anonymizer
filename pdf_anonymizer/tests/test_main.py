@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
-from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+from pdf_anonymizer.call_llm import anonymize_text_with_llm
 from pdf_anonymizer.prompts import simple
 
 
@@ -17,8 +17,8 @@ class TestAnonymizer(unittest.TestCase):
     output_txt_path = os.path.join(data_path, 'sample.anonymized_output.txt')
     mapping_path = os.path.join(data_path, 'sample.mapping.json')
 
-    @patch('main.genai.GenerativeModel')
-    def test_anonymize_text_with_gemini(self, MockGenerativeModel):
+    @patch('pdf_anonymizer.call_llm.genai.Client')
+    def test_anonymize_text_with_gemini(self, MockClient):
         """
         Tests the anonymization function with a mock Gemini API response.
         """
@@ -35,19 +35,64 @@ class TestAnonymizer(unittest.TestCase):
         '''
 
         # Configure the mock model to return the mock response
-        mock_model_instance = MockGenerativeModel.return_value
-        mock_model_instance.generate_content.return_value = mock_response
+        mock_client_instance = MockClient.return_value
+        mock_client_instance.models.generate_content.return_value = mock_response
 
         # Input text and existing mapping
         text = "My name is John Doe and I live in New York."
         existing_mapping = {}
 
         # Call the function
-        anonymized_text, new_mapping = anonymize_text_with_gemini(text, existing_mapping, prompt_template=simple.prompt_template)
+        anonymized_text, new_mapping = anonymize_text_with_llm(
+            text,
+            existing_mapping,
+            prompt_template=simple.prompt_template,
+            model_name='gemini-1.5-flash'
+        )
 
         # Asserts
         self.assertEqual(anonymized_text, "My name is PERSON_1 and I live in LOCATION_1.")
         self.assertEqual(new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"})
+
+    @patch('pdf_anonymizer.call_llm.ollama.chat')
+    def test_anonymize_text_with_ollama(self, mock_ollama_chat):
+        """
+        Tests the anonymization function with a mock Ollama API response.
+        """
+        # Create a mock response object
+        mock_response = {
+            "message": {
+                "content": '''
+                {
+                    "anonymized_text": "My name is PERSON_1 and I live in LOCATION_1.",
+                    "mapping": {
+                        "John Doe": "PERSON_1",
+                        "New York": "LOCATION_1"
+                    }
+                }
+                '''
+            }
+        }
+
+        # Configure the mock model to return the mock response
+        mock_ollama_chat.return_value = mock_response
+
+        # Input text and existing mapping
+        text = "My name is John Doe and I live in New York."
+        existing_mapping = {}
+
+        # Call the function
+        anonymized_text, new_mapping = anonymize_text_with_llm(
+            text,
+            existing_mapping,
+            prompt_template=simple.prompt_template,
+            model_name='gemma'
+        )
+
+        # Asserts
+        self.assertEqual(anonymized_text, "My name is PERSON_1 and I live in LOCATION_1.")
+        self.assertEqual(new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"})
+
 
     def test_load_and_extract_text(self):
         """

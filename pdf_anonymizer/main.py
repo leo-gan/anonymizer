@@ -1,7 +1,6 @@
 import sys
 import json
 from pathlib import Path
-import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 import logging
@@ -10,7 +9,7 @@ import typer
 from typing_extensions import Annotated
 from enum import Enum
 
-from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+from pdf_anonymizer.call_llm import anonymize_text_with_llm
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 from pdf_anonymizer.prompts import detailed, simple
 
@@ -29,6 +28,14 @@ app = typer.Typer()
 class PromptEnum(str, Enum):
     simple = "simple"
     detailed = "detailed"
+
+
+class ModelName(str, Enum):
+    gemini_2_5_pro = "gemini-2.5-pro"
+    gemini_2_5_flash = "gemini-2.5-flash"
+    gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
+    gemma = "gemma"  # It is not tested!
+    phi = "phi4-mini"  # Do not use this model in production but it is good for testing.
 
 
 def main(
@@ -56,20 +63,25 @@ def main(
             help="Can be 'simple' or 'detailed'.",
         ),
     ] = PromptEnum.simple,
+    model_name: Annotated[
+        ModelName,
+        typer.Option(
+            help="The model to use for anonymization.",
+        ),
+    ] = ModelName.gemini_2_5_flash_lite,
 ):
     """
     Main function to run the PDF anonymization process.
     """
     load_dotenv()
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
-        sys.exit(1)
-
-    genai.configure(api_key=api_key)
+    if "gemini" in model_name.value:
+        if not os.getenv("GOOGLE_API_KEY"):
+            logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
+            sys.exit(1)
 
     logging.info(f"  --pdf_path: {pdf_path}")
     logging.info(f"  --characters_to_anonymize: {characters_to_anonymize}")
+    logging.info(f"  --model_name: {model_name.value}")
 
     prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
     prompt_template = prompt_mapping[prompt_name.value]
@@ -97,7 +109,12 @@ def main(
         logging.info(f"Anonymizing part {i+1}/{len(text_pages)}...")
         start_time = time.time()
 
-        anonymized_text, final_mapping = anonymize_text_with_gemini(text_page, final_mapping, prompt_template)
+        anonymized_text, final_mapping = anonymize_text_with_llm(
+            text_page,
+            final_mapping,
+            prompt_template,
+            model_name.value
+        )
 
         end_time = time.time()
         duration = end_time - start_time
