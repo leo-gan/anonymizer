@@ -1,3 +1,4 @@
-PyPDF2
-google-generativeai
 python-dotenv
+pymupdf4llm
+langchain-text-splitters
+google-generativeai

@@ -37,10 +37,10 @@ def main():
     parser = argparse.ArgumentParser(description="Anonymize a PDF file.")
     parser.add_argument("pdf_path", help="The path to the PDF file to anonymize.")
     parser.add_argument(
-        "--pages_in_group",
+        "--characters_to_anonymize",
         type=int,
-        default=100,
-        help="Number of pages to group together for anonymization.",
+        default=100000,
+        help="Number of characters to send for anonymization in one go.",
     )
 
     parser.add_argument(
@@ -53,8 +53,8 @@ def main():
 
     pdf_path = args.pdf_path
     logging.info(f"  --pdf_path: {pdf_path}")
-    pages_in_group = args.pages_in_group
-    logging.info(f"  --pages_in_group: {pages_in_group}")
+    characters_to_anonymize = args.characters_to_anonymize
+    logging.info(f"  --characters_to_anonymize: {characters_to_anonymize}")
 
     prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
     prompt_template = prompt_mapping[args.prompt_name]
@@ -62,7 +62,7 @@ def main():
 
     # PDF file: chunk and convert to text
     pdf_file_size = os.path.getsize(pdf_path)
-    text_pages = load_and_extract_text(pdf_path)
+    text_pages = load_and_extract_text(pdf_path, characters_to_anonymize)
 
     if not text_pages:
         logging.warning("No text could be extracted from the PDF.")
@@ -79,17 +79,12 @@ def main():
     final_mapping = {}
     num_pages = len(text_pages)
 
-    for i in range(0, num_pages, pages_in_group):
-        start_page = i + 1
-        end_page = min(i + pages_in_group, num_pages)
-        logging.info(f"Anonymizing pages {start_page}-{end_page}/{num_pages}...")
-
-        page_group = text_pages[i:end_page]
-        # The separator is added here to delineate pages within a chunk for the LLM.
-        text_chunk = "\n\n--- Page Break ---\n\n".join(page_group)
-
+    for i, text_page in enumerate (text_pages):
+        logging.info(f"Anonymizing part {i+1}/{len(text_pages)}...")
         start_time = time.time()
-        anonymized_text, final_mapping = anonymize_text_with_gemini(text_chunk, final_mapping, prompt_template)
+
+        anonymized_text, final_mapping = anonymize_text_with_gemini(text_page, final_mapping, prompt_template)
+
         end_time = time.time()
         duration = end_time - start_time
         minutes = int(duration // 60)
@@ -109,6 +104,8 @@ def main():
         f.write(full_anonymized_text)
 
     mapping_file = f"{pdf_file_name}.mapping.json"
+    # fix some glitch:
+    final_mapping = {k: v for k, v in final_mapping.items() if k != v}
     with open(mapping_file, "w", encoding="utf-8") as f:
         json.dump(final_mapping, f, indent=4)
 

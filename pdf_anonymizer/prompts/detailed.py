@@ -29,10 +29,10 @@ ANONYMIZATION GUIDELINES:
     *   Follow the prefix with an underscore (`_`) and a sequential numerical identifier (e.g., `PERSON_1`, `ADDRESS_1`, `DATE_5`).
     *   **Handling Variations of Entities:** If you encounter a variation of an already anonymized entity, it should create a new, related anonymized tag to indicate this variation. The convention for variations will be: `[Original_Anonymized_Tag].v_[variation_number]`.
 
-        *   **Example:** If "Mary Smith" is mapped to `PERSON_1`, then "Mary's" should be mapped to `PERSON_1.v_2`.
-        *   **Example:** If "John Doe" is mapped to `PERSON_2`, then "Mr. John Doe" should be mapped to `PERSON_2.v_2`.
-        *   **Example:** If "123 Oak Street" is mapped to `ADDRESS_3`, then "Oak Street" (if referring to the same street in context) could be mapped to `ADDRESS_3.v_2`.
-        *   **Example:** If "Springfield" is mapped to `LOCATION_4`, then "Springfield's" could be mapped to `LOCATION_4.v_2`.
+        *   **Example:** If "Mary Smith" is mapped as `PERSON_1`, then "Mary's" should be mapped as `PERSON_1.v_2`.
+        *   **Example:** If "John Doe" is mapped as `PERSON_2`, then "Mr. John Doe" should be mapped as `PERSON_2.v_2`.
+        *   **Example:** If "123 Oak Street" is mapped as `ADDRESS_3`, then "Oak Street" (if referring as the same street in context) could be mapped to `ADDRESS_3.v_2`.
+        *   **Example:** If "Springfield" is mapped as `LOCATION_4`, then "Springfield's" could be mapped as `LOCATION_4.v_2`.
 
 *   **One-to-One Mapping:** Each distinct original entity found in the text must have a unique entry in the JSON mapping. If an entity appears multiple times, it should be mapped to the same anonymized tag each time.
 
@@ -51,16 +51,16 @@ EXAMPLES:
 "PERSON_1, who lives at ADDRESS_1, PERSON_3, met PERSON_2 yesterday."
 
 **JSON Output Example:** 
-{
+{{
 	"anonymized_text": "PERSON_1, who lives at ADDRESS_1, met PERSON_2 yesterday.",
-	"mapping": {
+	"mapping": {{
 
-	  "John Joe": "PERSON_1",
-	  "2864, Holm st, Springfild": "ADDRESS_1",
-	  "Springfild": "LOCATION_2",
-	  "Mary Smith": "PERSON_2"
-	}
-}
+	  "PERSON_1": "John Joe",
+	  "ADDRESS_1": "2864, Holm st, Springfild",
+	  "LOCATION_2": "Springfild",
+	  "PERSON_2": "Mary Smith" 
+	}}
+}}
 
 >>>>>>>>>>>>>>>>>>>>>>
 EXISTING MAPPING:

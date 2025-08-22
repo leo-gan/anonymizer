@@ -25,7 +25,8 @@ def anonymize_text_with_gemini(text, existing_mapping, prompt_template):
     Returns:
         tuple: A tuple containing the anonymized text and the updated mapping.
     """
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model_name = 'gemini-2.5-flash'
+    model = genai.GenerativeModel(model_name)
     prompt = prompt_template.format(
         existing_mapping=json.dumps(existing_mapping),
         text=text
@@ -35,6 +36,7 @@ def anonymize_text_with_gemini(text, existing_mapping, prompt_template):
     max_retries = 3
     for attempt in range(max_retries):
         try:
+            logging.info(f"Calling '{model_name}': text: {len(text):,}, mapping: {len(existing_mapping):,}, attempt {attempt + 1}")
             response = model.generate_content(prompt)
             print_token_count(response)
             # It's better to clean the response from markdown code block markers
