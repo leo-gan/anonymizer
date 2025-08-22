@@ -6,7 +6,7 @@ import ollama
 from google import genai
 
 
-OLLAMA_MODELS = ["gemma", "phi"]
+OLLAMA_MODELS = ["gemma", "phi4-mini"]
 
 
 def anonymize_text_with_llm(text, existing_mapping, prompt_template, model_name: str):

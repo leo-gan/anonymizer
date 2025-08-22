@@ -34,8 +34,8 @@ class ModelName(str, Enum):
     gemini_2_5_pro = "gemini-2.5-pro"
     gemini_2_5_flash = "gemini-2.5-flash"
     gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
-    gemma = "gemma"
-    phi = "phi"
+    gemma = "gemma"  # It is not tested!
+    phi = "phi4-mini"  # Do not use this model in production but it is good for testing.
 
 
 def main(
