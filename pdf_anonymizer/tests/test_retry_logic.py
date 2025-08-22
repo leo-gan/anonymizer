@@ -3,7 +3,8 @@ from unittest.mock import patch, MagicMock
 import json
 import time
 
-from pdf_anonymizer.main import anonymize_text_with_gemini
+from pdf_anonymizer.call_gemini import anonymize_text_with_gemini
+
 
 class TestAnonymizeTextWithGemini(unittest.TestCase):
 

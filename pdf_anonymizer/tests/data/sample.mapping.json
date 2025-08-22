@@ -1,1 +1,9 @@
-{}
+{
+	"anonymized_text": "PERSON_1, who lives at ADDRESS_1, met PERSON_2 yesterday.",
+	"mapping": {
+	  "John Joe": "PERSON_1",
+	  "2864, Holm st, Springfild": "ADDRESS_1",
+	  "Springfild": "LOCATION_2",
+	  "Mary Smith": "PERSON_2"
+	}
+}
