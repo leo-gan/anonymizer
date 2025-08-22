@@ -47,6 +47,7 @@ def main():
         "--prompt_name",
         type=str,
         default="simple",
+        choices=["simple", "detailed"],
         help="Can be 'simple' or 'detailed'.",
     )
     args = parser.parse_args()

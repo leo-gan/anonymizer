@@ -22,9 +22,9 @@ def load_and_extract_text(pdf_path, characters_to_anonymize=100000):
         splitter = MarkdownTextSplitter(chunk_size=characters_to_anonymize, chunk_overlap=0)
         docs = splitter.create_documents([md_text])
         return [doc.page_content for doc in docs]
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         logging.error(f"Error: The file at {pdf_path} was not found.")
-        sys.exit(1)
+        raise e
     except Exception as e:
         logging.error(f"An error occurred while reading the PDF: {e}")
-        sys.exit(1)
+        raise e
