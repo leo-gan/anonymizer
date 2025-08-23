@@ -40,16 +40,16 @@ def anonymize_text_with_llm(text, existing_mapping, prompt_template, model_name:
                         'content': prompt,
                     },
                 ])
-                cleaned_response = response['message']['content'].strip().replace('```json', '').replace('```', '').strip()
+                raw_text = response['message']['content']
             else:
                 client = genai.Client()
                 response = client.models.generate_content(
                     model=model_name,
                     contents=prompt
                 )
-                # It's better to clean the response from markdown code block markers
-                cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
+                raw_text = response.text
 
+            cleaned_response = raw_text.strip().replace('```json', '').replace('```', '').strip()
             result = json.loads(cleaned_response)
             return result.get("anonymized_text", ""), result.get("mapping", existing_mapping)
         except json.JSONDecodeError as e:

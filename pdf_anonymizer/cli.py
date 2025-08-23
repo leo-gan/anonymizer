@@ -11,6 +11,7 @@ from pdf_anonymizer.utils import save_results
 from pdf_anonymizer.prompts import detailed, simple
 from pdf_anonymizer.conf import (
     PromptEnum,
+    ModelProvider,
     ModelName,
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_PROMPT_NAME,
@@ -30,6 +31,7 @@ logging.basicConfig(
 app = typer.Typer()
 
 
+@app.command()
 def run(
     pdf_path: Annotated[
         Path,
@@ -66,10 +68,11 @@ def run(
     Main function to run the PDF anonymization process.
     """
     load_dotenv()
-    if "gemini" in model_name.value:
-        if not os.getenv("GOOGLE_API_KEY"):
-            logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
-            sys.exit(1)
+    if model_name.provider == ModelProvider.GOOGLE:
+        if "gemini" in model_name.value:
+            if not os.getenv("GOOGLE_API_KEY"):
+                logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
+                sys.exit(1)
 
     logging.info(f"  --pdf-path: {pdf_path}")
     logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
@@ -98,5 +101,4 @@ def run(
 
 
 if __name__ == "__main__":
-    app.command()(run)
     app()
