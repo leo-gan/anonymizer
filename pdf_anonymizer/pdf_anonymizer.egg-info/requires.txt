@@ -1,7 +1,0 @@
-python-dotenv
-pymupdf4llm
-langchain-text-splitters
-google-genai
-typer
-rich
-ollama
