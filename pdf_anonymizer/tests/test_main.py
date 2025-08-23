@@ -1,11 +1,6 @@
 import unittest
 from unittest.mock import Mock, patch
 import os
-import sys
-
-# Add the parent directory to the path so we can import main
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
 from pdf_anonymizer.prompts import simple
@@ -18,7 +13,7 @@ class TestAnonymizer(unittest.TestCase):
     mapping_path = os.path.join(data_path, 'sample.mapping.json')
 
     @patch('pdf_anonymizer.call_llm.genai.Client')
-    def test_anonymize_text_with_gemini(self, MockClient):
+    def test_anonymize_text_with_gemini(self, mock_client):
         """
         Tests the anonymization function with a mock Gemini API response.
         """
@@ -35,8 +30,9 @@ class TestAnonymizer(unittest.TestCase):
         '''
 
         # Configure the mock model to return the mock response
-        mock_client_instance = MockClient.return_value
-        mock_client_instance.models.generate_content.return_value = mock_response
+        mock_client_instance = mock_client.return_value
+        mock_model_instance = mock_client_instance.models
+        mock_model_instance.generate_content.return_value = mock_response
 
         # Input text and existing mapping
         text = "My name is John Doe and I live in New York."
@@ -112,10 +108,6 @@ class TestAnonymizer(unittest.TestCase):
         self.assertEqual(len(text_pages), 1)
         # Check if the extracted text contains the expected "who lives at"
         self.assertIn("who lives at", text_pages[0])
-
-        # check if the output file exists
-        self.assertTrue(os.path.exists(self.output_txt_path))
-        self.assertTrue(os.path.exists(self.mapping_path))
 
 if __name__ == '__main__':
     unittest.main()

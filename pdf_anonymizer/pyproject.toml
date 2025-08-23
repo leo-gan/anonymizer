@@ -1,0 +1,18 @@
+[project]
+name = "pdf-anonymizer"
+version = "0.1.0"
+description = "A tool to anonymize PDF files using LLMs."
+authors = [{ name = "Leonid", email = "leo.gan.57@gmail.com" }]
+dependencies = [
+    "python-dotenv",
+    "pymupdf4llm",
+    "langchain-text-splitters",
+    "google-genai",
+    "typer",
+    "rich",
+    "ollama",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
