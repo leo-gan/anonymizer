@@ -71,13 +71,13 @@ def run(
             logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
             sys.exit(1)
 
-    logging.info(f"  --pdf_path: {pdf_path}")
-    logging.info(f"  --characters_to_anonymize: {characters_to_anonymize}")
-    logging.info(f"  --model_name: {model_name.value}")
+    logging.info(f"  --pdf-path: {pdf_path}")
+    logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
+    logging.info(f"  --model-name: {model_name.value}")
 
     prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
     prompt_template = prompt_mapping[prompt_name.value]
-    logging.info(f"  --prompt_name: {prompt_name.value}")
+    logging.info(f"  --prompt-name: {prompt_name.value}")
 
     full_anonymized_text, final_mapping = anonymize_pdf(
         pdf_path,

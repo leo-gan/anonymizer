@@ -8,8 +8,8 @@ This application anonymizes large PDF files by splitting them into smaller piece
 2.  **Anonymization with LLMs**: Each page's text is sent to an LLM (Google Gemini or a local Ollama model) with a prompt that instructs it to identify and replace Personally Identifiable Information (PII) like names, locations, etc.
 3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that the same entity is replaced with the same placeholder (e.g., "John Smith" is always replaced with "PERSON_1").
 4.  **Output**: The application generates two files:
-    *   `anonymized_output.txt`: The full text of the PDF with all PII replaced by placeholders.
-    *   `mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
+    *   `{original_file_name}.anonymized_output.txt`: The full text of the PDF with all PII replaced by placeholders.
+    *   `{original_file_name}.mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
 
 ## Installation
 
@@ -58,7 +58,7 @@ You can also specify the model and prompt you want to use:
 uv run python pdf_anonymizer/main.py /path/to/your/document.pdf --model-name phi --prompt-name detailed
 ```
 
-The output files (`anonymized_output.txt` and `mapping.json`) will be created in the root directory of the project.
+The output files (`{original_file_name}.anonymized_output.txt` and `{original_file_name}.mapping.json`) will be created in the root directory of the project.
 
 ## Example
 

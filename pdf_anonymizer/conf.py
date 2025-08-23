@@ -2,7 +2,7 @@ from enum import Enum
 
 # Default values
 DEFAULT_CHARACTERS_TO_ANONYMIZE = 100000
-DEFAULT_PROMPT_NAME = "simple"
+DEFAULT_PROMPT_NAME = "detailed"
 DEFAULT_MODEL_NAME = "gemini-2.5-flash-lite"
 
 # Enum for prompt names
