@@ -7,13 +7,12 @@ import typer
 from typing_extensions import Annotated
 
 from pdf_anonymizer.core import anonymize_pdf
-from pdf_anonymizer.utils import save_results
+from pdf_anonymizer.utils import save_mapping
 from pdf_anonymizer.prompts import detailed, simple
 from pdf_anonymizer.conf import (
     PromptEnum,
     ModelProvider,
     ModelName,
-    DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_PROMPT_NAME,
     DEFAULT_MODEL_NAME,
 )
@@ -45,12 +44,6 @@ def run(
             resolve_path=True,
         ),
     ],
-    characters_to_anonymize: Annotated[
-        int,
-        typer.Option(
-            help="Number of characters to send for anonymization in one go."
-        ),
-    ] = DEFAULT_CHARACTERS_TO_ANONYMIZE,
     prompt_name: Annotated[
         PromptEnum,
         typer.Option(
@@ -75,29 +68,25 @@ def run(
                 sys.exit(1)
 
     logging.info(f"  --pdf-path: {pdf_path}")
-    logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
     logging.info(f"  --model-name: {model_name.value}")
 
     prompt_mapping = {"simple": simple.prompt_template, "detailed": detailed.prompt_template}
     prompt_template = prompt_mapping[prompt_name.value]
     logging.info(f"  --prompt-name: {prompt_name.value}")
 
-    full_anonymized_text, final_mapping = anonymize_pdf(
+    anonymized_pdf_path, final_mapping = anonymize_pdf(
         pdf_path,
-        characters_to_anonymize,
         prompt_template,
         model_name.value
     )
 
-    if full_anonymized_text:
-        anonymized_output_file, mapping_file = save_results(
-            full_anonymized_text,
-            final_mapping,
-            pdf_path
-        )
+    if anonymized_pdf_path and final_mapping:
+        mapping_file_path = save_mapping(final_mapping, pdf_path)
         logging.info("Anonymization complete!")
-        logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
-        logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
+        logging.info(f"Anonymized PDF saved to '{anonymized_pdf_path}'")
+        logging.info(f"Mapping vocabulary saved to '{mapping_file_path}'")
+    else:
+        logging.warning("Anonymization process did not produce a new PDF file.")
 
 
 if __name__ == "__main__":
