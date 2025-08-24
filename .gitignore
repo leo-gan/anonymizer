@@ -1,4 +1,5 @@
-/pdf_anonymizer/.env
+.env
 __pycache__/
 app.log
 *.egg-info/
+.venv/
