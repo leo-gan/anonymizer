@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import os
 
 
 def save_results(full_anonymized_text, final_mapping, pdf_path):
@@ -7,11 +8,17 @@ def save_results(full_anonymized_text, final_mapping, pdf_path):
     Save the anonymized text and the mapping to files.
     """
     pdf_file_name = Path(pdf_path).stem
-    anonymized_output_file = f"{pdf_file_name}.anonymized_output.txt"
+
+    anonymized_dir = "data/anonymized"
+    mappings_dir = "data/mappings"
+    os.makedirs(anonymized_dir, exist_ok=True)
+    os.makedirs(mappings_dir, exist_ok=True)
+
+    anonymized_output_file = f"{anonymized_dir}/{pdf_file_name}.anonymized.md"
     with open(anonymized_output_file, "w", encoding="utf-8") as f:
         f.write(full_anonymized_text)
 
-    mapping_file = f"{pdf_file_name}.mapping.json"
+    mapping_file = f"{mappings_dir}/{pdf_file_name}.mapping.json"
     # fix some glitch:
     final_mapping = {k: v for k, v in final_mapping.items() if k != v}
     with open(mapping_file, "w", encoding="utf-8") as f:
