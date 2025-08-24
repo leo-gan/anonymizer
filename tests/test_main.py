@@ -7,10 +7,50 @@ from pdf_anonymizer.prompts import simple
 
 
 class TestAnonymizer(unittest.TestCase):
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'pdf_anonymizer', 'tests', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
     sample_pdf_path = os.path.join(data_path, 'sample.pdf')
-    output_txt_path = os.path.join(data_path, 'sample.anonymized_output.txt')
-    mapping_path = os.path.join(data_path, 'sample.mapping.json')
+
+    def test_save_results(self):
+        """
+        Tests the save_results function.
+        """
+        # Sample data
+        from pdf_anonymizer.utils import save_results
+        import shutil
+        full_anonymized_text = "This is a test."
+        final_mapping = {"key": "value"}
+        pdf_path = self.sample_pdf_path
+
+        # expected file paths
+        expected_anonymized_file = "data/anonymized/sample.anonymized.md"
+        expected_mapping_file = "data/mappings/sample.mapping.json"
+
+        # clean up before test
+        if os.path.exists("data"):
+            shutil.rmtree("data")
+
+        # Call the function
+        anonymized_output_file, mapping_file = save_results(
+            full_anonymized_text,
+            final_mapping,
+            pdf_path
+        )
+
+        # Asserts
+        self.assertEqual(anonymized_output_file, expected_anonymized_file)
+        self.assertEqual(mapping_file, expected_mapping_file)
+        self.assertTrue(os.path.exists(anonymized_output_file))
+        self.assertTrue(os.path.exists(mapping_file))
+
+        with open(anonymized_output_file, "r") as f:
+            self.assertEqual(f.read(), full_anonymized_text)
+
+        with open(mapping_file, "r") as f:
+            import json
+            self.assertEqual(json.load(f), final_mapping)
+
+        # clean up after test
+        shutil.rmtree("data")
 
     @patch('pdf_anonymizer.call_llm.genai.Client')
     def test_anonymize_text_with_gemini(self, mock_client):
