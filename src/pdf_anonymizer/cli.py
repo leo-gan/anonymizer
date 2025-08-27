@@ -33,10 +33,10 @@ app = typer.Typer()
 
 @app.command()
 def run(
-    pdf_path: Annotated[
-        Path,
+    pdf_paths: Annotated[
+        list[Path],
         typer.Argument(
-            help="The path to the PDF file to anonymize.",
+            help="A list of paths to PDF files to anonymize.",
             exists=True,
             file_okay=True,
             dir_okay=False,
@@ -74,7 +74,7 @@ def run(
                 logging.error("Error: GOOGLE_API_KEY not found. Please set it in the .env file.")
                 sys.exit(1)
 
-    logging.info(f"  --pdf-path: {pdf_path}")
+    logging.info(f"  --pdf-paths: {pdf_paths}")
     logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
     logging.info(f"  --model-name: {model_name.value}")
 
@@ -82,22 +82,26 @@ def run(
     prompt_template = prompt_mapping[prompt_name.value]
     logging.info(f"  --prompt-name: {prompt_name.value}")
 
-    full_anonymized_text, final_mapping = anonymize_pdf(
-        pdf_path,
-        characters_to_anonymize,
-        prompt_template,
-        model_name.value
-    )
+    logging.info(f"Found {len(pdf_paths)} PDF file(s) to process.")
 
-    if full_anonymized_text:
-        anonymized_output_file, mapping_file = save_results(
-            full_anonymized_text,
-            final_mapping,
-            pdf_path
+    for i, pdf_path in enumerate(pdf_paths, 1):
+        logging.info(f"Processing file {i}/{len(pdf_paths)}: {pdf_path}")
+        full_anonymized_text, final_mapping = anonymize_pdf(
+            pdf_path,
+            characters_to_anonymize,
+            prompt_template,
+            model_name.value
         )
-        logging.info("Anonymization complete!")
-        logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
-        logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
+
+        if full_anonymized_text:
+            anonymized_output_file, mapping_file = save_results(
+                full_anonymized_text,
+                final_mapping,
+                pdf_path
+            )
+            logging.info(f"Anonymization for {pdf_path} complete!")
+            logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
+            logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
 
 
 if __name__ == "__main__":
