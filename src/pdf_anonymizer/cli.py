@@ -13,9 +13,11 @@ from pdf_anonymizer.conf import (
     PromptEnum,
     ModelProvider,
     ModelName,
+    OutputFormat,
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_PROMPT_NAME,
     DEFAULT_MODEL_NAME,
+    DEFAULT_OUTPUT_FORMAT,
 )
 
 
@@ -63,6 +65,12 @@ def run(
             help="The model to use for anonymization.",
         ),
     ] = DEFAULT_MODEL_NAME,
+    output_format: Annotated[
+        OutputFormat,
+        typer.Option(
+            help="The output format for the anonymized document.",
+        ),
+    ] = DEFAULT_OUTPUT_FORMAT,
 ):
     """
     Main function to run the PDF anonymization process.
@@ -93,7 +101,8 @@ def run(
         anonymized_output_file, mapping_file = save_results(
             full_anonymized_text,
             final_mapping,
-            pdf_path
+            pdf_path,
+            output_format,
         )
         logging.info("Anonymization complete!")
         logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

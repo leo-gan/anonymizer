@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
 import os
+from markdown_pdf import MarkdownPdf
 
 
-def save_results(full_anonymized_text, final_mapping, pdf_path):
+def save_results(full_anonymized_text, final_mapping, pdf_path, output_format):
     """
     Save the anonymized text and the mapping to files.
     """
@@ -14,9 +15,15 @@ def save_results(full_anonymized_text, final_mapping, pdf_path):
     os.makedirs(anonymized_dir, exist_ok=True)
     os.makedirs(mappings_dir, exist_ok=True)
 
-    anonymized_output_file = f"{anonymized_dir}/{pdf_file_name}.anonymized.md"
-    with open(anonymized_output_file, "w", encoding="utf-8") as f:
-        f.write(full_anonymized_text)
+    if output_format == "pdf":
+        anonymized_output_file = f"{anonymized_dir}/{pdf_file_name}.anonymized.pdf"
+        pdf = MarkdownPdf()
+        pdf.add_section(full_anonymized_text)
+        pdf.save(anonymized_output_file)
+    else:
+        anonymized_output_file = f"{anonymized_dir}/{pdf_file_name}.anonymized.md"
+        with open(anonymized_output_file, "w", encoding="utf-8") as f:
+            f.write(full_anonymized_text)
 
     mapping_file = f"{mappings_dir}/{pdf_file_name}.mapping.json"
     # fix some glitch:
