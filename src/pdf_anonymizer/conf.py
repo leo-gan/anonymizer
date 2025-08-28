@@ -1,9 +1,14 @@
 from enum import Enum
+from typing import Type, TypeVar
 
 # Default values
-DEFAULT_CHARACTERS_TO_ANONYMIZE = 100000
-DEFAULT_PROMPT_NAME = "detailed"
-DEFAULT_MODEL_NAME = "gemini-2.5-flash"
+DEFAULT_CHARACTERS_TO_ANONYMIZE: int = 100000
+DEFAULT_PROMPT_NAME: str = "detailed"
+DEFAULT_MODEL_NAME: str = "gemini-2.5-flash"
+
+# Type variable for enum values
+T = TypeVar("T", bound=Enum)
+
 
 # Enum for prompt names
 class PromptEnum(str, Enum):
@@ -25,7 +30,28 @@ class ModelName(str, Enum):
     phi = "phi4-mini"
 
     @property
-    def provider(self) -> ModelProvider:
+    def provider(self) -> "ModelProvider":
         if "gemini" in self.value:
             return ModelProvider.GOOGLE
         return ModelProvider.OLLAMA
+
+
+def get_enum_value(enum_type: Type[T], value: str) -> T:
+    """Safely get an enum value from a string.
+
+    Args:
+        enum_type: The enum class to get the value from.
+        value: The string value to look up in the enum.
+
+    Returns:
+        The corresponding enum member.
+
+    Raises:
+        ValueError: If the value is not found in the enum.
+    """
+    try:
+        return enum_type(value)
+    except ValueError as e:
+        raise ValueError(
+            f"Invalid value '{value}' for enum {enum_type.__name__}"
+        ) from e

@@ -1,11 +1,21 @@
 import json
-from pathlib import Path
 import os
+from pathlib import Path
 
 
-def save_results(full_anonymized_text, final_mapping, pdf_path):
+def save_results(
+    full_anonymized_text: str, final_mapping: dict[str, str], pdf_path: str
+) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
+
+    Args:
+        full_anonymized_text (str): The anonymized text.
+        final_mapping (dict[str, str]): The mapping.
+        pdf_path (str): The path to the original PDF file.
+
+    Returns:
+        tuple[str, str]: The paths to the anonymized text file and the mapping file.
     """
     pdf_file_name = Path(pdf_path).stem
 

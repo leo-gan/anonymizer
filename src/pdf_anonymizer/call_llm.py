@@ -1,76 +1,120 @@
 import json
 import logging
 import time
+from typing import Dict, Tuple, TypedDict, Union
 
 import ollama
 from google import genai
 
-
 OLLAMA_MODELS = ["gemma", "phi4-mini"]
 
 
-def anonymize_text_with_llm(text, existing_mapping, prompt_template, model_name: str):
+# Type definitions for better code clarity
+class OllamaResponse(TypedDict):
+    message: Dict[str, str]
+
+
+class ModelResponse(TypedDict):
+    text: str
+
+
+class AnonymizationResult(TypedDict):
+    anonymized_text: str
+    mapping: Dict[str, str]
+
+
+def anonymize_text_with_llm(
+    text: str,
+    existing_mapping: Dict[str, str],
+    prompt_template: str,
+    model_name: str,
+) -> Tuple[str, Dict[str, str]]:
     """
     Anonymizes a text chunk using a specified language model and updates the mapping.
     It retries on failure up to a maximum of 3 times.
 
     Args:
-        model_name: The name of the model to use.
+        text: The text to anonymize.
+        existing_mapping: The existing mapping of original to anonymized entities.
         prompt_template: The prompt template for the anonymization task.
-        text (str): The text to anonymize.
-        existing_mapping (dict): The existing mapping of original to anonymized entities.
+        model_name: The name of the model to use.
 
     Returns:
-        tuple: A tuple containing the anonymized text and the updated mapping.
+        A tuple containing the anonymized text and the updated mapping.
     """
     prompt = prompt_template.format(
-        existing_mapping=json.dumps(existing_mapping),
-        text=text
+        existing_mapping=json.dumps(existing_mapping), text=text
     )
 
-    response = None
+    response: Union[OllamaResponse, ModelResponse, None] = None
     max_retries = 3
+
     for attempt in range(max_retries):
         try:
-            logging.info(f"Calling '{model_name}': text: {len(text):,}, mapping: {len(existing_mapping):,}, attempt {attempt + 1}")
+            logging.info(
+                f"Calling '{model_name}': text: {len(text):,}, "
+                f"mapping: {len(existing_mapping):,}, attempt {attempt + 1}"
+            )
+
             if model_name in OLLAMA_MODELS:
-                response = ollama.chat(model=model_name, messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt,
-                    },
-                ])
-                raw_text = response['message']['content']
+                response = ollama.chat(
+                    model=model_name,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                raw_text: str = response["message"]["content"]
             else:
                 client = genai.Client()
                 response = client.models.generate_content(
-                    model=model_name,
-                    contents=prompt
+                    model=model_name, contents=prompt
                 )
                 raw_text = response.text
 
-            cleaned_response = raw_text.strip().replace('```json', '').replace('```', '').strip()
-            result = json.loads(cleaned_response)
-            return result.get("anonymized_text", ""), result.get("mapping", existing_mapping)
+            cleaned_response = (
+                raw_text.strip().replace("```json", "").replace("```", "").strip()
+            )
+            result: AnonymizationResult = json.loads(cleaned_response)
+
+            return (
+                result.get("anonymized_text", ""),
+                result.get("mapping", existing_mapping),
+            )
+
         except json.JSONDecodeError as e:
-            response_text = ""
-            if model_name in OLLAMA_MODELS:
-                if response and 'message' in response and 'content' in response['message']:
-                    response_text = response['message']['content']
-            else:
-                if response:
-                    response_text = response.text
-            logging.error(f"Attempt {attempt + 1} failed with JSON decode error: {e}, {response_text[:200] = } ...")
+            response_text = _get_response_text(response, model_name)
+            logging.error(
+                f"Attempt {attempt + 1} failed with JSON decode error: {e}, "
+                f"response: {response_text[:200]}..."
+            )
             if attempt + 1 == max_retries:
                 logging.error("Max retries reached. Returning original text.")
                 return text, existing_mapping
-            time.sleep(1)  # Wait for 1 second before retrying
+
         except Exception as e:
             logging.error(f"Attempt {attempt + 1} failed with an error: {e}")
             if attempt + 1 == max_retries:
                 logging.error("Max retries reached. Returning original text.")
                 return text, existing_mapping
-            time.sleep(1)
 
-    # This part should not be reached if the loop is exited correctly.
+        time.sleep(1)  # Wait before retrying
+
     return text, existing_mapping
+
+
+def _get_response_text(
+    response: Union[OllamaResponse, ModelResponse, None], model_name: str
+) -> str:
+    """Extract text content from different response types."""
+    if not response:
+        return ""
+
+    if model_name in OLLAMA_MODELS:
+        if (
+            isinstance(response, dict)
+            and "message" in response
+            and "content" in response["message"]
+        ):
+            return response["message"]["content"]
+    elif hasattr(response, "text"):
+        return response.text
+
+    return ""

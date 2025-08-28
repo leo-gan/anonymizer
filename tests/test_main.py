@@ -1,22 +1,25 @@
+import os
 import unittest
 from unittest.mock import Mock, patch
-import os
-from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
+
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
+from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 from pdf_anonymizer.prompts import simple
 
 
 class TestAnonymizer(unittest.TestCase):
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-    sample_pdf_path = os.path.join(data_path, 'sample.pdf')
+    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+    sample_pdf_path = os.path.join(data_path, "sample.pdf")
 
     def test_save_results(self):
         """
         Tests the save_results function.
         """
         # Sample data
-        from pdf_anonymizer.utils import save_results
         import shutil
+
+        from pdf_anonymizer.utils import save_results
+
         full_anonymized_text = "This is a test."
         final_mapping = {"key": "value"}
         pdf_path = self.sample_pdf_path
@@ -31,9 +34,7 @@ class TestAnonymizer(unittest.TestCase):
 
         # Call the function
         anonymized_output_file, mapping_file = save_results(
-            full_anonymized_text,
-            final_mapping,
-            pdf_path
+            full_anonymized_text, final_mapping, pdf_path
         )
 
         # Asserts
@@ -47,19 +48,20 @@ class TestAnonymizer(unittest.TestCase):
 
         with open(mapping_file, "r") as f:
             import json
+
             self.assertEqual(json.load(f), final_mapping)
 
         # clean up after test
         shutil.rmtree("data")
 
-    @patch('pdf_anonymizer.call_llm.genai.Client')
+    @patch("pdf_anonymizer.call_llm.genai.Client")
     def test_anonymize_text_with_gemini(self, mock_client):
         """
         Tests the anonymization function with a mock Gemini API response.
         """
         # Create a mock response object
         mock_response = Mock()
-        mock_response.text = '''
+        mock_response.text = """
         {
             "anonymized_text": "My name is PERSON_1 and I live in LOCATION_1.",
             "mapping": {
@@ -67,7 +69,7 @@ class TestAnonymizer(unittest.TestCase):
                 "New York": "LOCATION_1"
             }
         }
-        '''
+        """
 
         # Configure the mock model to return the mock response
         mock_client_instance = mock_client.return_value
@@ -83,14 +85,18 @@ class TestAnonymizer(unittest.TestCase):
             text,
             existing_mapping,
             prompt_template=simple.prompt_template,
-            model_name='gemini-1.5-flash'
+            model_name="gemini-1.5-flash",
         )
 
         # Asserts
-        self.assertEqual(anonymized_text, "My name is PERSON_1 and I live in LOCATION_1.")
-        self.assertEqual(new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"})
+        self.assertEqual(
+            anonymized_text, "My name is PERSON_1 and I live in LOCATION_1."
+        )
+        self.assertEqual(
+            new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"}
+        )
 
-    @patch('pdf_anonymizer.call_llm.ollama.chat')
+    @patch("pdf_anonymizer.call_llm.ollama.chat")
     def test_anonymize_text_with_ollama(self, mock_ollama_chat):
         """
         Tests the anonymization function with a mock Ollama API response.
@@ -98,7 +104,7 @@ class TestAnonymizer(unittest.TestCase):
         # Create a mock response object
         mock_response = {
             "message": {
-                "content": '''
+                "content": """
                 {
                     "anonymized_text": "My name is PERSON_1 and I live in LOCATION_1.",
                     "mapping": {
@@ -106,7 +112,7 @@ class TestAnonymizer(unittest.TestCase):
                         "New York": "LOCATION_1"
                     }
                 }
-                '''
+                """
             }
         }
 
@@ -122,13 +128,16 @@ class TestAnonymizer(unittest.TestCase):
             text,
             existing_mapping,
             prompt_template=simple.prompt_template,
-            model_name='gemma'
+            model_name="gemma",
         )
 
         # Asserts
-        self.assertEqual(anonymized_text, "My name is PERSON_1 and I live in LOCATION_1.")
-        self.assertEqual(new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"})
-
+        self.assertEqual(
+            anonymized_text, "My name is PERSON_1 and I live in LOCATION_1."
+        )
+        self.assertEqual(
+            new_mapping, {"John Doe": "PERSON_1", "New York": "LOCATION_1"}
+        )
 
     def test_load_and_extract_text(self):
         """
@@ -149,5 +158,6 @@ class TestAnonymizer(unittest.TestCase):
         # Check if the extracted text contains the expected "who lives at"
         self.assertIn("who lives at", text_pages[0])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

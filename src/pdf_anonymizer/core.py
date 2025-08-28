@@ -1,18 +1,34 @@
 import logging
-import time
 import os
+import time
+from typing import Dict, List, Optional, Tuple
 
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 
 
-def anonymize_pdf(pdf_path, characters_to_anonymize, prompt_template, model_name):
+def anonymize_pdf(
+    pdf_path: str,
+    characters_to_anonymize: int,
+    prompt_template: str,
+    model_name: str,
+) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """
-    Anonymize a PDF file.
+    Anonymize a PDF file by processing its text content.
+
+    Args:
+        pdf_path: Path to the PDF file to anonymize.
+        characters_to_anonymize: Number of characters to process in each chunk.
+        prompt_template: Template string for the anonymization prompt.
+        model_name: Name of the language model to use for anonymization.
+
+    Returns:
+        A tuple containing the anonymized text and the mapping of original to anonymized entities,
+        or (None, None) if processing fails.
     """
     # PDF file: chunk and convert to text
     pdf_file_size = os.path.getsize(pdf_path)
-    text_pages = load_and_extract_text(pdf_path, characters_to_anonymize)
+    text_pages: List[str] = load_and_extract_text(pdf_path, characters_to_anonymize)
 
     if not text_pages:
         logging.warning("No text could be extracted from the PDF.")
@@ -24,18 +40,15 @@ def anonymize_pdf(pdf_path, characters_to_anonymize, prompt_template, model_name
     logging.info(f"  - Extracted text size: {extracted_text_size / 1024:.2f} KB")
 
     # Anonymization:
-    anonymized_chunks = []
-    final_mapping = {}
+    anonymized_chunks: List[str] = []
+    final_mapping: Dict[str, str] = {}
 
     for i, text_page in enumerate(text_pages):
-        logging.info(f"Anonymizing part {i+1}/{len(text_pages)}...")
+        logging.info(f"Anonymizing part {i + 1}/{len(text_pages)}...")
         start_time = time.time()
 
         anonymized_text, final_mapping = anonymize_text_with_llm(
-            text_page,
-            final_mapping,
-            prompt_template,
-            model_name
+            text_page, final_mapping, prompt_template, model_name
         )
 
         end_time = time.time()

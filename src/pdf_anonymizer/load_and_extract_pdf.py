@@ -1,12 +1,10 @@
 import logging
-import sys
 
 import pymupdf4llm
 from langchain_text_splitters import MarkdownTextSplitter
 
 
-
-def load_and_extract_text(pdf_path, characters_to_anonymize=100000):
+def load_and_extract_text(pdf_path, characters_to_anonymize=100000) -> list[str]:
     """
     Loads a PDF file and extracts text from each page.
 
@@ -19,7 +17,9 @@ def load_and_extract_text(pdf_path, characters_to_anonymize=100000):
     """
     try:
         md_text = pymupdf4llm.to_markdown(pdf_path, show_progress=False)
-        splitter = MarkdownTextSplitter(chunk_size=characters_to_anonymize, chunk_overlap=0)
+        splitter = MarkdownTextSplitter(
+            chunk_size=characters_to_anonymize, chunk_overlap=0
+        )
         docs = splitter.create_documents([md_text])
         return [doc.page_content for doc in docs]
     except FileNotFoundError as e:
