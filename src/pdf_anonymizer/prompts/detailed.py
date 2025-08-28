@@ -1,10 +1,11 @@
 prompt_template = """
-You are an expert at anonymizing text while maintaining the original meaning and context. Your task is to process the following text and perform two key actions:
+You are an expert at anonymizing text while maintaining the original meaning and context. 
+Your task is to process the Input text and perform these key actions:
 
 1. **Anonymize the text:** Identify and replace personally identifiable information (PII) and sensitive entities with anonymized tags.
 2. **Generate a JSON mapping:** Create a one-to-one mapping between the original entities and their corresponding anonymized tags.
-3. "Output": Return a single JSON object with two keys:
-        - "anonymized_text": The text with all PII replaced by placeholders.
+3. "Output": Return a single JSON object with two elements:
+        - "anonymized_text": The text with all PII replaced by placeholders. Do not return the Input text!
         - "mapping": The complete and updated JSON mapping.
 
 >>>>>>>>>>>>>>>>>>>>>>
@@ -27,7 +28,8 @@ ANONYMIZATION GUIDELINES:
     *   Use a consistent naming convention for anonymized tags.
     *   Prefix tags with the entity type (e.g., `PERSON`, `ADDRESS`, `DATE`, `EMAIL`, `COMPANY`, `PHONE`, `JOB_TITLE`, `ACCOUNT_ID`).
     *   Follow the prefix with an underscore (`_`) and a sequential numerical identifier (e.g., `PERSON_1`, `ADDRESS_1`, `DATE_5`).
-    *   **Handling Variations of Entities:** If you encounter a variation of an already anonymized entity, it should create a new, related anonymized tag to indicate this variation. The convention for variations will be: `[Original_Anonymized_Tag].v_[variation_number]`.
+    *   **Handling Variations of Entities:** If you encounter a variation of an already anonymized entity, it should create a new, 
+        related anonymized tag to indicate this variation. The convention for variations will be: `[Original_Anonymized_Tag].v_[variation_number]`.
 
         *   **Example:** If "Mary Smith" is mapped as `PERSON_1`, then "Mary's" should be mapped as `PERSON_1.v_2`.
         *   **Example:** If "John Doe" is mapped as `PERSON_2`, then "Mr. John Doe" should be mapped as `PERSON_2.v_2`.
@@ -43,22 +45,32 @@ EXAMPLES:
 
 **Input Text Example:**
 
-"John Joe, who lives at 2864, Holm st, Springfild, met Mary Smith yesterday."
+"John Joe, who lives at 2864, Holm st, Springfield, met Mary Smith yesterday."
 
 
-**Anonymized Text Example:**
+**Input Mapping Example:**
 
-"PERSON_1, who lives at ADDRESS_1, PERSON_3, met PERSON_2 yesterday."
+{{
+  "PERSON_1": "Alex Maxim",
+  "PERSON_2": "John Joell",
+  "PERSON_3": "John Joe",
+  "ADDRESS_1": "2864, Holm st, Springfield",
+}}
 
 **JSON Output Example:** 
-{{
-	"anonymized_text": "PERSON_1, who lives at ADDRESS_1, met PERSON_2 yesterday.",
-	"mapping": {{
+NOTES:
+- The PERSON_3 and ADDRESS_1 were detected in the Input Mapping and were used.
+- The PERSON_4 was a new and it was created and added to the Mapping.
+- The PERSON_1 and PERSON_2 were not detected in text but they are NOT removed or changed in the mapping!
 
-	  "PERSON_1": "John Joe",
-	  "ADDRESS_1": "2864, Holm st, Springfild",
-	  "LOCATION_2": "Springfild",
-	  "PERSON_2": "Mary Smith" 
+{{
+	"anonymized_text": "PERSON_3, who lives at ADDRESS_1, met PERSON_4 yesterday.",
+	"mapping": {{
+          "PERSON_1": "Alex Maxim",
+          "PERSON_2": "John Joell",
+          "PERSON_3": "John Joe",
+          "ADDRESS_1": "2864, Holm st, Springfield",
+          "PERSON_4": "Mary Smith",
 	}}
 }}
 
@@ -71,5 +83,5 @@ EXISTING MAPPING:
 TEXT TO ANONYMIZE:
 
 {text}
-  
+
 """

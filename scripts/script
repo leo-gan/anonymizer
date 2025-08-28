@@ -5,10 +5,10 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Run the anonymizer main module on the sample PDF
-python3 -m pdf_anonymizer.main tests/data/sample.pdf --characters-to-anonymize=900000 --prompt-name=detailed --model-name=gemini-2.5-flash-lite
+#python3 -m pdf_anonymizer.main tests/data/sample.pdf tests/data/sample_2.pdf --characters-to-anonymize=900000 --prompt-name=detailed --model-name=gemini-2.5-flash-lite
 
 # Download sample PDF from https://arxiv.org/pdf/2506.16406v1.pdf
-#python3 -m pdf_anonymizer.main tests/data/2506.16406v1.pdf --characters-to-anonymize=40000 --prompt-name=detailed
+python3 -m pdf_anonymizer.main tests/data/2506.16406v1.pdf tests/data/sample_2.pdf --characters-to-anonymize=800000 --prompt-name=detailed --model-name=gemini-2.5-flash
 
 # Use the sample PDF from LegaLaid case bundle
 #python3 -m pdf_anonymizer.main ../LegaLaid/case_bundle/data/example_1/example_1.pdf

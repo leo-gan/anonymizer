@@ -36,7 +36,14 @@ This application anonymizes large PDF files by splitting them into smaller piece
 
 ## Models
 
-If you are using Ollama, you need to download the models you want to use. You can do this from the command line. For example, to download the `phi` model:
+### Google Models:
+- the `gemini-2.5-flash` model (default) is recommended
+- the `gemini-2.5-flash-lite` model performs well only on small files!
+
+### Ollama models:
+Using Ollama models you can run anonymization locally for free.
+If you are using Ollama, you need to download the models you want to use. 
+You can do this from the command line. For example, to download the `phi` model:
 
 ```bash
 ollama pull phi
@@ -58,22 +65,22 @@ You can also specify the model and prompt you want to use:
 uv run python pdf_anonymizer/main.py /path/to/your/document.pdf --model-name phi --prompt-name detailed
 ```
 
-The output files (`{original_file_name}.anonymized_output.txt` and `{original_file_name}.mapping.json`) will be created in the root directory of the project.
+The output files (`data/anonymized/{original_file_name}.anonymized_output.md` and `data/mappings/{original_file_name}.mapping.json`) will be created in the `/data` directory of the project.
 
 ## Example
 
-**Input Text (from a PDF page):**
+**Input Text from a `sample.pdf`:**
 > "John Smith, CEO of Acme Corp, can be reached at john.smith@example.com."
 
-**`anonymized_output.txt`:**
+**Anonymized Output Markdown text: `sample.anonymized_output.md`**
 > "PERSON_1, CEO of ORGANIZATION_1, can be reached at EMAIL_1."
 
-**`mapping.json`:**
+**Entity Mapping: `sample.mapping.json`**
 ```json
 {
-    "John Smith": "PERSON_1",
-    "Acme Corp": "ORGANIZATION_1",
-    "john.smith@example.com": "EMAIL_1"
+  "PERSON_1": "John Smith",
+  "ORGANIZATION_1": "Acme Corp",
+  "EMAIL_1": "john.smith@example.com"
 }
 ```
 
