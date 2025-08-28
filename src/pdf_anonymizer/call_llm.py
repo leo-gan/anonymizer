@@ -60,7 +60,7 @@ def anonymize_text_with_llm(text, existing_mapping, prompt_template, model_name:
             else:
                 if response:
                     response_text = response.text
-            logging.error(f"Attempt {attempt + 1} failed with JSON decode error: {e} {response_text}")
+            logging.error(f"Attempt {attempt + 1} failed with JSON decode error: {e}, {response_text[:200] = } ...")
             if attempt + 1 == max_retries:
                 logging.error("Max retries reached. Returning original text.")
                 return text, existing_mapping

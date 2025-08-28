@@ -20,7 +20,6 @@ def anonymize_pdf(pdf_path, characters_to_anonymize, prompt_template, model_name
 
     extracted_text_size = sum(len(page) for page in text_pages)
 
-    logging.info(f"Starting anonymization for: {pdf_path}")
     logging.info(f"  - PDF file size: {pdf_file_size / 1024:.2f} KB")
     logging.info(f"  - Extracted text size: {extracted_text_size / 1024:.2f} KB")
 

@@ -85,6 +85,7 @@ def run(
     logging.info(f"Found {len(pdf_paths)} PDF file(s) to process.")
 
     for i, pdf_path in enumerate(pdf_paths, 1):
+        logging.info('='*40)
         logging.info(f"Processing file {i}/{len(pdf_paths)}: {pdf_path}")
         full_anonymized_text, final_mapping = anonymize_pdf(
             pdf_path,

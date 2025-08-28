@@ -18,7 +18,7 @@ def load_and_extract_text(pdf_path, characters_to_anonymize=100000):
         list: A list of strings, where each string is the text of a page.
     """
     try:
-        md_text = pymupdf4llm.to_markdown(pdf_path)
+        md_text = pymupdf4llm.to_markdown(pdf_path, show_progress=False)
         splitter = MarkdownTextSplitter(chunk_size=characters_to_anonymize, chunk_overlap=0)
         docs = splitter.create_documents([md_text])
         return [doc.page_content for doc in docs]
