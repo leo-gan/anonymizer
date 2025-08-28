@@ -53,26 +53,97 @@ You can see a list of available models on the Ollama website.
 
 ## Usage
 
-Run the application from the command line, providing the path to the PDF file you want to anonymize.
+### Basic Commands
 
-Using `uv`:
+1. **Anonymize a PDF**:
+   ```bash
+   uv run python pdf_anonymizer/main.py run /path/to/your/document.pdf
+   ```
+
+2. **Deanonymize a file**:
+   ```bash
+   uv run python pdf_anonymizer/main.py deanonymize \
+       data/anonymized/document.anonymized.md \
+       data/mappings/document.mapping.json
+   ```
+
+## Command Line Arguments
+
+### `run` command
+Anonymize one or more PDF files.
+
 ```bash
-uv run python pdf_anonymizer/main.py /path/to/your/document.pdf
+uv run python pdf_anonymizer/main.py run PDF_FILES [OPTIONS]
 ```
 
-You can also specify the model and prompt you want to use:
+#### Arguments:
+- `PDF_FILES`: Path to one or several PDF files for anonymization.
+
+#### Options:
+- `--characters-to-anonymize INTEGER`  
+  Number of characters to send to the model for anonymization in one go.  
+  Default: `100000`
+
+- `--prompt-name [simple|detailed]`  
+  The prompt template to use for anonymization.  
+  Choices: `simple`, `detailed`  
+  Default: `detailed`
+
+- `--model-name TEXT`  
+  The language model to use for anonymization.  
+  Available models:
+  - Google models (require GOOGLE_API_KEY):
+    - `gemini-2.5-pro`
+    - `gemini-2.5-flash` (default)
+    - `gemini-2.5-flash-lite`
+  - Local Ollama models:
+    - `gemma:7b`
+    - `phi4-mini`
+  Default: `gemini-2.5-flash`
+
+### `deanonymize` command
+Revert anonymization using a mapping file.
+
 ```bash
-uv run python pdf_anonymizer/main.py /path/to/your/document.pdf --model-name phi --prompt-name detailed
+uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
 ```
 
-The output files (`data/anonymized/{original_file_name}.anonymized_output.md` and `data/mappings/{original_file_name}.mapping.json`) will be created in the `/data` directory of the project.
+#### Arguments:
+- `ANONYMIZED_FILE`: Path to the anonymized text file
+- `MAPPING_FILE`: Path to the JSON mapping file
 
-## Example
+## Environment Variables
+
+- `GOOGLE_API_KEY`: Required when using Google's Gemini models
+- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models
+
+## Examples
+
+1. **Basic anonymization**:
+   ```bash
+   uv run python pdf_anonymizer/main.py run document.pdf
+   ```
+
+2. **Custom model and prompt**:
+   ```bash
+   uv run python pdf_anonymizer/main.py run document.pdf --model-name phi4-mini --prompt-name simple
+   ```
+
+3. **Custom character chunk size**:
+The models can have different performance with different chunk sizes.
+
+   ```bash
+   uv run python pdf_anonymizer/main.py run document.pdf --characters-to-anonymize 50000
+   ```
+
+## Anonymization
+
+### Example
 
 **Input Text from a `sample.pdf`:**
 > "John Smith, CEO of Acme Corp, can be reached at john.smith@example.com."
 
-**Anonymized Output Markdown text: `sample.anonymized_output.md`**
+**Anonymized Output Markdown text: `sample.anonymized.md`**
 > "PERSON_1, CEO of ORGANIZATION_1, can be reached at EMAIL_1."
 
 **Entity Mapping: `sample.mapping.json`**
@@ -83,6 +154,30 @@ The output files (`data/anonymized/{original_file_name}.anonymized_output.md` an
   "EMAIL_1": "john.smith@example.com"
 }
 ```
+
+## Deanonymization
+
+The tool also supports reversing the anonymization process using the `deanonymize` command. This can be useful if you need to recover the original text from an anonymized document.
+
+### Usage
+
+To deanonymize a file, you'll need both the anonymized text and its corresponding mapping file:
+
+```bash
+uv run python pdf_anonymizer/main.py deanonymize data/anonymized/document.anonymized.md data/mappings/document.mapping.json
+```
+
+This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`
+and a deanonymization statistics file at `data/stats/document.deanonymization_stat.json`.
+
+### Example
+
+**Anonymized Text: `sample.anonymized.md`**
+> "PERSON_1, CEO of ORGANIZATION_1, can be reached at EMAIL_1."
+
+**Deanonymized Output: `sample.deanonymized.md`**
+> "John Smith, CEO of Acme Corp, can be reached at john.smith@example.com."
+
 
 ## Testing
 
