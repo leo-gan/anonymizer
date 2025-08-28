@@ -16,7 +16,7 @@ def test_deanonymize_file():
         "PERSON_1": "John Doe",
         "LOCATION_1": "New York",
         "EMAIL_1": "john.doe@example.com",
-        "PERSON_37": "Unused Person"
+        "PERSON_37": "Unused Person",
     }
     mapping_file = Path("test_mapping.json")
     mapping_file.write_text(json.dumps(mapping_content))
@@ -41,7 +41,6 @@ def test_deanonymize_file():
     assert stats_content["deanonymized_file"] == deanonymized_output_file
     assert sorted(stats_content["unused_mappings"]) == ["PERSON_37"]
     assert sorted(stats_content["not_found_mappings"]) == ["PERSON_4"]
-
 
     # Cleanup
     os.remove(anonymized_file)
