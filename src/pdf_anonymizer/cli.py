@@ -19,7 +19,7 @@ from pdf_anonymizer.conf import (
 )
 from pdf_anonymizer.core import anonymize_pdf
 from pdf_anonymizer.prompts import detailed, simple
-from pdf_anonymizer.utils import save_results
+from pdf_anonymizer.utils import deanonymize_file, save_results
 
 logging.basicConfig(
     level=logging.INFO,
@@ -116,6 +116,49 @@ def run(
             logging.info(f"Anonymization for {pdf_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
             logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
+
+
+@app.command()
+def deanonymize(
+    anonymized_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to the anonymized file.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+    mapping_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to the mapping file.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+) -> None:
+    """
+    Deanonymize a file using a mapping file.
+
+    Args:
+        anonymized_file: Path to the anonymized file.
+        mapping_file: Path to the mapping file.
+    """
+    logging.info(f"Deanonymizing '{anonymized_file}' using '{mapping_file}'")
+    deanonymized_output_file, stats_file = deanonymize_file(
+        str(anonymized_file), str(mapping_file)
+    )
+    logging.info("Deanonymization complete!")
+    logging.info(f"Deanonymized text saved into '{deanonymized_output_file}'")
+    logging.info(f"Deanonymization statistics saved into '{stats_file}'")
 
 
 if __name__ == "__main__":
