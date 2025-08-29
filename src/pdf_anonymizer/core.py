@@ -4,14 +4,18 @@ import time
 from typing import Dict, List, Optional, Tuple
 
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
+from pdf_anonymizer.exceptions import AnonymizationError
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
+
+
+from pdf_anonymizer.conf import ModelName
 
 
 def anonymize_pdf(
     pdf_path: str,
     characters_to_anonymize: int,
     prompt_template: str,
-    model_name: str,
+    model_name: ModelName,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """
     Anonymize a PDF file by processing its text content.
@@ -47,9 +51,15 @@ def anonymize_pdf(
         logging.info(f"Anonymizing part {i + 1}/{len(text_pages)}...")
         start_time = time.time()
 
-        anonymized_text, final_mapping = anonymize_text_with_llm(
-            text_page, final_mapping, prompt_template, model_name
-        )
+        try:
+            anonymized_text, final_mapping = anonymize_text_with_llm(
+                text_page, final_mapping, prompt_template, model_name
+            )
+        except AnonymizationError as e:
+            logging.error(
+                f"Anonymization failed for {pdf_path} on chunk {i + 1}: {e}"
+            )
+            return None, None
 
         end_time = time.time()
         duration = end_time - start_time

@@ -6,8 +6,8 @@ from typing import Dict, Tuple, TypedDict, Union
 import ollama
 from google import genai
 
-OLLAMA_MODELS = ["gemma", "phi4-mini"]
-
+from pdf_anonymizer.conf import ModelName, ModelProvider
+from pdf_anonymizer.exceptions import AnonymizationError
 
 # Type definitions for better code clarity
 class OllamaResponse(TypedDict):
@@ -27,7 +27,7 @@ def anonymize_text_with_llm(
     text: str,
     existing_mapping: Dict[str, str],
     prompt_template: str,
-    model_name: str,
+    model_name: ModelName,
 ) -> Tuple[str, Dict[str, str]]:
     """
     Anonymizes a text chunk using a specified language model and updates the mapping.
@@ -52,20 +52,20 @@ def anonymize_text_with_llm(
     for attempt in range(max_retries):
         try:
             logging.info(
-                f"Calling '{model_name}': text: {len(text):,}, "
+                f"Calling '{model_name.value}': text: {len(text):,}, "
                 f"mapping: {len(existing_mapping):,}, attempt {attempt + 1}"
             )
 
-            if model_name in OLLAMA_MODELS:
+            if model_name.provider == ModelProvider.OLLAMA:
                 response = ollama.chat(
-                    model=model_name,
+                    model=model_name.value,
                     messages=[{"role": "user", "content": prompt}],
                 )
                 raw_text: str = response["message"]["content"]
             else:
                 client = genai.Client()
                 response = client.models.generate_content(
-                    model=model_name, contents=prompt
+                    model=model_name.value, contents=prompt
                 )
                 raw_text = response.text
 
@@ -86,28 +86,26 @@ def anonymize_text_with_llm(
                 f"response: {response_text[:200]}..."
             )
             if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
+                raise AnonymizationError("Max retries reached due to JSON decode error.")
 
         except Exception as e:
             logging.error(f"Attempt {attempt + 1} failed with an error: {e}")
             if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
+                raise AnonymizationError(f"Max retries reached due to an error: {e}")
 
         time.sleep(1)  # Wait before retrying
 
-    return text, existing_mapping
+    raise AnonymizationError("Anonymization failed after all retries.")
 
 
 def _get_response_text(
-    response: Union[OllamaResponse, ModelResponse, None], model_name: str
+    response: Union[OllamaResponse, ModelResponse, None], model_name: ModelName
 ) -> str:
     """Extract text content from different response types."""
     if not response:
         return ""
 
-    if model_name in OLLAMA_MODELS:
+    if model_name.provider == ModelProvider.OLLAMA:
         if (
             isinstance(response, dict)
             and "message" in response

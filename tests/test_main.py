@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
+from pdf_anonymizer.conf import ModelName
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 from pdf_anonymizer.prompts import simple
 
@@ -85,7 +86,7 @@ class TestAnonymizer(unittest.TestCase):
             text,
             existing_mapping,
             prompt_template=simple.prompt_template,
-            model_name="gemini-1.5-flash",
+            model_name=ModelName.gemini_2_5_flash,
         )
 
         # Asserts
@@ -128,7 +129,7 @@ class TestAnonymizer(unittest.TestCase):
             text,
             existing_mapping,
             prompt_template=simple.prompt_template,
-            model_name="gemma",
+            model_name=ModelName.gemma_7b,
         )
 
         # Asserts

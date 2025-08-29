@@ -3,6 +3,8 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from pdf_anonymizer.call_llm import anonymize_text_with_llm
+from pdf_anonymizer.conf import ModelName
+from pdf_anonymizer.exceptions import AnonymizationError
 from pdf_anonymizer.prompts import simple
 
 
@@ -32,7 +34,7 @@ class TestAnonymizeTextWithLlm(unittest.TestCase):
         text = "This is a test text."
         existing_mapping = {}
         anonymized_text, mapping = anonymize_text_with_llm(
-            text, existing_mapping, self.prompt_template, "gemini-2.5-pro"
+            text, existing_mapping, self.prompt_template, ModelName.gemini_2_5_pro
         )
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
@@ -73,7 +75,7 @@ class TestAnonymizeTextWithLlm(unittest.TestCase):
         text = "This is a test text."
         existing_mapping = {}
         anonymized_text, mapping = anonymize_text_with_llm(
-            text, existing_mapping, self.prompt_template, "gemini-2.5-pro"
+            text, existing_mapping, self.prompt_template, ModelName.gemini_2_5_pro
         )
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
@@ -107,7 +109,7 @@ class TestAnonymizeTextWithLlm(unittest.TestCase):
         text = "This is a test text."
         existing_mapping = {}
         anonymized_text, mapping = anonymize_text_with_llm(
-            text, existing_mapping, self.prompt_template, "gemini-2.5-pro"
+            text, existing_mapping, self.prompt_template, ModelName.gemini_2_5_pro
         )
 
         self.assertEqual(anonymized_text, "This is an anonymized text.")
@@ -123,12 +125,11 @@ class TestAnonymizeTextWithLlm(unittest.TestCase):
 
         text = "This is a test text."
         existing_mapping = {}
-        anonymized_text, mapping = anonymize_text_with_llm(
-            text, existing_mapping, self.prompt_template, "gemini-2.5-pro"
-        )
+        with self.assertRaises(AnonymizationError):
+            anonymize_text_with_llm(
+                text, existing_mapping, self.prompt_template, ModelName.gemini_2_5_pro
+            )
 
-        self.assertEqual(anonymized_text, text)
-        self.assertEqual(mapping, existing_mapping)
         self.assertEqual(mock_model_instance.generate_content.call_count, 3)
 
 

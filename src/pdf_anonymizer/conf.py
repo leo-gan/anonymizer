@@ -26,14 +26,17 @@ class ModelName(str, Enum):
     gemini_2_5_pro = "gemini-2.5-pro"
     gemini_2_5_flash = "gemini-2.5-flash"
     gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
-    gemma = "gemma:7b"
-    phi = "phi4-mini"
+    gemma_7b = "gemma:7b"
+    phi4_mini = "phi4-mini"
 
     @property
     def provider(self) -> "ModelProvider":
         if "gemini" in self.value:
             return ModelProvider.GOOGLE
-        return ModelProvider.OLLAMA
+        elif self.value in [self.gemma_7b.value, self.phi4_mini.value]:
+            return ModelProvider.OLLAMA
+        else:
+            raise ValueError(f"Unknown provider for model {self.value}")
 
 
 def get_enum_value(enum_type: Type[T], value: str) -> T:
