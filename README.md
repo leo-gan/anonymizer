@@ -1,15 +1,32 @@
 # PDF Anonymizer
 
-This application anonymizes large PDF files by splitting them into smaller pieces, converting them to text, and using Google Gemini or a local Ollama model to anonymize the text. It generates an anonymized version of the text and a mapping vocabulary of the original entities to their anonymized replacements.
+This application anonymizes large PDF files by splitting them into smaller pieces, converting them to text, and using Google Gemini or a local Ollama model to anonymize the text. 
+It generates an anonymized version of the text and a mapping vocabulary of the original entities to their anonymized replacements.
 
 ## How it works
 
-1.  **Splitting and Text Extraction**: The input PDF is split page by page, and the text content of each page is extracted.
-2.  **Anonymization with LLMs**: Each page's text is sent to an LLM (Google Gemini or a local Ollama model) with a prompt that instructs it to identify and replace Personally Identifiable Information (PII) like names, locations, etc.
-3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that the same entity is replaced with the same placeholder (e.g., "John Smith" is always replaced with "PERSON_1").
+1.  **Input**: The input can be a PDF file or a Markdown or Text file. It can be several files.
+2.  **Anonymization with LLMs**: Each text is sent to an LLM (Google Gemini or a local Ollama model) with a prompt 
+    that instructs it to identify and replace Personally Identifiable Information (PII) like names, locations, etc.
+3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that 
+    the same entity is replaced with the same placeholder (e.g., "John Smith" is always replaced with "PERSON_1").
+4.  **Large files**: Large files are split into smaller chunks to be anonymized.
 4.  **Output**: The application generates two files:
-    *   `{original_file_name}.anonymized_output.txt`: The full text of the PDF with all PII replaced by placeholders.
-    *   `{original_file_name}.mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
+    *   `data/anonymized/{original_file_name}.anonymized.md`: The anonymized Markdown text of the PDF with all PII replaced by placeholders.
+    *   `data/mappings/{original_file_name}.mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
+
+### Design Considerations
+
+- Currently, the LLMs can anonymize text with very good quality, much better than other tools, like Grammar rule engines.
+- Currently, the LLM can recognize and anonymize text directly from the PDF. But they can't edit the PDF file directly.
+  So, we can save the anonymized text only as a text.
+- **Markdown** format can be used as input for the LLM to anonymize the text and as output for the anonymized text.
+- Anonymized text and mapping are stored separately in different directories because of **security** reasons.
+- The anonymized file name starts with the original file name and ends with `.anonymized` and the mapping file name with `.mapping` for easy identification and security reasons.
+- The anonymized text is stored in Markdown format so the LLM can use the document structure information to anonymize the text.
+- **Large files** are split into smaller chunks to be anonymized because LLMs can't handle large texts in one go. 
+- **Mapping** is used to pass the whole 
+  document mapping to the LLM between chunk anonymization. Mapping also can be used to deanonymize the text.
 
 ## Installation
 
