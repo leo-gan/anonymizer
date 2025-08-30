@@ -1,7 +1,0 @@
-{
-    "anonymized_file": "/home/leo/PycharmProjects/GLD/anonymizer/data/anonymized/sample.anonymized.md",
-    "mapping_file": "/home/leo/PycharmProjects/GLD/anonymizer/data/mappings/sample.mapping.json",
-    "deanonymized_file": "data/deanonymized/sample.deanonymized.md",
-    "unused_mappings": [],
-    "not_found_mappings": []
-}

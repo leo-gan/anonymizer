@@ -106,7 +106,7 @@ def run(
         logging.info("=" * 40)
         logging.info(f"Processing file {i}/{len(pdf_paths)}: {pdf_path}")
         full_anonymized_text, final_mapping = anonymize_pdf(
-            str(pdf_path), characters_to_anonymize, prompt_template, model_name.value
+            str(pdf_path), characters_to_anonymize, prompt_template, model_name
         )
 
         if full_anonymized_text and final_mapping:
