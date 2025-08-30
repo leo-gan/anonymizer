@@ -4,14 +4,18 @@ FROM python:3.12-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the project files into the container
-COPY . .
-
-# Install uv
+# Install uv, this layer is almost always cached
 RUN pip install uv
 
-# Install dependencies
+# Copy files required for dependency installation
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies. This layer is cached if pyproject.toml/uv.lock don't change
 RUN uv sync
 
-# Set the entrypoint for the container
+# Copy the rest of the source code.
+# Changes to source code will only invalidate this layer and subsequent ones.
+COPY . .
+
+# Entrypoint
 ENTRYPOINT ["uv", "run", "python", "src/pdf_anonymizer/main.py"]
