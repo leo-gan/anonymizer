@@ -36,6 +36,7 @@ def anonymize_pdf(
         logging.warning("No text could be extracted from the PDF.")
         return None, None
 
+    logging.info(f"Extracted text pages: {text_pages}")
     extracted_text_size = sum(len(page) for page in text_pages)
 
     logging.info(f"  - PDF file size: {pdf_file_size / 1024:.2f} KB")
@@ -45,6 +46,8 @@ def anonymize_pdf(
     anonymized_chunks: List[str] = []
     final_mapping: Dict[str, str] = {}
     placeholder_counts: Dict[str, int] = {}
+    base_entity_placeholders: Dict[str, str] = {}
+    variation_counters: Dict[str, int] = {}
 
     for i, text_page in enumerate(text_pages):
         logging.info(f"Identifying entities in part {i + 1}/{len(text_pages)}...")
@@ -71,22 +74,54 @@ def anonymize_pdf(
             f"Processing {len(entities_to_process)} entities."
         )
 
+        # Consolidate base forms to handle variations like "John" vs "John Doe"
+        base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
+        for entity in entities_to_process:
+            base_form = entity.get("base_form")
+            if not base_form:
+                continue
+            for potential_full_form in base_forms:
+                if base_form != potential_full_form and base_form in potential_full_form:
+                    entity["base_form"] = potential_full_form
+                    break
+
+        # Generate placeholders for all entities that need to be processed
+        for entity in entities_to_process:
+            entity_text = entity["text"]
+            entity_type = entity["type"].upper()
+            base_form = entity.get("base_form") or entity_text
+
+            if entity_text in final_mapping:
+                continue
+
+            if base_form not in base_entity_placeholders:
+                # New base entity, create main placeholder
+                current_count = placeholder_counts.get(entity_type, 0) + 1
+                placeholder_counts[entity_type] = current_count
+                main_placeholder = f"{entity_type}_{current_count}"
+                base_entity_placeholders[base_form] = main_placeholder
+                if base_form not in final_mapping:
+                    final_mapping[base_form] = main_placeholder
+
+            main_placeholder = base_entity_placeholders[base_form]
+
+            if entity_text != base_form:
+                # It's a variation, create variation placeholder
+                current_variation_count = variation_counters.get(main_placeholder, 0) + 1
+                variation_counters[main_placeholder] = current_variation_count
+                variation_placeholder = f"{main_placeholder}.v_{current_variation_count}"
+                final_mapping[entity_text] = variation_placeholder
+            else:
+                final_mapping[entity_text] = main_placeholder
+
         # Sort entities by length descending to replace longer strings first
         entities_to_process.sort(key=lambda e: len(e["text"]), reverse=True)
 
         anonymized_text = text_page
         for entity in entities_to_process:
-            entity_text = entity["text"]
-            entity_type = entity["type"].upper()
-
-            if entity_text not in final_mapping:
-                current_count = placeholder_counts.get(entity_type, 0) + 1
-                placeholder_counts[entity_type] = current_count
-                placeholder = f"{entity_type}_{current_count}"
-                final_mapping[entity_text] = placeholder
-
-            placeholder = final_mapping[entity_text]
-            anonymized_text = anonymized_text.replace(entity_text, placeholder)
+            placeholder = final_mapping.get(entity["text"])
+            if placeholder:
+                anonymized_text = anonymized_text.replace(entity["text"], placeholder)
 
         anonymized_chunks.append(anonymized_text)
 

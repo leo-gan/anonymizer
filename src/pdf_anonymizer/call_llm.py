@@ -21,6 +21,7 @@ class ModelResponse(TypedDict):
 class Entity(TypedDict):
     text: str
     type: str
+    base_form: str
 
 
 class IdentificationResult(TypedDict):
