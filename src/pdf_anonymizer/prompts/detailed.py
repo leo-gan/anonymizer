@@ -1,87 +1,39 @@
 prompt_template = """
-You are an expert at anonymizing text while maintaining the original meaning and context. 
-Your task is to process the Input text and perform these key actions:
+    You are an expert in identifying Personally Identifiable Information (PII).
+    Your task is to read the text below and identify all PII entities.
 
-1. **Anonymize the text:** Identify and replace personally identifiable information (PII) and sensitive entities with anonymized tags.
-2. **Generate a JSON mapping:** Create a one-to-one mapping between the original entities and their corresponding anonymized tags.
-3. "Output": Return a single JSON object with two elements:
-        - "anonymized_text": The text with all PII replaced by placeholders. Do not return the Input text!
-        - "mapping": The complete and updated JSON mapping.
+    Instructions:
+    1.  Read the text carefully.
+    2.  Identify all PII based on the guidelines below.
+    3.  Return a single JSON object with one key: "entities".
+    4.  The value of "entities" should be a list of JSON objects, where each object represents a PII entity and has two keys: "text" (the PII) and "type" (the entity type).
 
->>>>>>>>>>>>>>>>>>>>>>
-ANONYMIZATION GUIDELINES:
+    ENTITY TYPES:
+    *   **PERSON:** Full names, first names, last names, middle names.
+    *   **ADDRESS:** Street names, house numbers, city names, state/province names, postal codes, country names.
+    *   **DATE:** Only birthdates. Do not identify other dates.
+    *   **PHONE:** Any numerical sequences resembling phone numbers.
+    *   **EMAIL:** Standard email address formats.
+    *   **ORGANIZATION:** Names of organizations, businesses, companies.
+    *   **JOB_TITLE:** Specific roles or positions within organizations.
+    *   **ID:** Any alphanumeric strings that appear to be account numbers or identifiers.
+    *   **LOCATION:** Locations that are not full addresses, like cities or landmarks.
 
-*   **Entity Types:** Focus on identifying and anonymizing common PII and sensitive data, including but not limited to:
+    Example:
+    Text: "John Doe from Acme Inc. visited our office in Springfield yesterday."
+    Response:
+    {{
+        "entities": [
+            {{"text": "John Doe", "type": "PERSON"}},
+            {{"text": "Acme Inc.", "type": "ORGANIZATION"}},
+            {{"text": "Springfield", "type": "LOCATION"}}
+        ]
+    }}
 
-    *   **Names:** Full names, first names, last names, middle names.
-    *   **Addresses:** Street names, house numbers, city names, state/province names, postal codes, country names.
-    *   **Dates:** Do not anonymize dates! Only birthdates should be anonymized.
-    *   **Phone Numbers:** Any numerical sequences resembling phone numbers.
-    *   **Email Addresses:** Standard email address formats.
-    *   **Company Names:** Names of organizations, businesses.
-    *   **Job Titles:** Specific roles or positions within organizations.
-    *   **Account Numbers/IDs:** Any alphanumeric strings that appear to be identifiers.
-    *   **Other Sensitive Information:** Any other data that could reasonably identify an individual or organization.
+    Text to process:
+    ---
+    {text}
+    ---
 
-*   **Anonymized Tagging Convention:**
-
-    *   Use a consistent naming convention for anonymized tags.
-    *   Prefix tags with the entity type (e.g., `PERSON`, `ADDRESS`, `DATE`, `EMAIL`, `COMPANY`, `PHONE`, `JOB_TITLE`, `ACCOUNT_ID`).
-    *   Follow the prefix with an underscore (`_`) and a sequential numerical identifier (e.g., `PERSON_1`, `ADDRESS_1`, `DATE_5`).
-    *   **Handling Variations of Entities:** If you encounter a variation of an already anonymized entity, it should create a new, 
-        related anonymized tag to indicate this variation. The convention for variations will be: `[Original_Anonymized_Tag].v_[variation_number]`.
-
-        *   **Example:** If "Mary Smith" is mapped as `PERSON_1`, then "Mary's" should be mapped as `PERSON_1.v_2`.
-        *   **Example:** If "John Doe" is mapped as `PERSON_2`, then "Mr. John Doe" should be mapped as `PERSON_2.v_2`.
-        *   **Example:** If "123 Oak Street" is mapped as `ADDRESS_3`, then "Oak Street" (if referring as the same street in context) could be mapped to `ADDRESS_3.v_2`.
-        *   **Example:** If "Springfield" is mapped as `LOCATION_4`, then "Springfield's" could be mapped as `LOCATION_4.v_2`.
-
-*   **One-to-One Mapping:** Each distinct original entity found in the text must have a unique entry in the JSON mapping. If an entity appears multiple times, it should be mapped to the same anonymized tag each time.
-
-*   **Contextual Awareness:** Use contextual clues to determine if a piece of information is indeed sensitive or an entity to be anonymized. For example, "Apple" as a fruit should not be anonymized, but "Apple Inc." should.
-
->>>>>>>>>>>>>>>>>>>>>>
-EXAMPLES:
-
-**Input Text Example:**
-
-"John Joe, who lives at 2864, Holm st, Springfield, met Mary Smith yesterday."
-
-
-**Input Mapping Example:**
-
-{{
-  "PERSON_1": "Alex Maxim",
-  "PERSON_2": "John Joell",
-  "PERSON_3": "John Joe",
-  "ADDRESS_1": "2864, Holm st, Springfield",
-}}
-
-**JSON Output Example:** 
-NOTES:
-- The PERSON_3 and ADDRESS_1 were detected in the Input Mapping and were used.
-- The PERSON_4 was a new and it was created and added to the Mapping.
-- The PERSON_1 and PERSON_2 were not detected in text but they are NOT removed or changed in the mapping!
-
-{{
-	"anonymized_text": "PERSON_3, who lives at ADDRESS_1, met PERSON_4 yesterday.",
-	"mapping": {{
-          "PERSON_1": "Alex Maxim",
-          "PERSON_2": "John Joell",
-          "PERSON_3": "John Joe",
-          "ADDRESS_1": "2864, Holm st, Springfield",
-          "PERSON_4": "Mary Smith",
-	}}
-}}
-
->>>>>>>>>>>>>>>>>>>>>>
-EXISTING MAPPING:
-
-{existing_mapping}
-
->>>>>>>>>>>>>>>>>>>>>>
-TEXT TO ANONYMIZE:
-
-{text}
-
-"""
+    Respond with ONLY the JSON object.
+    """

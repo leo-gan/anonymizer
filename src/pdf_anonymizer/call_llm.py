@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import Dict, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 import ollama
 from google import genai
@@ -18,33 +18,33 @@ class ModelResponse(TypedDict):
     text: str
 
 
-class AnonymizationResult(TypedDict):
-    anonymized_text: str
-    mapping: Dict[str, str]
+class Entity(TypedDict):
+    text: str
+    type: str
 
 
-def anonymize_text_with_llm(
+class IdentificationResult(TypedDict):
+    entities: List[Entity]
+
+
+def identify_entities_with_llm(
     text: str,
-    existing_mapping: Dict[str, str],
     prompt_template: str,
     model_name: str,
-) -> Tuple[str, Dict[str, str]]:
+) -> List[Entity]:
     """
-    Anonymizes a text chunk using a specified language model and updates the mapping.
+    Identifies PII entities in a text chunk using a specified language model.
     It retries on failure up to a maximum of 3 times.
 
     Args:
-        text: The text to anonymize.
-        existing_mapping: The existing mapping of original to anonymized entities.
-        prompt_template: The prompt template for the anonymization task.
+        text: The text to analyze.
+        prompt_template: The prompt template for the identification task.
         model_name: The name of the model to use.
 
     Returns:
-        A tuple containing the anonymized text and the updated mapping.
+        A list of identified entities.
     """
-    prompt = prompt_template.format(
-        existing_mapping=json.dumps(existing_mapping), text=text
-    )
+    prompt = prompt_template.format(text=text)
 
     response: Union[OllamaResponse, ModelResponse, None] = None
     max_retries = 3
@@ -52,8 +52,7 @@ def anonymize_text_with_llm(
     for attempt in range(max_retries):
         try:
             logging.info(
-                f"Calling '{model_name}': text: {len(text):,}, "
-                f"mapping: {len(existing_mapping):,}, attempt {attempt + 1}"
+                f"Calling '{model_name}': text: {len(text):,}, attempt {attempt + 1}"
             )
 
             if model_name in OLLAMA_MODELS:
@@ -72,12 +71,9 @@ def anonymize_text_with_llm(
             cleaned_response = (
                 raw_text.strip().replace("```json", "").replace("```", "").strip()
             )
-            result: AnonymizationResult = json.loads(cleaned_response)
+            result: IdentificationResult = json.loads(cleaned_response)
 
-            return (
-                result.get("anonymized_text", ""),
-                result.get("mapping", existing_mapping),
-            )
+            return result.get("entities", [])
 
         except json.JSONDecodeError as e:
             response_text = _get_response_text(response, model_name)
@@ -86,18 +82,18 @@ def anonymize_text_with_llm(
                 f"response: {response_text[:200]}..."
             )
             if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
+                logging.error("Max retries reached. Returning empty list.")
+                return []
 
         except Exception as e:
             logging.error(f"Attempt {attempt + 1} failed with an error: {e}")
             if attempt + 1 == max_retries:
-                logging.error("Max retries reached. Returning original text.")
-                return text, existing_mapping
+                logging.error("Max retries reached. Returning empty list.")
+                return []
 
         time.sleep(1)  # Wait before retrying
 
-    return text, existing_mapping
+    return []
 
 
 def _get_response_text(
