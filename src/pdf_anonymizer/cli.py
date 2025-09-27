@@ -19,7 +19,11 @@ from pdf_anonymizer.conf import (
 )
 from pdf_anonymizer.core import anonymize_pdf
 from pdf_anonymizer.prompts import detailed, simple
-from pdf_anonymizer.utils import deanonymize_file, save_results
+from pdf_anonymizer.utils import (
+    consolidate_mapping,
+    deanonymize_file,
+    save_results,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -110,6 +114,12 @@ def run(
         )
 
         if full_anonymized_text and final_mapping:
+            # Consolidate mapping before saving
+            logging.info("Consolidating mapping...")
+            full_anonymized_text, final_mapping = consolidate_mapping(
+                full_anonymized_text, final_mapping
+            )
+
             anonymized_output_file, mapping_file = save_results(
                 full_anonymized_text, final_mapping, str(pdf_path)
             )

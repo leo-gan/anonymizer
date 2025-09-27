@@ -1,1 +1,0 @@
-John Joe, who lives at 2864, Holm st, Springfild, met Mary Smith yesterday.
