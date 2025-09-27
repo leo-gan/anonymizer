@@ -2,6 +2,46 @@ import json
 import os
 import re
 from pathlib import Path
+from typing import Dict, Tuple
+
+
+def consolidate_mapping(
+    anonymized_text: str, mapping: Dict[str, str]
+) -> Tuple[str, Dict[str, str]]:
+    """
+    Consolidates the mapping to ensure one-to-one correspondence and updates the text.
+
+    Args:
+        anonymized_text: The text with anonymized placeholders.
+        mapping: The dictionary mapping placeholders to original PII.
+
+    Returns:
+        A tuple containing the updated anonymized text and the consolidated mapping.
+    """
+    # Invert the mapping to find duplicates
+    value_to_keys: Dict[str, list] = {}
+    for key, value in mapping.items():
+        if value not in value_to_keys:
+            value_to_keys[value] = []
+        value_to_keys[value].append(key)
+
+    consolidation_map = {}
+    consolidated_mapping = mapping.copy()
+
+    for value, keys in value_to_keys.items():
+        if len(keys) > 1:
+            canonical_key = keys[0]
+            for key_to_replace in keys[1:]:
+                consolidation_map[key_to_replace] = canonical_key
+                if key_to_replace in consolidated_mapping:
+                    del consolidated_mapping[key_to_replace]
+
+    # Update the anonymized text
+    for old_key, new_key in consolidation_map.items():
+        # Use word boundaries to avoid replacing parts of other words
+        anonymized_text = re.sub(r"\b" + re.escape(old_key) + r"\b", new_key, anonymized_text)
+
+    return anonymized_text, consolidated_mapping
 
 
 def save_results(

@@ -1,36 +1,34 @@
 # PDF Anonymizer
 
-This application anonymizes large PDF files by splitting them into smaller pieces, converting them to text, and using Google Gemini or a local Ollama model to anonymize the text. 
+This application anonymizes large PDF, Markdown or Text files using LLMs. 
 It generates an anonymized version of the text and a mapping vocabulary of the original entities to their anonymized replacements.
 
 ## How it works
 
 1.  **Input**: The input can be a PDF file or a Markdown or Text file. It can be several files.
-2.  **Anonymization with LLMs**: Each text is sent to an LLM (Google Gemini or a local Ollama model) with a prompt 
-    that instructs it to identify and replace Personally Identifiable Information (PII) like names, locations, etc.
+2.  **Anonymization with LLMs**: Each text is sent to an LLM (Google Gemini or a local Ollama model) with an instruction 
+    to identify and replace `Personally Identifiable Information` (`PII`) like names, locations, etc.
 3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that 
     the same entity is replaced with the same placeholder (e.g., "John Smith" is always replaced with "PERSON_1").
 4.  **Large files**: Large files are split into smaller chunks to be anonymized.
 4.  **Output**: The application generates two files:
-    *   `data/anonymized/{original_file_name}.anonymized.md`: The anonymized Markdown text of the PDF with all PII replaced by placeholders.
+    *   `data/anonymized/{original_file_name}.anonymized.md`: The anonymized Markdown text with all PII replaced by placeholders.
     *   `data/mappings/{original_file_name}.mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
 
 ### Design Considerations
 
-- Currently, the LLMs can anonymize text with very good quality, much better than other tools, like Grammar rule engines.
-- Currently, the LLM can recognize and anonymize text directly from the PDF. But they can't edit the PDF file directly.
-  So, we can save the anonymized text only as a text.
-- **Markdown** format can be used as input for the LLM to anonymize the text and as output for the anonymized text.
+- LLMs can anonymize text with very good quality, much better than other tools, like Grammar rule engines.
+- LLM recognizes and anonymizes text directly from the PDF. But LLM can't edit the PDF file directly.
+  So, the Anonymizer saves the anonymized text only as a text.
 - Anonymized text and mapping are stored separately in different directories because of **security** reasons.
-- The anonymized file name starts with the original file name and ends with `.anonymized` and the mapping file name with `.mapping` for easy identification and security reasons.
-- The anonymized text is stored in Markdown format so the LLM can use the document structure information to anonymize the text.
-- **Large files** are split into smaller chunks to be anonymized because LLMs can't handle large texts in one go. 
-- **Mapping** is used to pass the whole 
-  document mapping to the LLM between chunk anonymization. Mapping also can be used to deanonymize the text.
+- The anonymized file name compounded as the original file name and with `.anonymized` suffix and the mapping file name with `.mapping` suffix for easy identification and security reasons.
+- The anonymized text is stored in Markdown format so it saves the document structure information.
+- **Large files** are split into smaller chunks to be anonymized since LLMs can't handle large texts in one go. 
+- **Mapping** is needed to make anonymization consistent between anonymized text chunks. Mapping also used to deanonymize the text.
 
 ## Installation
 
-1.  **Install `uv`**: This project uses `uv` for package management. You can install it by following the official instructions: [https://astral.sh/docs/uv#installation](https://astral.sh/docs/uv#installation)
+1.  **Install `uv`**: This project uses `uv` for package management. Follow the [official installation instructions](https://astral.sh/docs/uv#installation).
 
 2.  **Clone the repository**:
     ```bash
@@ -43,13 +41,18 @@ It generates an anonymized version of the text and a mapping vocabulary of the o
     uv sync
     ```
 
-4.  **Install Ollama (optional)**: If you want to use a local model for anonymization, you need to install Ollama. You can find the installation instructions on the official website: [https://ollama.com/](https://ollama.com/)
+4.  **Install Ollama (optional)**: If you want to use a local model for anonymization, install Ollama. Follow the [official installation instructions](https://ollama.com/)
 
-5.  **Set up environment variables**: Create a `.env` file inside the `pdf_anonymizer` directory.
+5.  **Set up environment variables**: Create a `.env` file inside the `pdf_anonymizer` directory. Use the `.env.template` as a template.
     *   If you are using Google Gemini, add your Google API key:
         ```
         GOOGLE_API_KEY="YOUR_API_KEY_HERE"
         ```
+
+## Environment Variables
+
+- `GOOGLE_API_KEY`: Required when using Google's Gemini models
+- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models
 
 ## Models
 
@@ -58,7 +61,8 @@ It generates an anonymized version of the text and a mapping vocabulary of the o
 - the `gemini-2.5-flash-lite` model performs well only on small files!
 
 ### Ollama models:
-Using Ollama models you can run anonymization locally for free.
+Using Ollama models you perform anonymization locally for free.
+See a [list of available models](https://ollama.com/search).
 If you are using Ollama, you need to download the models you want to use. 
 You can do this from the command line. For example, to download the `phi` model:
 
@@ -66,13 +70,11 @@ You can do this from the command line. For example, to download the `phi` model:
 ollama pull phi
 ```
 
-You can see a list of available models on the Ollama website.
 
-## Usage
+## Anonymization
 
-### Basic Commands
+### Usage
 
-1. **Anonymize a PDF**:
    ```bash
    uv run python pdf_anonymizer/main.py run /path/to/your/document.pdf
    ```
@@ -83,8 +85,6 @@ You can see a list of available models on the Ollama website.
        data/anonymized/document.anonymized.md \
        data/mappings/document.mapping.json
    ```
-
-## Command Line Arguments
 
 ### `run` command
 Anonymize one or more PDF files.
@@ -116,25 +116,8 @@ uv run python pdf_anonymizer/main.py run PDF_FILES [OPTIONS]
   - Local Ollama models:
     - `gemma:7b`
     - `phi4-mini`
-  Default: `gemini-2.5-flash`
 
-### `deanonymize` command
-Revert anonymization using a mapping file.
-
-```bash
-uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
-```
-
-#### Arguments:
-- `ANONYMIZED_FILE`: Path to the anonymized text file
-- `MAPPING_FILE`: Path to the JSON mapping file
-
-## Environment Variables
-
-- `GOOGLE_API_KEY`: Required when using Google's Gemini models
-- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models
-
-## Examples
+### Examples
 
 1. **Basic anonymization**:
    ```bash
@@ -147,17 +130,18 @@ uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
    ```
 
 3. **Custom character chunk size**:
+Models have a specific limit on the number of characters/tokens they can process in one go.
+You can find this limit in the model's documentation.
 The models can have different performance with different chunk sizes.
 
    ```bash
    uv run python pdf_anonymizer/main.py run document.pdf --characters-to-anonymize 50000
    ```
 
-## Anonymization
 
-### Example
+### Anonymization results
 
-**Input Text from a `sample.pdf`:**
+**Input Text: `sample.pdf`:**
 > "John Smith, CEO of Acme Corp, can be reached at john.smith@example.com."
 
 **Anonymized Output Markdown text: `sample.anonymized.md`**
@@ -174,7 +158,7 @@ The models can have different performance with different chunk sizes.
 
 ## Deanonymization
 
-The tool also supports reversing the anonymization process using the `deanonymize` command. This can be useful if you need to recover the original text from an anonymized document.
+**Anonymizer** supports reversing the anonymization process using the `deanonymize` command. This can be useful if you need to recover the original text from an anonymized document.
 
 ### Usage
 
@@ -187,7 +171,18 @@ uv run python pdf_anonymizer/main.py deanonymize data/anonymized/document.anonym
 This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`
 and a deanonymization statistics file at `data/stats/document.deanonymization_stat.json`.
 
-### Example
+### `deanonymize` command
+Revert anonymization using a mapping file.
+
+```bash
+uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
+```
+
+#### Arguments:
+- `ANONYMIZED_FILE`: Path to the anonymized text file
+- `MAPPING_FILE`: Path to the JSON mapping file
+
+### Deanonymization results
 
 **Anonymized Text: `sample.anonymized.md`**
 > "PERSON_1, CEO of ORGANIZATION_1, can be reached at EMAIL_1."
