@@ -1,18 +1,18 @@
 # PDF Anonymizer
 
-This application anonymizes large PDF, Markdown or Text files using LLMs. 
+This application anonymizes large PDF, Markdown or Text files using LLMs.
 It generates an anonymized version of the text and a mapping vocabulary of the original entities to their anonymized replacements.
 
 ## How it works
 
-1.  **Input**: The input can be a PDF file or a Markdown or Text file. It can be several files.
-2.  **Anonymization with LLMs**: Each text is sent to an LLM (Google Gemini or a local Ollama model) with an instruction 
+1.  **Input**: The input can be a PDF, Markdown or Text file. It can be several files.
+2.  **Anonymization with LLMs**: Each text is sent to an LLM (Google Gemini or a local Ollama model) with an instruction
     to identify and replace `Personally Identifiable Information` (`PII`) like names, locations, etc.
-3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that 
+3.  **Consistent Mapping**: A mapping vocabulary is maintained throughout the process. This ensures that
     the same entity is replaced with the same placeholder (e.g., "John Smith" is always replaced with "PERSON_1").
 4.  **Large files**: Large files are split into smaller chunks to be anonymized.
 4.  **Output**: The application generates two files:
-    *   `data/anonymized/{original_file_name}.anonymized.md`: The anonymized Markdown text with all PII replaced by placeholders.
+    *   `data/anonymized/{original_file_name}.anonymized.{md,txt}`: The anonymized text with all PII replaced by placeholders. For PDF inputs, the output is a Markdown file. For other file types, the original extension is preserved.
     *   `data/mappings/{original_file_name}.mapping.json`: A JSON file containing the one-to-one mapping of the original PII to the anonymized placeholders.
 
 ### Design Considerations
@@ -23,7 +23,7 @@ It generates an anonymized version of the text and a mapping vocabulary of the o
 - Anonymized text and mapping are stored separately in different directories because of **security** reasons.
 - The anonymized file name compounded as the original file name and with `.anonymized` suffix and the mapping file name with `.mapping` suffix for easy identification and security reasons.
 - The anonymized text is stored in Markdown format so it saves the document structure information.
-- **Large files** are split into smaller chunks to be anonymized since LLMs can't handle large texts in one go. 
+- **Large files** are split into smaller chunks to be anonymized since LLMs can't handle large texts in one go.
 - **Mapping** is needed to make anonymization consistent between anonymized text chunks. Mapping also used to deanonymize the text.
 
 ## Installation
@@ -63,7 +63,7 @@ It generates an anonymized version of the text and a mapping vocabulary of the o
 ### Ollama models:
 Using Ollama models you perform anonymization locally for free.
 See a [list of available models](https://ollama.com/search).
-If you are using Ollama, you need to download the models you want to use. 
+If you are using Ollama, you need to download the models you want to use.
 You can do this from the command line. For example, to download the `phi` model:
 
 ```bash
@@ -76,7 +76,7 @@ ollama pull phi
 ### Usage
 
    ```bash
-   uv run python pdf_anonymizer/main.py run /path/to/your/document.pdf
+   uv run python pdf_anonymizer/main.py run /path/to/your/document.pdf /path/to/another/document.md
    ```
 
 2. **Deanonymize a file**:
@@ -87,27 +87,27 @@ ollama pull phi
    ```
 
 ### `run` command
-Anonymize one or more PDF files.
+Anonymize one or more files.
 
 ```bash
-uv run python pdf_anonymizer/main.py run PDF_FILES [OPTIONS]
+uv run python pdf_anonymizer/main.py run FILE_PATHS [OPTIONS]
 ```
 
 #### Arguments:
-- `PDF_FILES`: Path to one or several PDF files for anonymization.
+- `FILE_PATHS`: Path to one or several PDF, Markdown, or text files for anonymization.
 
 #### Options:
-- `--characters-to-anonymize INTEGER`  
-  Number of characters to send to the model for anonymization in one go.  
+- `--characters-to-anonymize INTEGER`
+  Number of characters to send to the model for anonymization in one go.
   Default: `100000`
 
-- `--prompt-name [simple|detailed]`  
-  The prompt template to use for anonymization.  
-  Choices: `simple`, `detailed`  
+- `--prompt-name [simple|detailed]`
+  The prompt template to use for anonymization.
+  Choices: `simple`, `detailed`
   Default: `detailed`
 
-- `--model-name TEXT`  
-  The language model to use for anonymization.  
+- `--model-name TEXT`
+  The language model to use for anonymization.
   Available models:
   - Google models (require GOOGLE_API_KEY):
     - `gemini-2.5-pro`
@@ -126,7 +126,7 @@ uv run python pdf_anonymizer/main.py run PDF_FILES [OPTIONS]
 
 2. **Custom model and prompt**:
    ```bash
-   uv run python pdf_anonymizer/main.py run document.pdf --model-name phi4-mini --prompt-name simple
+   uv run python pdf_anonymizer/main.py run document.md --model-name phi4-mini --prompt-name simple
    ```
 
 3. **Custom character chunk size**:
@@ -135,7 +135,7 @@ You can find this limit in the model's documentation.
 The models can have different performance with different chunk sizes.
 
    ```bash
-   uv run python pdf_anonymizer/main.py run document.pdf --characters-to-anonymize 50000
+   uv run python pdf_anonymizer/main.py run document.txt --characters-to-anonymize 50000
    ```
 
 

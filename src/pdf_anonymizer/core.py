@@ -4,21 +4,21 @@ import time
 from typing import Dict, List, Optional, Tuple
 
 from pdf_anonymizer.call_llm import identify_entities_with_llm
-from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
+from pdf_anonymizer.load_and_extract import load_and_extract_text_from_file
 
 
-def anonymize_pdf(
-    pdf_path: str,
+def anonymize_file(
+    file_path: str,
     characters_to_anonymize: int,
     prompt_template: str,
     model_name: str,
     anonymized_entities: Optional[List[str]] = None,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """
-    Anonymize a PDF file by processing its text content.
+    Anonymize a file by processing its text content.
 
     Args:
-        pdf_path: Path to the PDF file to anonymize.
+        file_path: Path to the file to anonymize.
         characters_to_anonymize: Number of characters to process in each chunk.
         prompt_template: Template string for the anonymization prompt.
         model_name: Name of the language model to use for anonymization.
@@ -28,18 +28,20 @@ def anonymize_pdf(
         A tuple containing the anonymized text and the mapping of original to anonymized entities,
         or (None, None) if processing fails.
     """
-    # PDF file: chunk and convert to text
-    pdf_file_size = os.path.getsize(pdf_path)
-    text_pages: List[str] = load_and_extract_text(pdf_path, characters_to_anonymize)
+    # File: chunk and convert to text
+    file_size = os.path.getsize(file_path)
+    text_pages: List[str] = load_and_extract_text_from_file(
+        file_path, characters_to_anonymize
+    )
 
     if not text_pages:
-        logging.warning("No text could be extracted from the PDF.")
+        logging.warning("No text could be extracted from the file.")
         return None, None
 
-    logging.info(f"Extracted text pages: {text_pages[:50]} ...")
+    logging.info(f"Extracted text pages: {text_pages[0][:50]} ...")
     extracted_text_size = sum(len(page) for page in text_pages)
 
-    logging.info(f"  - PDF file size: {pdf_file_size / 1024:.2f} KB")
+    logging.info(f"  - File size: {file_size / 1024:.2f} KB")
     logging.info(f"  - Extracted text size: {extracted_text_size / 1024:.2f} KB")
 
     # Anonymization:

@@ -6,7 +6,7 @@ from typing import Dict, List, TypedDict, Union
 import ollama
 from google import genai
 
-OLLAMA_MODELS = ["gemma", "phi4-mini"]
+from pdf_anonymizer.conf import ModelName, ModelProvider
 
 
 # Type definitions for better code clarity
@@ -55,8 +55,9 @@ def identify_entities_with_llm(
             logging.info(
                 f"Calling '{model_name}': text: {len(text):,}, attempt {attempt + 1}"
             )
+            model_enum = ModelName(model_name)
 
-            if model_name in OLLAMA_MODELS:
+            if model_enum.provider == ModelProvider.OLLAMA:
                 response = ollama.chat(
                     model=model_name,
                     messages=[{"role": "user", "content": prompt}],
@@ -104,7 +105,8 @@ def _get_response_text(
     if not response:
         return ""
 
-    if model_name in OLLAMA_MODELS:
+    model_enum = ModelName(model_name)
+    if model_enum.provider == ModelProvider.OLLAMA:
         if (
             isinstance(response, dict)
             and "message" in response

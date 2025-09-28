@@ -34,7 +34,7 @@ class TestAnonymizer(unittest.TestCase):
         entities = identify_entities_with_llm(
             text,
             prompt_template=simple.prompt_template,
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.5-flash",
         )
 
         # Asserts
@@ -73,7 +73,7 @@ class TestAnonymizer(unittest.TestCase):
         entities = identify_entities_with_llm(
             text,
             prompt_template=simple.prompt_template,
-            model_name="gemma",
+            model_name="gemma:7b",
         )
 
         # Asserts
