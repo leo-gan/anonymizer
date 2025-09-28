@@ -36,7 +36,7 @@ def anonymize_pdf(
         logging.warning("No text could be extracted from the PDF.")
         return None, None
 
-    logging.info(f"Extracted text pages: {text_pages}")
+    logging.info(f"Extracted text pages: {text_pages[:50]} ...")
     extracted_text_size = sum(len(page) for page in text_pages)
 
     logging.info(f"  - PDF file size: {pdf_file_size / 1024:.2f} KB")
