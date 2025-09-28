@@ -1,10 +1,11 @@
 .PHONY: install lint format
 
 install:
-	pip install -e .[dev]
+	uv pip install -e .[dev]
 
 lint:
-	ruff check .
+	uv run ruff check .
 
 format:
-	ruff format .
+	uv run ruff format .
+	uv run ruff check . --select I --fix

@@ -1,4 +1,5 @@
 import unittest
+
 from pdf_anonymizer.utils import consolidate_mapping
 
 

@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+
 from pdf_anonymizer.core import anonymize_pdf
 
 
