@@ -1,7 +1,7 @@
 .PHONY: install lint format
 
 install:
-	uv pip install -e .[dev]
+	uv pip install -e .[dev] --system
 
 lint:
 	uv run ruff check .
