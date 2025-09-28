@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import typer
 from dotenv import load_dotenv
@@ -73,6 +73,19 @@ def run(
             case_sensitive=False,
         ),
     ] = get_enum_value(ModelName, DEFAULT_MODEL_NAME),
+    anonymized_entities: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--anonymized-entities",
+            help="A file with a list of entities to anonymize.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more PDF files by replacing PII with anonymized placeholders.
@@ -82,6 +95,7 @@ def run(
         characters_to_anonymize: Number of characters to process in each chunk.
         prompt_name: The prompt template to use for anonymization.
         model_name: The language model to use for anonymization.
+        anonymized_entities: A file with a list of entities to anonymize.
     """
     load_environment()
 
@@ -104,13 +118,23 @@ def run(
     prompt_template: str = prompt_templates[prompt_name]
     logging.info(f"  --prompt-name: {prompt_name.value}")
 
+    entities_to_anonymize = None
+    if anonymized_entities:
+        with open(anonymized_entities, "r") as f:
+            entities_to_anonymize = [line.strip() for line in f.readlines()]
+        logging.info(f"  --anonymized-entities: {entities_to_anonymize}")
+
     logging.info(f"Found {len(pdf_paths)} PDF file(s) to process.")
 
     for i, pdf_path in enumerate(pdf_paths, 1):
         logging.info("=" * 40)
         logging.info(f"Processing file {i}/{len(pdf_paths)}: {pdf_path}")
         full_anonymized_text, final_mapping = anonymize_pdf(
-            str(pdf_path), characters_to_anonymize, prompt_template, model_name.value
+            str(pdf_path),
+            characters_to_anonymize,
+            prompt_template,
+            model_name.value,
+            entities_to_anonymize,
         )
 
         if full_anonymized_text and final_mapping:
