@@ -17,7 +17,7 @@ from pdf_anonymizer.conf import (
     PromptEnum,
     get_enum_value,
 )
-from pdf_anonymizer.core import anonymize_pdf
+from pdf_anonymizer.core import anonymize_file
 from pdf_anonymizer.prompts import detailed, simple
 from pdf_anonymizer.utils import (
     consolidate_mapping,
@@ -43,10 +43,10 @@ def load_environment() -> None:
 
 @app.command()
 def run(
-    pdf_paths: Annotated[
+    file_paths: Annotated[
         List[Path],
         typer.Argument(
-            help="A list of paths to PDF files to anonymize.",
+            help="A list of paths to files to anonymize.",
             exists=True,
             file_okay=True,
             dir_okay=False,
@@ -88,10 +88,10 @@ def run(
     ] = None,
 ) -> None:
     """
-    Anonymize one or more PDF files by replacing PII with anonymized placeholders.
+    Anonymize one or more files by replacing PII with anonymized placeholders.
 
     Args:
-        pdf_paths: List of paths to PDF files to process.
+        file_paths: List of paths to files to process.
         characters_to_anonymize: Number of characters to process in each chunk.
         prompt_name: The prompt template to use for anonymization.
         model_name: The language model to use for anonymization.
@@ -106,7 +106,7 @@ def run(
             )
             sys.exit(1)
 
-    logging.info(f"  --pdf-paths: {pdf_paths}")
+    logging.info(f"  --file-paths: {file_paths}")
     logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
     logging.info(f"  --model-name: {model_name.value}")
 
@@ -124,13 +124,13 @@ def run(
             entities_to_anonymize = [line.strip() for line in f.readlines()]
         logging.info(f"  --anonymized-entities: {entities_to_anonymize}")
 
-    logging.info(f"Found {len(pdf_paths)} PDF file(s) to process.")
+    logging.info(f"Found {len(file_paths)} file(s) to process.")
 
-    for i, pdf_path in enumerate(pdf_paths, 1):
+    for i, file_path in enumerate(file_paths, 1):
         logging.info("=" * 40)
-        logging.info(f"Processing file {i}/{len(pdf_paths)}: {pdf_path}")
-        full_anonymized_text, final_mapping = anonymize_pdf(
-            str(pdf_path),
+        logging.info(f"Processing file {i}/{len(file_paths)}: {file_path}")
+        full_anonymized_text, final_mapping = anonymize_file(
+            str(file_path),
             characters_to_anonymize,
             prompt_template,
             model_name.value,
@@ -145,9 +145,9 @@ def run(
             )
 
             anonymized_output_file, mapping_file = save_results(
-                full_anonymized_text, final_mapping, str(pdf_path)
+                full_anonymized_text, final_mapping, str(file_path)
             )
-            logging.info(f"Anonymization for {pdf_path} complete!")
+            logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
             logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
 
