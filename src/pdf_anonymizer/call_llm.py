@@ -8,6 +8,7 @@ from google import genai
 
 from pdf_anonymizer.conf import ModelName, ModelProvider
 
+
 # Type definitions for better code clarity
 class OllamaResponse(TypedDict):
     message: Dict[str, str]

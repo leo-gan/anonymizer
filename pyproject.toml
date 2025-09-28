@@ -22,7 +22,7 @@ build-backend = "setuptools.build_meta"
 pdf-anonymizer = "pdf_anonymizer.cli:app"
 
 [project.optional-dependencies]
-dev = ["ruff"]
+dev = ["ruff", "pytest", "pytest-mock"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

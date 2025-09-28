@@ -74,7 +74,9 @@ def save_results(
     else:
         output_extension = file_extension
 
-    anonymized_output_file = f"{anonymized_dir}/{file_stem}.anonymized{output_extension}"
+    anonymized_output_file = (
+        f"{anonymized_dir}/{file_stem}.anonymized{output_extension}"
+    )
     with open(anonymized_output_file, "w", encoding="utf-8") as f:
         f.write(full_anonymized_text)
 
