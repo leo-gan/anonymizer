@@ -15,11 +15,7 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         # Mock the response from the generative model
         mock_response = MagicMock()
         mock_response.text = json.dumps(
-            {
-                "entities": [
-                    {"text": "person", "type": "PERSON", "base_form": "person"}
-                ]
-            }
+            {"entities": [{"text": "person", "type": "PERSON", "base_form": "person"}]}
         )
         mock_client_instance = mock_client.return_value
         mock_model_instance = mock_client_instance.models
@@ -30,7 +26,9 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
             text, self.prompt_template, "gemini-2.5-pro"
         )
 
-        self.assertEqual(entities, [{"text": "person", "type": "PERSON", "base_form": "person"}])
+        self.assertEqual(
+            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+        )
         mock_model_instance.generate_content.assert_called_once()
 
     @patch("pdf_anonymizer.call_llm.genai.Client")
@@ -41,11 +39,7 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
 
         mock_response_success = MagicMock()
         mock_response_success.text = json.dumps(
-            {
-                "entities": [
-                    {"text": "person", "type": "PERSON", "base_form": "person"}
-                ]
-            }
+            {"entities": [{"text": "person", "type": "PERSON", "base_form": "person"}]}
         )
 
         mock_client_instance = mock_client.return_value
@@ -61,7 +55,9 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
             text, self.prompt_template, "gemini-2.5-pro"
         )
 
-        self.assertEqual(entities, [{"text": "person", "type": "PERSON", "base_form": "person"}])
+        self.assertEqual(
+            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+        )
         self.assertEqual(mock_model_instance.generate_content.call_count, 3)
 
     @patch("pdf_anonymizer.call_llm.genai.Client")
@@ -69,11 +65,7 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         # Mock the response to fail twice with a generic Exception, then succeed
         mock_response_success = MagicMock()
         mock_response_success.text = json.dumps(
-            {
-                "entities": [
-                    {"text": "person", "type": "PERSON", "base_form": "person"}
-                ]
-            }
+            {"entities": [{"text": "person", "type": "PERSON", "base_form": "person"}]}
         )
 
         mock_client_instance = mock_client.return_value
@@ -89,7 +81,9 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
             text, self.prompt_template, "gemini-2.5-pro"
         )
 
-        self.assertEqual(entities, [{"text": "person", "type": "PERSON", "base_form": "person"}])
+        self.assertEqual(
+            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+        )
         self.assertEqual(mock_model_instance.generate_content.call_count, 3)
 
     @patch("pdf_anonymizer.call_llm.genai.Client")

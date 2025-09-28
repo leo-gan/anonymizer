@@ -3,7 +3,7 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple
 
-from pdf_anonymizer.call_llm import Entity, identify_entities_with_llm
+from pdf_anonymizer.call_llm import identify_entities_with_llm
 from pdf_anonymizer.load_and_extract_pdf import load_and_extract_text
 
 
@@ -75,14 +75,19 @@ def anonymize_pdf(
         )
 
         # Consolidate base forms to handle variations like "John" vs "John Doe"
-        base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
+        base_forms = {
+            e.get("base_form") for e in entities_to_process if e.get("base_form")
+        }
         sorted_base_forms = sorted(list(base_forms), key=len, reverse=True)
         for entity in entities_to_process:
             base_form = entity.get("base_form")
             if not base_form:
                 continue
             for potential_full_form in sorted_base_forms:
-                if base_form != potential_full_form and base_form in potential_full_form:
+                if (
+                    base_form != potential_full_form
+                    and base_form in potential_full_form
+                ):
                     entity["base_form"] = potential_full_form
                     break
 
@@ -108,9 +113,13 @@ def anonymize_pdf(
 
             if entity_text != base_form:
                 # It's a variation, create variation placeholder
-                current_variation_count = variation_counters.get(main_placeholder, 0) + 1
+                current_variation_count = (
+                    variation_counters.get(main_placeholder, 0) + 1
+                )
                 variation_counters[main_placeholder] = current_variation_count
-                variation_placeholder = f"{main_placeholder}.v_{current_variation_count}"
+                variation_placeholder = (
+                    f"{main_placeholder}.v_{current_variation_count}"
+                )
                 final_mapping[entity_text] = variation_placeholder
             else:
                 final_mapping[entity_text] = main_placeholder

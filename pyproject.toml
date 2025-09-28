@@ -3,6 +3,7 @@ name = "pdf-anonymizer"
 version = "0.2.2"
 description = "A tool to anonymize PDF files using LLMs."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
+requires-python = ">=3.10"
 dependencies = [
     "python-dotenv",
     "pymupdf4llm",
@@ -19,6 +20,9 @@ build-backend = "setuptools.build_meta"
 
 [project.scripts]
 pdf-anonymizer = "pdf_anonymizer.cli:app"
+
+[project.optional-dependencies]
+dev = ["ruff"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
