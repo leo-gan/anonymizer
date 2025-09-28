@@ -39,7 +39,9 @@ def consolidate_mapping(
     # Update the anonymized text
     for old_key, new_key in consolidation_map.items():
         # Use word boundaries to avoid replacing parts of other words
-        anonymized_text = re.sub(r"\b" + re.escape(old_key) + r"\b", new_key, anonymized_text)
+        anonymized_text = re.sub(
+            r"\b" + re.escape(old_key) + r"\b", new_key, anonymized_text
+        )
 
     return anonymized_text, consolidated_mapping
 

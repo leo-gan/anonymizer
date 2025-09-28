@@ -40,7 +40,7 @@ class TestAnonymizer(unittest.TestCase):
         # Asserts
         expected_entities = [
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
-            {"text": "New York", "type": "LOCATION", "base_form": "New York"}
+            {"text": "New York", "type": "LOCATION", "base_form": "New York"},
         ]
         self.assertEqual(entities, expected_entities)
 
@@ -79,7 +79,7 @@ class TestAnonymizer(unittest.TestCase):
         # Asserts
         expected_entities = [
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
-            {"text": "New York", "type": "LOCATION", "base_form": "New York"}
+            {"text": "New York", "type": "LOCATION", "base_form": "New York"},
         ]
         self.assertEqual(entities, expected_entities)
 
