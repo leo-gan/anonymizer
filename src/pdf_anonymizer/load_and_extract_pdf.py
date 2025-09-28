@@ -1,6 +1,7 @@
 import logging
-import fitz  # PyMuPDF
-from langchain_text_splitters import CharacterTextSplitter
+
+import pymupdf4llm
+from langchain_text_splitters import MarkdownTextSplitter
 
 
 def load_and_extract_text(pdf_path, characters_to_anonymize=100000) -> list[str]:
@@ -12,23 +13,15 @@ def load_and_extract_text(pdf_path, characters_to_anonymize=100000) -> list[str]
         pdf_path (str): The path to the PDF file.
 
     Returns:
-        list: A list of strings, where each string is a chunk of text.
+        list: A list of strings, where each string is the text of a page.
     """
     try:
-        doc = fitz.open(pdf_path)
-        full_text = ""
-        for page in doc:
-            full_text += page.get_text()
-        doc.close()
-
-        splitter = CharacterTextSplitter(
-            separator="\n",
-            chunk_size=characters_to_anonymize,
-            chunk_overlap=0,
-            length_function=len,
+        md_text = pymupdf4llm.to_markdown(pdf_path, show_progress=False)
+        splitter = MarkdownTextSplitter(
+            chunk_size=characters_to_anonymize, chunk_overlap=0
         )
-        chunks = splitter.split_text(full_text)
-        return chunks
+        docs = splitter.create_documents([md_text])
+        return [doc.page_content for doc in docs]
     except FileNotFoundError as e:
         logging.error(f"Error: The file at {pdf_path} was not found.")
         raise e
