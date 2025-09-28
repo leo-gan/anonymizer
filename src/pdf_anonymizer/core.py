@@ -76,11 +76,12 @@ def anonymize_pdf(
 
         # Consolidate base forms to handle variations like "John" vs "John Doe"
         base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
+        sorted_base_forms = sorted(list(base_forms), key=len, reverse=True)
         for entity in entities_to_process:
             base_form = entity.get("base_form")
             if not base_form:
                 continue
-            for potential_full_form in base_forms:
+            for potential_full_form in sorted_base_forms:
                 if base_form != potential_full_form and base_form in potential_full_form:
                     entity["base_form"] = potential_full_form
                     break
