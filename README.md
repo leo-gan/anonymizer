@@ -1,7 +1,12 @@
 # PDF Anonymizer
 
 This application anonymizes large PDF, Markdown or Text files using LLMs.
-It generates an anonymized version of the text and a mapping vocabulary of the original entities to their anonymized replacements.
+- LLM anonymizes text with `high quality`.
+- It anonymizes `large files consistently`. I've tried 1GB files.
+- Anonymizes for `free`, if you use an open-source LLM (It uses hashtag#Ollama underhood for OS LLMs)
+- Can do `Deanonymization`. It's helpful when you allow untrusted parties to edit your sensitive documents.
+- Anonymizes `PDF`, `Markdown`, and `text` files.
+
 
 ## How it works
 
@@ -18,7 +23,7 @@ It generates an anonymized version of the text and a mapping vocabulary of the o
 ### Design Considerations
 
 - LLMs can anonymize text with very good quality, much better than other tools, like Grammar rule engines.
-- LLM recognizes and anonymizes text directly from the PDF. But LLM can't edit the PDF file directly.
+- LLM can anonymize text directly from the PDF. But LLM can't edit the PDF file directly.
   So, the Anonymizer saves the anonymized text only as a text.
 - Anonymized text and mapping are stored separately in different directories because of **security** reasons.
 - The anonymized file name compounded as the original file name and with `.anonymized` suffix and the mapping file name with `.mapping` suffix for easy identification and security reasons.
