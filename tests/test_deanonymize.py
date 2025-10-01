@@ -2,7 +2,7 @@ import json
 import os
 from pathlib import Path
 
-from pdf_anonymizer.utils import deanonymize_file
+from pdf_anonymizer_core.utils import deanonymize_file
 
 
 def test_deanonymize_file():

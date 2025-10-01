@@ -8,7 +8,7 @@ import typer
 from dotenv import load_dotenv
 from typing_extensions import Annotated
 
-from pdf_anonymizer.conf import (
+from pdf_anonymizer_core.conf import (
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_MODEL_NAME,
     DEFAULT_PROMPT_NAME,
@@ -17,9 +17,9 @@ from pdf_anonymizer.conf import (
     PromptEnum,
     get_enum_value,
 )
-from pdf_anonymizer.core import anonymize_file
-from pdf_anonymizer.prompts import detailed, simple
-from pdf_anonymizer.utils import (
+from pdf_anonymizer_core.core import anonymize_file
+from pdf_anonymizer_core.prompts import detailed, simple
+from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
     save_results,

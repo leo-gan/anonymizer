@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from pdf_anonymizer.call_llm import identify_entities_with_llm
-from pdf_anonymizer.prompts import simple
+from pdf_anonymizer_core.call_llm import identify_entities_with_llm
+from pdf_anonymizer_core.prompts import simple
 
 
 class TestAnonymizer(unittest.TestCase):
-    @patch("pdf_anonymizer.call_llm.genai.Client")
+    @patch("pdf_anonymizer_core.call_llm.genai.Client")
     def test_identify_entities_with_gemini(self, mock_client):
         """
         Tests the entity identification function with a mock Gemini API response.
@@ -44,7 +44,7 @@ class TestAnonymizer(unittest.TestCase):
         ]
         self.assertEqual(entities, expected_entities)
 
-    @patch("pdf_anonymizer.call_llm.ollama.chat")
+    @patch("pdf_anonymizer_core.call_llm.ollama.chat")
     def test_identify_entities_with_ollama(self, mock_ollama_chat):
         """
         Tests the entity identification function with a mock Ollama API response.

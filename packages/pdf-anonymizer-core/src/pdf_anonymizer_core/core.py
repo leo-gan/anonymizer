@@ -3,8 +3,8 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple
 
-from pdf_anonymizer.call_llm import identify_entities_with_llm
-from pdf_anonymizer.load_and_extract import load_and_extract_text_from_file
+from pdf_anonymizer_core.call_llm import identify_entities_with_llm
+from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 
 
 def anonymize_file(

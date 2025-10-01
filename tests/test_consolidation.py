@@ -1,6 +1,6 @@
 import unittest
 
-from pdf_anonymizer.utils import consolidate_mapping
+from pdf_anonymizer_core.utils import consolidate_mapping
 
 
 class TestConsolidation(unittest.TestCase):

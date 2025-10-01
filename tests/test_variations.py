@@ -1,20 +1,20 @@
 from pytest_mock import MockerFixture
 
-from pdf_anonymizer.core import anonymize_file
+from pdf_anonymizer_core.core import anonymize_file
 
 
 def test_consolidate_variations(mocker: MockerFixture) -> None:
     """Variations of an entity are consolidated under a single base placeholder."""
-    # Patch where the functions are looked up (in pdf_anonymizer.core)
+    # Patch where the functions are looked up (in pdf_anonymizer_core.core)
     mocker.patch("os.path.getsize", return_value=0)
     mocker.patch(
-        "pdf_anonymizer.core.load_and_extract_text_from_file",
+        "pdf_anonymizer_core.core.load_and_extract_text_from_file",
         return_value=[
             "Mr. John Doe is a consultant. We have a meeting with John Doe tomorrow. Also, we need to review John's latest report."
         ],
     )
     mocker.patch(
-        "pdf_anonymizer.core.identify_entities_with_llm",
+        "pdf_anonymizer_core.core.identify_entities_with_llm",
         return_value=[
             {"text": "Mr. John Doe", "type": "PERSON", "base_form": "John Doe"},
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
@@ -44,11 +44,11 @@ def test_no_variations(mocker: MockerFixture) -> None:
     """No variations: each entity gets its own base placeholder."""
     mocker.patch("os.path.getsize", return_value=0)
     mocker.patch(
-        "pdf_anonymizer.core.load_and_extract_text_from_file",
+        "pdf_anonymizer_core.core.load_and_extract_text_from_file",
         return_value=["John Doe met Jane Smith."],
     )
     mocker.patch(
-        "pdf_anonymizer.core.identify_entities_with_llm",
+        "pdf_anonymizer_core.core.identify_entities_with_llm",
         return_value=[
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
             {"text": "Jane Smith", "type": "PERSON", "base_form": "Jane Smith"},
