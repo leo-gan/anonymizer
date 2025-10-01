@@ -81,7 +81,6 @@ ollama pull phi
 ### Usage
 
    ```bash
-   uv run python pdf_anonymizer/main.py run /path/to/your/document.pdf /path/to/another/document.md
    ```
 
 2. **Deanonymize a file**:
