@@ -137,26 +137,17 @@ def run(
         )
 
         if full_anonymized_text and final_mapping:
-            # Consolidate mapping before saving
-            logging.info("Consolidating mapping...")
-            # consolidate_mapping expects placeholder -> original
-            placeholder_to_original = {}
-            for original, placeholder in final_mapping.items():
-                if placeholder not in placeholder_to_original:
-                    placeholder_to_original[placeholder] = original
+            # The mapping from anonymize_file is original -> placeholder.
+            # We will standardize on placeholder -> original for subsequent steps.
+            placeholder_to_original = {v: k for k, v in final_mapping.items()}
 
+            logging.info("Consolidating mapping...")
             full_anonymized_text, consolidated_placeholder_map = consolidate_mapping(
                 full_anonymized_text, placeholder_to_original
             )
 
-            # Convert back to original -> placeholder for saving API
-            consolidated_original_map = {
-                original: placeholder
-                for placeholder, original in consolidated_placeholder_map.items()
-            }
-
             anonymized_output_file, mapping_file = save_results(
-                full_anonymized_text, consolidated_original_map, str(file_path)
+                full_anonymized_text, consolidated_placeholder_map, str(file_path)
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

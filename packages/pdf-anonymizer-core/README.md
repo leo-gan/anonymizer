@@ -62,8 +62,12 @@ text, mapping = anonymize_file(
 from pdf_anonymizer_core.utils import consolidate_mapping, save_results, deanonymize_file
 
 # Consolidate placeholders and save anonymization outputs
-anonymized_text, mapping = consolidate_mapping(anonymized_text, mapping)
-md_path, json_path = save_results(anonymized_text, mapping, original_file_path)
+# Note: The mapping from anonymize_file is original->placeholder.
+# We invert it for use with other utility functions.
+placeholder_to_original = {v: k for k, v in mapping.items()}
+anonymized_text, consolidated_mapping = consolidate_mapping(anonymized_text, placeholder_to_original)
+# save_results now expects placeholder->original
+md_path, json_path = save_results(anonymized_text, consolidated_mapping, original_file_path)
 
 # Deanonymize using mapping
 out_md, stats_json = deanonymize_file(

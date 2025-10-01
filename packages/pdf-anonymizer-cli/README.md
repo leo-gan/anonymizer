@@ -53,9 +53,9 @@ pdf-anonymizer --help
 
 ```bash
 pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
-  [--characters-to-anonymize INT] \
+  [--characters-to-anonymize INTEGER] \
   [--prompt-name {simple|detailed}] \
-  [--model-name MODEL] \
+  [--model-name TEXT] \
   [--anonymized-entities PATH]
 ```
 

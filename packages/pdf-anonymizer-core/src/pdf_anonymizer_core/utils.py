@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 from typing import Dict, Tuple
 
+_PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
+
 
 def consolidate_mapping(
     anonymized_text: str, mapping: Dict[str, str]
@@ -82,13 +84,8 @@ def save_results(
 
     mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
     # Persist mapping as placeholder -> original for correct deanonymization
-    placeholder_to_original: dict[str, str] = {}
-    for original, placeholder in final_mapping.items():
-        # Prefer the first original we saw for a given placeholder
-        if placeholder not in placeholder_to_original:
-            placeholder_to_original[placeholder] = original
     with open(mapping_file, "w", encoding="utf-8") as f:
-        json.dump(placeholder_to_original, f, indent=4)
+        json.dump(final_mapping, f, indent=4)
 
     return anonymized_output_file, mapping_file
 
@@ -121,7 +118,7 @@ def deanonymize_file(
 
     # Detect mapping direction and normalize to placeholder -> original
     # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
-    placeholder_key_pattern = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
+    placeholder_key_pattern = _PLACEHOLDER_PATTERN
     keys_look_like_placeholders = sum(
         1
         for k in raw_mapping.keys()
