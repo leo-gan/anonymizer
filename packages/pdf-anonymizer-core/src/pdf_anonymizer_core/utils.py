@@ -123,10 +123,14 @@ def deanonymize_file(
     # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
     placeholder_key_pattern = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
     keys_look_like_placeholders = sum(
-        1 for k in raw_mapping.keys() if isinstance(k, str) and placeholder_key_pattern.match(k)
+        1
+        for k in raw_mapping.keys()
+        if isinstance(k, str) and placeholder_key_pattern.match(k)
     )
     values_look_like_placeholders = sum(
-        1 for v in raw_mapping.values() if isinstance(v, str) and placeholder_key_pattern.match(v)
+        1
+        for v in raw_mapping.values()
+        if isinstance(v, str) and placeholder_key_pattern.match(v)
     )
 
     if keys_look_like_placeholders >= values_look_like_placeholders:
@@ -164,9 +168,7 @@ def deanonymize_file(
 
     # Unused mappings: base placeholders that never occurred (neither base nor any variation)
     used_bases = {p.split(".v_")[0] for p in used_placeholders}
-    unused_mappings = sorted([
-        p for p in sorted_placeholders if p not in used_bases
-    ])
+    unused_mappings = sorted([p for p in sorted_placeholders if p not in used_bases])
 
     anonymized_path = Path(anonymized_file_path)
     file_stem = anonymized_path.name.replace(f".anonymized{anonymized_path.suffix}", "")

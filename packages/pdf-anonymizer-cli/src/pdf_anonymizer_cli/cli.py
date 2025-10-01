@@ -6,8 +6,6 @@ from typing import Dict, List, Optional
 
 import typer
 from dotenv import load_dotenv
-from typing_extensions import Annotated
-
 from pdf_anonymizer_core.conf import (
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_MODEL_NAME,
@@ -24,6 +22,7 @@ from pdf_anonymizer_core.utils import (
     deanonymize_file,
     save_results,
 )
+from typing_extensions import Annotated
 
 logging.basicConfig(
     level=logging.INFO,

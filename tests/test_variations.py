@@ -1,6 +1,5 @@
-from pytest_mock import MockerFixture
-
 from pdf_anonymizer_core.core import anonymize_file
+from pytest_mock import MockerFixture
 
 
 def test_consolidate_variations(mocker: MockerFixture) -> None:
