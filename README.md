@@ -80,25 +80,30 @@ ollama pull phi
 
 ### Usage
 
-   ```bash
-   ```
+```bash
+pdf-anonymizer --help
+```
 
 2. **Deanonymize a file**:
-   ```bash
-   uv run python pdf_anonymizer/main.py deanonymize \
-       data/anonymized/document.anonymized.md \
-       data/mappings/document.mapping.json
-   ```
+```bash
+pdf-anonymizer deanonymize \
+    data/anonymized/document.anonymized.md \
+    data/mappings/document.mapping.json
+```
 
 ### `run` command
 Anonymize one or more files.
 
 ```bash
-uv run python pdf_anonymizer/main.py run FILE_PATHS [OPTIONS]
+pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
+  [--characters-to-anonymize INTEGER] \
+  [--prompt-name {simple|detailed}] \
+  [--model-name TEXT] \
+  [--anonymized-entities PATH]
 ```
 
 #### Arguments:
-- `FILE_PATHS`: Path to one or several PDF, Markdown, or text files for anonymization.
+- `FILE_PATH`: Path to one or several PDF, Markdown, or text files for anonymization.
 
 #### Options:
 - `--characters-to-anonymize INTEGER`
@@ -124,24 +129,23 @@ uv run python pdf_anonymizer/main.py run FILE_PATHS [OPTIONS]
 ### Examples
 
 1. **Basic anonymization**:
-   ```bash
-   uv run python pdf_anonymizer/main.py run document.pdf
-   ```
+```bash
+pdf-anonymizer run document.pdf
+```
 
 2. **Custom model and prompt**:
-   ```bash
-   uv run python pdf_anonymizer/main.py run document.md --model-name phi4-mini --prompt-name simple
-   ```
+```bash
+pdf-anonymizer run notes.md --model-name phi4-mini --prompt-name simple
+```
 
 3. **Custom character chunk size**:
 Models have a specific limit on the number of characters/tokens they can process in one go.
 You can find this limit in the model's documentation.
 The models can have different performance with different chunk sizes.
 
-   ```bash
-   uv run python pdf_anonymizer/main.py run document.txt --characters-to-anonymize 50000
-   ```
-
+```bash
+pdf-anonymizer run document.txt --characters-to-anonymize 50000
+```
 
 ### Anonymization results
 
@@ -169,7 +173,7 @@ The models can have different performance with different chunk sizes.
 To deanonymize a file, you'll need both the anonymized text and its corresponding mapping file:
 
 ```bash
-uv run python pdf_anonymizer/main.py deanonymize data/anonymized/document.anonymized.md data/mappings/document.mapping.json
+pdf-anonymizer deanonymize data/anonymized/document.anonymized.md data/mappings/document.mapping.json
 ```
 
 This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`
@@ -179,7 +183,7 @@ and a deanonymization statistics file at `data/stats/document.deanonymization_st
 Revert anonymization using a mapping file.
 
 ```bash
-uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
+pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE
 ```
 
 #### Arguments:
@@ -197,9 +201,9 @@ uv run python pdf_anonymizer/main.py deanonymize ANONYMIZED_FILE MAPPING_FILE
 
 ## Testing
 
-The project includes a test suite to verify the functionality of the core components. To run the tests, navigate to the `pdf_anonymizer` directory and run:
+The project includes a test suite to verify the functionality of the core components.
 
 ```bash
-uv run python -m unittest discover tests
+uv run pytest
 ```
 This will discover and run all the tests in the `tests` directory.
