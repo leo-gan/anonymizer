@@ -7,7 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "typer",
     "rich",
-    "pdf-anonymizer-core @ {root:uri}/../pdf-anonymizer-core",
+    "pdf-anonymizer-core",
 ]
 
 [build-system]
@@ -19,3 +19,6 @@ pdf-anonymizer = "pdf_anonymizer_cli.cli:app"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.uv.sources]
+pdf-anonymizer-core = { workspace = true }
