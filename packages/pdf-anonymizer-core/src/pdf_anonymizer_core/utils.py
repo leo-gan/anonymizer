@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 from typing import Dict, Tuple
 
+_PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
+
 
 def consolidate_mapping(
     anonymized_text: str, mapping: Dict[str, str]
@@ -54,7 +56,7 @@ def save_results(
 
     Args:
         full_anonymized_text (str): The anonymized text.
-        final_mapping (dict[str, str]): The mapping.
+        final_mapping (dict[str, str]): Mapping of original text -> placeholder.
         file_path (str): The path to the original file.
 
     Returns:
@@ -81,8 +83,7 @@ def save_results(
         f.write(full_anonymized_text)
 
     mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
-    # fix some glitch:
-    final_mapping = {k: v for k, v in final_mapping.items() if k != v}
+    # Persist mapping as placeholder -> original for correct deanonymization
     with open(mapping_file, "w", encoding="utf-8") as f:
         json.dump(final_mapping, f, indent=4)
 
@@ -95,6 +96,13 @@ def deanonymize_file(
     """
     Deanonymize a file using a mapping file.
 
+    The mapping file can be either:
+    - placeholder -> original (preferred), or
+    - original -> placeholder (legacy). In this case it will be inverted.
+
+    Variations like "PERSON_1.v_1" will be mapped to the base placeholder's
+    original value if only the base (e.g., "PERSON_1") exists in the mapping.
+
     Args:
         anonymized_file_path (str): Path to the anonymized file.
         mapping_file_path (str): Path to the mapping file.
@@ -106,27 +114,58 @@ def deanonymize_file(
         anonymized_text = f.read()
 
     with open(mapping_file_path, "r", encoding="utf-8") as f:
-        mapping = json.load(f)
+        raw_mapping = json.load(f)
+
+    # Detect mapping direction and normalize to placeholder -> original
+    # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
+    placeholder_key_pattern = _PLACEHOLDER_PATTERN
+    keys_look_like_placeholders = sum(
+        1
+        for k in raw_mapping.keys()
+        if isinstance(k, str) and placeholder_key_pattern.match(k)
+    )
+    values_look_like_placeholders = sum(
+        1
+        for v in raw_mapping.values()
+        if isinstance(v, str) and placeholder_key_pattern.match(v)
+    )
+
+    if keys_look_like_placeholders >= values_look_like_placeholders:
+        placeholder_to_original = dict(raw_mapping)
+    else:
+        # Legacy: invert original -> placeholder to placeholder -> original
+        placeholder_to_original = {}
+        for original, placeholder in raw_mapping.items():
+            if isinstance(placeholder, str):
+                placeholder_to_original.setdefault(placeholder, original)
 
     deanonymized_text = anonymized_text
-    used_mappings = set()
+    used_placeholders = set()  # track actual placeholders (including variations) found
 
-    # Sort placeholders by length in descending order to avoid partial replacements
-    sorted_placeholders = sorted(mapping.keys(), key=len, reverse=True)
+    # Replace placeholders by longest first to avoid partial overlaps
+    sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
 
-    for placeholder in sorted_placeholders:
-        if placeholder in deanonymized_text:
-            deanonymized_text = deanonymized_text.replace(
-                placeholder, mapping[placeholder]
-            )
-            used_mappings.add(placeholder)
+    for base_placeholder in sorted_placeholders:
+        original_value = placeholder_to_original[base_placeholder]
+        # Match base and its variations: PERSON_1 and PERSON_1.v_1, PERSON_1.v_2, ...
+        pattern = re.compile(rf"\b{re.escape(base_placeholder)}(?:\.v_\d+)?\b")
 
+        # Record any matches before substitution
+        matches = set(pattern.findall(deanonymized_text))
+        if matches:
+            used_placeholders.update(matches)
+            deanonymized_text = pattern.sub(original_value, deanonymized_text)
+
+    # Gather stats
     all_placeholders_in_text = set(
         re.findall(r"[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?", anonymized_text)
     )
 
-    not_found_mappings = sorted(list(all_placeholders_in_text - set(mapping.keys())))
-    unused_mappings = sorted(list(set(mapping.keys()) - used_mappings))
+    not_found_mappings = sorted(list(all_placeholders_in_text - used_placeholders))
+
+    # Unused mappings: base placeholders that never occurred (neither base nor any variation)
+    used_bases = {p.split(".v_")[0] for p in used_placeholders}
+    unused_mappings = sorted([p for p in sorted_placeholders if p not in used_bases])
 
     anonymized_path = Path(anonymized_file_path)
     file_stem = anonymized_path.name.replace(f".anonymized{anonymized_path.suffix}", "")

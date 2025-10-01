@@ -6,7 +6,7 @@ from typing import Dict, List, TypedDict, Union
 import ollama
 from google import genai
 
-from pdf_anonymizer.conf import ModelName, ModelProvider
+from pdf_anonymizer_core.conf import ModelName, ModelProvider
 
 
 # Type definitions for better code clarity

@@ -2,6 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[manifest]
+members = [
+    "pdf-anonymizer-cli",
+    "pdf-anonymizer-core",
+    "pdf-anonymizer-workspace",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -419,18 +426,47 @@ wheels = [
 ]
 
 [[package]]
-name = "pdf-anonymizer"
-version = "0.2.2"
-source = { editable = "." }
+name = "pdf-anonymizer-cli"
+version = "0.3.0"
+source = { editable = "packages/pdf-anonymizer-cli" }
+dependencies = [
+    { name = "pdf-anonymizer-core" },
+    { name = "rich" },
+    { name = "typer" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pdf-anonymizer-core", editable = "packages/pdf-anonymizer-core" },
+    { name = "rich" },
+    { name = "typer" },
+]
+
+[[package]]
+name = "pdf-anonymizer-core"
+version = "0.3.0"
+source = { editable = "packages/pdf-anonymizer-core" }
 dependencies = [
     { name = "google-genai" },
     { name = "langchain-text-splitters" },
     { name = "ollama" },
     { name = "pymupdf4llm" },
     { name = "python-dotenv" },
-    { name = "rich" },
-    { name = "typer" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "google-genai" },
+    { name = "langchain-text-splitters" },
+    { name = "ollama" },
+    { name = "pymupdf4llm" },
+    { name = "python-dotenv" },
+]
+
+[[package]]
+name = "pdf-anonymizer-workspace"
+version = "0.2.2"
+source = { editable = "." }
 
 [package.optional-dependencies]
 dev = [
@@ -441,16 +477,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "google-genai" },
-    { name = "langchain-text-splitters" },
-    { name = "ollama" },
-    { name = "pymupdf4llm" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-mock", marker = "extra == 'dev'" },
-    { name = "python-dotenv" },
-    { name = "rich" },
     { name = "ruff", marker = "extra == 'dev'" },
-    { name = "typer" },
 ]
 provides-extras = ["dev"]
 

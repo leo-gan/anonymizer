@@ -6,9 +6,7 @@ from typing import Dict, List, Optional
 
 import typer
 from dotenv import load_dotenv
-from typing_extensions import Annotated
-
-from pdf_anonymizer.conf import (
+from pdf_anonymizer_core.conf import (
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_MODEL_NAME,
     DEFAULT_PROMPT_NAME,
@@ -17,13 +15,14 @@ from pdf_anonymizer.conf import (
     PromptEnum,
     get_enum_value,
 )
-from pdf_anonymizer.core import anonymize_file
-from pdf_anonymizer.prompts import detailed, simple
-from pdf_anonymizer.utils import (
+from pdf_anonymizer_core.core import anonymize_file
+from pdf_anonymizer_core.prompts import detailed, simple
+from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
     save_results,
 )
+from typing_extensions import Annotated
 
 logging.basicConfig(
     level=logging.INFO,
@@ -138,14 +137,17 @@ def run(
         )
 
         if full_anonymized_text and final_mapping:
-            # Consolidate mapping before saving
+            # The mapping from anonymize_file is original -> placeholder.
+            # We will standardize on placeholder -> original for subsequent steps.
+            placeholder_to_original = {v: k for k, v in final_mapping.items()}
+
             logging.info("Consolidating mapping...")
-            full_anonymized_text, final_mapping = consolidate_mapping(
-                full_anonymized_text, final_mapping
+            full_anonymized_text, consolidated_placeholder_map = consolidate_mapping(
+                full_anonymized_text, placeholder_to_original
             )
 
             anonymized_output_file, mapping_file = save_results(
-                full_anonymized_text, final_mapping, str(file_path)
+                full_anonymized_text, consolidated_placeholder_map, str(file_path)
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

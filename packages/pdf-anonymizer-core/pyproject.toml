@@ -1,0 +1,20 @@
+[project]
+name = "pdf-anonymizer-core"
+version = "0.3.0"
+description = "Core functionality for a tool to anonymize PDF, Markdown, and plain text files using LLMs."
+authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "python-dotenv",
+    "pymupdf4llm",
+    "langchain-text-splitters",
+    "google-genai",
+    "ollama",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}

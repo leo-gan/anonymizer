@@ -1,6 +1,8 @@
 .PHONY: install lint format test
 
 install:
+	uv pip install -e ./packages/pdf-anonymizer-core --system
+	uv pip install -e ./packages/pdf-anonymizer-cli --system
 	uv pip install -e .[dev] --system
 
 lint:

@@ -1,0 +1,24 @@
+[project]
+name = "pdf-anonymizer-cli"
+version = "0.3.0"
+description = "CLI for a tool to anonymize PDF, Markdown, and plain text files using LLMs."
+authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "typer",
+    "rich",
+    "pdf-anonymizer-core",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+pdf-anonymizer = "pdf_anonymizer_cli.cli:app"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.uv.sources]
+pdf-anonymizer-core = { workspace = true }
