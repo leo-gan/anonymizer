@@ -1,55 +1,36 @@
-# pdf-anonymizer-cli
+# PDF Anonymizer CLI
 
-CLI for anonymizing PDF, Markdown, and plain text files using LLMs. Supports Google Gemini and local Ollama models. Produces anonymized text plus a mapping JSON for consistent entity replacement. Also supports deanonymization.
+A command-line interface for anonymizing PDF, Markdown, and plain text files using LLMs.
 
-## Install
+## Installation
 
-Using uv (recommended):
+This project uses `uv` and is structured as a monorepo. The dependencies for the CLI and its core library are managed at the root of the project.
 
-```bash
-# From the repository root
-uv pip install -e ./packages/pdf-anonymizer-core
-uv pip install -e ./packages/pdf-anonymizer-cli
-```
+1.  **Install `uv`**: Follow the [official installation instructions](https://astral.sh/docs/uv#installation).
+2.  **Install dependencies from the repository root**:
+    ```bash
+    # From the repository root
+    uv sync
+    ```
+    This installs the `pdf-anonymizer` executable.
 
-Using pip:
+## Environment Variables
 
-```bash
-pip install -e ./packages/pdf-anonymizer-core
-pip install -e ./packages/pdf-anonymizer-cli
-```
+The CLI will automatically load a `.env` file from the current directory or any parent directory. For consistency, it's recommended to place a single `.env` file at the root of the repository.
 
-This installs the `pdf-anonymizer` executable entrypoint.
+- `GOOGLE_API_KEY`: Required when using Google's Gemini models.
+- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models.
 
-## Environment
-
-The CLI will auto-load a `.env` file located at:
-
-- `packages/pdf-anonymizer-cli/.env`
-
-You can also export variables in your shell instead of using a `.env` file.
-
-Variables:
-
-- `GOOGLE_API_KEY` — required for Google Gemini models
-- `OLLAMA_HOST` — optional, defaults to `http://localhost:11434`
-
-Example `.env`:
-
+Example `.env` file:
 ```env
 GOOGLE_API_KEY="YOUR_API_KEY_HERE"
-# OLLAMA_HOST="http://localhost:11434"
 ```
 
 ## Usage
 
-Basic help:
-
-```bash
-pdf-anonymizer --help
-```
-
 ### Anonymize
+
+The `run` command anonymizes one or more files.
 
 ```bash
 pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
@@ -59,47 +40,48 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
   [--anonymized-entities PATH]
 ```
 
-- `FILE_PATH ...` — one or more files (PDF, .md, .txt)
-- `--characters-to-anonymize` — chunk size per LLM call (default from core config)
-- `--prompt-name` — `simple` or `detailed` (default: `detailed`)
-- `--model-name` — e.g. `gemini-2.5-flash` (default) or local models like `gemma:7b`, `phi4-mini`
-- `--anonymized-entities` — path to a newline-delimited list of entities to anonymize
+**Arguments**:
+- `FILE_PATH`: Path to one or several PDF, Markdown, or text files for anonymization.
 
-Outputs per input file:
+**Options**:
+- `--characters-to-anonymize INTEGER`: Number of characters to process in each chunk (default: `100000`).
+- `--prompt-name [simple|detailed]`: The prompt template to use (default: `detailed`).
+- `--model-name TEXT`: The language model to use.
+- `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 
-- `data/anonymized/<name>.anonymized.{md|txt}`
-- `data/mappings/<name>.mapping.json`
+**Models**:
+- **Google**: `gemini-2.5-pro`, `gemini-2.5-flash` (default), `gemini-2.5-flash-lite`.
+- **Ollama**: `gemma:7b`, `phi4-mini`.
+
+### Examples
+
+**Basic anonymization**:
+```bash
+pdf-anonymizer run document.pdf
+```
+
+**Custom model and prompt**:
+```bash
+pdf-anonymizer run notes.md --model-name phi4-mini --prompt-name simple
+```
 
 ### Deanonymize
+
+The `deanonymize` command reverts anonymization using a mapping file.
 
 ```bash
 pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE
 ```
 
-Outputs:
+**Arguments**:
+- `ANONYMIZED_FILE`: Path to the anonymized text file.
+- `MAPPING_FILE`: Path to the JSON mapping file.
 
-- `data/deanonymized/<name>.deanonymized.md`
-- `data/stats/<name>.deanonymization_stat.json`
-
-## Examples
-
+**Example**:
 ```bash
-# Minimal
-pdf-anonymizer run document.pdf
-
-# Custom model and prompt
-pdf-anonymizer run notes.md --model-name phi4-mini --prompt-name simple
-
-# Custom chunk size
-pdf-anonymizer run document.txt --characters-to-anonymize 50000
-
-# Deanonymize
 pdf-anonymizer deanonymize \
-  data/anonymized/document.anonymized.md \
-  data/mappings/document.mapping.json
+    data/anonymized/document.anonymized.md \
+    data/mappings/document.mapping.json
 ```
 
-## Notes
-
-- For Google models, ensure `GOOGLE_API_KEY` is set; otherwise the command will exit with an error.
-- Logs are written to `app.log` alongside console output.
+This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`.
