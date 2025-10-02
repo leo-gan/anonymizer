@@ -10,7 +10,7 @@ name = "pdf-anonymizer-workspace"
 version = "0.2.2"
 
 [project.optional-dependencies]
-dev = ["ruff", "pytest", "pytest-mock", "ollama"]
+dev = ["ruff", "pytest", "pytest-mock"]
 
 [tool.pytest.ini_options]
 pythonpath = [
