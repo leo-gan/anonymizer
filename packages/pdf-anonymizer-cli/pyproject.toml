@@ -3,12 +3,17 @@ name = "pdf-anonymizer-cli"
 version = "0.3.0"
 description = "CLI for a tool to anonymize PDF, Markdown, and plain text files using LLMs."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
+license = { text = "MIT" }
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "typer",
     "rich",
     "pdf-anonymizer-core",
 ]
+
+[project.urls]
+repository = "https://github.com/leo-gan/anonymizer"
 
 [build-system]
 requires = ["setuptools>=61.0"]
