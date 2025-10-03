@@ -5,16 +5,28 @@ build-backend = "setuptools.build_meta"
 [tool.uv]
 workspace = { members = ["packages/*"] }
 
+[tool.uv.sources]
+pdf-anonymizer-core = { workspace = true }
+pdf-anonymizer-cli = { workspace = true }
+
 [project]
 name = "pdf-anonymizer-workspace"
 version = "0.3.1"
-dependencies = [
-    "huggingface-hub>=0.35.3",
-    "protobuf>=6.32.1",
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest", "pytest-mock"]
+
+[dependency-groups]
+# Use: `uv sync --group dev` to install a full dev environment including all providers
+# Note: keep root runtime deps empty; install workspace members via path deps for dev only
+dev = [
+  "ruff",
+  "pytest",
+  "pytest-mock",
+  "pdf-anonymizer-core[huggingface,google,ollama,openrouter]",
+  "pdf-anonymizer-cli",
+]
 
 [tool.pytest.ini_options]
 pythonpath = [

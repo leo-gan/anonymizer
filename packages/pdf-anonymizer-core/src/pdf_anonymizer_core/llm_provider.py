@@ -18,6 +18,7 @@ class GoogleProvider(LLMProvider):
     def __init__(self):
         try:
             from google import genai
+
             self.genai = genai
         except ImportError:
             raise ImportError(
@@ -37,6 +38,7 @@ class OllamaProvider(LLMProvider):
     def __init__(self):
         try:
             import ollama
+
             self.ollama = ollama
         except ImportError:
             raise ImportError(
@@ -62,6 +64,7 @@ class HuggingFaceProvider(LLMProvider):
     def __init__(self):
         try:
             from huggingface_hub import InferenceClient
+
             self.InferenceClient = InferenceClient
         except ImportError:
             raise ImportError(
@@ -93,6 +96,7 @@ class OpenRouterProvider(LLMProvider):
     def __init__(self):
         try:
             from openai import OpenAI
+
             self.OpenAI = OpenAI
         except ImportError:
             raise ImportError(

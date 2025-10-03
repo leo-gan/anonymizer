@@ -4,7 +4,7 @@ from typing import Type, TypeVar
 # Default values
 DEFAULT_CHARACTERS_TO_ANONYMIZE: int = 100000
 DEFAULT_PROMPT_NAME: str = "detailed"
-DEFAULT_MODEL_NAME: str = "google_gemini_2_5_flash"
+DEFAULT_MODEL_NAME: str = "gemini-2.5-flash"
 
 # Type variable for enum values
 T = TypeVar("T", bound=Enum)

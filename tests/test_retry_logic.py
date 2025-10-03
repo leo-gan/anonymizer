@@ -39,7 +39,11 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
             "this is not a valid json",
             "this is not a valid json",
             json.dumps(
-                {"entities": [{"text": "person", "type": "PERSON", "base_form": "person"}]}
+                {
+                    "entities": [
+                        {"text": "person", "type": "PERSON", "base_form": "person"}
+                    ]
+                }
             ),
         ]
         mock_get_provider.return_value = mock_provider
@@ -61,7 +65,11 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
             Exception("API error"),
             Exception("API error"),
             json.dumps(
-                {"entities": [{"text": "person", "type": "PERSON", "base_form": "person"}]}
+                {
+                    "entities": [
+                        {"text": "person", "type": "PERSON", "base_form": "person"}
+                    ]
+                }
             ),
         ]
         mock_get_provider.return_value = mock_provider
