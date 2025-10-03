@@ -6,14 +6,14 @@ from pdf_anonymizer_core.prompts import simple
 
 
 class TestAnonymizer(unittest.TestCase):
-    @patch("pdf_anonymizer_core.call_llm.genai.Client")
-    def test_identify_entities_with_gemini(self, mock_client):
+    @patch("pdf_anonymizer_core.call_llm.get_provider")
+    def test_identify_entities_with_gemini(self, mock_get_provider):
         """
         Tests the entity identification function with a mock Gemini API response.
         """
         # Create a mock response object
-        mock_response = Mock()
-        mock_response.text = """
+        mock_provider = Mock()
+        mock_provider.call.return_value = """
         {
             "entities": [
                 {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
@@ -21,11 +21,7 @@ class TestAnonymizer(unittest.TestCase):
             ]
         }
         """
-
-        # Configure the mock model to return the mock response
-        mock_client_instance = mock_client.return_value
-        mock_model_instance = mock_client_instance.models
-        mock_model_instance.generate_content.return_value = mock_response
+        mock_get_provider.return_value = mock_provider
 
         # Input text
         text = "My name is John Doe and I live in New York."
@@ -38,33 +34,29 @@ class TestAnonymizer(unittest.TestCase):
         )
 
         # Asserts
+        mock_get_provider.assert_called_once_with("google")
         expected_entities = [
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
             {"text": "New York", "type": "LOCATION", "base_form": "New York"},
         ]
         self.assertEqual(entities, expected_entities)
 
-    @patch("pdf_anonymizer_core.call_llm.ollama.chat")
-    def test_identify_entities_with_ollama(self, mock_ollama_chat):
+    @patch("pdf_anonymizer_core.call_llm.get_provider")
+    def test_identify_entities_with_ollama(self, mock_get_provider):
         """
         Tests the entity identification function with a mock Ollama API response.
         """
         # Create a mock response object
-        mock_response = {
-            "message": {
-                "content": """
-                {
-                    "entities": [
-                        {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
-                        {"text": "New York", "type": "LOCATION", "base_form": "New York"}
-                    ]
-                }
-                """
-            }
+        mock_provider = Mock()
+        mock_provider.call.return_value = """
+        {
+            "entities": [
+                {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
+                {"text": "New York", "type": "LOCATION", "base_form": "New York"}
+            ]
         }
-
-        # Configure the mock model to return the mock response
-        mock_ollama_chat.return_value = mock_response
+        """
+        mock_get_provider.return_value = mock_provider
 
         # Input text
         text = "My name is John Doe and I live in New York."
@@ -77,6 +69,7 @@ class TestAnonymizer(unittest.TestCase):
         )
 
         # Asserts
+        mock_get_provider.assert_called_once_with("ollama")
         expected_entities = [
             {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
             {"text": "New York", "type": "LOCATION", "base_form": "New York"},

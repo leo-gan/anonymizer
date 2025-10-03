@@ -4,28 +4,36 @@ A command-line interface for anonymizing PDF, Markdown, and plain text files usi
 
 ## Installation
 
-This project uses `uv` and is structured as a monorepo. The dependencies for the CLI and its core library are managed at the root of the project.
+Install the CLI with your favorite package manager. To use a specific LLM provider, you must install the corresponding extra.
 
-1.  **Install `uv`**: Follow the [official installation instructions](https://astral.sh/docs/uv#installation).
-2.  **Install dependencies from the repository root**:
-    ```bash
-    # From the repository root
-    uv sync
-    ```
-    This installs the `pdf-anonymizer` executable.
+- **Google**: `pip install "pdf-anonymizer-cli[google]"`
+- **Ollama**: `pip install "pdf-anonymizer-cli[ollama]"`
+- **Hugging Face**: `pip install "pdf-anonymizer-cli[huggingface]"`
+- **OpenRouter**: `pip install "pdf-anonymizer-cli[openrouter]"`
+
+You can also install multiple extras at once:
+
+```bash
+pip install "pdf-anonymizer-cli[google,openrouter]"
+```
+
+This installs the `pdf-anonymizer` executable.
+
 
 ## Environment Variables
 
 The CLI will automatically load a `.env` file from the current directory or any parent directory. For consistency, it's recommended to place a single `.env` file at the root of the repository.
 
-- `GOOGLE_API_KEY`: Required when using Google's Gemini models.
-- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models.
+- `GOOGLE_API_KEY`: Required when using Google models.
 - `HUGGING_FACE_TOKEN`: Required when using Hugging Face models. You can get a token from [here](https://huggingface.co/docs/hub/security-tokens).
+- `OPENROUTER_API_KEY`: Required when using OpenRouter models.
+- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 
 Example `.env` file:
 ```env
 GOOGLE_API_KEY="YOUR_API_KEY_HERE"
 HUGGING_FACE_TOKEN="YOUR_HF_TOKEN_HERE"
+OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
 ```
 
 ## Usage
@@ -52,20 +60,26 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 
 **Models**:
-- **Google**: `gemini-2.5-pro`, `gemini-2.5-flash` (default), `gemini-2.5-flash-lite`.
-- **Ollama**: `gemma:7b`, `phi4-mini`.
-- **Hugging Face**: `openai/gpt-oss-20b`, `mistralai/Mistral-7B-Instruct-v0.1`, `HuggingFaceH4/zephyr-7b-beta`.
+- **Google**: `google_gemini_2_5_pro`, `google_gemini_2_5_flash` (default), `google_gemini_2_5_flash_lite`.
+- **Ollama**: `ollama_gemma`, `ollama_phi`.
+- **Hugging Face**: `huggingface_openai_gpt_oss_20b`, `huggingface_mistral_7b_instruct`, `huggingface_zephyr_7b_beta`.
+- **OpenRouter**: `openrouter_gpt_4o`, `openrouter_gemini_pro`.
 
 ### Examples
 
-**Basic anonymization**:
+**Basic anonymization with the default model (Google)**:
 ```bash
 pdf-anonymizer run document.pdf
 ```
 
-**Custom model and prompt**:
+**Custom model and prompt (Ollama)**:
 ```bash
-pdf-anonymizer run notes.md --model-name phi4-mini --prompt-name simple
+pdf-anonymizer run notes.md --model-name ollama_phi --prompt-name simple
+```
+
+**Using an OpenRouter model**:
+```bash
+pdf-anonymizer run report.pdf --model-name openrouter_gpt_4o
 ```
 
 ### Deanonymize

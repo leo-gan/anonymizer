@@ -1,25 +1,13 @@
 import json
 import logging
-import os
 import time
-from typing import Any, Dict, List, TypedDict, Union
+from typing import List, TypedDict
 
-import ollama
-from google import genai
-from huggingface_hub import InferenceClient
-
-from pdf_anonymizer_core.conf import ModelName, ModelProvider
+from pdf_anonymizer_core.conf import ModelName
+from pdf_anonymizer_core.llm_provider import get_provider
 
 
 # Type definitions for better code clarity
-class OllamaResponse(TypedDict):
-    message: Dict[str, str]
-
-
-class ModelResponse(TypedDict):
-    text: str
-
-
 class Entity(TypedDict):
     text: str
     type: str
@@ -48,8 +36,6 @@ def identify_entities_with_llm(
         A list of identified entities.
     """
     prompt = prompt_template.format(text=text)
-
-    response: Union[OllamaResponse, ModelResponse, Any, None] = None
     max_retries = 3
 
     for attempt in range(max_retries):
@@ -58,26 +44,9 @@ def identify_entities_with_llm(
                 f"Calling '{model_name}': text: {len(text):,}, attempt {attempt + 1}"
             )
             model_enum = ModelName(model_name)
+            provider = get_provider(model_enum.provider)
+            raw_text = provider.call(prompt, model_enum.value)
 
-            if model_enum.provider == ModelProvider.OLLAMA:
-                response = ollama.chat(
-                    model=model_name,
-                    messages=[{"role": "user", "content": prompt}],
-                )
-            elif model_enum.provider == ModelProvider.HUGGINGFACE:
-                client = InferenceClient(
-                    model=model_name, token=os.getenv("HUGGING_FACE_TOKEN")
-                )
-                response = client.chat_completion(
-                    messages=[{"role": "user", "content": prompt}],
-                )
-            else:
-                client = genai.Client()
-                response = client.models.generate_content(
-                    model=model_name, contents=prompt
-                )
-
-            raw_text = _get_response_text(response, model_name)
             cleaned_response = (
                 raw_text.strip().replace("```json", "").replace("```", "").strip()
             )
@@ -86,10 +55,9 @@ def identify_entities_with_llm(
             return result.get("entities", [])
 
         except json.JSONDecodeError as e:
-            response_text = _get_response_text(response, model_name)
             logging.error(
                 f"Attempt {attempt + 1} failed with JSON decode error: {e}, "
-                f"response: {response_text[:200]}..."
+                f"response: {raw_text[:200] if 'raw_text' in locals() else 'N/A'}..."
             )
             if attempt + 1 == max_retries:
                 logging.error("Max retries reached. Returning empty list.")
@@ -104,34 +72,3 @@ def identify_entities_with_llm(
         time.sleep(1)  # Wait before retrying
 
     return []
-
-
-def _get_response_text(
-    response: Union[OllamaResponse, ModelResponse, Any, None],
-    model_name: str,
-) -> str:
-    """Extract text content from different response types."""
-    if not response:
-        return ""
-
-    model_enum = ModelName(model_name)
-    if model_enum.provider == ModelProvider.OLLAMA:
-        if (
-            isinstance(response, dict)
-            and "message" in response
-            and "content" in response["message"]
-        ):
-            return response["message"]["content"]
-    elif model_enum.provider == ModelProvider.HUGGINGFACE:
-        if (
-            response
-            and hasattr(response, "choices")
-            and response.choices
-            and hasattr(response.choices[0], "message")
-            and hasattr(response.choices[0].message, "content")
-        ):
-            return response.choices[0].message.content or ""
-    elif hasattr(response, "text"):
-        return response.text
-
-    return ""

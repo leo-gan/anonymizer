@@ -10,10 +10,13 @@ dependencies = [
     "python-dotenv",
     "pymupdf4llm",
     "langchain-text-splitters",
-    "google-genai",
-    "ollama",
-    "huggingface-hub",
 ]
+
+[project.optional-dependencies]
+google = ["google-genai"]
+ollama = ["ollama"]
+huggingface = ["huggingface-hub"]
+openrouter = ["openai"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"

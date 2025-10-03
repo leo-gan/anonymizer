@@ -4,7 +4,7 @@ from typing import Type, TypeVar
 # Default values
 DEFAULT_CHARACTERS_TO_ANONYMIZE: int = 100000
 DEFAULT_PROMPT_NAME: str = "detailed"
-DEFAULT_MODEL_NAME: str = "gemini-2.5-flash"
+DEFAULT_MODEL_NAME: str = "google_gemini_2_5_flash"
 
 # Type variable for enum values
 T = TypeVar("T", bound=Enum)
@@ -20,26 +20,26 @@ class ModelProvider(str, Enum):
     GOOGLE = "google"
     OLLAMA = "ollama"
     HUGGINGFACE = "huggingface"
+    OPENROUTER = "openrouter"
 
 
 # Then you could associate a provider with each model, for instance:
 class ModelName(str, Enum):
-    gemini_2_5_pro = "gemini-2.5-pro"
-    gemini_2_5_flash = "gemini-2.5-flash"
-    gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
-    gemma = "gemma:7b"
-    phi = "phi4-mini"
-    mistral_7b_instruct = "mistralai/Mistral-7B-Instruct-v0.1"
-    zephyr_7b_beta = "HuggingFaceH4/zephyr-7b-beta"
-    openai_gpt_oss_20b = "openai/gpt-oss-20b"
+    google_gemini_2_5_pro = "gemini-2.5-pro"
+    google_gemini_2_5_flash = "gemini-2.5-flash"
+    google_gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
+    ollama_gemma = "gemma:7b"
+    ollama_phi = "phi4-mini"
+    huggingface_mistral_7b_instruct = "mistralai/Mistral-7B-Instruct-v0.1"
+    huggingface_zephyr_7b_beta = "HuggingFaceH4/zephyr-7b-beta"
+    huggingface_openai_gpt_oss_20b = "openai/gpt-oss-20b"
+    openrouter_gpt_4o = "openai/gpt-4o"
+    openrouter_gemini_pro = "google/gemini-pro"
 
     @property
     def provider(self) -> "ModelProvider":
-        if "gemini" in self.value:
-            return ModelProvider.GOOGLE
-        if "/" in self.value:
-            return ModelProvider.HUGGINGFACE
-        return ModelProvider.OLLAMA
+        provider_name = self.name.split("_")[0].upper()
+        return ModelProvider[provider_name]
 
 
 def get_enum_value(enum_type: Type[T], value: str) -> T:

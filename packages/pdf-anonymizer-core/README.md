@@ -2,23 +2,35 @@
 
 This package provides the core functionality for the PDF/Text anonymizer, including text extraction, LLM-driven anonymization, and deanonymization logic. It is used by `pdf-anonymizer-cli`.
 
-## Installation for Development
+## Installation
 
-This project uses `uv` and is structured as a monorepo. To install the necessary dependencies for development, run the following command from the root of the repository:
+Install the base package with your favorite package manager:
 
 ```bash
-# From the repository root
-uv sync
+pip install pdf-anonymizer-core
 ```
 
-This will install the `pdf-anonymizer-core` package in editable mode.
+To use a specific LLM provider, you must install the corresponding extra. This helps to keep the installation lightweight by only downloading the libraries you need.
+
+- **Google**: `pip install "pdf-anonymizer-core[google]"`
+- **Ollama**: `pip install "pdf-anonymizer-core[ollama]"`
+- **Hugging Face**: `pip install "pdf-anonymizer-core[huggingface]"`
+- **OpenRouter**: `pip install "pdf-anonymizer-core[openrouter]"`
+
+You can also install multiple extras at once:
+
+```bash
+pip install "pdf-anonymizer-core[google,ollama]"
+```
 
 ## Environment Variables
 
 The core library itself does not load `.env` files. Environment variables must be loaded by the application that uses this library (e.g., `pdf-anonymizer-cli`) or set in your shell.
 
-- `GOOGLE_API_KEY`: Required when using Google's Gemini models.
-- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models.
+- `GOOGLE_API_KEY`: Required when using Google models.
+- `HUGGING_FACE_TOKEN`: Required when using Hugging Face models.
+- `OPENROUTER_API_KEY`: Required when using OpenRouter models.
+- `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 
 ## API Usage
 
@@ -34,7 +46,7 @@ from pdf_anonymizer_core.prompts import detailed
 text, mapping = anonymize_file(
     file_path="/path/to/file.pdf",
     prompt_template=detailed.prompt_template,
-    model_name="gemini-2.5-flash"
+    model_name="google_gemini_2_5_flash"
 )
 
 if text and mapping:
@@ -71,5 +83,5 @@ from pdf_anonymizer_core.conf import (
 )
 
 print(f"Default model: {DEFAULT_MODEL_NAME}")
-print(f"Available Google models: {[m.value for m in ModelName if 'gemini' in m.value]}")
+print(f"Available Google models: {[m.value for m in ModelName if m.provider == 'google']}")
 ```
