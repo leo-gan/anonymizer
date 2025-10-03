@@ -20,7 +20,7 @@ The CLI will automatically load a `.env` file from the current directory or any 
 
 - `GOOGLE_API_KEY`: Required when using Google's Gemini models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models.
-- `HUGGING_FACE_TOKEN`: Required when using Hugging Face models.
+- `HUGGING_FACE_TOKEN`: Required when using Hugging Face models. You can get a token from [here](https://huggingface.co/docs/hub/security-tokens).
 
 Example `.env` file:
 ```env
