@@ -31,6 +31,7 @@ class ModelName(str, Enum):
     phi = "phi4-mini"
     mistral_7b_instruct = "mistralai/Mistral-7B-Instruct-v0.1"
     zephyr_7b_beta = "HuggingFaceH4/zephyr-7b-beta"
+    openai_gpt_oss_20b = "openai/gpt-oss-20b"
 
     @property
     def provider(self) -> "ModelProvider":

@@ -1,4 +1,4 @@
-# PDF Anonymizer
+# 🦉🫥 PDF Anonymizer
 
 This application anonymizes large PDF, Markdown or Text files using LLMs.
 

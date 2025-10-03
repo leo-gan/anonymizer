@@ -1,4 +1,4 @@
-# PDF Anonymizer Core
+# 🦉🫥 PDF Anonymizer Core
 
 This package provides the core functionality for the PDF/Text anonymizer, including text extraction, LLM-driven anonymization, and deanonymization logic. It is used by `pdf-anonymizer-cli`.
 

@@ -70,7 +70,6 @@ def identify_entities_with_llm(
                 )
                 response = client.chat_completion(
                     messages=[{"role": "user", "content": prompt}],
-                    max_tokens=1024,
                 )
             else:
                 client = genai.Client()

@@ -1,4 +1,4 @@
-# PDF Anonymizer CLI
+# 🦉🫥 PDF Anonymizer CLI
 
 A command-line interface for anonymizing PDF, Markdown, and plain text files using LLMs.
 
@@ -54,7 +54,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 **Models**:
 - **Google**: `gemini-2.5-pro`, `gemini-2.5-flash` (default), `gemini-2.5-flash-lite`.
 - **Ollama**: `gemma:7b`, `phi4-mini`.
-- **Hugging Face**: `mistralai/Mistral-7B-Instruct-v0.1`, `HuggingFaceH4/zephyr-7b-beta`.
+- **Hugging Face**: `openai/gpt-oss-20b`, `mistralai/Mistral-7B-Instruct-v0.1`, `HuggingFaceH4/zephyr-7b-beta`.
 
 ### Examples
 
