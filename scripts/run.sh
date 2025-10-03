@@ -11,4 +11,4 @@ cd "$(dirname "$0")/.."
 SAMPLE="tests/data/sample.pdf"
 
 # Run anonymization via CLI
-pdf-anonymizer run "$SAMPLE" --model-name openai/gpt-oss-20b
+pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-pro"
