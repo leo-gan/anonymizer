@@ -1,4 +1,4 @@
-# PDF Anonymizer CLI
+# 🦉🫥 PDF Anonymizer CLI
 
 A command-line interface for anonymizing PDF, Markdown, and plain text files using LLMs.
 
@@ -20,10 +20,12 @@ The CLI will automatically load a `.env` file from the current directory or any 
 
 - `GOOGLE_API_KEY`: Required when using Google's Gemini models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using local Ollama models.
+- `HUGGING_FACE_TOKEN`: Required when using Hugging Face models. You can get a token from [here](https://huggingface.co/docs/hub/security-tokens).
 
 Example `.env` file:
 ```env
 GOOGLE_API_KEY="YOUR_API_KEY_HERE"
+HUGGING_FACE_TOKEN="YOUR_HF_TOKEN_HERE"
 ```
 
 ## Usage
@@ -52,6 +54,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 **Models**:
 - **Google**: `gemini-2.5-pro`, `gemini-2.5-flash` (default), `gemini-2.5-flash-lite`.
 - **Ollama**: `gemma:7b`, `phi4-mini`.
+- **Hugging Face**: `openai/gpt-oss-20b`, `mistralai/Mistral-7B-Instruct-v0.1`, `HuggingFaceH4/zephyr-7b-beta`.
 
 ### Examples
 

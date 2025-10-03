@@ -7,7 +7,11 @@ workspace = { members = ["packages/*"] }
 
 [project]
 name = "pdf-anonymizer-workspace"
-version = "0.3.0"
+version = "0.3.1"
+dependencies = [
+    "huggingface-hub>=0.35.3",
+    "protobuf>=6.32.1",
+]
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest", "pytest-mock"]
