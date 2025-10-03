@@ -19,6 +19,7 @@ class PromptEnum(str, Enum):
 class ModelProvider(str, Enum):
     GOOGLE = "google"
     OLLAMA = "ollama"
+    HUGGINGFACE = "huggingface"
 
 
 # Then you could associate a provider with each model, for instance:
@@ -28,11 +29,15 @@ class ModelName(str, Enum):
     gemini_2_5_flash_lite = "gemini-2.5-flash-lite"
     gemma = "gemma:7b"
     phi = "phi4-mini"
+    mistral_7b_instruct = "mistralai/Mistral-7B-Instruct-v0.1"
+    zephyr_7b_beta = "HuggingFaceH4/zephyr-7b-beta"
 
     @property
     def provider(self) -> "ModelProvider":
         if "gemini" in self.value:
             return ModelProvider.GOOGLE
+        if "/" in self.value:
+            return ModelProvider.HUGGINGFACE
         return ModelProvider.OLLAMA
 
 

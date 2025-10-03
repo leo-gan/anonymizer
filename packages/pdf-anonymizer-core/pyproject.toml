@@ -12,6 +12,7 @@ dependencies = [
     "langchain-text-splitters",
     "google-genai",
     "ollama",
+    "huggingface-hub",
 ]
 
 [project.urls]

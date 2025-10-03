@@ -1,10 +1,12 @@
 import json
 import logging
+import os
 import time
-from typing import Dict, List, TypedDict, Union
+from typing import Any, Dict, List, TypedDict, Union
 
 import ollama
 from google import genai
+from huggingface_hub import InferenceClient
 
 from pdf_anonymizer_core.conf import ModelName, ModelProvider
 
@@ -47,7 +49,7 @@ def identify_entities_with_llm(
     """
     prompt = prompt_template.format(text=text)
 
-    response: Union[OllamaResponse, ModelResponse, None] = None
+    response: Union[OllamaResponse, ModelResponse, Any, None] = None
     max_retries = 3
 
     for attempt in range(max_retries):
@@ -62,14 +64,21 @@ def identify_entities_with_llm(
                     model=model_name,
                     messages=[{"role": "user", "content": prompt}],
                 )
-                raw_text: str = response["message"]["content"]
+            elif model_enum.provider == ModelProvider.HUGGINGFACE:
+                client = InferenceClient(
+                    model=model_name, token=os.getenv("HUGGING_FACE_TOKEN")
+                )
+                response = client.chat_completion(
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=1024,
+                )
             else:
                 client = genai.Client()
                 response = client.models.generate_content(
                     model=model_name, contents=prompt
                 )
-                raw_text = response.text
 
+            raw_text = _get_response_text(response, model_name)
             cleaned_response = (
                 raw_text.strip().replace("```json", "").replace("```", "").strip()
             )
@@ -99,7 +108,8 @@ def identify_entities_with_llm(
 
 
 def _get_response_text(
-    response: Union[OllamaResponse, ModelResponse, None], model_name: str
+    response: Union[OllamaResponse, ModelResponse, Any, None],
+    model_name: str,
 ) -> str:
     """Extract text content from different response types."""
     if not response:
@@ -113,6 +123,15 @@ def _get_response_text(
             and "content" in response["message"]
         ):
             return response["message"]["content"]
+    elif model_enum.provider == ModelProvider.HUGGINGFACE:
+        if (
+            response
+            and hasattr(response, "choices")
+            and response.choices
+            and hasattr(response.choices[0], "message")
+            and hasattr(response.choices[0].message, "content")
+        ):
+            return response.choices[0].message.content or ""
     elif hasattr(response, "text"):
         return response.text
 
