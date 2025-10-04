@@ -3,7 +3,7 @@ import logging
 import time
 from typing import List, TypedDict
 
-from pdf_anonymizer_core.conf import ModelName
+from pdf_anonymizer_core.conf import get_provider_and_model_name
 from pdf_anonymizer_core.llm_provider import get_provider
 
 
@@ -43,9 +43,9 @@ def identify_entities_with_llm(
             logging.info(
                 f"Calling '{model_name}': text: {len(text):,}, attempt {attempt + 1}"
             )
-            model_enum = ModelName(model_name)
-            provider = get_provider(model_enum.provider)
-            raw_text = provider.call(prompt, model_enum.value)
+            provider_name, actual_model_name = get_provider_and_model_name(model_name)
+            provider = get_provider(provider_name)
+            raw_text = provider.call(prompt, actual_model_name)
 
             cleaned_response = (
                 raw_text.strip().replace("```json", "").replace("```", "").strip()

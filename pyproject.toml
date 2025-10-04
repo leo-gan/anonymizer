@@ -24,7 +24,7 @@ dev = [
   "ruff",
   "pytest",
   "pytest-mock",
-  "pdf-anonymizer-core[huggingface,google,ollama,openrouter]",
+  "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic]",
   "pdf-anonymizer-cli",
 ]
 

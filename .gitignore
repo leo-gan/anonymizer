@@ -6,3 +6,4 @@ app.log
 *.pdf
 .idea/
 /data/
+dist/

@@ -2,6 +2,13 @@
 
 A command-line interface for anonymizing PDF, Markdown, and plain text files using LLMs.
 
+- **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
+- **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
+- **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
+- **Reversible**: Supports deanonymization to recover original data when needed.
+- **Multi-Format**: Works with PDF, Markdown, and plain text files.
+
+
 ## Installation
 
 Install the CLI with your favorite package manager. To use a specific LLM provider, you must install the corresponding extra.
@@ -10,6 +17,8 @@ Install the CLI with your favorite package manager. To use a specific LLM provid
 - **Ollama**: `pip install "pdf-anonymizer-cli[ollama]"`
 - **Hugging Face**: `pip install "pdf-anonymizer-cli[huggingface]"`
 - **OpenRouter**: `pip install "pdf-anonymizer-cli[openrouter]"`
+- **OpenAI**: `pip install "pdf-anonymizer-cli[openai]"`
+- **Anthropic**: `pip install "pdf-anonymizer-cli[anthropic]"`
 
 You can also install multiple extras at once:
 
@@ -27,6 +36,8 @@ The CLI will automatically load a `.env` file from the current directory or any 
 - `GOOGLE_API_KEY`: Required when using Google models.
 - `HUGGING_FACE_TOKEN`: Required when using Hugging Face models. You can get a token from [here](https://huggingface.co/docs/hub/security-tokens).
 - `OPENROUTER_API_KEY`: Required when using OpenRouter models.
+- `OPENAI_API_KEY`: Required when using OpenAI models.
+- `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 
 Example `.env` file:
@@ -60,10 +71,14 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 
 **Models**:
+You can use any of the predefined models below, or specify a custom model using the format `"provider/model-name"`. For example: `--model-name "openai/gpt-4o"`.
+
 - **Google**: `google_gemini_2_5_pro`, `google_gemini_2_5_flash` (default), `google_gemini_2_5_flash_lite`.
 - **Ollama**: `ollama_gemma`, `ollama_phi`.
 - **Hugging Face**: `huggingface_openai_gpt_oss_20b`, `huggingface_mistral_7b_instruct`, `huggingface_zephyr_7b_beta`.
 - **OpenRouter**: `openrouter_gpt_4o`, `openrouter_gemini_pro`.
+- **OpenAI**: `openai_gpt_4o`, `openai_gpt_5`.
+- **Anthropic**: `anthropic_claude_4_sonet`, `anthropic_claude_4_sonet_4_5`.
 
 ### Examples
 
