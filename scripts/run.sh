@@ -11,4 +11,11 @@ cd "$(dirname "$0")/.."
 SAMPLE="tests/data/sample.pdf"
 
 # Run anonymization via CLI
-pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-flash-latest"
+# run with the default model
+pdf-anonymizer run "$SAMPLE"
+
+## run with the unknown model name for the google provider
+#pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-flash-latest"
+
+## run with the gemini model name for the OpenRouter provider
+#pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-pro"

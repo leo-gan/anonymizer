@@ -10,10 +10,9 @@ from pdf_anonymizer_core.conf import (
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
     DEFAULT_MODEL_NAME,
     DEFAULT_PROMPT_NAME,
-    ModelName,
-    ModelProvider,
     PromptEnum,
     get_enum_value,
+    get_provider_and_model_name,
 )
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.prompts import detailed, simple
@@ -66,12 +65,11 @@ def run(
         ),
     ] = get_enum_value(PromptEnum, DEFAULT_PROMPT_NAME),
     model_name: Annotated[
-        ModelName,
+        str,
         typer.Option(
-            help="The name of the model to use for anonymization.",
-            case_sensitive=False,
+            help="The name of the model to use for anonymization (supports enum values or 'provider/model').",
         ),
-    ] = get_enum_value(ModelName, DEFAULT_MODEL_NAME),
+    ] = DEFAULT_MODEL_NAME,
     anonymized_entities: Annotated[
         Optional[Path],
         typer.Option(
@@ -98,8 +96,9 @@ def run(
     """
     load_environment()
 
-    if model_name.provider == ModelProvider.GOOGLE:
-        if "gemini" in model_name.value and not os.getenv("GOOGLE_API_KEY"):
+    provider_name, _ = get_provider_and_model_name(model_name)
+    if provider_name == "google":
+        if "gemini" in model_name and not os.getenv("GOOGLE_API_KEY"):
             logging.error(
                 "Error: GOOGLE_API_KEY not found. Please set it in the .env file."
             )
@@ -107,7 +106,7 @@ def run(
 
     logging.info(f"  --file-paths: {file_paths}")
     logging.info(f"  --characters-to-anonymize: {characters_to_anonymize}")
-    logging.info(f"  --model-name: {model_name.value}")
+    logging.info(f"  --model-name: {model_name}")
 
     # Select the appropriate prompt template
     prompt_templates: Dict[str, str] = {
@@ -132,7 +131,7 @@ def run(
             str(file_path),
             characters_to_anonymize,
             prompt_template,
-            model_name.value,
+            model_name,
             entities_to_anonymize,
         )
 
