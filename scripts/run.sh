@@ -11,4 +11,4 @@ cd "$(dirname "$0")/.."
 SAMPLE="tests/data/sample.pdf"
 
 # Run anonymization via CLI
-pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-pro"
+pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-flash-latest"

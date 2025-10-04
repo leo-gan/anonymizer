@@ -2,6 +2,13 @@
 
 A command-line interface for anonymizing PDF, Markdown, and plain text files using LLMs.
 
+- **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
+- **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
+- **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
+- **Reversible**: Supports deanonymization to recover original data when needed.
+- **Multi-Format**: Works with PDF, Markdown, and plain text files.
+
+
 ## Installation
 
 Install the CLI with your favorite package manager. To use a specific LLM provider, you must install the corresponding extra.

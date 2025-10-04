@@ -157,7 +157,6 @@ class AnthropicProvider(LLMProvider):
         client = self.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         response = client.messages.create(
             model=model_name,
-            max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text if response.content else ""
