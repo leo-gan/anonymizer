@@ -4,7 +4,7 @@ This application anonymizes large PDF, Markdown or Text files using LLMs.
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
-- **Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models or cheap [Hugging Face hosted](https://huggingface.co/) and [OpenRouter](https://openrouter.ai/) models.
+- **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
 - **Multi-Format**: Works with PDF, Markdown, and plain text files.
 
@@ -32,9 +32,22 @@ This project is a monorepo containing two main packages:
 
 4.  **Install Ollama (optional)**: If you want to use a local model for anonymization, install [Ollama](https://ollama.com/).
 
-5.  **Set up environment variables**: Create a `.env` file in the `packages/pdf-anonymizer-cli` directory. If you are using Google Gemini, add your Google API key:
-    ```
-    GOOGLE_API_KEY="YOUR_API_KEY_HERE"
+5.  **Set up environment variables**: Create a `.env` file in the `packages/pdf-anonymizer-cli` directory and add the necessary API keys for the providers you want to use. For example:
+    ```env
+    # For Google models
+    GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+
+    # For OpenAI models
+    OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
+
+    # For Anthropic models
+    ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY"
+
+    # For Hugging Face models
+    HUGGING_FACE_TOKEN="YOUR_HF_TOKEN"
+
+    # For OpenRouter models
+    OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
     ```
 
 ## Quick Start

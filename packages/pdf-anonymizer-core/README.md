@@ -16,6 +16,8 @@ To use a specific LLM provider, you must install the corresponding extra. This h
 - **Ollama**: `pip install "pdf-anonymizer-core[ollama]"`
 - **Hugging Face**: `pip install "pdf-anonymizer-core[huggingface]"`
 - **OpenRouter**: `pip install "pdf-anonymizer-core[openrouter]"`
+- **OpenAI**: `pip install "pdf-anonymizer-core[openai]"`
+- **Anthropic**: `pip install "pdf-anonymizer-core[anthropic]"`
 
 You can also install multiple extras at once:
 
@@ -30,6 +32,8 @@ The core library itself does not load `.env` files. Environment variables must b
 - `GOOGLE_API_KEY`: Required when using Google models.
 - `HUGGING_FACE_TOKEN`: Required when using Hugging Face models.
 - `OPENROUTER_API_KEY`: Required when using OpenRouter models.
+- `OPENAI_API_KEY`: Required when using OpenAI models.
+- `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 
 ## API Usage
@@ -46,7 +50,7 @@ from pdf_anonymizer_core.prompts import detailed
 text, mapping = anonymize_file(
     file_path="/path/to/file.pdf",
     prompt_template=detailed.prompt_template,
-    model_name="google_gemini_2_5_flash"
+    model_name="google_gemini_2_5_flash"  # Can also be a custom model like "openai/gpt-4o"
 )
 
 if text and mapping:

@@ -117,14 +117,63 @@ class OpenRouterProvider(LLMProvider):
         return completion.choices[0].message.content or ""
 
 
+class OpenAIProvider(LLMProvider):
+    def __init__(self):
+        try:
+            from openai import OpenAI
+
+            self.OpenAI = OpenAI
+        except ImportError:
+            raise ImportError(
+                "The 'openai' extra is not installed. "
+                "Please run 'pip install \"pdf-anonymizer-core[openai]\"'."
+            )
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY environment variable not set.")
+
+    def call(self, prompt: str, model_name: str) -> str:
+        client = self.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        completion = client.chat.completions.create(
+            model=model_name, messages=[{"role": "user", "content": prompt}]
+        )
+        return completion.choices[0].message.content or ""
+
+
+class AnthropicProvider(LLMProvider):
+    def __init__(self):
+        try:
+            from anthropic import Anthropic
+
+            self.Anthropic = Anthropic
+        except ImportError:
+            raise ImportError(
+                "The 'anthropic' extra is not installed. "
+                "Please run 'pip install \"pdf-anonymizer-core[anthropic]\"'."
+            )
+        if not os.getenv("ANTHROPIC_API_KEY"):
+            raise ValueError("ANTHROPIC_API_KEY environment variable not set.")
+
+    def call(self, prompt: str, model_name: str) -> str:
+        client = self.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        response = client.messages.create(
+            model=model_name,
+            max_tokens=4096,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.content[0].text if response.content else ""
+
+
 def get_provider(provider_name: str) -> LLMProvider:
     """Factory function to get a provider instance."""
-    if provider_name == "google":
-        return GoogleProvider()
-    if provider_name == "ollama":
-        return OllamaProvider()
-    if provider_name == "huggingface":
-        return HuggingFaceProvider()
-    if provider_name == "openrouter":
-        return OpenRouterProvider()
+    provider_map = {
+        "google": GoogleProvider,
+        "ollama": OllamaProvider,
+        "huggingface": HuggingFaceProvider,
+        "openrouter": OpenRouterProvider,
+        "openai": OpenAIProvider,
+        "anthropic": AnthropicProvider,
+    }
+    provider_class = provider_map.get(provider_name)
+    if provider_class:
+        return provider_class()
     raise ValueError(f"Unknown provider: {provider_name}")

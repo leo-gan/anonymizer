@@ -17,6 +17,8 @@ google = ["google-genai"]
 ollama = ["ollama"]
 huggingface = ["huggingface-hub"]
 openrouter = ["openai"]
+openai = ["openai"]
+anthropic = ["anthropic"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"
