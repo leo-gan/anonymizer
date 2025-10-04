@@ -682,7 +682,7 @@ dev = [
 [package.dev-dependencies]
 dev = [
     { name = "pdf-anonymizer-cli" },
-    { name = "pdf-anonymizer-core", extra = ["google", "huggingface", "ollama", "openrouter"] },
+    { name = "pdf-anonymizer-core", extra = ["anthropic", "google", "huggingface", "ollama", "openai", "openrouter"] },
     { name = "pytest" },
     { name = "pytest-mock" },
     { name = "ruff" },
@@ -699,7 +699,7 @@ provides-extras = ["dev"]
 [package.metadata.requires-dev]
 dev = [
     { name = "pdf-anonymizer-cli", editable = "packages/pdf-anonymizer-cli" },
-    { name = "pdf-anonymizer-core", extras = ["huggingface", "google", "ollama", "openrouter"], editable = "packages/pdf-anonymizer-core" },
+    { name = "pdf-anonymizer-core", extras = ["huggingface", "google", "ollama", "openrouter", "openai", "anthropic"], editable = "packages/pdf-anonymizer-core" },
     { name = "pytest" },
     { name = "pytest-mock" },
     { name = "ruff" },

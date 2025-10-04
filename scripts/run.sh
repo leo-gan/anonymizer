@@ -19,3 +19,9 @@ pdf-anonymizer run "$SAMPLE"
 
 ## run with the gemini model name for the OpenRouter provider
 #pdf-anonymizer run "$SAMPLE" --model-name "google/gemini-pro"
+
+## run for the OpenAI provider
+#pdf-anonymizer run "$SAMPLE" --model-name "gpt-5"
+
+## run for the Anthropic provider
+#pdf-anonymizer run "$SAMPLE" --model-name "claude-4-sonet"

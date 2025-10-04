@@ -1,13 +1,17 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from pdf_anonymizer_core.conf import DEFAULT_CHARACTERS_TO_ANONYMIZE
 
 
 class LLMProvider(ABC):
     """Abstract base class for LLM providers."""
 
     @abstractmethod
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         """
         Call the language model and return the text content of the response.
         """
@@ -28,7 +32,9 @@ class GoogleProvider(LLMProvider):
         if not os.getenv("GOOGLE_API_KEY"):
             raise ValueError("GOOGLE_API_KEY environment variable not set.")
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         client = self.genai.Client()
         response = client.models.generate_content(model=model_name, contents=prompt)
         return response.text if hasattr(response, "text") else ""
@@ -46,7 +52,9 @@ class OllamaProvider(LLMProvider):
                 "Please run 'pip install \"pdf-anonymizer-core[ollama]\"'."
             )
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         response: Dict[str, Any] = self.ollama.chat(
             model=model_name,
             messages=[{"role": "user", "content": prompt}],
@@ -74,7 +82,9 @@ class HuggingFaceProvider(LLMProvider):
         if not os.getenv("HUGGING_FACE_TOKEN"):
             raise ValueError("HUGGING_FACE_TOKEN environment variable not set.")
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         client = self.InferenceClient(
             model=model_name, token=os.getenv("HUGGING_FACE_TOKEN")
         )
@@ -106,7 +116,9 @@ class OpenRouterProvider(LLMProvider):
         if not os.getenv("OPENROUTER_API_KEY"):
             raise ValueError("OPENROUTER_API_KEY environment variable not set.")
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         client = self.OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=os.getenv("OPENROUTER_API_KEY"),
@@ -131,7 +143,9 @@ class OpenAIProvider(LLMProvider):
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set.")
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         client = self.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
             model=model_name, messages=[{"role": "user", "content": prompt}]
@@ -153,11 +167,18 @@ class AnthropicProvider(LLMProvider):
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise ValueError("ANTHROPIC_API_KEY environment variable not set.")
 
-    def call(self, prompt: str, model_name: str) -> str:
+    def call(
+        self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
+    ) -> str:
         client = self.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         response = client.messages.create(
             model=model_name,
+            # Tie output budget to caller-provided max_output_tokens if given; otherwise a safe default
+            max_tokens=max_output_tokens
+            if isinstance(max_output_tokens, int) and max_output_tokens > 0
+            else DEFAULT_CHARACTERS_TO_ANONYMIZE // 4,
             messages=[{"role": "user", "content": prompt}],
+            stream=True,
         )
         return response.content[0].text if response.content else ""
 
