@@ -71,14 +71,15 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 
 **Models**:
-You can use any of the predefined models below, or specify a custom model using the format `"provider/model-name"`. For example: `--model-name "openai/gpt-4o"`.
+You can use any of the predefined models below, or specify a new model using the format `"provider/model-name"`. 
+For example: `--model-name "google/gemini-flash-latest"`.
 
-- **Google**: `google_gemini_2_5_pro`, `google_gemini_2_5_flash` (default), `google_gemini_2_5_flash_lite`.
-- **Ollama**: `ollama_gemma`, `ollama_phi`.
-- **Hugging Face**: `huggingface_openai_gpt_oss_20b`, `huggingface_mistral_7b_instruct`, `huggingface_zephyr_7b_beta`.
-- **OpenRouter**: `openrouter_gpt_4o`, `openrouter_gemini_pro`.
-- **OpenAI**: `openai_gpt_4o`, `openai_gpt_5`.
-- **Anthropic**: `anthropic_claude_4_sonet`, `anthropic_claude_4_sonet_4_5`.
+- **Google**: `gemini-2.5-pro`, `gemini-2.5-flash` (default), `gemini-2.5-flash-lite`.
+- **Ollama**: `gemma:7b`, `phi4-mini`.
+- **Hugging Face**: `openai/gpt-oss-20b`, `mistralai/Mistral-7B-Instruct-v0.1`, `HuggingFaceH4/zephyr-7b-beta`.
+- **OpenRouter**: `openai/gpt-4o`, `google/gemini-pro`.
+- **OpenAI**: `gpt-4o`, `gpt-5`.
+- **Anthropic**: `claude-4-sonet`, `claude-4.5-sonet`.
 
 ### Examples
 
@@ -87,14 +88,14 @@ You can use any of the predefined models below, or specify a custom model using 
 pdf-anonymizer run document.pdf
 ```
 
-**Custom model and prompt (Ollama)**:
+**A new model (Google) and a simple prompt**:
 ```bash
-pdf-anonymizer run notes.md --model-name ollama_phi --prompt-name simple
+pdf-anonymizer run notes.md --model-name "google/gemini-flash-latest" --prompt-name simple
 ```
 
 **Using an OpenRouter model**:
 ```bash
-pdf-anonymizer run report.pdf --model-name openrouter_gpt_4o
+pdf-anonymizer run report.pdf --model-name "openai/gpt-4o"
 ```
 
 ### Deanonymize
