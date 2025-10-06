@@ -50,7 +50,7 @@ from pdf_anonymizer_core.prompts import detailed
 text, mapping = anonymize_file(
     file_path="/path/to/file.pdf",
     prompt_template=detailed.prompt_template,
-    model_name="google_gemini_2_5_flash"  # Can also be a custom model like "openai/gpt-4o"
+    model_name="gemini-2.5-pro"  # Can also be a new model like "google/gemini-flash-latest"
 )
 
 if text and mapping:
