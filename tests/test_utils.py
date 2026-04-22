@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 from pdf_anonymizer_core.utils import save_results
 
 def test_save_results_pdf(tmp_path, monkeypatch):
