@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import time
 from typing import Dict, List, Optional, Tuple
 
@@ -127,13 +128,23 @@ def anonymize_file(
                 final_mapping[entity_text] = main_placeholder
 
         # Sort entities by length descending to replace longer strings first
+        # and to ensure correct matching order in the regex
         entities_to_process.sort(key=lambda e: len(e["text"]), reverse=True)
 
         anonymized_text = text_page
-        for entity in entities_to_process:
-            placeholder = final_mapping.get(entity["text"])
-            if placeholder:
-                anonymized_text = anonymized_text.replace(entity["text"], placeholder)
+        if entities_to_process:
+            # Create a mapping for unique entity texts to their placeholders
+            replacement_map = {}
+            for entity in entities_to_process:
+                text_to_replace = entity["text"]
+                if text_to_replace in final_mapping and text_to_replace not in replacement_map:
+                    replacement_map[text_to_replace] = final_mapping[text_to_replace]
+
+            if replacement_map:
+                # Compile a single regex pattern for all entities
+                pattern = re.compile("|".join(re.escape(k) for k in replacement_map.keys()))
+                # Perform all replacements in a single pass
+                anonymized_text = pattern.sub(lambda m: replacement_map[m.group(0)], text_page)
 
         anonymized_chunks.append(anonymized_text)
 
