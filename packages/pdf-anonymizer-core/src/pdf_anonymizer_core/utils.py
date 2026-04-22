@@ -38,11 +38,16 @@ def consolidate_mapping(
                 if key_to_replace in consolidated_mapping:
                     del consolidated_mapping[key_to_replace]
 
-    # Update the anonymized text
-    for old_key, new_key in consolidation_map.items():
+    # Update the anonymized text in a single pass
+    if consolidation_map:
         # Use word boundaries to avoid replacing parts of other words
-        anonymized_text = re.sub(
-            r"\b" + re.escape(old_key) + r"\b", new_key, anonymized_text
+        # Replace by longest keys first to ensure correct matching
+        sorted_keys = sorted(consolidation_map.keys(), key=len, reverse=True)
+        pattern = re.compile(
+            r"\b(" + "|".join(re.escape(key) for key in sorted_keys) + r")\b"
+        )
+        anonymized_text = pattern.sub(
+            lambda m: consolidation_map[m.group(1)], anonymized_text
         )
 
     return anonymized_text, consolidated_mapping
@@ -145,16 +150,22 @@ def deanonymize_file(
     # Replace placeholders by longest first to avoid partial overlaps
     sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
 
-    for base_placeholder in sorted_placeholders:
-        original_value = placeholder_to_original[base_placeholder]
+    if sorted_placeholders:
         # Match base and its variations: PERSON_1 and PERSON_1.v_1, PERSON_1.v_2, ...
-        pattern = re.compile(rf"\b{re.escape(base_placeholder)}(?:\.v_\d+)?\b")
+        # We use a single regex pass for all placeholders to avoid ReDoS and performance bottlenecks.
+        pattern = re.compile(
+            r"\b("
+            + "|".join(re.escape(p) for p in sorted_placeholders)
+            + r")(?:\.v_\d+)?\b"
+        )
 
-        # Record any matches before substitution
-        matches = set(pattern.findall(deanonymized_text))
-        if matches:
-            used_placeholders.update(matches)
-            deanonymized_text = pattern.sub(original_value, deanonymized_text)
+        def replace_match(match):
+            full_match = match.group(0)
+            base_placeholder = match.group(1)
+            used_placeholders.add(full_match)
+            return placeholder_to_original[base_placeholder]
+
+        deanonymized_text = pattern.sub(replace_match, deanonymized_text)
 
     # Gather stats
     all_placeholders_in_text = set(
