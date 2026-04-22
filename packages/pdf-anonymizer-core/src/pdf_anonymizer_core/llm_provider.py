@@ -1,8 +1,30 @@
+import functools
 import os
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
 from pdf_anonymizer_core.conf import DEFAULT_CHARACTERS_TO_ANONYMIZE
+
+
+def validate_import(extra_name: str):
+    """
+    Decorator to handle ImportError for optional dependencies.
+    """
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except ImportError:
+                raise ImportError(
+                    f"The '{extra_name}' extra is not installed. "
+                    f"Please run 'pip install \"pdf-anonymizer-core[{extra_name}]\"'."
+                )
+
+        return wrapper
+
+    return decorator
 
 
 class LLMProvider(ABC):
@@ -19,16 +41,11 @@ class LLMProvider(ABC):
 
 
 class GoogleProvider(LLMProvider):
+    @validate_import("google")
     def __init__(self):
-        try:
-            from google import genai
+        from google import genai
 
-            self.genai = genai
-        except ImportError:
-            raise ImportError(
-                "The 'google' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[google]\"'."
-            )
+        self.genai = genai
         if not os.getenv("GOOGLE_API_KEY"):
             raise ValueError("GOOGLE_API_KEY environment variable not set.")
 
@@ -41,16 +58,11 @@ class GoogleProvider(LLMProvider):
 
 
 class OllamaProvider(LLMProvider):
+    @validate_import("ollama")
     def __init__(self):
-        try:
-            import ollama
+        import ollama
 
-            self.ollama = ollama
-        except ImportError:
-            raise ImportError(
-                "The 'ollama' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[ollama]\"'."
-            )
+        self.ollama = ollama
 
     def call(
         self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
@@ -69,16 +81,11 @@ class OllamaProvider(LLMProvider):
 
 
 class HuggingFaceProvider(LLMProvider):
+    @validate_import("huggingface")
     def __init__(self):
-        try:
-            from huggingface_hub import InferenceClient
+        from huggingface_hub import InferenceClient
 
-            self.InferenceClient = InferenceClient
-        except ImportError:
-            raise ImportError(
-                "The 'huggingface' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[huggingface]\"'."
-            )
+        self.InferenceClient = InferenceClient
         if not os.getenv("HUGGING_FACE_TOKEN"):
             raise ValueError("HUGGING_FACE_TOKEN environment variable not set.")
 
@@ -103,16 +110,11 @@ class HuggingFaceProvider(LLMProvider):
 
 
 class OpenRouterProvider(LLMProvider):
+    @validate_import("openrouter")
     def __init__(self):
-        try:
-            from openai import OpenAI
+        from openai import OpenAI
 
-            self.OpenAI = OpenAI
-        except ImportError:
-            raise ImportError(
-                "The 'openrouter' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[openrouter]\"'."
-            )
+        self.OpenAI = OpenAI
         if not os.getenv("OPENROUTER_API_KEY"):
             raise ValueError("OPENROUTER_API_KEY environment variable not set.")
 
@@ -130,16 +132,11 @@ class OpenRouterProvider(LLMProvider):
 
 
 class OpenAIProvider(LLMProvider):
+    @validate_import("openai")
     def __init__(self):
-        try:
-            from openai import OpenAI
+        from openai import OpenAI
 
-            self.OpenAI = OpenAI
-        except ImportError:
-            raise ImportError(
-                "The 'openai' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[openai]\"'."
-            )
+        self.OpenAI = OpenAI
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set.")
 
@@ -154,16 +151,11 @@ class OpenAIProvider(LLMProvider):
 
 
 class AnthropicProvider(LLMProvider):
+    @validate_import("anthropic")
     def __init__(self):
-        try:
-            from anthropic import Anthropic
+        from anthropic import Anthropic
 
-            self.Anthropic = Anthropic
-        except ImportError:
-            raise ImportError(
-                "The 'anthropic' extra is not installed. "
-                "Please run 'pip install \"pdf-anonymizer-core[anthropic]\"'."
-            )
+        self.Anthropic = Anthropic
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise ValueError("ANTHROPIC_API_KEY environment variable not set.")
 
