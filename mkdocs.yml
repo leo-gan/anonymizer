@@ -2,8 +2,8 @@ site_name: 🦉🫥 PDF Anonymizer
 site_description: High-quality, reversible, context-aware LLM-based PDF, Markdown, and Text anonymizer
 site_author: Leonid
 site_url: https://leo-gan.github.io/anonymizer/
-repo_name: LeoGan/anonymizer
-repo_url: https://github.com/LeoGan/anonymizer
+repo_name: leo-gan/anonymizer
+repo_url: https://github.com/leo-gan/anonymizer
 edit_uri: edit/main/docs/
 
 theme:
@@ -45,7 +45,7 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/LeoGan/anonymizer
+      link: https://github.com/leo-gan/anonymizer
       name: GitHub Repository
 
 markdown_extensions:

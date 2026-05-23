@@ -11,7 +11,7 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
 ### Steps
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/LeoGan/anonymizer.git
+    git clone https://github.com/leo-gan/anonymizer.git
     cd anonymizer
     ```
 
