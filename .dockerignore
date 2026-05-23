@@ -1,0 +1,6 @@
+# Ignore:
+app.log
+tests/data/2506.16406v1.pdf
+data/
+
+.env
