@@ -15,6 +15,12 @@ format:
 test:
 	uv run pytest
 
+docs-serve:
+	uv run mkdocs serve
+
+docs-build:
+	uv run mkdocs build
+
 # -----------------------------
 # Packaging & Publishing
 # -----------------------------

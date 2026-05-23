@@ -5,6 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.uv]
 workspace = { members = ["packages/*"] }
 
+[tool.setuptools]
+packages = []
+
 [tool.uv.sources]
 pdf-anonymizer-core = { workspace = true }
 pdf-anonymizer-cli = { workspace = true }
@@ -26,6 +29,8 @@ dev = [
   "pytest-mock",
   "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic]",
   "pdf-anonymizer-cli",
+  "mkdocs>=1.5.0",
+  "mkdocs-material>=9.5.0",
 ]
 
 [tool.pytest.ini_options]

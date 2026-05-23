@@ -7,3 +7,5 @@ app.log
 .idea/
 /data/
 dist/
+.pypirc
+site/

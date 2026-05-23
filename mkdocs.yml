@@ -1,0 +1,83 @@
+site_name: 🦉🫥 PDF Anonymizer
+site_description: High-quality, reversible, context-aware LLM-based PDF, Markdown, and Text anonymizer
+site_author: Leonid
+site_url: https://leogan.github.io/anonymizer/
+repo_name: LeoGan/anonymizer
+repo_url: https://github.com/LeoGan/anonymizer
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Scheme mode: Light
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Scheme mode: Dark
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.instant
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    logo: material/shield-lock
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/LeoGan/anonymizer
+      name: GitHub Repository
+
+markdown_extensions:
+  - md_in_html
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Privacy & Anonymization 101:
+    - Course Overview: 101/index.md
+    - Why Anonymize?: 101/why-anonymization.md
+    - Where is it Needed?: 101/where-needed.md
+    - Contemporary Techniques: 101/techniques.md
+    - How PDF Anonymizer is Different: 101/how-different.md
+  - Project Docs:
+    - Overview: project/index.md
+    - Installation: project/installation.md
+    - CLI Reference: project/cli-usage.md
+    - SDK & API Usage: project/api-usage.md
+    - Architecture Design: project/architecture.md
