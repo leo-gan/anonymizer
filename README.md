@@ -1,12 +1,26 @@
 # 🦉🫥 PDF Anonymizer
 
-This application anonymizes large PDF, Markdown or Text files using LLMs.
+This application anonymizes large PDF, Markdown, or Text files using LLMs.
+
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
+[![CI Workflow](https://github.com/LeoGan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/LeoGan/anonymizer/actions)
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
 - **Multi-Format**: Works with PDF, Markdown, and plain text files.
+
+## 📖 Documentation
+
+A comprehensive documentation site is available at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.
+
+The documentation includes:
+- **[Anonymization 101](https://leo-gan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
+- **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
+- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize`.
+- **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
+- **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
 
 ## Project Structure
 
@@ -32,7 +46,7 @@ This project is a monorepo containing two main packages:
 
 4.  **Install Ollama (optional)**: If you want to use a local model for anonymization, install [Ollama](https://ollama.com/).
 
-5.  **Set up environment variables**: Create a `.env` file in the `packages/pdf-anonymizer-cli` directory and add the necessary API keys for the providers you want to use. For example:
+5.  **Set up environment variables**: Create a `.env` file in the root directory of the repository (or in the `packages/pdf-anonymizer-cli` directory) and add the necessary API keys for the providers you want to use. For example:
     ```env
     # For Google models
     GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
@@ -52,13 +66,19 @@ This project is a monorepo containing two main packages:
 
 ## Quick Start
 
-To anonymize a file, use the `pdf-anonymizer` command:
+To anonymize a file, run the `pdf-anonymizer` CLI tool using `uv run`:
 
 ```bash
-pdf-anonymizer run document.pdf
+uv run pdf-anonymizer run document.pdf
 ```
 
-For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md).
+To deanonymize the file later:
+
+```bash
+uv run pdf-anonymizer deanonymize document.anonymized.md document.mapping.json
+```
+
+For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md) or the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/).
 
 ## Testing
 
