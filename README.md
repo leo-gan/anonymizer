@@ -2,7 +2,7 @@
 
 This application anonymizes large PDF, Markdown, or Text files using LLMs.
 
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://LeoGan.github.io/anonymizer/)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
 [![CI Workflow](https://github.com/LeoGan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/LeoGan/anonymizer/actions)
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
@@ -13,14 +13,14 @@ This application anonymizes large PDF, Markdown, or Text files using LLMs.
 
 ## 📖 Documentation
 
-A comprehensive documentation site is available at **[LeoGan.github.io/anonymizer/](https://LeoGan.github.io/anonymizer/)**.
+A comprehensive documentation site is available at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.
 
 The documentation includes:
-- **[Anonymization 101](https://LeoGan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
-- **[Installation Guide](https://LeoGan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
-- **[CLI Usage](https://LeoGan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize`.
-- **[API Usage](https://LeoGan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
-- **[Architecture](https://LeoGan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
+- **[Anonymization 101](https://leo-gan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
+- **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
+- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize`.
+- **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
+- **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
 
 ## Project Structure
 
@@ -78,7 +78,7 @@ To deanonymize the file later:
 uv run pdf-anonymizer deanonymize document.anonymized.md document.mapping.json
 ```
 
-For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md) or the [**CLI Usage Docs**](https://LeoGan.github.io/anonymizer/project/cli-usage/).
+For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md) or the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/).
 
 ## Testing
 
