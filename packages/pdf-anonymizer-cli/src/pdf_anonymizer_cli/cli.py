@@ -8,14 +8,14 @@ import typer
 from dotenv import load_dotenv
 from pdf_anonymizer_core.conf import (
     DEFAULT_LOG_FILE,
-    PromptEnum,
     ConfigProfile,
+    PromptEnum,
     get_config_for_profile,
     get_provider_and_model_name,
 )
 from pdf_anonymizer_core.core import anonymize_file
-from pdf_anonymizer_core.prompts import detailed, simple
 from pdf_anonymizer_core.llm_provider import configure_cache
+from pdf_anonymizer_core.prompts import detailed, simple
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,

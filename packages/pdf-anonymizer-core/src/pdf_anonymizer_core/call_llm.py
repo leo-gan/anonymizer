@@ -2,10 +2,12 @@ import logging
 import random
 import time
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 from pdf_anonymizer_core.conf import get_provider_and_model_name
 from pdf_anonymizer_core.llm_provider import get_provider
+
 
 # Pydantic models for structured output parsing
 class EntityModel(BaseModel):

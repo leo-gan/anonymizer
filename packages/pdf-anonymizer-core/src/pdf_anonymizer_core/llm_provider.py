@@ -1,12 +1,13 @@
-import os
-import json
 import hashlib
+import json
 import logging
+import os
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
 from threading import Lock
+from typing import Any, Dict, Optional
 
 from pdf_anonymizer_core.conf import DEFAULT_CHARACTERS_TO_ANONYMIZE
+
 
 # Thread-safe Local LLM Response Cache
 class LocalLLMCache:

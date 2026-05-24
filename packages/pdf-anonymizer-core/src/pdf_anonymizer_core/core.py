@@ -5,9 +5,9 @@ import time
 from typing import Dict, List, Optional, Tuple
 
 from pdf_anonymizer_core.call_llm import identify_entities_with_llm
+from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
-from pdf_anonymizer_core.conf import DEFAULT_REGEX_PATTERNS, DEFAULT_CHUNK_OVERLAP
 
 
 def anonymize_file(

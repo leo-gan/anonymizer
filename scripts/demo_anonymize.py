@@ -1,13 +1,18 @@
-import sys
-import os
-from unittest.mock import patch, Mock
 import json
+import os
+import sys
+from unittest.mock import Mock, patch
 
 # Ensure python can find our core package
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "packages", "pdf-anonymizer-core", "src")))
 
 from pdf_anonymizer_core.core import anonymize_file
-from pdf_anonymizer_core.utils import save_results, deanonymize_file, consolidate_mapping
+from pdf_anonymizer_core.utils import (
+    consolidate_mapping,
+    deanonymize_file,
+    save_results,
+)
+
 
 def run_demo():
     print("=" * 70)

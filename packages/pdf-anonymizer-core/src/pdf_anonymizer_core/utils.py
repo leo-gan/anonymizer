@@ -3,10 +3,11 @@ import os
 import re
 from pathlib import Path
 from typing import Dict, Tuple
+
 from pdf_anonymizer_core.conf import (
     DEFAULT_ANONYMIZED_DIR,
-    DEFAULT_MAPPINGS_DIR,
     DEFAULT_DEANONYMIZED_DIR,
+    DEFAULT_MAPPINGS_DIR,
     DEFAULT_STATS_DIR,
 )
 

@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, Optional, Type, TypeVar
+
 from pydantic import BaseModel, Field
 
 # Constants that were previously hardcoded in various places

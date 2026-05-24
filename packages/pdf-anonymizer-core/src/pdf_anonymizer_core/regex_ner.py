@@ -1,6 +1,7 @@
-import re
 import logging
+import re
 from typing import Dict, List, TypedDict
+
 
 class EntityDict(TypedDict):
     text: str

@@ -1,5 +1,7 @@
-import fitz
 import os
+
+import fitz
+
 
 def main():
     pdf_path = "data/arxiv_sample.pdf"
