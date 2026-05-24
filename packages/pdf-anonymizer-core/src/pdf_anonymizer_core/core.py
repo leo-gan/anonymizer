@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import time
 from typing import Dict, List, Optional, Tuple
 
@@ -180,13 +181,18 @@ def anonymize_file(
         else:
             final_mapping[entity_text] = main_placeholder
 
-    # Sort entities by length descending to replace longer strings first
-    entities_to_process.sort(key=lambda e: len(e["text"]), reverse=True)
-
     anonymized_text = full_text
-    for entity in entities_to_process:
-        placeholder = final_mapping.get(entity["text"])
-        if placeholder:
-            anonymized_text = anonymized_text.replace(entity["text"], placeholder)
+    if entities_to_process:
+        # Sort entities by length descending to match longer strings first
+        entities_to_process.sort(key=lambda e: len(e["text"]), reverse=True)
+        
+        # Build selective boundary checks to prevent partial matching (e.g. "John" inside "Johnson")
+        def make_boundary_pattern(text: str) -> str:
+            prefix = r"\b" if text[0].isalnum() or text[0] == "_" else ""
+            suffix = r"\b" if text[-1].isalnum() or text[-1] == "_" else ""
+            return f"{prefix}{re.escape(text)}{suffix}"
+            
+        pattern = re.compile("|".join(make_boundary_pattern(e["text"]) for e in entities_to_process))
+        anonymized_text = pattern.sub(lambda m: final_mapping[m.group(0)], anonymized_text)
 
     return anonymized_text, final_mapping
