@@ -6,7 +6,11 @@ from abc import ABC, abstractmethod
 from threading import Lock
 from typing import Any, Dict, Optional
 
-from pdf_anonymizer_core.conf import DEFAULT_CHARACTERS_TO_ANONYMIZE
+from pdf_anonymizer_core.conf import (
+    DEFAULT_CACHE_DIR,
+    DEFAULT_CACHE_FILE,
+    DEFAULT_CHARACTERS_TO_ANONYMIZE,
+)
 
 
 # Thread-safe Local LLM Response Cache
@@ -80,7 +84,6 @@ class LLMProvider(ABC):
         
         # Initialize default cache if enabled and not yet initialized
         if _cache_enabled and _cache_instance is None:
-            from pdf_anonymizer_core.conf import DEFAULT_CACHE_DIR, DEFAULT_CACHE_FILE
             configure_cache(True, DEFAULT_CACHE_DIR, DEFAULT_CACHE_FILE)
             
         if _cache_enabled and _cache_instance is not None:
