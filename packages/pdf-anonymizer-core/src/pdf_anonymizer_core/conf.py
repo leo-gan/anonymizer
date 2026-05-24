@@ -21,7 +21,7 @@ DEFAULT_LOG_FILE: str = "app.log"
 # Default Regex Patterns for first-stage NER
 DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "EMAIL": r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+",
-    "PHONE": r"\+?\d{1,4}?[- \s]?\(?\d{1,3}?\)?[- \s]?\d{1,4}[- \s]?\d{1,4}[- \s]?\d{1,9}",
+    "PHONE": r"\+?\b(?:\d{1,4}[- \s]?)?\(?\d{3,4}\)?[- \s]?\d{3,4}(?:[- \s]?\d{3,9})?\b",
     "SSN": r"\b\d{3}-\d{2}-\d{4}\b",
     "CREDIT_CARD": r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b",
     "IP_ADDRESS": r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b",
