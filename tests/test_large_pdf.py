@@ -1,4 +1,3 @@
-import os
 import unittest
 from unittest.mock import Mock, patch
 from pdf_anonymizer_core.core import anonymize_file

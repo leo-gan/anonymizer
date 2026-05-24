@@ -3,7 +3,7 @@
 This application anonymizes large PDF, Markdown, or Text files using LLMs.
 
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
-[![CI Workflow](https://github.com/LeoGan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/LeoGan/anonymizer/actions)
+[![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
