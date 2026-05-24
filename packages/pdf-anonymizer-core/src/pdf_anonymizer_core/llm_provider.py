@@ -1,3 +1,4 @@
+import atexit
 import hashlib
 import json
 import logging
@@ -21,6 +22,8 @@ class LocalLLMCache:
         self.lock = Lock()
         self._cache = {}
         self._load_cache()
+        # Register automatic save at exit to avoid full disk writes on every set()
+        atexit.register(self.save)
 
     def _load_cache(self):
         with self.lock:
@@ -32,7 +35,7 @@ class LocalLLMCache:
                     logging.warning(f"Failed to load LLM cache file: {e}")
                     self._cache = {}
 
-    def _save_cache(self):
+    def save(self):
         try:
             os.makedirs(self.cache_dir, exist_ok=True)
             with self.lock:
@@ -52,7 +55,6 @@ class LocalLLMCache:
         key = f"{model_name}:{prompt_hash}"
         with self.lock:
             self._cache[key] = response
-        self._save_cache()
 
 _cache_instance: Optional[LocalLLMCache] = None
 _cache_enabled: bool = True
