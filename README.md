@@ -3,7 +3,7 @@
 This application anonymizes large PDF, Markdown, or Text files using LLMs.
 
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
-[![CI Workflow](https://github.com/LeoGan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/LeoGan/anonymizer/actions)
+[![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
@@ -35,7 +35,7 @@ This project is a monorepo containing two main packages:
 
 2.  **Clone the repository**:
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/leo-gan/anonymizer.git
     cd anonymizer
     ```
 
@@ -79,6 +79,22 @@ uv run pdf-anonymizer deanonymize document.anonymized.md document.mapping.json
 ```
 
 For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md) or the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/).
+
+## Demo: Anonymization & Deanonymization Example
+
+To demonstrate the hybrid NER (Regex + LLM) and the complete round-trip process on a real document, we have provided a demo script:
+
+1. **Prepare the Demo Document**: This script downloads an open-access arXiv research paper PDF and injects synthetic PII (name, email, phone, IP, SSN) onto the first page:
+   ```bash
+   uv run python scripts/prepare_demo_pdf.py
+   ```
+
+2. **Run the Demo**: This script runs the hybrid NER on the PDF, anonymizes the PII to structured placeholders, saves the mapping vocabulary, and performs a complete round-trip deanonymization:
+   ```bash
+   uv run python scripts/demo_anonymize.py
+   ```
+
+You will see colorized console logs showing the exact matched entities, the anonymized text, and the fully-reverted deanonymized output.
 
 ## Testing
 

@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import List, Tuple
 
 import pymupdf4llm
 from langchain_text_splitters import (
@@ -9,25 +10,26 @@ from langchain_text_splitters import (
 
 
 def load_and_extract_text_from_pdf(
-    file_path: str, characters_to_anonymize: int = 100000
-) -> list[str]:
+    file_path: str, characters_to_anonymize: int = 100000, chunk_overlap: int = 0
+) -> Tuple[str, List[str]]:
     """
-    Loads a PDF file and extracts text from each page.
+    Loads a PDF file and extracts text from each page, returning the full text and chunked text.
 
     Args:
-        characters_to_anonymize: Number of characters to anonymize in one go.
         file_path (str): The path to the PDF file.
+        characters_to_anonymize: Number of characters to anonymize in one go (chunk size).
+        chunk_overlap: Overlap size between chunks.
 
     Returns:
-        list: A list of strings, where each string is the text of a page.
+        Tuple[str, List[str]]: The full text as a string, and a list of chunk strings.
     """
     try:
         md_text = pymupdf4llm.to_markdown(file_path, show_progress=False)
         splitter = MarkdownTextSplitter(
-            chunk_size=characters_to_anonymize, chunk_overlap=0
+            chunk_size=characters_to_anonymize, chunk_overlap=chunk_overlap
         )
         docs = splitter.create_documents([md_text])
-        return [doc.page_content for doc in docs]
+        return md_text, [doc.page_content for doc in docs]
     except FileNotFoundError as e:
         logging.error(f"Error: The file at {file_path} was not found.")
         raise e
@@ -37,40 +39,41 @@ def load_and_extract_text_from_pdf(
 
 
 def load_and_extract_text_from_file(
-    file_path: str, characters_to_anonymize: int = 100000
-) -> list[str]:
+    file_path: str, characters_to_anonymize: int = 100000, chunk_overlap: int = 0
+) -> Tuple[str, List[str]]:
     """
-    Loads a file and extracts text, splitting it into chunks.
+    Loads a file and extracts text, returning the full text and chunked text.
 
     Args:
         file_path (str): The path to the file.
         characters_to_anonymize: Number of characters to process in each chunk.
+        chunk_overlap: Overlap size between chunks.
 
     Returns:
-        list: A list of strings, where each string is a chunk of text.
+        Tuple[str, List[str]]: The full text as a string, and a list of chunk strings.
     """
     path = Path(file_path)
     file_extension = path.suffix.lower()
 
     try:
         if file_extension == ".pdf":
-            return load_and_extract_text_from_pdf(file_path, characters_to_anonymize)
+            return load_and_extract_text_from_pdf(file_path, characters_to_anonymize, chunk_overlap)
         elif file_extension == ".md":
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
             splitter = MarkdownTextSplitter(
-                chunk_size=characters_to_anonymize, chunk_overlap=0
+                chunk_size=characters_to_anonymize, chunk_overlap=chunk_overlap
             )
             docs = splitter.create_documents([text])
-            return [doc.page_content for doc in docs]
+            return text, [doc.page_content for doc in docs]
         elif file_extension == ".txt":
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=characters_to_anonymize, chunk_overlap=0
+                chunk_size=characters_to_anonymize, chunk_overlap=chunk_overlap
             )
             docs = splitter.create_documents([text])
-            return [doc.page_content for doc in docs]
+            return text, [doc.page_content for doc in docs]
         else:
             logging.warning(
                 f"Unsupported file type: {file_extension}. Treating as plain text."
@@ -78,10 +81,10 @@ def load_and_extract_text_from_file(
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=characters_to_anonymize, chunk_overlap=0
+                chunk_size=characters_to_anonymize, chunk_overlap=chunk_overlap
             )
             docs = splitter.create_documents([text])
-            return [doc.page_content for doc in docs]
+            return text, [doc.page_content for doc in docs]
     except FileNotFoundError as e:
         logging.error(f"Error: The file at {file_path} was not found.")
         raise e

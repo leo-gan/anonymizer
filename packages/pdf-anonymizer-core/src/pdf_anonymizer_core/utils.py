@@ -4,6 +4,13 @@ import re
 from pathlib import Path
 from typing import Dict, Tuple
 
+from pdf_anonymizer_core.conf import (
+    DEFAULT_ANONYMIZED_DIR,
+    DEFAULT_DEANONYMIZED_DIR,
+    DEFAULT_MAPPINGS_DIR,
+    DEFAULT_STATS_DIR,
+)
+
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
 
@@ -66,8 +73,8 @@ def save_results(
     file_stem = original_path.stem
     file_extension = original_path.suffix.lower()
 
-    anonymized_dir = "data/anonymized"
-    mappings_dir = "data/mappings"
+    anonymized_dir = DEFAULT_ANONYMIZED_DIR
+    mappings_dir = DEFAULT_MAPPINGS_DIR
     os.makedirs(anonymized_dir, exist_ok=True)
     os.makedirs(mappings_dir, exist_ok=True)
 
@@ -171,8 +178,8 @@ def deanonymize_file(
     file_stem = anonymized_path.name.replace(f".anonymized{anonymized_path.suffix}", "")
     output_extension = anonymized_path.suffix
 
-    deanonymized_dir = "data/deanonymized"
-    stats_dir = "data/stats"
+    deanonymized_dir = DEFAULT_DEANONYMIZED_DIR
+    stats_dir = DEFAULT_STATS_DIR
     os.makedirs(deanonymized_dir, exist_ok=True)
     os.makedirs(stats_dir, exist_ok=True)
 

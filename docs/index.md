@@ -41,7 +41,7 @@ Ensure you have [uv](https://astral.sh/docs/uv) installed, then sync the depende
 
 ```bash
 # Clone the repository
-git clone https://github.com/LeoGan/anonymizer.git
+git clone https://github.com/leo-gan/anonymizer.git
 cd anonymizer
 
 # Install all development dependencies (including support for all LLM providers)
@@ -61,3 +61,20 @@ To deanonymize the file later:
 # Revert the anonymization
 pdf-anonymizer deanonymize data/sample.anonymized.md data/sample.mapping.json
 ```
+
+---
+
+## Interactive Demo Example
+
+We provide a pre-built example containing hybrid NER (Regex + LLM) and full round-trip verification:
+
+1. **Prepare the PDF**: Downloads an open-access arXiv research paper and writes synthetic PII (name, email, phone, IP, SSN) onto the first page:
+   ```bash
+   uv run python scripts/prepare_demo_pdf.py
+   ```
+
+2. **Execute Anonymization & Deanonymization**: Runs the pipeline and asserts correctness, printing the original, anonymized, and recovered text:
+   ```bash
+   uv run python scripts/demo_anonymize.py
+   ```
+
