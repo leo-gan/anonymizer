@@ -66,12 +66,19 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true
+  - pymdownx.superfences:
+      # This custom fence tells MkDocs to handle "mermaid" code blocks specially
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Home: index.md
   - Privacy & Anonymization 101:
     - Course Overview: 101/index.md
     - Why Anonymize?: 101/why-anonymization.md
+    - History: 101/history.md
     - Where is it Needed?: 101/where-needed.md
     - Contemporary Techniques: 101/techniques.md
     - How PDF Anonymizer is Different: 101/how-different.md
