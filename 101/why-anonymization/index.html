@@ -18,7 +18,7 @@
         <link rel="prev" href="../">
       
       
-        <link rel="next" href="../where-needed/">
+        <link rel="next" href="../history/">
       
       
         
@@ -617,6 +617,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../where-needed/" class="md-nav__link">
         
   
@@ -1044,14 +1072,13 @@
 <h2 id="1-what-is-anonymization">1. What is Anonymization?<a class="headerlink" href="#1-what-is-anonymization" title="Permanent link">&para;</a></h2>
 <p><strong>Data Anonymization</strong> is the process of destroying or modifying personal identifiers in a dataset so that the individuals whom the data describes can no longer be identified, directly or indirectly. </p>
 <p>Under legal regimes like the European Union's General Data Protection Regulation (GDPR), if a dataset is truly anonymous, it is no longer considered "personal data" and is exempt from strict privacy regulations. This makes anonymization the ultimate goal for safe data sharing and retention.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>graph TD
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    Raw[Raw Document / PII] --&gt;|Anonymize| Anon[Anonymized Document]
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    Raw --&gt;|Extract Keys| Map[Cryptographic/Secure Mapping File]
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    Anon --&gt;|Downstream System / AI API| Analysis[Unrestricted Processing]
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    Analysis --&gt;|Retrieve Insights| Revert[Process Results]
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    Map --&gt;|Deanonymize| Revert
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    Revert --&gt;|Output| Final[Original / Recovered Document]
-</span></code></pre></div>
+<pre class="mermaid"><code>graph TD
+    Raw[Raw Document / PII] --&gt;|Anonymize| Anon[Anonymized Document]
+    Raw --&gt;|Extract Keys| Map[Cryptographic/Secure Mapping File]
+    Anon --&gt;|Downstream System / AI API| Analysis[Unrestricted Processing]
+    Analysis --&gt;|Retrieve Insights| Revert[Process Results]
+    Map --&gt;|Deanonymize| Revert
+    Revert --&gt;|Output| Final[Original / Recovered Document]</code></pre>
 <h3 id="reversible-vs-irreversible-anonymization">Reversible vs. Irreversible Anonymization<a class="headerlink" href="#reversible-vs-irreversible-anonymization" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Irreversible Anonymization (Redaction)</strong>: The original values are permanently destroyed. It is highly secure, but it limits downstream utility when you need to follow up or link records back to the source.</li>
