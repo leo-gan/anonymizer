@@ -56,9 +56,11 @@ class TestLargePdfAnonymizer(unittest.TestCase):
         # Assertions
         # 1. Verify file size mock was queried
         mock_getsize.assert_called_once_with("very_large_10gb_file.pdf")
-        
+
         # 2. Verify pymupdf4llm mock was queried
-        mock_to_markdown.assert_called_once_with("very_large_10gb_file.pdf", show_progress=False)
+        mock_to_markdown.assert_called_once_with(
+            "very_large_10gb_file.pdf", show_progress=False
+        )
 
         # 3. Verify LLM provider mock was called
         mock_get_provider.assert_called_once_with("google")

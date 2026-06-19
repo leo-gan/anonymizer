@@ -1,3 +1,14 @@
+"""Text extraction and semantic chunking for PDF, Markdown, and plain text.
+
+Uses pymupdf4llm for high-quality PDF → Markdown conversion (preserves
+structure useful for LLMs) and langchain text splitters:
+- MarkdownTextSplitter for .pdf and .md (respects headers/code blocks)
+- RecursiveCharacterTextSplitter for .txt / fallback
+
+Chunk size and overlap are the primary controls for memory usage and
+LLM context consumption.
+"""
+
 import logging
 from pathlib import Path
 from typing import List, Tuple
@@ -57,7 +68,9 @@ def load_and_extract_text_from_file(
 
     try:
         if file_extension == ".pdf":
-            return load_and_extract_text_from_pdf(file_path, characters_to_anonymize, chunk_overlap)
+            return load_and_extract_text_from_pdf(
+                file_path, characters_to_anonymize, chunk_overlap
+            )
         elif file_extension == ".md":
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()

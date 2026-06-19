@@ -1,3 +1,10 @@
+"""Utilities for mapping consolidation, result saving, and deanonymization.
+
+These helpers are used by both the CLI and direct SDK consumers. They handle
+the reversible placeholder mapping contract, output file layout conventions,
+and post-deanonymization auditing statistics.
+"""
+
 import json
 import os
 import re
@@ -105,22 +112,26 @@ def save_results(
 def deanonymize_file(
     anonymized_file_path: str, mapping_file_path: str
 ) -> tuple[str, str]:
-    """
-    Deanonymize a file using a mapping file.
+    """Deanonymize a file using a mapping file.
 
-    The mapping file can be either:
-    - placeholder -> original (preferred), or
-    - original -> placeholder (legacy). In this case it will be inverted.
+    Restores original PII values from placeholders. Supports both current
+    (placeholder -> original) and legacy (original -> placeholder) mapping
+    directions via auto-detection.
 
-    Variations like "PERSON_1.v_1" will be mapped to the base placeholder's
-    original value if only the base (e.g., "PERSON_1") exists in the mapping.
+    The implementation correctly handles variation placeholders (PERSON_1.v_2
+    etc.) by falling back to the base placeholder's original value.
+
+    After processing it also produces an audit statistics JSON file.
 
     Args:
-        anonymized_file_path (str): Path to the anonymized file.
-        mapping_file_path (str): Path to the mapping file.
+        anonymized_file_path: Path to the previously anonymized document.
+        mapping_file_path: Path to the JSON mapping file.
 
     Returns:
-        A tuple containing the path to the deanonymized file and the statistics file.
+        A tuple (deanonymized_file_path, stats_file_path).
+        The stats file contains:
+            - unused_mappings: placeholders in the map that did not appear in text
+            - not_found_mappings: placeholders seen in text but missing from the map
     """
     with open(anonymized_file_path, "r", encoding="utf-8") as f:
         anonymized_text = f.read()

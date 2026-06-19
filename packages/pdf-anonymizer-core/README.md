@@ -25,6 +25,7 @@ You can also install multiple extras at once:
 pip install "pdf-anonymizer-core[google,ollama]"
 ```
 
+Full documentation, including the Python SDK guide, CLI reference, recipes, and architecture, lives at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)** (especially the [Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/) section).
 ## Environment Variables
 
 The core library itself does not load `.env` files. Environment variables must be loaded by the application that uses this library (e.g., `pdf-anonymizer-cli`) or set in your shell.
@@ -60,19 +61,19 @@ if text and mapping:
 
 ### `deanonymize_file()`
 
-Reverts anonymization using a mapping file.
+Reverts anonymization using a mapping file. The function writes the restored document and a stats file, returning their paths.
 
 ```python
 from pdf_anonymizer_core.utils import deanonymize_file
 
 # Assumes you have an anonymized file and a mapping file
-deanonymized_text, stats = deanonymize_file(
-    anonymized_file="path/to/anonymized.md",
-    mapping_file="path/to/mapping.json"
+deanonymized_file_path, stats_file_path = deanonymize_file(
+    "path/to/anonymized.md",
+    "path/to/mapping.json",
 )
 
-if deanonymized_text:
-    print("Deanonymized Text:", deanonymized_text)
+print("Deanonymized file:", deanonymized_file_path)
+print("Stats file:", stats_file_path)
 ```
 
 ### Configuration

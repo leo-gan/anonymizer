@@ -26,7 +26,7 @@ from pdf_anonymizer_core.core import anonymize_file
 
 ## 2. `deanonymize_file`
 
-The `deanonymize_file` function reads an anonymized file, loads the entity placeholders dictionary from a JSON file, replaces placeholders with their original values, and returns the result.
+The `deanonymize_file` function reads an anonymized file, loads the mapping (auto-detecting placeholder→original or legacy direction), replaces placeholders (including `.v_N` variants), writes the restored document to the conventional output directory, writes a statistics JSON file, and returns the two output file paths.
 
 ### Import Signature
 ```python
@@ -34,12 +34,12 @@ from pdf_anonymizer_core.utils import deanonymize_file
 ```
 
 ### Parameters
-*   `anonymized_file` (`str`): Path to the markdown or text file that has placeholders.
-*   `mapping_file` (`str`): Path to the JSON mapping file containing the original entity-to-placeholder mapping dictionary.
+*   `anonymized_file_path` (`str`): Path to the markdown or text file that has placeholders.
+*   `mapping_file_path` (`str`): Path to the JSON mapping file containing the original entity-to-placeholder mapping dictionary.
 
 ### Returns
-*   `deanonymized_text` (`str`): The restored text containing original PII.
-*   `stats` (`dict`): Processing metadata, including entity counts.
+*   `deanonymized_file_path` (`str`): Path to the written restored document.
+*   `stats_file_path` (`str`): Path to the written deanonymization statistics JSON file.
 
 ---
 
@@ -116,12 +116,25 @@ with open(mapping_path, "w", encoding="utf-8") as f:
 
 # 3. Deanonymize programmatically
 print(f"\nRestoring file from {anonymized_path} using {mapping_path}...")
-restored_text, stats = deanonymize_file(
-    anonymized_file=anonymized_path,
-    mapping_file=mapping_path
+deanonymized_file_path, stats_file_path = deanonymize_file(
+    anonymized_path,
+    mapping_path,
 )
 
-print("\n--- Restored Text Output ---")
+print("Deanonymized file saved to:", deanonymized_file_path)
+print("Stats file saved to:", stats_file_path)
+
+# If you need the text content in memory:
+with open(deanonymized_file_path, "r", encoding="utf-8") as f:
+    restored_text = f.read()
+print("\n--- Restored Text Output (first 500 chars) ---")
 print(restored_text[:500] + "\n...")
-print("Stats:", stats)
 ```
+
+---
+
+## See Also
+
+- **[Recipes & Common Workflows](recipes.md)** — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files, etc.).
+- **[CLI Reference](cli-usage.md)** — the command-line surface that wraps the same core functions.
+- **[Architecture Design](architecture.md)** — how the anonymization pipeline, consolidation, and deanonymization actually work internally.

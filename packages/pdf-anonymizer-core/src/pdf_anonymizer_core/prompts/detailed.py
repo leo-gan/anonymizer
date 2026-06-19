@@ -1,3 +1,15 @@
+"""Detailed (higher-quality) PII identification prompt.
+
+This prompt instructs the LLM to:
+- Use deep contextual understanding
+- Return base_form for coreference handling
+- Identify a rich set of entity types including JOB_TITLE, ID, and DATE (birthdates only)
+- Explicitly handle variations and possessives
+
+Use this prompt (via pdf_anonymizer_core.prompts.detailed.prompt_template)
+when you want maximum accuracy (pairs well with BEST_QUALITY profile).
+"""
+
 prompt_template = """
     You are an expert in identifying Personally Identifiable Information (PII) with high accuracy and contextual understanding.
     Your task is to read the text below and identify all PII entities, including their variations.

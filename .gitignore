@@ -8,4 +8,5 @@ app.log
 /data/
 dist/
 .pypirc
+# Built MkDocs site (never commit the generated HTML/JS/assets)
 site/

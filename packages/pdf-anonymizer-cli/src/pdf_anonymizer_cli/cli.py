@@ -65,7 +65,9 @@ def run(
     ] = ConfigProfile.BEST_SPEED,
     characters_to_anonymize: Annotated[
         Optional[int],
-        typer.Option(help="Override number of characters to send for anonymization in one go (chunk size)."),
+        typer.Option(
+            help="Override number of characters to send for anonymization in one go (chunk size)."
+        ),
     ] = None,
     prompt_name: Annotated[
         Optional[PromptEnum],

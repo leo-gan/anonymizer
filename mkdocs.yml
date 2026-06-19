@@ -26,6 +26,7 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
+
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -73,6 +74,20 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src]
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            docstring_style: google
+            members_order: alphabetical
+            show_signature_annotations: true
+
 nav:
   - Home: index.md
   - Privacy & Anonymization 101:
@@ -87,4 +102,6 @@ nav:
     - Installation: project/installation.md
     - CLI Reference: project/cli-usage.md
     - SDK & API Usage: project/api-usage.md
+    - API Reference (auto): project/api-reference.md
+    - Recipes & Common Workflows: project/recipes.md
     - Architecture Design: project/architecture.md

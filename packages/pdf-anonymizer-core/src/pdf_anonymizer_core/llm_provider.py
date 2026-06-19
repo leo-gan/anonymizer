@@ -1,3 +1,17 @@
+"""LLM provider adapters + response caching layer.
+
+This module contains:
+- LocalLLMCache: thread-safe on-disk caching of LLM responses (keyed by
+  model + prompt hash) to avoid repeated calls during development or
+  re-processing.
+- LLMProvider abstract base + concrete implementations for Google,
+  Ollama, Hugging Face, OpenRouter, OpenAI, and Anthropic.
+- configure_cache() and get_provider() factory.
+
+All providers implement a uniform `.call(prompt, model_name)` that goes
+through the cache when enabled.
+"""
+
 import atexit
 import hashlib
 import json
@@ -16,7 +30,9 @@ from pdf_anonymizer_core.conf import (
 
 # Thread-safe Local LLM Response Cache
 class LocalLLMCache:
-    def __init__(self, cache_dir: str = "data/cache", cache_file: str = "llm_responses.json"):
+    def __init__(
+        self, cache_dir: str = "data/cache", cache_file: str = "llm_responses.json"
+    ):
         self.cache_dir = cache_dir
         self.cache_file = os.path.join(cache_dir, cache_file)
         self.lock = Lock()
@@ -56,10 +72,24 @@ class LocalLLMCache:
         with self.lock:
             self._cache[key] = response
 
+
 _cache_instance: Optional[LocalLLMCache] = None
 _cache_enabled: bool = True
 
-def configure_cache(enabled: bool, cache_dir: str = "data/cache", cache_file: str = "llm_responses.json"):
+
+def configure_cache(
+    enabled: bool, cache_dir: str = "data/cache", cache_file: str = "llm_responses.json"
+):
+    """Enable or disable (and optionally relocate) the global LLM response cache.
+
+    Called automatically by the CLI according to the active AppConfig.
+    You can also call it directly when using the core SDK.
+
+    Args:
+        enabled: Whether caching should be active.
+        cache_dir: Directory in which llm_responses.json will be stored.
+        cache_file: Filename for the JSON cache.
+    """
     global _cache_instance, _cache_enabled
     _cache_enabled = enabled
     if enabled:
@@ -69,36 +99,43 @@ def configure_cache(enabled: bool, cache_dir: str = "data/cache", cache_file: st
 
 
 class LLMProvider(ABC):
-    """Abstract base class for LLM providers."""
+    """Abstract base class for LLM providers.
+
+    Subclasses must implement _call_raw. The public .call() method (inherited)
+    adds transparent caching when the global cache is enabled.
+    """
 
     @abstractmethod
     def _call_raw(
         self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
     ) -> str:
-        """Call the language model and return the text content of the response."""
+        """Raw provider call. Must be overridden by concrete providers."""
         pass
 
     def call(
         self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
     ) -> str:
-        """Call the language model, checking the local cache first."""
+        """Public entry point used by the anonymizer.
+
+        Checks the cache (if enabled) before delegating to the concrete provider.
+        """
         global _cache_instance, _cache_enabled
-        
+
         # Initialize default cache if enabled and not yet initialized
         if _cache_enabled and _cache_instance is None:
             configure_cache(True, DEFAULT_CACHE_DIR, DEFAULT_CACHE_FILE)
-            
+
         if _cache_enabled and _cache_instance is not None:
             cached_val = _cache_instance.get(model_name, prompt)
             if cached_val is not None:
                 logging.info(f"Cache hit for model '{model_name}'")
                 return cached_val
-                
+
         response = self._call_raw(prompt, model_name, max_output_tokens)
-        
+
         if _cache_enabled and _cache_instance is not None and response:
             _cache_instance.set(model_name, prompt, response)
-            
+
         return response
 
 
