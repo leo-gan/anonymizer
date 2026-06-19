@@ -15,15 +15,10 @@ Explore the modules below to build a strong foundation in data privacy:
 *   **Legal Ecosystems**: Overview of GDPR, HIPAA, and CCPA.
 *   **The Threat Model**: Understanding data leakage and deanonymization attacks.
 *   **Ethics & Trust**: Cultivating customer trust through privacy-first systems.
+*   **Where It's Needed**: Key sectors including healthcare, finance, research, and generative AI.
 
 ### [History](history.md)
 *   **Key Milestones**: From early census methods and *k*-anonymity to differential privacy and LLM-era privacy challenges.
-
-### [Where is it Needed?](where-needed.md)
-*   **Healthcare & Life Sciences**: Clinical trials, Electronic Health Records (EHR), and patient confidentiality.
-*   **Finance & FinTech**: Payment processing, anti-money laundering, fraud research, and credit analysis.
-*   **Academic & Industrial Research**: Safely distributing real-world datasets for public good.
-*   **AI Training & Fine-Tuning**: Stripping personal details from datasets before training LLMs.
 
 ### [Contemporary Techniques & Tools](techniques.md)
 *   **Traditional Methods**: Data masking, tokenization, hashing, and pseudonymization.

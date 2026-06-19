@@ -57,7 +57,11 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
@@ -87,7 +91,6 @@ nav:
     - Course Overview: 101/index.md
     - Why Anonymize?: 101/why-anonymization.md
     - History: 101/history.md
-    - Where is it Needed?: 101/where-needed.md
     - Contemporary Techniques: 101/techniques.md
     - How PDF Anonymizer is Different: 101/how-different.md
   - Project Docs:

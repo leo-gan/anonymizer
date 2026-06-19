@@ -98,4 +98,5 @@ A popular Python framework for detecting and redacting PII in unstructured text.
 
 ---
 
-Next, let's explore [**how PDF Anonymizer differs**](how-different.md) from these traditional tools and why it is uniquely suited for modern workflows.
+**In this course:**  
+[← Previous: History](history.md) | [Course Overview](index.md) | [Next: How PDF Anonymizer is Different](how-different.md)
