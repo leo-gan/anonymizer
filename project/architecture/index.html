@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://leo-gan.github.io/anonymizer/project/architecture/">
       
       
-        <link rel="prev" href="../api-usage/">
+        <link rel="prev" href="../recipes/">
       
       
       
@@ -52,6 +52,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -761,6 +763,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference (auto)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes & Common Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -967,6 +1025,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#practical-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1153,6 +1222,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#practical-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1261,6 +1341,14 @@
 *   <code>unused_mappings</code>: Placeholders present in the map that were not found in the anonymized text.
 *   <code>not_found_mappings</code>: Placeholders detected in the text that had no matching entry in the map.
 *   These are output to a JSON file in <code>data/stats/&lt;stem&gt;.deanonymization_stat.json</code> for validation and compliance auditing.</p>
+<hr />
+<h2 id="practical-usage">Practical Usage<a class="headerlink" href="#practical-usage" title="Permanent link">&para;</a></h2>
+<p>For concrete command-line and Python examples of the concepts described above (profiles, local vs external workflows, batching, cache control, large files, etc.) see the <strong><a href="../recipes/">Recipes &amp; Common Workflows</a></strong> page.</p>
+<p>Cross-reference:</p>
+<ul>
+<li><strong><a href="../cli-usage/">CLI Reference</a></strong></li>
+<li><strong><a href="../api-usage/">SDK &amp; API Usage</a></strong></li>
+</ul>
 
 
 

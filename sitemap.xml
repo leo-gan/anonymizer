@@ -2,50 +2,58 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://leo-gan.github.io/anonymizer/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/history/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/how-different/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/techniques/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/where-needed/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/101/why-anonymization/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
+    </url>
+    <url>
+         <loc>https://leo-gan.github.io/anonymizer/project/api-reference/</loc>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/api-usage/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/architecture/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/cli-usage/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/installation/</loc>
-         <lastmod>2026-05-26</lastmod>
+         <lastmod>2026-06-19</lastmod>
+    </url>
+    <url>
+         <loc>https://leo-gan.github.io/anonymizer/project/recipes/</loc>
+         <lastmod>2026-06-19</lastmod>
     </url>
 </urlset>
