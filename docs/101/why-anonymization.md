@@ -6,7 +6,7 @@ This is where data anonymization and reversible deanonymization become essential
 
 ---
 
-## 1. What is Anonymization?
+## What is Anonymization?
 
 **Data Anonymization** is the process of destroying or modifying personal identifiers in a dataset so that the individuals whom the data describes can no longer be identified, directly or indirectly. 
 
@@ -28,7 +28,7 @@ graph TD
 
 ---
 
-## 2. The Legal Compliance Landscape
+## The Legal Compliance Landscape
 
 Globally, privacy regulation has shifted from a best practice to a strict legal requirement. Failure to comply can result in catastrophic fines and reputational ruin.
 
@@ -40,7 +40,7 @@ Globally, privacy regulation has shifted from a best practice to a strict legal 
 
 ---
 
-## 3. The Risks of Deanonymization
+## The Risks of Deanonymization
 
 One of the most dangerous misconceptions in data sharing is that simple redaction is enough. History is full of **deanonymization attacks** (also known as *re-identification attacks*), where attackers combined "anonymized" datasets with external public databases to identify individuals.
 
@@ -57,13 +57,13 @@ One of the most dangerous misconceptions in data sharing is that simple redactio
     *   **Source Research**: Sweeney, L. (2000). *[Simple Demographics Often Identify People Uniquely](https://dataprivacylab.org/projects/identifiability/paper1.pdf)*. Carnegie Mellon University, Data Privacy Lab.
 
 ### The Threat Vectors
-1.  **Linkage Attacks**: Combining a masked dataset with another public dataset (e.g. voter registries, social media profiles).
-2.  **Background Knowledge Attacks**: An attacker knows some details about a specific target in the dataset and uses context clues to isolate them.
-3.  **Outlier Profiling**: Extreme or unique values (e.g., a patient who is 105 years old) make individuals easy to spot, even if their names are removed.
+- **Linkage Attacks**: Combining a masked dataset with another public dataset (e.g. voter registries, social media profiles).
+- **Background Knowledge Attacks**: An attacker knows some details about a specific target in the dataset and uses context clues to isolate them.
+- **Outlier Profiling**: Extreme or unique values (e.g., a patient who is 105 years old) make individuals easy to spot, even if their names are removed.
 
 ---
 
-## 4. Why Traditional Redaction is No Longer Sufficient
+## Why Traditional Redaction is No Longer Sufficient
 In unstructured text (like clinical notes, legal contracts, or corporate emails), PII is rarely just a name or a credit card number. It is woven into the context:
 *   *"The CFO, who recently took over after John's departure in April, met with the representative from the Berlin office."*
 *   Even if "John" is removed, the combination of *"CFO who started in April"* and *"Berlin office"* may narrow down the identity to one person.
@@ -73,3 +73,6 @@ To tackle this, we need **context-aware anonymization** that understands sentenc
 ---
 
 Next, let's explore [**where anonymization is actively required across industries**](where-needed.md).
+
+**In this course:**  
+[Course Overview](index.md) | [Next: History](history.md)

@@ -4,7 +4,7 @@ Data privacy is not a niche requirement. It is a critical operational bottleneck
 
 ---
 
-## 1. Healthcare & Life Sciences
+## Healthcare & Life Sciences
 
 Healthcare data contains some of the most sensitive information possible: medical histories, genetic sequences, psychiatric notes, and biometric measurements.
 
@@ -30,7 +30,7 @@ Healthcare data contains some of the most sensitive information possible: medica
 
 ---
 
-## 2. Finance & FinTech
+## Finance & FinTech
 
 Financial datasets contain credit card numbers, bank routing information, investment balances, and physical address transaction details.
 
@@ -41,7 +41,7 @@ Financial datasets contain credit card numbers, bank routing information, invest
 
 ---
 
-## 3. Academic & Corporate Research
+## Academic & Corporate Research
 
 Social scientists, economists, and UX researchers rely on human data to observe trends, run surveys, and validate hypotheses.
 
@@ -51,7 +51,7 @@ Social scientists, economists, and UX researchers rely on human data to observe 
 
 ---
 
-## 4. Generative AI & Large Language Models (LLMs)
+## Generative AI & Large Language Models (LLMs)
 
 The rise of generative AI has introduced a new and massive privacy challenge. When training, fine-tuning, or running inference with LLMs, organizations must ensure they do not expose sensitive data.
 

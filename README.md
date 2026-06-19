@@ -18,8 +18,11 @@ A comprehensive documentation site is available at **[leo-gan.github.io/anonymiz
 The documentation includes:
 - **[Anonymization 101](https://leo-gan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
 - **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
-- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize`.
+- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize` (including configuration profiles).
 - **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
+- **[API Reference (auto)](https://leo-gan.github.io/anonymizer/project/api-reference/)**: Auto-generated function signatures and details.
+- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)**: Practical patterns (local Ollama, external LLM round-trips, batching, profiles, caching, debugging, etc.).
+- **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)**: Common issues and solutions.
 - **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
 
 ## Project Structure
@@ -103,3 +106,13 @@ To run the test suite:
 ```bash
 uv run pytest
 ```
+
+---
+
+## See Also
+
+- **[Documentation Site](https://leo-gan.github.io/anonymizer/)** — Full guides, 101 course, and API reference.
+- **[Core Package README](./packages/pdf-anonymizer-core/README.md)** — SDK details and installation.
+- **[CLI Package README](./packages/pdf-anonymizer-cli/README.md)** — Command-line specifics.
+- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)** — Practical usage examples.
+- **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)** — Solutions to common problems.

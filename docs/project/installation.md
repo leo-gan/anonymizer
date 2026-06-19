@@ -4,7 +4,7 @@ This guide details how to set up PDF Anonymizer for development or programmatic 
 
 ---
 
-## 1. Development Installation (Monorepo)
+## Development Installation (Monorepo)
 
 The repository uses **`uv`**, a fast Python package installer and resolver. Ensure you have `uv` installed. If not, follow the [official Astral installation instructions](https://astral.sh/docs/uv#installation).
 
@@ -29,7 +29,7 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
 
 ---
 
-## 2. Installing as a Library Dependency
+## Installing as a Library Dependency
 
 If you are using `pdf-anonymizer-core` or `pdf-anonymizer-cli` in a separate external project, you can install them via `pip` or `uv`.
 
@@ -55,7 +55,7 @@ pip install "pdf-anonymizer-core[openai,anthropic]"
 
 ---
 
-## 3. Environment Variables Configuration
+## Environment Variables Configuration
 
 To run the anonymizer with cloud providers, you must supply API credentials. The CLI automatically loads a `.env` file from the directory where the command is executed or any parent directory. 
 
@@ -83,7 +83,7 @@ OLLAMA_HOST="http://localhost:11434"
 
 ---
 
-## 4. Verifying the Setup
+## Verifying the Setup
 
 To verify that the installation succeeded and all package internal references are valid, run the automated test suite:
 
@@ -92,3 +92,13 @@ uv run pytest
 ```
 
 If the tests pass, you are ready to use the CLI tool!
+
+---
+
+## See Also
+
+- **[Recipes & Common Workflows](recipes.md)** — practical examples that build on the setup described here (profiles, local models, caching, etc.).
+- **[CLI Reference](cli-usage.md)** — command options and configuration profiles.
+- **[SDK & API Usage](api-usage.md)** — using the library programmatically.
+- **[Architecture Design](architecture.md)** — internals that rely on the environment you set up.
+- **[API Reference (auto)](api-reference.md)** — detailed API surface.

@@ -78,3 +78,4 @@ We provide a pre-built example containing hybrid NER (Regex + LLM) and full roun
    uv run python scripts/demo_anonymize.py
    ```
 
+For many more real-world usage patterns (local-only processing, safe external LLM/agent workflows, batch jobs, entity-type filtering, profile selection, cache control, large documents, troubleshooting, etc.) see the dedicated **[Recipes & Common Workflows](project/recipes.md)** and **[Troubleshooting](project/troubleshooting.md)** pages. An auto-generated **[API Reference](project/api-reference.md)** is also available.
