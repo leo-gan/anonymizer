@@ -4,7 +4,14 @@ import sys
 from unittest.mock import Mock, patch
 
 # Ensure python can find our core package
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "packages", "pdf-anonymizer-core", "src")))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__), "..", "packages", "pdf-anonymizer-core", "src"
+        )
+    ),
+)
 
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.utils import (
@@ -27,11 +34,13 @@ def run_demo():
     # Mock the LLM provider to return the name "Alice Smith"
     # The Regex NER stage will automatically detect email, phone, IP, and SSN
     mock_provider = Mock()
-    mock_provider.call.return_value = json.dumps({
-        "entities": [
-            {"text": "Alice Smith", "type": "PERSON", "base_form": "Alice Smith"}
-        ]
-    })
+    mock_provider.call.return_value = json.dumps(
+        {
+            "entities": [
+                {"text": "Alice Smith", "type": "PERSON", "base_form": "Alice Smith"}
+            ]
+        }
+    )
 
     print("Step 1: Running Hybrid NER on the PDF (Regex + LLM)...")
     with patch("pdf_anonymizer_core.call_llm.get_provider", return_value=mock_provider):
@@ -53,7 +62,9 @@ def run_demo():
 
     # Standardize mapping to placeholder -> original and consolidate
     placeholder_to_original = {v: k for k, v in mapping.items()}
-    anonymized_text, consolidated_map = consolidate_mapping(anonymized_text, placeholder_to_original)
+    anonymized_text, consolidated_map = consolidate_mapping(
+        anonymized_text, placeholder_to_original
+    )
 
     # Save outputs
     print("\nStep 2: Saving Anonymized text and Mapping vocabulary...")
@@ -76,7 +87,9 @@ def run_demo():
 
     # Revert / Deanonymize
     print("\nStep 3: Performing Deanonymization (Round-Trip)...")
-    deanonymized_file, stats_file = deanonymize_file(anonymized_output_file, mapping_file)
+    deanonymized_file, stats_file = deanonymize_file(
+        anonymized_output_file, mapping_file
+    )
     print(f"  - Saved deanonymized text to: {deanonymized_file}")
     print(f"  - Saved stats to: {stats_file}")
 
@@ -88,7 +101,10 @@ def run_demo():
     print("-" * 50)
     reverted_lines = reverted_text.splitlines()
     for line in reverted_lines[:10]:
-        if any(pii in line for pii in ["Alice Smith", "alice.smith", "555-0199", "10.0.0.1", "123-45"]):
+        if any(
+            pii in line
+            for pii in ["Alice Smith", "alice.smith", "555-0199", "10.0.0.1", "123-45"]
+        ):
             print(f"\033[92m{line}\033[0m")  # highlight reverted text in green
         else:
             print(line)
@@ -103,6 +119,7 @@ def run_demo():
 
     print("\nDemo Round-Trip Completed Successfully!")
     print("=" * 70)
+
 
 if __name__ == "__main__":
     run_demo()

@@ -1,15 +1,15 @@
-import json
-import os
-import re
-from pathlib import Path
-from typing import Dict, Tuple
-
 """Utilities for mapping consolidation, result saving, and deanonymization.
 
 These helpers are used by both the CLI and direct SDK consumers. They handle
 the reversible placeholder mapping contract, output file layout conventions,
 and post-deanonymization auditing statistics.
 """
+
+import json
+import os
+import re
+from pathlib import Path
+from typing import Dict, Tuple
 
 from pdf_anonymizer_core.conf import (
     DEFAULT_ANONYMIZED_DIR,

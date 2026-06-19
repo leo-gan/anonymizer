@@ -68,7 +68,9 @@ def load_and_extract_text_from_file(
 
     try:
         if file_extension == ".pdf":
-            return load_and_extract_text_from_pdf(file_path, characters_to_anonymize, chunk_overlap)
+            return load_and_extract_text_from_pdf(
+                file_path, characters_to_anonymize, chunk_overlap
+            )
         elif file_extension == ".md":
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()

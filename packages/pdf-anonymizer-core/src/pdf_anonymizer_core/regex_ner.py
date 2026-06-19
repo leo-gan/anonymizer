@@ -19,19 +19,20 @@ class EntityDict(TypedDict):
     type: str
     base_form: str
 
+
 def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[EntityDict]:
     """
     Scans the text for PII using pre-configured regular expressions.
-    
+
     Args:
         text: Input text to analyze.
         patterns: Dictionary mapping entity type strings to regex patterns.
-        
+
     Returns:
         A list of EntityDict representing identified PII.
     """
     entities: List[EntityDict] = []
-    
+
     for entity_type, pattern_str in patterns.items():
         try:
             compiled_pattern = re.compile(pattern_str)
@@ -40,13 +41,15 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
                 # Filter out empty or whitespace-only matches
                 if not matched_text.strip():
                     continue
-                
-                entities.append({
-                    "text": matched_text,
-                    "type": entity_type.upper(),
-                    "base_form": matched_text,
-                })
+
+                entities.append(
+                    {
+                        "text": matched_text,
+                        "type": entity_type.upper(),
+                        "base_form": matched_text,
+                    }
+                )
         except re.error as e:
             logging.error(f"Invalid regex pattern configured for {entity_type}: {e}")
-            
+
     return entities

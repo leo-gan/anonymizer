@@ -13,22 +13,23 @@ def main():
 
     doc = fitz.open(pdf_path)
     page = doc[0]  # Get first page
-    
+
     # Write synthetic PII line-by-line to avoid horizontal page clipping
     pii_lines = [
         "Document Owner: Alice Smith",
         "Email: alice.smith@example.com",
         "Phone: +1-555-0199",
         "Server IP: 10.0.0.1",
-        "SSN: 123-45-6789"
+        "SSN: 123-45-6789",
     ]
-    
+
     for idx, line in enumerate(pii_lines):
         page.insert_text((50, 40 + idx * 15), line, fontsize=9, color=(1, 0, 0))
-        
+
     doc.save(output_path)
     doc.close()
     print(f"Generated PDF with PII at: {output_path}")
+
 
 if __name__ == "__main__":
     main()

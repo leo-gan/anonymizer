@@ -39,11 +39,13 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "IP_ADDRESS": r"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
 }
 
+
 # Config Profiles
 class ConfigProfile(str, Enum):
     BEST_QUALITY = "best-quality"
     BEST_SPEED = "best-speed"
     BEST_COST = "best-cost"
+
 
 # Centralized profiles dictionary
 PROFILE_CONFIGS: Dict[ConfigProfile, Dict[str, Any]] = {
@@ -76,6 +78,7 @@ PROFILE_CONFIGS: Dict[ConfigProfile, Dict[str, Any]] = {
     },
 }
 
+
 class AppConfig(BaseModel):
     model_name: str
     prompt_name: str
@@ -92,7 +95,10 @@ class AppConfig(BaseModel):
     deanonymized_dir: str = DEFAULT_DEANONYMIZED_DIR
     stats_dir: str = DEFAULT_STATS_DIR
     log_file: str = DEFAULT_LOG_FILE
-    regex_patterns: Dict[str, str] = Field(default_factory=lambda: dict(DEFAULT_REGEX_PATTERNS))
+    regex_patterns: Dict[str, str] = Field(
+        default_factory=lambda: dict(DEFAULT_REGEX_PATTERNS)
+    )
+
 
 def get_config_for_profile(
     profile: ConfigProfile,
@@ -122,7 +128,7 @@ def get_config_for_profile(
         (or to be passed through configure_cache, etc.).
     """
     profile_defaults = PROFILE_CONFIGS[profile]
-    
+
     resolved_prompt_name = prompt_name or profile_defaults["prompt_name"]
     if isinstance(resolved_prompt_name, Enum):
         resolved_prompt_name = resolved_prompt_name.value
@@ -130,19 +136,26 @@ def get_config_for_profile(
     return AppConfig(
         model_name=model_name or profile_defaults["model_name"],
         prompt_name=resolved_prompt_name,
-        chunk_size=chunk_size if chunk_size is not None else profile_defaults["chunk_size"],
-        chunk_overlap=chunk_overlap if chunk_overlap is not None else profile_defaults["chunk_overlap"],
+        chunk_size=chunk_size
+        if chunk_size is not None
+        else profile_defaults["chunk_size"],
+        chunk_overlap=chunk_overlap
+        if chunk_overlap is not None
+        else profile_defaults["chunk_overlap"],
         max_retries=profile_defaults["max_retries"],
         base_retry_delay=profile_defaults["base_retry_delay"],
         max_retry_delay=profile_defaults["max_retry_delay"],
     )
 
+
 # Legacy / Existing Enums for compatibility
 T = TypeVar("T", bound=Enum)
+
 
 class PromptEnum(str, Enum):
     simple = "simple"
     detailed = "detailed"
+
 
 class ModelProvider(str, Enum):
     GOOGLE = "google"
@@ -151,6 +164,7 @@ class ModelProvider(str, Enum):
     OPENROUTER = "openrouter"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+
 
 class ModelName(str, Enum):
     google_gemini_2_5_pro = "gemini-2.5-pro"
@@ -173,6 +187,7 @@ class ModelName(str, Enum):
         provider_name = self.name.split("_")[0].upper()
         return ModelProvider[provider_name]
 
+
 def get_enum_value(enum_type: Type[T], value: str) -> T:
     try:
         return enum_type(value)
@@ -180,6 +195,7 @@ def get_enum_value(enum_type: Type[T], value: str) -> T:
         raise ValueError(
             f"Invalid value '{value}' for enum {enum_type.__name__}"
         ) from e
+
 
 def get_provider_and_model_name(model_name_str: str) -> tuple[str, str]:
     try:
