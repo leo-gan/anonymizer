@@ -4,7 +4,7 @@ Developers can integrate `pdf-anonymizer-core` directly into their Python applic
 
 ---
 
-## 1. `anonymize_file`
+## `anonymize_file`
 
 The `anonymize_file` function reads, extracts, chunks, and masks a file, returning the final anonymized string and the mapped PII dictionary.
 
@@ -24,9 +24,9 @@ from pdf_anonymizer_core.core import anonymize_file
 
 ---
 
-## 2. `deanonymize_file`
+## `deanonymize_file`
 
-The `deanonymize_file` function reads an anonymized file, loads the mapping (auto-detecting placeholder→original or legacy direction), replaces placeholders (including `.v_N` variants), writes the restored document to the conventional output directory, writes a statistics JSON file, and returns the two output file paths.
+The `deanonymize_file` function reads an anonymized file, loads the mapping (auto-detecting placeholder→original or legacy direction), replaces placeholders (including `.v_N` variants), writes the restored document to the conventional output directory (`data/deanonymized/`), writes a statistics JSON file (`data/stats/`), and returns the two output file paths.
 
 ### Import Signature
 ```python
@@ -43,7 +43,7 @@ from pdf_anonymizer_core.utils import deanonymize_file
 
 ---
 
-## 3. Configuration & Prompts
+## Configuration & Prompts
 
 The core library exposes configuration constants, model structures, and prompts in `conf` and `prompts` modules.
 
@@ -75,7 +75,7 @@ prompt_text = detailed.prompt_template
 
 ---
 
-## 4. End-to-End Code Example
+## End-to-End Code Example
 
 Here is a complete script demonstrating how to programmatically anonymize a document, print the details, and then programmatically restore the text.
 
@@ -131,10 +131,27 @@ print("\n--- Restored Text Output (first 500 chars) ---")
 print(restored_text[:500] + "\n...")
 ```
 
+You can also pass a custom list for `anonymized_entities` or supply your own `regex_patterns` dict for the first-stage NER.
+
+### Advanced: Caching and Full Control
+
+The library caches LLM responses by default (in `data/cache/llm_responses.json`). You can control it directly:
+
+```python
+from pdf_anonymizer_core.llm_provider import configure_cache
+configure_cache(enabled=True, cache_dir="my-cache", cache_file="responses.json")
+```
+
+For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_patterns`, `max_retries`, etc.) see the [auto-generated API Reference](api-reference.md) or the Recipes page.
+
 ---
 
 ## See Also
 
-- **[Recipes & Common Workflows](recipes.md)** — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files, etc.).
+- **[Recipes & Common Workflows](recipes.md)** — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files).
 - **[CLI Reference](cli-usage.md)** — the command-line surface that wraps the same core functions.
+- **[API Reference (auto)](api-reference.md)** — auto-generated detailed signatures.
+- **[Architecture Design](architecture.md)** — internals behind the functions documented here.
+- **[Installation & Setup](installation.md)** — how to set up the environment for the SDK.
+- **[Troubleshooting](troubleshooting.md)** — help with common SDK and CLI issues.
 - **[Architecture Design](architecture.md)** — how the anonymization pipeline, consolidation, and deanonymization actually work internally.

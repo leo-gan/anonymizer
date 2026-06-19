@@ -6,7 +6,7 @@ Use these recipes as starting points and adapt the commands or code to your envi
 
 ---
 
-## 1. Fully Local & Private Anonymization (Ollama)
+## Fully Local & Private Anonymization (Ollama)
 
 Run everything on your own machine so no document data ever leaves your computer.
 
@@ -19,7 +19,7 @@ Run everything on your own machine so no document data ever leaves your computer
 
 ```bash
 pdf-anonymizer run contract.pdf \
-  --config-profile best-speed \
+  -p best-speed \
   --model-name "ollama/phi4-mini"
 ```
 
@@ -51,7 +51,7 @@ anonymized, mapping = anonymize_file(
 
 ---
 
-## 2. Anonymize → Send to External AI / Service → Deanonymize Locally
+## Anonymize → Send to External AI / Service → Deanonymize Locally
 
 The classic reversible workflow: protect the original data, let an untrusted system (public ChatGPT, Claude, a third-party analysis service, translation pipeline, etc.) work on the masked version, then recover the real values locally.
 
@@ -60,7 +60,7 @@ The classic reversible workflow: protect the original data, let an untrusted sys
 1. Anonymize locally (or with a trusted key):
 
    ```bash
-   pdf-anonymizer run sensitive-report.pdf --config-profile best-quality
+   pdf-anonymizer run sensitive-report.pdf -p best-quality
    ```
 
    This produces:
@@ -87,7 +87,7 @@ You can repeat step 4 any time you receive new output from the external system a
 
 ---
 
-## 3. Batch Processing Multiple Files
+## Batch Processing Multiple Files
 
 The CLI accepts multiple input paths.
 
@@ -96,7 +96,7 @@ pdf-anonymizer run \
   reports/q1.pdf \
   notes/meeting-2025-06.md \
   archive/transcript.txt \
-  --config-profile best-cost
+  -p best-cost
 ```
 
 Each file is processed independently. Results are written using the original stem name into the conventional output directories (`data/anonymized/`, `data/mappings/`, etc.).
@@ -108,7 +108,7 @@ For very large batch jobs you may want to:
 
 ---
 
-## 4. Anonymize Only Specific Entity Types
+## Anonymize Only Specific Entity Types
 
 Use a text file containing the entity types you care about (one per line, uppercase).
 
@@ -133,53 +133,24 @@ See the example file at `packages/pdf-anonymizer-cli/entities.example.txt`.
 
 ---
 
-## 5. Choose and Override Configuration Profiles
+## Choose and Override Configuration Profiles
 
-Profiles are the recommended way to select a quality/speed/cost tradeoff.
-
-| Profile       | Model (default)       | Prompt   | Chunk size | Overlap | Retries | Typical use                     |
-|---------------|-----------------------|----------|------------|---------|---------|---------------------------------|
-| `best-quality`| gemini-2.5-pro        | detailed | 15k        | 2000    | 5       | Most accurate results           |
-| `best-speed`  | gemini-2.5-flash      | simple   | 30k        | 1000    | 3       | Balanced (default)              |
-| `best-cost`   | gemini-2.5-flash-lite | simple   | 60k        | 3000    | 3       | Cheap + fast on long documents  |
-
-**CLI usage**
-
-```bash
-# High accuracy on an important contract
-pdf-anonymizer run contract.pdf -p best-quality
-
-# Fast + cheap on a large folder of notes
-pdf-anonymizer run notes/*.md -p best-cost --model-name "ollama/phi4-mini"
-```
-
-Any of `--model-name`, `--prompt-name`, or `--characters-to-anonymize` act as **overrides** on top of the chosen profile.
-
-**Programmatic**
-
-```python
-from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
-
-config = get_config_for_profile(
-    ConfigProfile.BEST_QUALITY,
-    model_name="google/gemini-2.5-pro",   # optional override
-    chunk_size=12000,                      # optional override
-)
-```
-
-See `conf.py` for the exact `PROFILE_CONFIGS` values.
+Profiles are the recommended way to select a quality/speed/cost tradeoff (see also the table in the [CLI Reference](cli-usage.md)).
 
 **Quick introspection (Python)**
 
 ```python
 from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
+
 cfg = get_config_for_profile(ConfigProfile.BEST_QUALITY)
 print(cfg.model_dump())   # see exactly what the profile resolved to
 ```
 
+Any scalar override (`model_name`, `prompt_name`, `chunk_size`) takes precedence.
+
 ---
 
-## 6. Use the Python SDK in Pipelines / Applications
+## Use the Python SDK in Pipelines / Applications
 
 Minimal end-to-end example using the helper that mirrors the CLI:
 
@@ -226,7 +197,7 @@ You can also pass a custom list for `anonymized_entities` or supply your own `re
 
 ---
 
-## 7. Working with Mapping Files and Deanonymization Statistics
+## Working with Mapping Files and Deanonymization Statistics
 
 After deanonymization the tool always writes a stats file:
 
@@ -253,7 +224,7 @@ The mapping file format is `placeholder → original` (the direction used at dea
 
 ---
 
-## 8. LLM Response Caching
+## LLM Response Caching
 
 By default the core caches successful LLM responses (keyed by model + prompt hash) to `data/cache/llm_responses.json`.
 
@@ -276,13 +247,11 @@ configure_cache(
 )
 ```
 
-The CLI always enables caching according to the profile's `AppConfig`. There is currently no CLI flag to turn it off (you can delete or move the cache directory manually if you want a cold run).
-
-The cache is thread-safe and saved on process exit.
+The CLI always enables caching according to the profile's `AppConfig`. Delete or move the cache directory for a cold run.
 
 ---
 
-## 9. Processing Very Large Documents
+## Processing Very Large Documents
 
 PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
@@ -298,11 +267,11 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 - Use Markdown-aware splitting (automatic for `.pdf` and `.md`). Plain `.txt` falls back to recursive character splitting.
 - Watch the log output: each chunk is logged (`Identifying entities in part X/Y...`).
 - The `chunk_overlap` (profile-driven) helps the model see context across chunk boundaries for coreference.
-- If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors. Use `best-quality` profile for more aggressive retries on important jobs.
+- If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors.
 
 ---
 
-## 10. Advanced: Custom First-Stage Regex (SDK only)
+## Advanced: Custom First-Stage Regex (SDK only)
 
 The hybrid approach runs fast deterministic regex patterns before the LLM call. You can supply your own set:
 
@@ -329,7 +298,7 @@ text, mapping = anonymize_file(
 )
 ```
 
-The LLM stage still runs and can catch things the regexes missed (or correct borderline cases via the priority merge).
+The LLM stage still runs and can catch things the regexes missed.
 
 ---
 
@@ -344,13 +313,15 @@ When things go wrong the log is the first place to look (rate-limit errors, prov
 
 You can also delete or move `data/cache/llm_responses.json` to force a cold run with no cached LLM responses.
 
+---
+
 ## See Also
 
-- **[CLI Reference](cli-usage.md)** — complete flag reference and model alias list.
-- **[SDK & API Usage](api-usage.md)** — lower-level function signatures.
+- **[CLI Reference](cli-usage.md)** — complete flag reference, model aliases, and the profiles table.
+- **[SDK & API Usage](api-usage.md)** — lower-level function signatures and returns.
 - **[API Reference (auto)](api-reference.md)** — living signature documentation generated from source docstrings.
 - **[Architecture Design](architecture.md)** — how chunking, consolidation, mapping, and reversal actually work.
 - **[Installation & Setup](installation.md)** — provider extras and environment variables.
-- **[CONTRIBUTING.md](https://github.com/leo-gan/anonymizer/blob/main/CONTRIBUTING.md)** — development setup, `make` targets, and contribution workflow.
+- **[Troubleshooting](troubleshooting.md)** — solutions to common problems encountered when following these recipes.
 
 For conceptual background see the [Privacy & Anonymization 101](../101/index.md) track.

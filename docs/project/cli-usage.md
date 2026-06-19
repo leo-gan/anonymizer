@@ -4,7 +4,7 @@ The `pdf-anonymizer-cli` package installs the `pdf-anonymizer` executable. This 
 
 ---
 
-## 1. The `run` Command (Anonymization)
+## The `run` Command (Anonymization)
 
 The `run` command processes one or more files, masks PII, and outputs the anonymized document along with a mapping file.
 
@@ -20,14 +20,37 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 
 | Option | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--characters-to-anonymize` | `INTEGER` | `100000` | The character size of each chunk sent to the LLM. |
-| `--prompt-name` | `simple` \| `detailed` | `detailed` | The type of instruction prompt sent to the LLM. |
-| `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute. |
+| `--config-profile` / `-p` | `best-quality` \| `best-speed` \| `best-cost` | `best-speed` | Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). |
+| `--characters-to-anonymize` | `INTEGER` | `100000` | The character size of each chunk sent to the LLM (overrides profile). |
+| `--prompt-name` | `simple` \| `detailed` | `detailed` | The type of instruction prompt sent to the LLM (overrides profile). |
+| `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
 | `--anonymized-entities` | `PATH` | *None* | Path to a text file containing custom entities to search for and anonymize. |
+
+### Configuration Profiles
+
+The `--config-profile` (or `-p`) flag is the recommended way to select quality/speed/cost trade-offs. It sets a bundle of model, prompt, chunk size, overlap, and retry settings. Any of `--model-name`, `--prompt-name`, or `--characters-to-anonymize` act as **overrides** on top of the chosen profile.
+
+| Profile        | Default Model           | Prompt   | Chunk Size | Overlap | Retries | Best For                          |
+|----------------|-------------------------|----------|------------|---------|---------|-----------------------------------|
+| `best-quality` | `gemini-2.5-pro`        | detailed | 15,000     | 2,000   | 5       | Highest accuracy (slower/costlier)|
+| `best-speed`   | `gemini-2.5-flash`      | simple   | 30,000     | 1,000   | 3       | Balanced (default)                |
+| `best-cost`    | `gemini-2.5-flash-lite` | simple   | 60,000     | 3,000   | 3       | Cheap & fast on long documents    |
+
+**Examples**
+
+```bash
+# High accuracy on an important contract
+pdf-anonymizer run contract.pdf -p best-quality
+
+# Fast + cheap batch of notes with a local model
+pdf-anonymizer run notes/*.md -p best-cost --model-name "ollama/phi4-mini"
+```
+
+See the [Recipes & Common Workflows](recipes.md) page for more profile usage patterns.
 
 ---
 
-## 2. Models & Providers
+## Models & Providers
 
 You can select a model via the `--model-name` option. PDF Anonymizer can use pre-configured alias strings or dynamically resolve model paths using the format `provider/model-identifier`.
 
@@ -67,7 +90,7 @@ pdf-anonymizer run doc.pdf --model-name "google/gemini-2.0-flash-exp"
 
 ---
 
-## 3. The `deanonymize` Command (Reversal)
+## The `deanonymize` Command (Reversal)
 
 The `deanonymize` command reads an anonymized document, loads the JSON mapping file containing placeholders and original PII, restores the original text, and writes the output file.
 
@@ -86,7 +109,7 @@ If `ANONYMIZED_FILE` is `data/anonymized/document.anonymized.md`, the output wil
 
 ---
 
-## 4. Operational Examples
+## Operational Examples
 
 ### Example 1: Basic Anonymization
 Anonymize a meeting transcript using the default Gemini model:
@@ -121,8 +144,38 @@ pdf-anonymizer deanonymize \
 
 ---
 
+## Output Files & Auditing
+
+Both commands write results under conventional directories (created automatically):
+
+*   `data/anonymized/<stem>.anonymized.md` (or `.txt`)
+*   `data/mappings/<stem>.mapping.json`
+*   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`)
+*   `data/stats/<stem>.deanonymization_stat.json`
+
+The stats file contains:
+
+```json
+{
+  "anonymized_file": "...",
+  "mapping_file": "...",
+  "deanonymized_file": "...",
+  "unused_mappings": ["PERSON_7"],
+  "not_found_mappings": []
+}
+```
+
+*   `unused_mappings`: placeholders present in the map but never found in the anonymized text (usually harmless).
+*   `not_found_mappings`: placeholders seen in the text with no corresponding entry in the map (may indicate a corrupted or partial mapping).
+
+These are useful for compliance/audit pipelines. See the [Recipes & Common Workflows](recipes.md) page for more details on working with mappings and stats.
+
+---
+
 ## See Also
 
-- **[Recipes & Common Workflows](recipes.md)** — end-to-end patterns including batch processing, local-only Ollama runs, safe external LLM usage, entity filtering, profiles, caching, and large-file tips.
-- **[SDK & API Usage](api-usage.md)** — using the same functionality from Python.
-- **[Architecture Design](architecture.md)** — details on chunking, hybrid NER, base-form consolidation, and the mapping engine.
+- **[Recipes & Common Workflows](recipes.md)** — practical end-to-end examples (profiles, local models, external LLM workflows, caching, debugging).
+- **[SDK & API Usage](api-usage.md)** — programmatic usage of the same core functions.
+- **[API Reference (auto)](api-reference.md)** — auto-generated function signatures.
+- **[Architecture Design](architecture.md)** — how chunking, hybrid detection, mapping, and reversal work internally.
+- **[Installation & Setup](installation.md)** — provider extras and environment setup.

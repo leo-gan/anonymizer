@@ -4,7 +4,7 @@ Over the past few decades, computer scientists and statisticians have developed 
 
 ---
 
-## 1. Traditional & Cryptographic Methods
+## Traditional & Cryptographic Methods
 
 These are the most common methods used in databases and structured logs.
 
@@ -22,7 +22,7 @@ Passing PII through a cryptographic hash function (e.g., SHA-256) or replacing i
 
 ---
 
-## 2. Statistical Privacy Models
+## Statistical Privacy Models
 
 For structured tables (like Excel or SQL tables), researchers use mathematical parameters to measure privacy strength.
 
@@ -49,7 +49,7 @@ A further extension of *l*-diversity. It requires that the distribution of a sen
 
 ---
 
-## 3. Advanced Modern Privacy Paradigms
+## Advanced Modern Privacy Paradigms
 
 For highly sensitive large-scale analytics, companies are moving towards mathematical guarantees.
 
@@ -68,7 +68,7 @@ Using machine learning models (like GANs or LLMs) to generate completely artific
 
 ---
 
-## 4. Legacy Anonymization Software & Libraries
+## Legacy Anonymization Software & Libraries
 
 When developers need to anonymize unstructured text files (PDFs, Word docs, texts), they traditionally turn to these open-source tools:
 
@@ -98,4 +98,5 @@ A popular Python framework for detecting and redacting PII in unstructured text.
 
 ---
 
-Next, let's explore [**how PDF Anonymizer differs**](how-different.md) from these traditional tools and why it is uniquely suited for modern workflows.
+**In this course:**  
+[← Previous: History](history.md) | [Course Overview](index.md) | [Next: How PDF Anonymizer is Different](how-different.md)

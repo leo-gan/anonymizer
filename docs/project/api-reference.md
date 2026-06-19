@@ -1,11 +1,11 @@
 # API Reference
 
-This page is **automatically generated** from the source code using [mkdocstrings](https://mkdocstrings.github.io/).
+This page is **automatically generated** from source code using [mkdocstrings](https://mkdocstrings.github.io/).
 
-It reflects the current public surface of `pdf-anonymizer-core`. The hand-written usage guide lives in [SDK & API Usage](api-usage.md). For practical examples see [Recipes & Common Workflows](recipes.md).
+It reflects the current public surface of `pdf-anonymizer-core`. The hand-written usage guide is in [SDK & API Usage](api-usage.md). For practical examples see [Recipes & Common Workflows](recipes.md).
 
 !!! info
-    The CLI (`pdf-anonymizer-cli`) is a thin wrapper built with [Typer](https://typer.tiangolo.com/). Most application logic lives in the core package.
+    The CLI (`pdf-anonymizer-cli`) is a thin wrapper built with [Typer](https://typer.tiangolo.com/). Most logic lives in the core package.
 
 ---
 

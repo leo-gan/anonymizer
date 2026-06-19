@@ -119,4 +119,13 @@ pdf-anonymizer deanonymize \
 
 This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`.
 
-For the complete CLI reference, configuration profiles, and many practical recipes (local-only, external LLM workflows, batching, etc.) see the full documentation site: **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.
+---
+
+## See Also
+
+- **[Main Documentation](https://leo-gan.github.io/anonymizer/)** — Full guides including the 101 course.
+- **[Core Package README](../pdf-anonymizer-core/README.md)** — Details on the underlying library.
+- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)** — Practical CLI usage examples (profiles, batching, external workflows, etc.).
+- **[CLI Reference (full)](https://leo-gan.github.io/anonymizer/project/cli-usage/)** — Complete command reference on the docs site.
+- **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)** — Help with common CLI problems.
+- **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)** — How the CLI and core work together.

@@ -6,7 +6,7 @@ Here is what makes this project different.
 
 ---
 
-## 1. Traditional Regex/NER vs. LLM Context Awareness
+## Traditional Regex/NER vs. LLM Context Awareness
 
 Traditional text anonymizers (like Microsoft Presidio) use regular expressions for patterns (e.g. emails) and classical Named Entity Recognition (NER) for words (e.g. names). This approach has severe limitations:
 
@@ -21,15 +21,15 @@ Traditional text anonymizers (like Microsoft Presidio) use regular expressions f
 
 ---
 
-## 2. Reversible Masking (The Mapping Engine)
+## Reversible Masking (The Mapping Engine)
 
 Many tools simply erase text or replace it with generic masks (like `<REDACTED>`), destroying the structure and utility of the document. 
 
-PDF Anonymizer creates **reversible placeholder mappings**.
+PDF Anonymizer creates **reversible placeholder mappings**:
 
-1.  **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `[PERSON_1]`, `[COMPANY_2]`, `[DATE_1]`). This preserves the grammar, flow, and structural meaning of the document.
-2.  **Separate Cryptographic Map**: The CLI outputs an anonymized document along with a JSON-formatted mapping file (e.g., `document.mapping.json`).
-3.  **Local Deanonymization**: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's `deanonymize` command locally with the mapping file to restore the original names.
+- **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `[PERSON_1]`, `[COMPANY_2]`, `[DATE_1]`). This preserves the grammar, flow, and structural meaning of the document.
+- **Separate Cryptographic Map**: The CLI outputs an anonymized document along with a JSON-formatted mapping file (e.g., `document.mapping.json`).
+- **Local Deanonymization**: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's `deanonymize` command locally with the mapping file to restore the original names.
 
 ```
 [Raw Document] -> [PDF Anonymizer CLI]
@@ -52,7 +52,7 @@ PDF Anonymizer creates **reversible placeholder mappings**.
 
 ---
 
-## 3. Privacy-First and Cost-Effective
+## Privacy-First and Cost-Effective
 
 Sending sensitive documents to public cloud APIs to redact them is a security contradiction. 
 
@@ -61,7 +61,7 @@ Sending sensitive documents to public cloud APIs to redact them is a security co
 
 ---
 
-## 4. Engineered for Scale (Up to 1GB)
+## Engineered for Scale (Up to 1GB)
 
 Large documents (like a 500-page clinical trial registry or a 1GB database export in text format) exceed the maximum input size (context window) of typical LLMs, or they cause standard scripts to crash due to memory depletion.
 
@@ -82,3 +82,6 @@ Large documents (like a 500-page clinical trial registry or a 1GB database expor
 ---
 
 Now that you understand the concepts and the value of the PDF Anonymizer project, you are ready to dive into the **[Project Developer Documentation](../project/index.md)** to install and use it.
+
+**In this course:**  
+[← Previous: Contemporary Techniques](techniques.md) | [Course Overview](index.md)
