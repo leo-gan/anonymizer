@@ -118,3 +118,11 @@ pdf-anonymizer deanonymize \
 ```
 *   **Output created**:
     *   `data/meeting_transcript.deanonymized.md`
+
+---
+
+## See Also
+
+- **[Recipes & Common Workflows](recipes.md)** — end-to-end patterns including batch processing, local-only Ollama runs, safe external LLM usage, entity filtering, profiles, caching, and large-file tips.
+- **[SDK & API Usage](api-usage.md)** — using the same functionality from Python.
+- **[Architecture Design](architecture.md)** — details on chunking, hybrid NER, base-form consolidation, and the mapping engine.

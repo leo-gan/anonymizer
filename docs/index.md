@@ -18,7 +18,7 @@ PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK 
 
     ---
 
-    Ready to build or run? Explore the installation guides, CLI command reference, Python API/SDK code examples, and monorepo architectural internals.
+    Ready to build or run? Explore the installation guides, CLI command reference, Python API/SDK code examples, **practical recipes & workflows**, and monorepo architectural internals.
 
     [:octicons-arrow-right-24: Explore Project Docs](project/index.md)
 
@@ -78,3 +78,6 @@ We provide a pre-built example containing hybrid NER (Regex + LLM) and full roun
    uv run python scripts/demo_anonymize.py
    ```
 
+---
+
+For many more real-world usage patterns (local-only processing, safe external LLM/agent workflows, batch jobs, entity-type filtering, profile selection, cache control, large documents, etc.) see the dedicated **[Recipes & Common Workflows](project/recipes.md)** page.

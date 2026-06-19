@@ -125,3 +125,11 @@ print("\n--- Restored Text Output ---")
 print(restored_text[:500] + "\n...")
 print("Stats:", stats)
 ```
+
+---
+
+## See Also
+
+- **[Recipes & Common Workflows](recipes.md)** — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files, etc.).
+- **[CLI Reference](cli-usage.md)** — the command-line surface that wraps the same core functions.
+- **[Architecture Design](architecture.md)** — how the anonymization pipeline, consolidation, and deanonymization actually work internally.

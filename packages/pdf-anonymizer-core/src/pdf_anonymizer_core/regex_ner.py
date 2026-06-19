@@ -1,3 +1,14 @@
+"""Fast first-stage Named Entity Recognition using regular expressions.
+
+The hybrid pipeline (core.anonymize_file) always runs regex NER before
+the (more expensive) LLM stage. Matches from regex are later merged
+with LLM results using a simple priority system.
+
+This module is intentionally small and dependency-free (beyond stdlib).
+You can supply a completely custom `regex_patterns` dict when calling
+anonymize_file directly.
+"""
+
 import logging
 import re
 from typing import Dict, List, TypedDict

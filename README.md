@@ -20,6 +20,7 @@ The documentation includes:
 - **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
 - **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference manual for `pdf-anonymizer run` and `pdf-anonymizer deanonymize`.
 - **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
+- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)**: Practical patterns (local Ollama, external LLM round-trips, batching, profiles, large files, etc.).
 - **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
 
 ## Project Structure
@@ -78,7 +79,7 @@ To deanonymize the file later:
 uv run pdf-anonymizer deanonymize document.anonymized.md document.mapping.json
 ```
 
-For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md) or the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/).
+For detailed command-line options and examples, please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md), the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/), or the **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)** page.
 
 ## Demo: Anonymization & Deanonymization Example
 

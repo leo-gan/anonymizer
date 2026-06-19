@@ -1,3 +1,15 @@
+"""Central configuration, defaults, profiles, and model/provider enums.
+
+This module defines:
+- Default constants and directories used by the anonymizer.
+- Three built-in ConfigProfiles (best-quality, best-speed, best-cost) that
+  bundle sensible combinations of model, prompt, chunk size, retries, etc.
+- The AppConfig Pydantic model.
+- get_config_for_profile() helper (used heavily by the CLI).
+- Legacy enums (PromptEnum, ModelName, etc.) for compatibility and
+  dynamic provider/model resolution.
+"""
+
 from enum import Enum
 from typing import Any, Dict, Optional, Type, TypeVar
 
@@ -89,7 +101,26 @@ def get_config_for_profile(
     chunk_size: Optional[int] = None,
     chunk_overlap: Optional[int] = None,
 ) -> AppConfig:
-    """Gets the AppConfig instance based on a ConfigProfile with optional overrides."""
+    """Return an AppConfig populated from one of the built-in profiles.
+
+    Profiles provide convenient quality/speed/cost presets. Any of the
+    scalar overrides (model_name, prompt_name, chunk_size, chunk_overlap)
+    take precedence over the profile defaults.
+
+    The other fields (retries, delays, cache settings, directories) always
+    come from the chosen profile.
+
+    Args:
+        profile: One of ConfigProfile.BEST_QUALITY, BEST_SPEED or BEST_COST.
+        model_name: Optional override for the model (string or provider/model).
+        prompt_name: Optional override ("simple" or "detailed").
+        chunk_size: Optional override for characters_to_anonymize / chunk_size.
+        chunk_overlap: Optional override for chunk overlap.
+
+    Returns:
+        A fully populated AppConfig instance ready to drive anonymize_file
+        (or to be passed through configure_cache, etc.).
+    """
     profile_defaults = PROFILE_CONFIGS[profile]
     
     resolved_prompt_name = prompt_name or profile_defaults["prompt_name"]

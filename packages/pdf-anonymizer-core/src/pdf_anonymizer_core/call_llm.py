@@ -1,3 +1,11 @@
+"""LLM calling logic with structured parsing and resilient retries.
+
+Contains:
+- Pydantic models used to validate LLM JSON responses (EntityModel, IdentificationResult).
+- classify_error(): decides which exceptions are worth retrying.
+- identify_entities_with_llm(): the main retrying wrapper that talks to providers.
+"""
+
 import logging
 import random
 import time
@@ -62,20 +70,27 @@ def identify_entities_with_llm(
     base_retry_delay: float = 1.0,
     max_retry_delay: float = 10.0,
 ) -> List[dict]:
-    """
-    Identifies PII entities in a text chunk using a specified language model.
-    It retries on failure up to max_retries with exponential backoff.
+    """Call an LLM (via the configured provider) to extract PII entities from one chunk.
+
+    The call is wrapped with retry logic:
+    - Transient errors (rate limits, 5xx, connection, parsing) are retried.
+    - Auth errors are not retried.
+    - Uses exponential backoff + jitter.
+
+    The response is cleaned of markdown fences and validated with Pydantic
+    before returning a list of plain dicts.
 
     Args:
-        text: The text to analyze.
-        prompt_template: The prompt template for the identification task.
-        model_name: The name of the model to use.
-        max_retries: Max number of attempts.
-        base_retry_delay: Base delay for backoff.
-        max_retry_delay: Max delay for backoff.
+        text: The chunk of text to analyze.
+        prompt_template: Prompt containing a {text} placeholder.
+        model_name: Model string (passed through get_provider_and_model_name).
+        max_retries: Maximum number of attempts.
+        base_retry_delay: Starting backoff delay (seconds).
+        max_retry_delay: Upper bound on backoff delay (seconds).
 
     Returns:
-        A list of identified entities as dicts.
+        List of entity dicts (each with "text", "type", and optionally "base_form").
+        Returns [] on unrecoverable failure after retries.
     """
     prompt = prompt_template.format(text=text)
 

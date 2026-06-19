@@ -4,6 +4,14 @@ import re
 import time
 from typing import Dict, List, Optional, Tuple
 
+"""Core anonymization engine.
+
+This module provides the primary high-level entry point for anonymizing
+documents (PDF, Markdown, or plain text) using a hybrid Regex + LLM approach
+with support for large files via chunking, entity consolidation, and reversible
+placeholder mapping.
+"""
+
 from pdf_anonymizer_core.call_llm import identify_entities_with_llm
 from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
@@ -22,24 +30,42 @@ def anonymize_file(
     base_retry_delay: float = 1.0,
     max_retry_delay: float = 10.0,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
-    """
-    Anonymize a file by processing its text content.
+    """Anonymize a file by processing its text content.
+
+    Performs a two-stage entity detection (fast regex first pass followed by
+    LLM-based semantic detection), deduplicates, consolidates base forms for
+    coreference (e.g. "Dr. Smith" / "Smith"), generates typed placeholders
+    (PERSON_1, ORGANIZATION_3.v_1, ...), and performs length-descending safe
+    replacement to produce reversible anonymized output.
+
+    The function streams large inputs via chunking (Markdown-aware for PDF/MD)
+    so that very large files (hundreds of MB) can be processed without
+    exhausting context windows or memory.
 
     Args:
-        file_path: Path to the file to anonymize.
-        characters_to_anonymize: Number of characters to process in each chunk.
-        prompt_template: Template string for the anonymization prompt.
-        model_name: Name of the language model to use for anonymization.
-        anonymized_entities: A list of entities to anonymize.
-        chunk_overlap: Number of characters overlapping between chunks.
-        regex_patterns: Regular expression patterns for first-stage NER.
-        max_retries: Max retries for LLM calls.
-        base_retry_delay: Base delay for backoff.
-        max_retry_delay: Max delay for backoff.
+        file_path: Path to the file to anonymize (.pdf, .md, or .txt).
+        characters_to_anonymize: Target character size of each chunk sent to the LLM.
+        prompt_template: The full prompt template string (use one from
+            pdf_anonymizer_core.prompts or supply your own).
+        model_name: Model identifier or "provider/model" string
+            (e.g. "gemini-2.5-flash", "ollama/phi4-mini", "google/gemini-2.0-flash-exp").
+        anonymized_entities: Optional whitelist of entity *types* (e.g. ["PERSON", "ORGANIZATION"]).
+            When provided, only matching entities are replaced.
+        chunk_overlap: Number of characters of overlap between consecutive chunks.
+        regex_patterns: Custom first-stage regex map. Defaults to built-in patterns
+            for EMAIL, PHONE, SSN, CREDIT_CARD, IP_ADDRESS.
+        max_retries: Maximum LLM call attempts per chunk (with exponential backoff).
+        base_retry_delay: Base delay in seconds for retry backoff.
+        max_retry_delay: Maximum delay cap for retry backoff.
 
     Returns:
-        A tuple containing the anonymized text and the mapping of original to anonymized entities,
-        or (None, None) if processing fails.
+        A tuple (anonymized_text, mapping) where:
+            - anonymized_text is the masked document (or None on failure)
+            - mapping is a dict of original_value -> placeholder (or None on failure)
+
+    Note:
+        The returned mapping is in original -> placeholder direction.
+        The CLI later converts it to placeholder -> original for deanonymization.
     """
     if regex_patterns is None:
         regex_patterns = DEFAULT_REGEX_PATTERNS

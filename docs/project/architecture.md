@@ -95,3 +95,14 @@ After restoration, the engine computes:
 *   `unused_mappings`: Placeholders present in the map that were not found in the anonymized text.
 *   `not_found_mappings`: Placeholders detected in the text that had no matching entry in the map.
 *   These are output to a JSON file in `data/stats/<stem>.deanonymization_stat.json` for validation and compliance auditing.
+
+---
+
+## Practical Usage
+
+For concrete command-line and Python examples of the concepts described above (profiles, local vs external workflows, batching, cache control, large files, etc.) see the **[Recipes & Common Workflows](recipes.md)** page.
+
+Cross-reference:
+
+*   **[CLI Reference](cli-usage.md)**
+*   **[SDK & API Usage](api-usage.md)**

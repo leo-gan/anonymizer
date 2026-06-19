@@ -25,6 +25,7 @@ You can also install multiple extras at once:
 pip install "pdf-anonymizer-core[google,ollama]"
 ```
 
+Full documentation, including the Python SDK guide, CLI reference, recipes, and architecture, lives at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)** (especially the [Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/) section).
 ## Environment Variables
 
 The core library itself does not load `.env` files. Environment variables must be loaded by the application that uses this library (e.g., `pdf-anonymizer-cli`) or set in your shell.

@@ -53,6 +53,7 @@ A CLI tool built on top of `pdf-anonymizer-core` that:
 To dive deeper into the technical details, navigate through the following guides:
 
 1.  **[Installation & Setup](installation.md)**: Learn how to set up the development environment using `uv`, manage packages, and define environment variables.
-2.  **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options, custom model strings, and usage examples.
+2.  **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options (including `--config-profile`), custom model strings, and usage examples.
 3.  **[SDK & API Usage](api-usage.md)**: Learn how to import PDF Anonymizer as a Python library in your own applications.
-4.  **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.
+4.  **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — fully local Ollama usage, safe external LLM workflows, batching, entity filtering, caching, large files, and more.
+5.  **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, chunking, hybrid Regex+LLM detection, and file splitting mechanisms.

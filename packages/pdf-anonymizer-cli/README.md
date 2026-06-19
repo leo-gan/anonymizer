@@ -118,3 +118,5 @@ pdf-anonymizer deanonymize \
 ```
 
 This will create a deanonymized version of the file at `data/deanonymized/document.deanonymized.md`.
+
+For the complete CLI reference, configuration profiles, and many practical recipes (local-only, external LLM workflows, batching, etc.) see the full documentation site: **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.

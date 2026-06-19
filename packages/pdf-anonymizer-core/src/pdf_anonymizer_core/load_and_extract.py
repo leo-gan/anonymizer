@@ -1,3 +1,14 @@
+"""Text extraction and semantic chunking for PDF, Markdown, and plain text.
+
+Uses pymupdf4llm for high-quality PDF → Markdown conversion (preserves
+structure useful for LLMs) and langchain text splitters:
+- MarkdownTextSplitter for .pdf and .md (respects headers/code blocks)
+- RecursiveCharacterTextSplitter for .txt / fallback
+
+Chunk size and overlap are the primary controls for memory usage and
+LLM context consumption.
+"""
+
 import logging
 from pathlib import Path
 from typing import List, Tuple
