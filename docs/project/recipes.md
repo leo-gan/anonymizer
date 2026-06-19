@@ -214,11 +214,12 @@ with open("contract.mapping.json", "w", encoding="utf-8") as f:
     json.dump(placeholder_to_original, f, indent=2)
 
 # 4. Later: restore
-restored, stats = deanonymize_file(
-    anonymized_file="contract.anonymized.md",
-    mapping_file="contract.mapping.json",
+deanonymized_file_path, stats_file_path = deanonymize_file(
+    "contract.anonymized.md",
+    "contract.mapping.json",
 )
-print("Deanonymization stats:", stats)
+print("Deanonymized file saved to:", deanonymized_file_path)
+print("Stats file saved to:", stats_file_path)
 ```
 
 You can also pass a custom list for `anonymized_entities` or supply your own `regex_patterns` dict for the first-stage NER.

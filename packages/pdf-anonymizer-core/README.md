@@ -61,19 +61,19 @@ if text and mapping:
 
 ### `deanonymize_file()`
 
-Reverts anonymization using a mapping file.
+Reverts anonymization using a mapping file. The function writes the restored document and a stats file, returning their paths.
 
 ```python
 from pdf_anonymizer_core.utils import deanonymize_file
 
 # Assumes you have an anonymized file and a mapping file
-deanonymized_text, stats = deanonymize_file(
-    anonymized_file="path/to/anonymized.md",
-    mapping_file="path/to/mapping.json"
+deanonymized_file_path, stats_file_path = deanonymize_file(
+    "path/to/anonymized.md",
+    "path/to/mapping.json",
 )
 
-if deanonymized_text:
-    print("Deanonymized Text:", deanonymized_text)
+print("Deanonymized file:", deanonymized_file_path)
+print("Stats file:", stats_file_path)
 ```
 
 ### Configuration
