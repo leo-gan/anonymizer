@@ -508,34 +508,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../101/where-needed/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Where is it Needed?
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../101/techniques/" class="md-nav__link">
         
   
@@ -739,10 +711,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-pdf-anonymizer-core" class="md-nav__link">
+  <a href="#pdf-anonymizer-core" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. pdf-anonymizer-core
+        pdf-anonymizer-core
       
     </span>
   </a>
@@ -750,10 +722,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-pdf-anonymizer-cli" class="md-nav__link">
+  <a href="#pdf-anonymizer-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. pdf-anonymizer-cli
+        pdf-anonymizer-cli
       
     </span>
   </a>
@@ -932,6 +904,34 @@
   
   
     <li class="md-nav__item">
+      <a href="troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="architecture/" class="md-nav__link">
         
   
@@ -1010,10 +1010,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-pdf-anonymizer-core" class="md-nav__link">
+  <a href="#pdf-anonymizer-core" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. pdf-anonymizer-core
+        pdf-anonymizer-core
       
     </span>
   </a>
@@ -1021,10 +1021,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-pdf-anonymizer-cli" class="md-nav__link">
+  <a href="#pdf-anonymizer-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. pdf-anonymizer-cli
+        pdf-anonymizer-cli
       
     </span>
   </a>
@@ -1088,7 +1088,7 @@
 <hr />
 <h2 id="the-packages">The Packages<a class="headerlink" href="#the-packages" title="Permanent link">&para;</a></h2>
 <p>The project contains two decoupled Python packages inside <code>packages/</code>:</p>
-<h3 id="1-pdf-anonymizer-core">1. <code>pdf-anonymizer-core</code><a class="headerlink" href="#1-pdf-anonymizer-core" title="Permanent link">&para;</a></h3>
+<h3 id="pdf-anonymizer-core"><code>pdf-anonymizer-core</code><a class="headerlink" href="#pdf-anonymizer-core" title="Permanent link">&para;</a></h3>
 <p>Contains all the core engines, including:</p>
 <ul>
 <li>Text extraction from PDF, Markdown, and plain text formats.</li>
@@ -1097,7 +1097,7 @@
 <li>Streaming chunk utility to process large text files.</li>
 <li>Mapping and restoration engine for deanonymization.</li>
 </ul>
-<h3 id="2-pdf-anonymizer-cli">2. <code>pdf-anonymizer-cli</code><a class="headerlink" href="#2-pdf-anonymizer-cli" title="Permanent link">&para;</a></h3>
+<h3 id="pdf-anonymizer-cli"><code>pdf-anonymizer-cli</code><a class="headerlink" href="#pdf-anonymizer-cli" title="Permanent link">&para;</a></h3>
 <p>A CLI tool built on top of <code>pdf-anonymizer-core</code> that:</p>
 <ul>
 <li>Exposes a command-line interface using <code>Typer</code> (supporting autocompletion, clean logs, and command help).</li>
@@ -1107,13 +1107,15 @@
 <hr />
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <p>To dive deeper into the technical details, navigate through the following guides:</p>
-<ol>
+<ul>
 <li><strong><a href="installation/">Installation &amp; Setup</a></strong>: Learn how to set up the development environment using <code>uv</code>, manage packages, and define environment variables.</li>
 <li><strong><a href="cli-usage/">CLI Reference</a></strong>: Explore the command-line arguments, options (including <code>--config-profile</code>), custom model strings, and usage examples.</li>
 <li><strong><a href="api-usage/">SDK &amp; API Usage</a></strong>: Learn how to import PDF Anonymizer as a Python library in your own applications.</li>
-<li><strong><a href="recipes/">Recipes &amp; Common Workflows</a></strong>: Practical end-to-end examples — fully local Ollama usage, safe external LLM workflows, batching, entity filtering, caching, large files, and more.</li>
-<li><strong><a href="architecture/">Architecture Design</a></strong>: Understand the data flow, prompt styling, LLM adapters, chunking, hybrid Regex+LLM detection, and file splitting mechanisms.</li>
-</ol>
+<li><strong><a href="api-reference/">API Reference (auto)</a></strong>: Living signature reference generated from source docstrings.</li>
+<li><strong><a href="recipes/">Recipes &amp; Common Workflows</a></strong>: Practical end-to-end examples — fully local Ollama usage, safe external LLM workflows, batching, entity filtering, profiles, caching, debugging, and more.</li>
+<li><strong><a href="troubleshooting/">Troubleshooting</a></strong>: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.</li>
+<li><strong><a href="architecture/">Architecture Design</a></strong>: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.</li>
+</ul>
 
 
 

@@ -21,10 +21,6 @@
          <lastmod>2026-06-19</lastmod>
     </url>
     <url>
-         <loc>https://leo-gan.github.io/anonymizer/101/where-needed/</loc>
-         <lastmod>2026-06-19</lastmod>
-    </url>
-    <url>
          <loc>https://leo-gan.github.io/anonymizer/101/why-anonymization/</loc>
          <lastmod>2026-06-19</lastmod>
     </url>
@@ -54,6 +50,10 @@
     </url>
     <url>
          <loc>https://leo-gan.github.io/anonymizer/project/recipes/</loc>
+         <lastmod>2026-06-19</lastmod>
+    </url>
+    <url>
+         <loc>https://leo-gan.github.io/anonymizer/project/troubleshooting/</loc>
          <lastmod>2026-06-19</lastmod>
     </url>
 </urlset>
