@@ -273,17 +273,30 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
 ## Advanced: Custom First-Stage Regex (SDK only)
 
-The hybrid approach runs fast deterministic regex patterns before the LLM call. You can supply your own set:
+The hybrid approach runs a fast deterministic RE2 (google-re2) regex pass before every LLM call.
+You can supply your own set (or a filtered slice of the built-in collection):
 
 ```python
 from pdf_anonymizer_core.core import anonymize_file
-from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
+from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.prompts import detailed
 
+# Option A: completely custom
 custom_regex = {
-    "EMAIL": r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+",
+    "EMAIL": r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
     "EMPLOYEE_ID": r"\bEMP-\d{6}\b",
-    # add more ...
+    # ...
+}
+
+# Option B: use the built-in library (RE2-powered, 30+ countries)
+# It includes: EMAIL, URL, CREDIT_CARD, IBAN, CRYPTO_*, VIN, MAC, IPV4/6,
+# DATE_ISO, CURRENCY_AMOUNT, BIC_SWIFT + country partitioned IDs:
+# SSN_US / SIN_CA / NINO_GB / INSEE_FR / DNI_ES / CODICE_FISCALE_IT / AADHAAR_IN / RESIDENT_ID_CN / ...
+# VAT_*/EIN_*/business numbers, DRIVERS_LICENSE_*, PASSPORT_*, MEDICAL_* etc.
+country_focused = {
+    k: v for k, v in DEFAULT_REGEX_PATTERNS.items()
+    if k in ("EMAIL", "CREDIT_CARD", "IBAN", "SSN_US", "SIN_CA", "NINO_GB", "INSEE_FR",
+             "RESIDENT_ID_CN", "PAN_IN", "VAT_FR", "VAT_DE", "DRIVERS_LICENSE_US")
 }
 
 cfg = get_config_for_profile(ConfigProfile.BEST_SPEED)
@@ -293,12 +306,19 @@ text, mapping = anonymize_file(
     characters_to_anonymize=cfg.chunk_size,
     prompt_template=detailed.prompt_template,
     model_name=cfg.model_name,
-    regex_patterns=custom_regex,
+    regex_patterns=country_focused,   # or custom_regex or DEFAULT_REGEX_PATTERNS
     # ... other config fields
 )
 ```
 
-The LLM stage still runs and can catch things the regexes missed.
+All regex patterns are RE2-safe (linear time, no ReDoS). Entity type keys (upper-cased) become the
+placeholder prefixes (IBAN_3, SSN_US_2, CRYPTO_ETH_1 ...). The LLM stage still runs afterwards and
+adds semantic detections the regex stage could not catch. See `conf.py` (the giant docstring on
+`DEFAULT_REGEX_PATTERNS`) and `regex_ner.py` for the full catalogue and country partitioning rules.
+
+The default collection already covers the mandatory countries (USA, Canada, UK, Spain, Italy,
+France, India, China) plus 25+ more via dedicated national/tax/driver/VAT/business patterns plus
+universals that apply everywhere (credit cards, IBANs used across Europe, crypto, VIN, MAC, etc.).
 
 ---
 

@@ -78,18 +78,36 @@ print("Stats file:", stats_file_path)
 
 ### Configuration
 
-You can import default configurations and available models from the `conf` module.
+You can import default configurations, profiles, and available models from the `conf` module.
 
 ```python
 from pdf_anonymizer_core.conf import (
     DEFAULT_MODEL_NAME,
     ModelName,
     PromptEnum,
+    ConfigProfile,
+    get_config_for_profile,
+    DEFAULT_REGEX_PATTERNS,
 )
 
 print(f"Default model: {DEFAULT_MODEL_NAME}")
 print(f"Available Google models: {[m.value for m in ModelName if m.provider == 'google']}")
+print("Regex first-stage covers:", sorted(DEFAULT_REGEX_PATTERNS.keys())[:10], "...")
+
+# Recommended way to obtain bundled settings (used by the CLI's --config-profile / -p)
+cfg = get_config_for_profile(ConfigProfile.BEST_SPEED)
+print(cfg.model_name, cfg.chunk_size)
 ```
+
+The CLI exposes `--config-profile` (short: `-p`) with the values `best-quality`, `best-speed` (default), and `best-cost`.  
+These profiles control model, prompt, chunk size, overlap, retries, etc. You can override individual values when calling `get_config_for_profile(...)` or when using the CLI.
+
+The first-stage regex (hybrid NER) is now powered by the RE2 engine (`google-re2` package).  
+`DEFAULT_REGEX_PATTERNS` contains 70+ patterns partitioned by country (ISO-2 suffixes) covering
+emails, phones, URLs, credit cards, crypto, IBAN/BIC, VIN, MAC, IPv4/6, dates plus national IDs,
+tax IDs, driver licences, VAT/business numbers, passports, medical licenses etc. for 30+ countries
+(mandatory: US, CA, GB, ES, IT, FR, IN, CN + many others). See `conf.py` and `regex_ner.py`
+module docs for the complete list and how to supply a country-filtered or custom subset.
 
 ---
 

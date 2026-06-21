@@ -32,7 +32,7 @@ def run_demo():
         return
 
     # Mock the LLM provider to return the name "Alice Smith"
-    # The Regex NER stage will automatically detect email, phone, IP, and SSN
+    # The Regex NER stage (RE2) will automatically detect email, phone, IP, SSN, IBAN, credit cards, crypto, VIN, MAC, many national IDs etc. (30+ countries)
     mock_provider = Mock()
     mock_provider.call.return_value = json.dumps(
         {
@@ -42,7 +42,7 @@ def run_demo():
         }
     )
 
-    print("Step 1: Running Hybrid NER on the PDF (Regex + LLM)...")
+    print("Step 1: Running Hybrid NER on the PDF (RE2 regex + LLM)...")
     with patch("pdf_anonymizer_core.call_llm.get_provider", return_value=mock_provider):
         anonymized_text, mapping = anonymize_file(
             file_path=pdf_path,
@@ -79,7 +79,7 @@ def run_demo():
     print("-" * 50)
     lines = anonymized_text.splitlines()
     for line in lines[:10]:
-        if any(p in line for p in ["PERSON", "EMAIL", "PHONE", "IP_ADDRESS", "SSN"]):
+        if any(p in line for p in ["PERSON", "EMAIL", "PHONE", "IP_ADDRESS", "SSN", "IBAN", "CREDIT_CARD", "CRYPTO"]):
             print(f"\033[93m{line}\033[0m")  # highlight changes in yellow
         else:
             print(line)

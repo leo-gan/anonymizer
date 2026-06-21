@@ -131,7 +131,7 @@ print("\n--- Restored Text Output (first 500 chars) ---")
 print(restored_text[:500] + "\n...")
 ```
 
-You can also pass a custom list for `anonymized_entities` or supply your own `regex_patterns` dict for the first-stage NER.
+You can also pass a custom list for `anonymized_entities` or supply your own `regex_patterns` dict for the first-stage NER (now RE2-powered with 70+ patterns for 30+ countries; see Recipes for examples and `conf.DEFAULT_REGEX_PATTERNS`).
 
 ### Advanced: Caching and Full Control
 
