@@ -10,6 +10,7 @@ dependencies = [
     "python-dotenv",
     "pymupdf4llm",
     "langchain-text-splitters",
+    "google-re2",
 ]
 
 [project.optional-dependencies]

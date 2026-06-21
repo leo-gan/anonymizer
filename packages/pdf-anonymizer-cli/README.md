@@ -55,6 +55,7 @@ The `run` command anonymizes one or more files.
 
 ```bash
 pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
+  [-p | --config-profile {best-quality|best-speed|best-cost}] \
   [--characters-to-anonymize INTEGER] \
   [--prompt-name {simple|detailed}] \
   [--model-name TEXT] \
@@ -65,9 +66,10 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `FILE_PATH`: Path to one or several PDF, Markdown, or text files for anonymization.
 
 **Options**:
-- `--characters-to-anonymize INTEGER`: Number of characters to process in each chunk (default: `100000`).
-- `--prompt-name [simple|detailed]`: The prompt template to use (default: `detailed`).
-- `--model-name TEXT`: The language model to use.
+- `-p, --config-profile {best-quality|best-speed|best-cost}`: The configuration profile to use. Profiles bundle sensible defaults for model, prompt, chunk size, overlap, and retries (default: `best-speed`). Individual flags (`--model-name`, `--prompt-name`, `--characters-to-anonymize`) act as overrides on top of the chosen profile.
+- `--characters-to-anonymize INTEGER`: Number of characters to process in each chunk (default: `100000`; overrides profile).
+- `--prompt-name [simple|detailed]`: The prompt template to use (default: `detailed`; overrides profile).
+- `--model-name TEXT`: The language model to use (overrides profile).
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 
 **Models**:
@@ -83,9 +85,19 @@ For example: `--model-name "google/gemini-flash-latest"`.
 
 ### Examples
 
-**Basic anonymization with the default model (Google)**:
+**Basic anonymization (uses the default `best-speed` profile)**:
 ```bash
 pdf-anonymizer run document.pdf
+```
+
+**High-quality run on an important document**:
+```bash
+pdf-anonymizer run contract.pdf -p best-quality
+```
+
+**Fast & cheap batch processing with a local model (override profile defaults)**:
+```bash
+pdf-anonymizer run notes/*.md -p best-cost --model-name "ollama/phi4-mini"
 ```
 
 **A new model (Google) and a simple prompt**:

@@ -20,7 +20,7 @@ def main():
         "Email: alice.smith@example.com",
         "Phone: +1-555-0199",
         "Server IP: 10.0.0.1",
-        "SSN: 123-45-6789",
+        "SSN: 123-45-6789",  # matched by SSN / SSN_US (US)
     ]
 
     for idx, line in enumerate(pii_lines):

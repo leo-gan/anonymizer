@@ -14,7 +14,7 @@ class TestLargePdfAnonymizer(unittest.TestCase):
         """
         Tests that a simulated 10 GB PDF runs instantly and consumes 0 tokens
         by fully mocking the PDF conversion and the LLM API calls.
-        It also tests the hybrid NER (Regex first, then LLM).
+        It also tests the hybrid NER (RE2 regex first, then LLM).
         """
         # Mock file size to be 10 GB
         mock_getsize.return_value = 10 * 1024 * 1024 * 1024  # 10 GB
@@ -68,7 +68,7 @@ class TestLargePdfAnonymizer(unittest.TestCase):
         # 4. Verify hybrid NER placeholders are correct
         # LLM entity placeholder
         self.assertIn("PERSON_1", anonymized_text)
-        # Regex entity placeholders (EMAIL, PHONE, IP_ADDRESS)
+        # Regex entity placeholders (EMAIL, PHONE, IP_ADDRESS etc. - still present after RE2 expansion)
         self.assertIn("EMAIL_1", anonymized_text)
         self.assertIn("PHONE_1", anonymized_text)
         self.assertIn("IP_ADDRESS_1", anonymized_text)

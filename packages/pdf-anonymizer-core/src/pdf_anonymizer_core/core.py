@@ -4,6 +4,13 @@ This module provides the primary high-level entry point for anonymizing
 documents (PDF, Markdown, or plain text) using a hybrid Regex + LLM approach
 with support for large files via chunking, entity consolidation, and reversible
 placeholder mapping.
+
+The first stage (regex) now uses the RE2 engine (google-re2) and ships with
+a large library of patterns covering emails, phones, URLs, credit cards,
+cryptocurrency addresses, IBANs/BICs, VINs, MACs, IPs, dates, plus
+country-specific government IDs, tax IDs, driver licences, national IDs,
+VAT/business numbers etc. for 30+ jurisdictions (see conf.DEFAULT_REGEX_PATTERNS
+and regex_ner docs for the full partitioned list).
 """
 
 import logging
@@ -52,8 +59,14 @@ def anonymize_file(
         anonymized_entities: Optional whitelist of entity *types* (e.g. ["PERSON", "ORGANIZATION"]).
             When provided, only matching entities are replaced.
         chunk_overlap: Number of characters of overlap between consecutive chunks.
-        regex_patterns: Custom first-stage regex map. Defaults to built-in patterns
-            for EMAIL, PHONE, SSN, CREDIT_CARD, IP_ADDRESS.
+        regex_patterns: Custom first-stage regex map. Defaults to the large built-in
+            collection in DEFAULT_REGEX_PATTERNS (see conf.py). The collection covers
+            universal PII (email, URLs, credit cards, crypto wallets, IBANs, VIN, MAC,
+            IPv4/IPv6, dates) plus country-partitioned national IDs, tax IDs, driver
+            licenses, VAT/business numbers, passports etc. for 30+ countries
+            (mandatory: US, CA, GB, ES, IT, FR, IN, CN plus DE, JP, BR, AU, NL, ...).
+            Keys become entity TYPEs (IPV4_ADDRESS, SSN_US, IBAN, CRYPTO_ETH, ...).
+            All patterns are RE2 (google-re2) safe.
         max_retries: Maximum LLM call attempts per chunk (with exponential backoff).
         base_retry_delay: Base delay in seconds for retry backoff.
         max_retry_delay: Maximum delay cap for retry backoff.
@@ -117,17 +130,55 @@ def anonymize_file(
         collected_entities.extend(regex_entities)
         collected_entities.extend(llm_entities)
 
-    # Deduplicate entities by text, prioritizing more specific types if matched multiple times
+    # Deduplicate entities by text, prioritizing more specific types if matched multiple times.
+    # Higher numbers win. Financial, government ID, crypto, and network identifiers
+    # receive elevated priority because they are high-risk and unambiguous.
     type_priority = {
-        "EMAIL": 10,
-        "CREDIT_CARD": 9,
-        "IP_ADDRESS": 8,
-        "SSN": 7,
-        "PHONE": 6,
-        "PERSON": 5,
-        "ORGANIZATION": 4,
-        "LOCATION": 3,
-        "ADDRESS": 2,
+        # Highest sensitivity / unambiguous structured PII (regex-first wins)
+        "CREDIT_CARD": 15,
+        "IBAN": 14,
+        "CRYPTO_BTC": 13,
+        "CRYPTO_ETH": 13,
+        "EMAIL": 12,
+        "SSN": 11,
+        "SSN_US": 11,
+        "SIN_CA": 11,
+        "NINO_GB": 11,
+        "INSEE_FR": 11,
+        "AADHAAR_IN": 11,
+        "RESIDENT_ID_CN": 11,
+        "EIN_US": 10,
+        "VAT_GB": 10,
+        "VAT_FR": 10,
+        "VAT_ES": 10,
+        "VAT_IT": 10,
+        "VAT_DE": 10,
+        "PAN_IN": 10,
+        "GSTIN_IN": 10,
+        "UNIFIED_SOCIAL_CREDIT_CODE_CN": 10,
+        "IPV4_ADDRESS": 9,
+        "IP_ADDRESS": 9,  # legacy
+        "IPV6_ADDRESS": 9,
+        "MAC_ADDRESS": 8,
+        "VIN": 8,
+        "MEDICAL_NPI_US": 8,
+        "PASSPORT": 7,
+        "US_PASSPORT": 7,
+        "GB_PASSPORT": 7,
+        "DRIVERS_LICENSE_US": 6,
+        "DRIVERS_LICENSE_GB": 6,
+        "DRIVERS_LICENSE_FR": 6,
+        "DRIVERS_LICENSE_CA": 6,
+        "DATE_ISO": 5,
+        "CURRENCY_AMOUNT": 5,
+        "BIC_SWIFT": 5,
+        "PHONE": 4,
+        "URL": 4,
+        # LLM-detected semantic types (lower than strong regex matches)
+        "PERSON": 3,
+        "ORGANIZATION": 2,
+        "LOCATION": 1,
+        "ADDRESS": 1,
     }
 
     best_entities: Dict[str, dict] = {}
