@@ -73,6 +73,7 @@ from pdf_anonymizer_core.utils import deanonymize_file
 deanonymized_file_path, stats_file_path = deanonymize_file(
     "path/to/anonymized.md",
     "path/to/mapping.json",
+    # mapping_passphrase="secret",  # required for *.mapping.json.enc
 )
 
 print("Deanonymized file:", deanonymized_file_path)

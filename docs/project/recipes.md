@@ -83,7 +83,25 @@ The classic reversible workflow: protect the original data, let an untrusted sys
 
 You can repeat step 4 any time you receive new output from the external system as long as you still have the original mapping file.
 
-**Tip**: The mapping file is the "key". Treat it like a password or cryptographic material.
+**Tip**: The mapping file is the "key". Anyone who has it can put the real names back. Treat it like a password.
+
+### Lock the mapping file
+
+By default the mapping is plain JSON. That is easy to use and easy to leak. You can lock it with a passphrase. The tool writes `*.mapping.json.enc` (AES-256-GCM) instead of `*.mapping.json`.
+
+```bash
+pdf-anonymizer run sensitive-report.pdf --mapping-passphrase 'a long secret'
+# or set ANONYMIZER_MAPPING_KEY in the environment
+
+pdf-anonymizer deanonymize \
+  data/anonymized/sensitive-report.anonymized.md \
+  data/mappings/sensitive-report.mapping.json.enc \
+  --mapping-passphrase 'a long secret'
+```
+
+Without a passphrase, behavior is unchanged: plaintext `*.mapping.json`. An encrypted file cannot be opened without the passphrase. The masked document is still not enough to recover the names.
+
+Do not put the passphrase in the document, the mapping, or the log.
 
 ---
 

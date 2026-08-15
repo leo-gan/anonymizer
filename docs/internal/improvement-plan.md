@@ -10,7 +10,7 @@
 - [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
 - [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
-- [ ] 5. Encrypted mapping file
+- [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
 - [ ] 6. Generalization and per-entity operators
 - [ ] 7. Quasi-identifier / linkage risk report
 - [ ] 8. HIPAA Safe Harbor entity profile
@@ -45,7 +45,7 @@ Known code facts to attach to:
 - `conf.py`: regexes are still structural. After a match, `validators.py` runs a cheap check (Luhn, IBAN, VIN, a few national IDs). Failures stay hidden as `TYPE_LIKE` (`IBAN_LIKE_1`).
 - `core.py`: replacement is whole-document string match, not character spans.
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
-- Recipes already call the mapping file “the key”; it is not encrypted.
+- Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM).
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
 
 ---
@@ -138,6 +138,8 @@ Known code facts to attach to:
 ---
 
 ### 5. Encrypted mapping file
+
+**Status:** done (2026-08-15) — [PR #44](https://github.com/leo-gan/anonymizer/pull/44) (`feat/encrypted-mapping`)
 
 **Technique:** cryptographic methods + GDPR “secure the key”.  
 **Why:** with the map, output is pseudonymized personal data (WP29 / EDPB). A leaked `*.mapping.json` is a full deanonymization.

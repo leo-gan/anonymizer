@@ -79,6 +79,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--countries TEXT`: ISO-2 country codes for national-ID regexes, comma-separated (e.g. `US,GB`). Universal patterns (email, IBAN, cards, …) always stay. Default: all countries.
 - `--verify / --no-verify`: After masking, scan for leftovers (default: on). Writes `data/stats/<stem>.residual_pii.json`. Does not rewrite the file.
 - `--verify-llm`: Also ask the language model to hunt for leftovers.
+- `--mapping-passphrase TEXT`: Lock the mapping as `*.mapping.json.enc`. Also `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON.
 
 `pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 
