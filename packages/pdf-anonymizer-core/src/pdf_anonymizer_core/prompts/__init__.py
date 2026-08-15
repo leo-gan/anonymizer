@@ -1,16 +1,18 @@
 """Prompt templates for the LLM anonymization stage.
 
-Exposes two ready-to-use templates:
+Exposes ready-to-use templates:
 
 - `detailed` : richer instructions, base_form support, more entity types,
   including INDIRECT (phrases that identify a person without naming them).
 - `simple`   : minimal, faster, lower token usage.
+- `hipaa`    : coverage aid for HIPAA Safe Harbor identifier classes.
+  Not a compliance certification.
 
 Example:
     from pdf_anonymizer_core.prompts import detailed
     prompt = detailed.prompt_template
 """
 
-from . import detailed, simple
+from . import detailed, hipaa, simple
 
-__all__ = ["detailed", "simple"]
+__all__ = ["detailed", "hipaa", "simple"]

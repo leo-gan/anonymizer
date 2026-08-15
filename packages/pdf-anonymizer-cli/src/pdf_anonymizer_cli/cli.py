@@ -9,15 +9,18 @@ from dotenv import load_dotenv
 from pdf_anonymizer_core.conf import (
     DEFAULT_LOG_FILE,
     ConfigProfile,
+    EntityProfile,
     PromptEnum,
     get_config_for_profile,
     get_provider_and_model_name,
+    operators_for_entity_profile,
+    types_for_entity_profile,
 )
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.operators import parse_operator_specs
-from pdf_anonymizer_core.prompts import detailed, simple
+from pdf_anonymizer_core.prompts import detailed, hipaa, simple
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
@@ -159,6 +162,17 @@ def run(
             ),
         ),
     ] = True,
+    entity_profile: Annotated[
+        Optional[EntityProfile],
+        typer.Option(
+            "--entity-profile",
+            help=(
+                "Named type coverage bundle. hipaa-safe-harbor is an aid for "
+                "the 18 Safe Harbor identifier classes, not a compliance certificate."
+            ),
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -225,8 +239,29 @@ def run(
     entities_to_anonymize = None
     if anonymized_entities:
         with open(anonymized_entities, "r") as f:
-            entities_to_anonymize = [line.strip() for line in f.readlines()]
+            entities_to_anonymize = [line.strip() for line in f.readlines() if line.strip()]
         logging.info(f"  --anonymized-entities: {entities_to_anonymize}")
+
+    if entity_profile is not None:
+        profile_types = types_for_entity_profile(entity_profile) or []
+        profile_ops = operators_for_entity_profile(entity_profile)
+        operator_map = {**profile_ops, **operator_map}
+        if entities_to_anonymize:
+            entities_to_anonymize = list(
+                dict.fromkeys([*profile_types, *entities_to_anonymize])
+            )
+        else:
+            entities_to_anonymize = profile_types
+        if (
+            entity_profile == EntityProfile.HIPAA_SAFE_HARBOR
+            and prompt_name is None
+        ):
+            prompt_template = hipaa.prompt_template
+        logging.info(
+            "  --entity-profile: %s (aid, not a compliance certificate)",
+            entity_profile.value,
+        )
+        logging.info("  --operator after profile: %s", operator_map)
 
     logging.info(f"Found {len(file_paths)} file(s) to process.")
 

@@ -11,7 +11,7 @@ This module defines:
 """
 
 from enum import Enum
-from typing import Any, Dict, Iterable, Optional, Type, TypeVar
+from typing import Any, Dict, Iterable, List, Optional, Type, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -322,6 +322,68 @@ class ConfigProfile(str, Enum):
     BEST_QUALITY = "best-quality"
     BEST_SPEED = "best-speed"
     BEST_COST = "best-cost"
+
+
+class EntityProfile(str, Enum):
+    """Named type + operator bundles. Separate from quality/speed ConfigProfile."""
+
+    HIPAA_SAFE_HARBOR = "hipaa-safe-harbor"
+
+
+# Types and prefixes this profile tries to hide. Prefixes match
+# DRIVERS_LICENSE_US, DATE_ISO, etc. This is an aid, not a compliance certificate.
+HIPAA_SAFE_HARBOR_TYPES: List[str] = [
+    "PERSON",
+    "ADDRESS",
+    "LOCATION",
+    "DATE",
+    "DATE_ISO",
+    "AGE",
+    "PHONE",
+    "FAX",
+    "EMAIL",
+    "SSN",
+    "MEDICAL_RECORD",
+    "MEDICAL_NPI_US",
+    "MEDICAL_LICENSE",
+    "HEALTH_PLAN_ID",
+    "ACCOUNT",
+    "ID",
+    "DRIVERS_LICENSE",
+    "PASSPORT",
+    "VIN",
+    "MAC_ADDRESS",
+    "URL",
+    "IPV4_ADDRESS",
+    "IPV6_ADDRESS",
+    "IP_ADDRESS",
+    "DEVICE_ID",
+    "BIOMETRIC",
+    "PHOTO",
+    "ORGANIZATION",
+    "INDIRECT",
+    "CREDIT_CARD",
+    "IBAN",
+]
+
+HIPAA_SAFE_HARBOR_OPERATORS: Dict[str, str] = {
+    "DATE": "generalize",
+    "DATE_ISO": "generalize",
+    "ADDRESS": "generalize",
+    "AGE": "generalize",
+}
+
+
+def types_for_entity_profile(profile: Optional[EntityProfile]) -> Optional[List[str]]:
+    if profile == EntityProfile.HIPAA_SAFE_HARBOR:
+        return list(HIPAA_SAFE_HARBOR_TYPES)
+    return None
+
+
+def operators_for_entity_profile(profile: Optional[EntityProfile]) -> Dict[str, str]:
+    if profile == EntityProfile.HIPAA_SAFE_HARBOR:
+        return dict(HIPAA_SAFE_HARBOR_OPERATORS)
+    return {}
 
 
 # Centralized profiles dictionary
