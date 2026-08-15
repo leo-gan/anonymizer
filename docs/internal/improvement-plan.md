@@ -10,7 +10,7 @@
 - [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
 - [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
-- [x] 5. Encrypted mapping file — done 2026-08-15, `feat/encrypted-mapping`
+- [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
 - [ ] 6. Generalization and per-entity operators
 - [ ] 7. Quasi-identifier / linkage risk report
 - [ ] 8. HIPAA Safe Harbor entity profile
@@ -139,7 +139,7 @@ Known code facts to attach to:
 
 ### 5. Encrypted mapping file
 
-**Status:** done (2026-08-15) — `feat/encrypted-mapping` (PR link after open)
+**Status:** done (2026-08-15) — [PR #44](https://github.com/leo-gan/anonymizer/pull/44) (`feat/encrypted-mapping`)
 
 **Technique:** cryptographic methods + GDPR “secure the key”.  
 **Why:** with the map, output is pseudonymized personal data (WP29 / EDPB). A leaked `*.mapping.json` is a full deanonymization.
