@@ -21,6 +21,7 @@ from pdf_anonymizer_core.utils import (
     deanonymize_file,
     save_results,
 )
+from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
 from typing_extensions import Annotated
 
 # Setup logging using log file configured in conf.py
@@ -106,6 +107,24 @@ def run(
             ),
         ),
     ] = None,
+    verify: Annotated[
+        bool,
+        typer.Option(
+            "--verify/--no-verify",
+            help=(
+                "After masking, scan the result for leftover personal details "
+                "(cheap regex). Writes data/stats/<stem>.residual_pii.json. "
+                "Does not rewrite the file."
+            ),
+        ),
+    ] = True,
+    verify_llm: Annotated[
+        bool,
+        typer.Option(
+            "--verify-llm/--no-verify-llm",
+            help="Also ask the language model to hunt for leftovers (slower).",
+        ),
+    ] = False,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -202,6 +221,24 @@ def run(
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
             logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
 
+            if verify or verify_llm:
+                report = verify_anonymized_text(
+                    full_anonymized_text,
+                    anonymized_file=anonymized_output_file,
+                    regex_patterns=config.regex_patterns,
+                    use_llm=verify_llm,
+                    model_name=config.model_name if verify_llm else None,
+                    max_retries=config.max_retries,
+                    base_retry_delay=config.base_retry_delay,
+                    max_retry_delay=config.max_retry_delay,
+                )
+                report_path = write_residual_report(report, anonymized_output_file)
+                logging.info(
+                    "Residual check: %s leftover hit(s). Report: %s",
+                    report["residual_count"],
+                    report_path,
+                )
+
 
 @app.command()
 def deanonymize(
@@ -240,6 +277,85 @@ def deanonymize(
     logging.info("Deanonymization complete!")
     logging.info(f"Deanonymized text saved into '{deanonymized_output_file}'")
     logging.info(f"Deanonymization statistics saved into '{stats_file}'")
+
+
+@app.command()
+def verify(
+    anonymized_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to an already anonymized file.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+    countries: Annotated[
+        Optional[str],
+        typer.Option(
+            "--countries",
+            help="ISO-2 country codes for the regex scan, comma-separated (e.g. US,GB).",
+        ),
+    ] = None,
+    verify_llm: Annotated[
+        bool,
+        typer.Option(
+            "--verify-llm/--no-verify-llm",
+            help="Also ask the language model to hunt for leftovers.",
+        ),
+    ] = False,
+    config_profile: Annotated[
+        ConfigProfile,
+        typer.Option(
+            "--config-profile",
+            "-p",
+            help="Profile used only when --verify-llm is set.",
+            case_sensitive=False,
+        ),
+    ] = ConfigProfile.BEST_SPEED,
+    model_name: Annotated[
+        Optional[str],
+        typer.Option(help="Override model when --verify-llm is set."),
+    ] = None,
+) -> None:
+    """Scan an anonymized file for leftover personal details. Does not rewrite it."""
+    load_environment()
+    country_list = None
+    if countries:
+        country_list = [part.strip() for part in countries.split(",") if part.strip()]
+
+    try:
+        config = get_config_for_profile(
+            profile=config_profile,
+            model_name=model_name,
+            countries=country_list,
+        )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
+
+    text = anonymized_file.read_text(encoding="utf-8")
+    report = verify_anonymized_text(
+        text,
+        anonymized_file=str(anonymized_file),
+        regex_patterns=config.regex_patterns,
+        use_llm=verify_llm,
+        model_name=config.model_name if verify_llm else None,
+        max_retries=config.max_retries,
+        base_retry_delay=config.base_retry_delay,
+        max_retry_delay=config.max_retry_delay,
+    )
+    report_path = write_residual_report(report, str(anonymized_file))
+    logging.info(
+        "Residual check: %s leftover hit(s). Report: %s",
+        report["residual_count"],
+        report_path,
+    )
+    if report["residual_count"]:
+        for hit in report["regex_hits"] + report["llm_hits"]:
+            logging.info("  leftover %s: %s", hit["type"], hit["text"])
 
 
 if __name__ == "__main__":

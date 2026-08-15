@@ -58,6 +58,11 @@ graph TD
     *   **Text/Fallback**: Uses `langchain_text_splitters.RecursiveCharacterTextSplitter`.
 *   This keeps individual requests within LLM token constraints and limits memory footprints.
 
+### Residual check (after replacement)
+*   The CLI re-runs the cheap regex pass on the masked text (unless `--no-verify`).
+*   Stand-in labels (`PERSON_1`, `IBAN_LIKE_1`) are ignored. Leftover emails or numbers are written to `data/stats/<stem>.residual_pii.json`.
+*   The file is not rewritten. `--verify-llm` adds an optional second read by the language model. `pdf-anonymizer verify` runs the same scan later.
+
 ### Regex first pass (with checksums)
 *   Each chunk is scanned with the RE2 pattern library (emails, cards, IBANs, national IDs, and so on).
 *   A hit that has a cheap extra digit check (card Luhn, IBAN mod-97, VIN check digit, a few national IDs) is relabeled ``TYPE_LIKE`` if that check fails (for example ``IBAN_LIKE``). The text is still replaced. A verified hit keeps the real type and wins if both labels appear for the same span. Listing ``IBAN`` in ``--anonymized-entities`` also includes ``IBAN_LIKE``.

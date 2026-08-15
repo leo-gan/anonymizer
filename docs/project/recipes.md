@@ -330,6 +330,34 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
 ---
 
+## Check the masked file for leftovers
+
+Hiding names is a first pass. A leftover email or a mistyped IBAN can still sit in the masked page.
+
+After `run`, the tool scans the result with the same cheap number/email search. It **does not rewrite** the file. It writes a report:
+
+`data/stats/<stem>.residual_pii.json`
+
+Stand-in labels such as `PERSON_1` or `IBAN_LIKE_1` are ignored. Real leftovers are listed.
+
+```bash
+# Default: regex scan after every run
+pdf-anonymizer run notes.pdf
+
+# Skip the scan
+pdf-anonymizer run notes.pdf --no-verify
+
+# Also ask the language model (slower)
+pdf-anonymizer run notes.pdf --verify-llm
+
+# Scan a file you already have
+pdf-anonymizer verify data/anonymized/notes.anonymized.md
+```
+
+This is a helper, not a lock. Read the report (and the page) before you share.
+
+---
+
 ## Limit national-ID regexes to some countries
 
 The first, fast search knows ID shapes for 30+ countries. On a US contract that is extra noise: a Polish PESEL or an Indian Aadhaar pattern can fire on a random digit string.
