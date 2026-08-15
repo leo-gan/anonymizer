@@ -11,7 +11,7 @@ This module defines:
 """
 
 from enum import Enum
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Iterable, Optional, Type, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -44,9 +44,8 @@ DEFAULT_LOG_FILE: str = "app.log"
 #   hidden. The LLM stage still follows for context-dependent or missed PII.
 # - Entity type keys use UPPER_SNAKE_CASE. Country-specific patterns are partitioned
 #   using ISO 3166-1 alpha-2 suffixes (e.g. SSN_US, NINO_GB, INSEE_FR, AADHAAR_IN,
-#   RESIDENT_ID_CN). This makes it trivial for callers to select a country subset:
-#       {k: v for k, v in DEFAULT_REGEX_PATTERNS.items()
-#        if not k.endswith(("_US", "_CA", ...)) or k.endswith("_US")}
+#   RESIDENT_ID_CN). Call filter_regex_patterns(countries=["US", "GB"]) to keep
+#   those national IDs plus every universal key (EMAIL, IBAN, CREDIT_CARD, ...).
 # - Universal patterns (EMAIL, CREDIT_CARD, IBAN, VIN, IPV4_ADDRESS, etc.) apply
 #   globally and are always included.
 # - All patterns are RE2-compatible (no look-around assertions, no Python-specific
@@ -219,6 +218,104 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "SSN": r"\b\d{3}-\d{2}-\d{4}\b",  # maps to US SSN
 }
 
+# ISO-2 suffixes used on country-specific keys (SSN_US, NINO_GB, PESEL_PL, ...).
+COUNTRY_PATTERN_SUFFIXES: frozenset[str] = frozenset(
+    {
+        "US",
+        "CA",
+        "GB",
+        "FR",
+        "ES",
+        "IT",
+        "IN",
+        "CN",
+        "DE",
+        "JP",
+        "KR",
+        "AU",
+        "NZ",
+        "BR",
+        "MX",
+        "AR",
+        "ZA",
+        "SG",
+        "HK",
+        "TW",
+        "NL",
+        "BE",
+        "CH",
+        "AT",
+        "SE",
+        "NO",
+        "DK",
+        "FI",
+        "PL",
+        "IE",
+        "PT",
+        "GR",
+        "IL",
+        "TR",
+        "RU",
+        "TH",
+        "MY",
+        "ID",
+    }
+)
+
+# Keys with no suffix that still belong to one country.
+_PATTERN_COUNTRY_ALIASES: Dict[str, str] = {
+    "SSN": "US",
+}
+
+
+def pattern_country(key: str) -> Optional[str]:
+    """Return the ISO-2 country for a pattern key, or None if it is universal."""
+    upper = key.upper()
+    if upper in _PATTERN_COUNTRY_ALIASES:
+        return _PATTERN_COUNTRY_ALIASES[upper]
+    suffix = upper.rsplit("_", 1)[-1]
+    if suffix in COUNTRY_PATTERN_SUFFIXES:
+        return suffix
+    return None
+
+
+def filter_regex_patterns(
+    countries: Optional[Iterable[str]] = None,
+    patterns: Optional[Dict[str, str]] = None,
+) -> Dict[str, str]:
+    """Keep universal patterns plus national-ID patterns for ``countries``.
+
+    Universal keys (EMAIL, IBAN, CREDIT_CARD, VIN, ...) always stay.
+    Country keys (SSN_US, NINO_GB, PESEL_PL, legacy SSN, ...) stay only when
+    their ISO-2 code is in ``countries``.
+
+    ``countries`` is a list of ISO-2 codes such as ``["US", "GB"]``.
+    ``None`` or an empty list returns a copy of all ``patterns``.
+    Unknown codes raise ``ValueError``.
+    """
+    source = DEFAULT_REGEX_PATTERNS if patterns is None else patterns
+    if not countries:
+        return dict(source)
+
+    wanted = {code.strip().upper() for code in countries if code and str(code).strip()}
+    if not wanted:
+        return dict(source)
+
+    unknown = sorted(wanted - COUNTRY_PATTERN_SUFFIXES)
+    if unknown:
+        raise ValueError(
+            "Unknown country code(s): "
+            + ", ".join(unknown)
+            + ". Use ISO-2 codes such as US, GB, FR."
+        )
+
+    filtered: Dict[str, str] = {}
+    for key, pattern in source.items():
+        country = pattern_country(key)
+        if country is None or country in wanted:
+            filtered[key] = pattern
+    return filtered
+
 
 # Config Profiles
 class ConfigProfile(str, Enum):
@@ -286,6 +383,7 @@ def get_config_for_profile(
     prompt_name: Optional[str] = None,
     chunk_size: Optional[int] = None,
     chunk_overlap: Optional[int] = None,
+    countries: Optional[Iterable[str]] = None,
 ) -> AppConfig:
     """Return an AppConfig populated from one of the built-in profiles.
 
@@ -302,6 +400,8 @@ def get_config_for_profile(
         prompt_name: Optional override ("simple" or "detailed").
         chunk_size: Optional override for characters_to_anonymize / chunk_size.
         chunk_overlap: Optional override for chunk overlap.
+        countries: Optional ISO-2 codes that limit national-ID regexes
+            (universal patterns always stay).
 
     Returns:
         A fully populated AppConfig instance ready to drive anonymize_file
@@ -325,6 +425,7 @@ def get_config_for_profile(
         max_retries=profile_defaults["max_retries"],
         base_retry_delay=profile_defaults["base_retry_delay"],
         max_retry_delay=profile_defaults["max_retry_delay"],
+        regex_patterns=filter_regex_patterns(countries),
     )
 
 

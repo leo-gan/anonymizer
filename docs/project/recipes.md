@@ -330,6 +330,36 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
 ---
 
+## Limit national-ID regexes to some countries
+
+The first, fast search knows ID shapes for 30+ countries. On a US contract that is extra noise: a Polish PESEL or an Indian Aadhaar pattern can fire on a random digit string.
+
+`--countries` keeps **every universal pattern** (email, phone, URL, card, IBAN, IP, MAC, crypto, VIN, dates, amounts) and only the national IDs for the codes you list.
+
+```bash
+pdf-anonymizer run contract.pdf --countries US,GB
+```
+
+That still finds emails and IBANs. It still finds a US SSN and a UK National Insurance number. It does **not** run the Polish, Indian, or Chinese national-ID patterns.
+
+Use ISO-2 codes (`US`, `GB`, `FR`, …), comma-separated, any case. Unknown codes stop the run with an error.
+
+**SDK**
+
+```python
+from pdf_anonymizer_core.conf import filter_regex_patterns, get_config_for_profile, ConfigProfile
+
+# Same filter the CLI uses
+only_us_gb = filter_regex_patterns(["US", "GB"])
+
+cfg = get_config_for_profile(ConfigProfile.BEST_SPEED, countries=["US", "GB"])
+# cfg.regex_patterns is already filtered
+```
+
+This is a regex-stage setting only. The language model still reads the whole page and can name an ID from another country if the text is clear.
+
+---
+
 ## Advanced: Custom First-Stage Regex (SDK only)
 
 The hybrid approach runs a fast deterministic RE2 (google-re2) regex pass before every LLM call.
@@ -337,7 +367,7 @@ You can supply your own set (or a filtered slice of the built-in collection):
 
 ```python
 from pdf_anonymizer_core.core import anonymize_file
-from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile, DEFAULT_REGEX_PATTERNS
+from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
 from pdf_anonymizer_core.prompts import detailed
 
 # Option A: completely custom
@@ -347,16 +377,10 @@ custom_regex = {
     # ...
 }
 
-# Option B: use the built-in library (RE2-powered, 30+ countries)
-# It includes: EMAIL, URL, CREDIT_CARD, IBAN, CRYPTO_*, VIN, MAC, IPV4/6,
-# DATE_ISO, CURRENCY_AMOUNT, BIC_SWIFT + country partitioned IDs:
-# SSN_US / SIN_CA / NINO_GB / INSEE_FR / DNI_ES / CODICE_FISCALE_IT / AADHAAR_IN / RESIDENT_ID_CN / ...
-# VAT_*/EIN_*/business numbers, DRIVERS_LICENSE_*, PASSPORT_*, MEDICAL_* etc.
-country_focused = {
-    k: v for k, v in DEFAULT_REGEX_PATTERNS.items()
-    if k in ("EMAIL", "CREDIT_CARD", "IBAN", "SSN_US", "SIN_CA", "NINO_GB", "INSEE_FR",
-             "RESIDENT_ID_CN", "PAN_IN", "VAT_FR", "VAT_DE", "DRIVERS_LICENSE_US")
-}
+# Option B: built-in library, limited to some countries (plus all universal keys)
+from pdf_anonymizer_core.conf import filter_regex_patterns
+
+country_focused = filter_regex_patterns(["US", "CA", "GB", "FR", "IN", "CN", "DE"])
 
 cfg = get_config_for_profile(ConfigProfile.BEST_SPEED)
 

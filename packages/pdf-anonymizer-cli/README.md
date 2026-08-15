@@ -61,7 +61,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
   [--characters-to-anonymize INTEGER] \
   [--prompt-name {simple|detailed}] \
   [--model-name TEXT] \
-  [--anonymized-entities PATH]
+  [--anonymized-entities PATH] \
+  [--countries US,GB]
 ```
 
 **Arguments**:
@@ -73,6 +74,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--prompt-name [simple|detailed]`: The prompt template to use (default: `detailed`; overrides profile).
 - `--model-name TEXT`: The language model to use (overrides profile).
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
+- `--countries TEXT`: ISO-2 country codes for national-ID regexes, comma-separated (e.g. `US,GB`). Universal patterns (email, IBAN, cards, …) always stay. Default: all countries.
 
 **Models**:
 You can use any of the predefined models below, or specify a new model using the format `"provider/model-name"`. 

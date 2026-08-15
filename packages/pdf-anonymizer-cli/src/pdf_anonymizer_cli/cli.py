@@ -95,19 +95,39 @@ def run(
             resolve_path=True,
         ),
     ] = None,
+    countries: Annotated[
+        Optional[str],
+        typer.Option(
+            "--countries",
+            help=(
+                "ISO-2 country codes for national-ID regexes, comma-separated "
+                "(e.g. US,GB). Universal patterns such as email and IBAN always "
+                "stay. Default: all countries."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
     """
     load_environment()
 
+    country_list = None
+    if countries:
+        country_list = [part.strip() for part in countries.split(",") if part.strip()]
+
     # Get configuration based on profile and optional user overrides
-    config = get_config_for_profile(
-        profile=config_profile,
-        model_name=model_name,
-        prompt_name=prompt_name,
-        chunk_size=characters_to_anonymize,
-    )
+    try:
+        config = get_config_for_profile(
+            profile=config_profile,
+            model_name=model_name,
+            prompt_name=prompt_name,
+            chunk_size=characters_to_anonymize,
+            countries=country_list,
+        )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
 
     # Configure LLM caching with values from configuration
     configure_cache(
@@ -129,6 +149,9 @@ def run(
     logging.info(f"  --chunk-size: {config.chunk_size}")
     logging.info(f"  --chunk-overlap: {config.chunk_overlap}")
     logging.info(f"  --model-name: {config.model_name}")
+    if country_list:
+        logging.info(f"  --countries: {country_list}")
+        logging.info(f"  --regex-patterns: {len(config.regex_patterns)} after country filter")
 
     # Select the appropriate prompt template
     prompt_templates: Dict[str, str] = {
