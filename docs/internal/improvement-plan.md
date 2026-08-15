@@ -22,7 +22,7 @@
 - [ ] 14. OCR for scanned PDFs
 - [ ] 15. In-place PDF redaction
 - [ ] 16. Regex-only / offline mode
-- [ ] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe)
+- [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
 
 ---
 
@@ -370,7 +370,7 @@ Known code facts to attach to:
 
 ### 17. Secure mapping encryption workflow
 
-**Status:** in progress (2026-08-15) — `feat/secure-encryption-workflow` (hardens item 5)
+**Status:** done (2026-08-15) — [PR #54](https://github.com/leo-gan/anonymizer/pull/54) (`feat/secure-encryption-workflow`, hardens item 5)
 
 **Technique:** cryptographic methods + "secure the key", with a real threat model for local files.
 
