@@ -118,7 +118,7 @@ See `conf.py`, `regex_ner.py`, and `validators.py`.
 
 `EntityProfile.HIPAA_SAFE_HARBOR` is a coverage aid for Safe Harbor identifier classes (year-only dates, ZIP3, age 90+). It is **not** a compliance certificate.
 
-Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`) go in `operators={"CREDIT_CARD": "mask"}` on `anonymize_file`.
+Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`) go in `operators={"PERSON": "fake"}` on `anonymize_file`. Pass `fake_secret=` so the same person always gets the same fake.
 
 To score identity-clue clumps in masked text (report only):
 

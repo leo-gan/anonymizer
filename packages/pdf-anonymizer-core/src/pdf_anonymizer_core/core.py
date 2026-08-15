@@ -39,6 +39,7 @@ def anonymize_file(
     base_retry_delay: float = 1.0,
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
+    fake_secret: Optional[str] = None,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -76,6 +77,8 @@ def anonymize_file(
         operators: Optional map of entity type → operator (replace, mask, hash,
             generalize, shift). Types not listed keep ``replace``. ``CREDIT_CARD_LIKE``
             follows ``CREDIT_CARD``.
+        fake_secret: Optional seed material for the ``fake`` operator. Same
+            person + type + secret always yields the same fake.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -288,6 +291,7 @@ def anonymize_file(
                 placeholder,
                 operator_for_type(entity_type, operators),
                 text_to_base.get(original, original),
+                fake_secret or "",
             )
         final_mapping = transformed
 

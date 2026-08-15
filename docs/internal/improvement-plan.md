@@ -14,6 +14,14 @@
 - [x] 6. Generalization and per-entity operators — done 2026-08-15, [PR #45](https://github.com/leo-gan/anonymizer/pull/45)
 - [x] 7. Quasi-identifier / linkage risk report — done 2026-08-15, [PR #46](https://github.com/leo-gan/anonymizer/pull/46)
 - [x] 8. HIPAA Safe Harbor entity profile — done 2026-08-15, [PR #47](https://github.com/leo-gan/anonymizer/pull/47)
+- [x] 9. Format-preserving synthetic replacements — done 2026-08-15, `feat/fake-operator`
+- [ ] 10. Cross-document consistent placeholders
+- [ ] 11. Allowlist / denylist gazetteers
+- [ ] 12. Span-based replacement
+- [ ] 13. TAB-style eval harness
+- [ ] 14. OCR for scanned PDFs
+- [ ] 15. In-place PDF redaction
+- [ ] 16. Regex-only / offline mode
 
 ---
 
@@ -221,20 +229,131 @@ Known code facts to attach to:
 
 ---
 
-## Suggested later (still independent)
+### 9. Format-preserving synthetic replacements
 
-Do not start these until 1–8 are done or explicitly re-prioritized.
+**Status:** done (2026-08-15) — `feat/fake-operator` (PR link after open)
 
-| Item | Notes |
-|---|---|
-| Format-preserving synthetic replacements | Seeded Faker keyed by `hash(secret, base_form, type)`. Cleaner as an operator on (6). |
-| Cross-document consistent placeholders | `--mapping-in existing.mapping.json` so `John Doe` is `PERSON_1` across a batch. |
-| Allowlist / denylist gazetteers | `--keep-list` / `--deny-list`. “Apple” the fruit vs “Apple Inc.” |
-| Span-based replacement | Carry `start`/`end`; replace intervals, longest-first. Makes (6) more correct. |
-| TAB-style eval harness | Mention-level and entity-level recall; split direct vs quasi identifiers. Tests/scripts only. |
-| OCR for scanned PDFs | Coverage gap; different stack. |
-| In-place PDF redaction | Different product surface (pixels / content streams), not Markdown export. |
-| Regex-only / offline mode | No LLM; useful for air-gapped structured PII. |
+**Technique:** synthetic data at *value* level, not whole-document GANs.  
+**Why:** Downstream readers (and LLMs) reason better over `Jane Alvarez` than `PERSON_1`. Raw values stay in the local mapping.
+
+**Do**
+
+- Add operator `fake`.
+- Seed with `hash(secret, base_form, type)` so the same person always gets the same fake.
+- Optional `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. Default secret is a built-in constant (stable, not private).
+- Keep mapping original → fake so deanonymize still works.
+
+**Touches:** `operators.py`, `core.py`, CLI, recipes.  
+**Prerequisite:** none (builds on (6)).
+
+---
+
+### 10. Cross-document consistent placeholders
+
+**Technique:** pseudonymization for longitudinal studies.  
+**Why:** Batch mode treats each file alone. `John Doe` is `PERSON_1` in file A and `PERSON_7` in file B.
+
+**Do**
+
+- `--mapping-in existing.mapping.json` seeds placeholder counts and `base_entity_placeholders`.
+- Write an updated combined map.
+- Works with encrypted maps when a passphrase is set.
+
+**Touches:** `anonymize_file`, CLI.  
+**Prerequisite:** none.
+
+---
+
+### 11. Allowlist / denylist gazetteers
+
+**Technique:** foundational NER (deny-lists / keep-lists).  
+**Why:** “Apple” the fruit vs “Apple Inc.”; your own org name should stay visible.
+
+**Do**
+
+- `--keep-list` / `--deny-list` files (one phrase per line).
+- Keep-list skips replacement. Deny-list forces an entity even if regex/LLM missed it.
+
+**Touches:** merge step in `core.py`, CLI.  
+**Prerequisite:** none.
+
+---
+
+### 12. Span-based replacement
+
+**Technique:** engineering. Makes operators and generalization more correct.  
+**Why:** Global string replace can change `May` inside the wrong word. Regex `finditer` offsets are thrown away today.
+
+**Do**
+
+- Carry `start`/`end` (per chunk, mapped back to `full_text`).
+- Replace intervals, longest-first, no overlap.
+
+**Touches:** `regex_ner.py`, `core.py`, optional LLM offsets.  
+**Prerequisite:** none. Do not block other items on this.
+
+---
+
+### 13. TAB-style eval harness
+
+**Technique:** the open question in history.md: how do you measure leftover risk and utility?  
+**Why:** Unit tests cover regex and mapping, not privacy metrics. No recall split for direct vs quasi identifiers.
+
+**Do**
+
+- `tests/eval/` or `scripts/eval_tab.py` on a small fixture (or TAB if licensed).
+- Report mention-level and entity-level recall; split EMAIL/SSN vs LOCATION/DATE.
+- Tests/scripts only. No product behavior change.
+
+**Touches:** tests/scripts.  
+**Prerequisite:** none.
+
+---
+
+### 14. OCR for scanned PDFs
+
+**Technique:** coverage.  
+**Why:** Image-only PDFs yield empty text today (`pymupdf4llm` has nothing to read).
+
+**Do**
+
+- Optional OCR extra (e.g. Tesseract / ocrmypdf) behind a flag or extra.
+- Document that this is a new dependency and a quality/speed trade.
+
+**Touches:** `load_and_extract.py`, extras, recipes.  
+**Prerequisite:** none.
+
+---
+
+### 15. In-place PDF redaction
+
+**Technique:** different product surface.  
+**Why:** Today we export Markdown. Some users need black boxes on the original PDF (pixels / content streams).
+
+**Do**
+
+- Research PyMuPDF redaction annotations vs content-stream rewrite.
+- Keep Markdown export as default. In-place is opt-in.
+- Mapping must still round-trip if we claim reversibility.
+
+**Touches:** new output path, CLI `--output-pdf`.  
+**Prerequisite:** none. Large; design before coding if needed.
+
+---
+
+### 16. Regex-only / offline mode
+
+**Technique:** data removal without a language model.  
+**Why:** Air-gapped machines, cost, or structured logs where regex is enough.
+
+**Do**
+
+- `--no-llm` / profile that skips `identify_entities_with_llm`.
+- Still run checksums, country filter, operators, verify, risk.
+- Document that names and identity clues will be missed.
+
+**Touches:** `core.py`, CLI, recipes.  
+**Prerequisite:** none.
 
 ---
 
@@ -254,10 +373,9 @@ Do not start these until 1–8 are done or explicitly re-prioritized.
 
 Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 
-- (6) synthetic `fake` (later) is cleaner as an operator.
-- (8) is just config + prompt if (6) exists; without (6) it can still force type coverage.
-- (7) is more useful after (1).
-- Span-based replacement (later) makes (6) more correct; do not block (6) on it.
+- (9) `fake` is an operator on (6).
+- (12) makes (6) and (9) more correct; do not block them on it.
+- (10) is cleaner after (5) if the seed map is encrypted.
 
 ---
 

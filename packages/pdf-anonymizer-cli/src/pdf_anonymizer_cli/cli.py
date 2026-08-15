@@ -147,7 +147,7 @@ def run(
         typer.Option(
             "--operator",
             help=(
-                "How to write one type: TYPE=replace|mask|hash|generalize|shift. "
+                "How to write one type: TYPE=replace|mask|hash|generalize|shift|fake. "
                 "Repeatable. Default for every type is replace (PERSON_1)."
             ),
         ),
@@ -162,6 +162,16 @@ def run(
             ),
         ),
     ] = True,
+    fake_secret: Annotated[
+        Optional[str],
+        typer.Option(
+            "--fake-secret",
+            help=(
+                "Seed for --operator TYPE=fake. Also ANONYMIZER_FAKE_SECRET. "
+                "Same person always gets the same fake. Default is a built-in constant."
+            ),
+        ),
+    ] = None,
     entity_profile: Annotated[
         Optional[EntityProfile],
         typer.Option(
@@ -280,6 +290,7 @@ def run(
             base_retry_delay=config.base_retry_delay,
             max_retry_delay=config.max_retry_delay,
             operators=operator_map or None,
+            fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
         )
 
         if full_anonymized_text and final_mapping:
