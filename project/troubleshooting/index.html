@@ -1209,6 +1209,7 @@
 <li>Use <code>--anonymized-entities</code> only if you intentionally want to restrict the types.</li>
 <li>Check <code>app.log</code> — it shows how many entities were found by Regex vs LLM per chunk.</li>
 <li>A number that <em>looks</em> like a card, IBAN, VIN, or national ID but fails the extra check-digit is still hidden, as <code>IBAN_LIKE_1</code> / <code>CREDIT_CARD_LIKE_1</code> and so on. That is expected for typos and example numbers such as <code>1234-5678-9012-3456</code>.</li>
+<li>After a run, check <code>data/stats/&lt;stem&gt;.residual_pii.json</code> (or <code>pdf-anonymizer verify …</code>). Leftover emails or numbers listed there were not hidden.</li>
 <li>Very short documents or unusual formatting can reduce recall.</li>
 </ul>
 <h2 id="llm-returns-invalid-json-parsing-failures">LLM Returns Invalid JSON / Parsing Failures<a class="headerlink" href="#llm-returns-invalid-json-parsing-failures" title="Permanent link">&para;</a></h2>

@@ -927,6 +927,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#residual-check-after-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Residual check (after replacement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#regex-first-pass-with-checksums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1135,6 +1146,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#residual-check-after-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Residual check (after replacement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#regex-first-pass-with-checksums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1325,6 +1347,12 @@
 </ul>
 </li>
 <li>This keeps individual requests within LLM token constraints and limits memory footprints.</li>
+</ul>
+<h3 id="residual-check-after-replacement">Residual check (after replacement)<a class="headerlink" href="#residual-check-after-replacement" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The CLI re-runs the cheap regex pass on the masked text (unless <code>--no-verify</code>).</li>
+<li>Stand-in labels (<code>PERSON_1</code>, <code>IBAN_LIKE_1</code>) are ignored. Leftover emails or numbers are written to <code>data/stats/&lt;stem&gt;.residual_pii.json</code>.</li>
+<li>The file is not rewritten. <code>--verify-llm</code> adds an optional second read by the language model. <code>pdf-anonymizer verify</code> runs the same scan later.</li>
 </ul>
 <h3 id="regex-first-pass-with-checksums">Regex first pass (with checksums)<a class="headerlink" href="#regex-first-pass-with-checksums" title="Permanent link">&para;</a></h3>
 <ul>
