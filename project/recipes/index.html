@@ -966,6 +966,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choose-how-a-type-is-written-mask-year-hash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose how a type is written (mask, year, hash)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#check-the-masked-file-for-leftovers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1250,6 +1261,17 @@
     <span class="md-ellipsis">
       
         Processing Very Large Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choose-how-a-type-is-written-mask-year-hash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose how a type is written (mask, year, hash)
       
     </span>
   </a>
@@ -1599,72 +1621,119 @@
 <li>If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors.</li>
 </ul>
 <hr />
+<h2 id="choose-how-a-type-is-written-mask-year-hash">Choose how a type is written (mask, year, hash)<a class="headerlink" href="#choose-how-a-type-is-written-mask-year-hash" title="Permanent link">&para;</a></h2>
+<p>By default every find becomes a stand-in such as <code>PERSON_1</code> or <code>CREDIT_CARD_2</code>. That is best for sending the page to another AI and putting names back later.</p>
+<p>Sometimes you want a different mark:</p>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>What the reader sees</th>
+<th>Good for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>replace</code></td>
+<td><code>PERSON_1</code> (default)</td>
+<td>Reversible stand-ins</td>
+</tr>
+<tr>
+<td><code>mask</code></td>
+<td><code>****-****-****-1111</code></td>
+<td>Cards, SSNs, phones (keep a little shape)</td>
+</tr>
+<tr>
+<td><code>generalize</code></td>
+<td><code>2019</code>, <code>021**</code>, <code>40-49</code></td>
+<td>Dates, ZIP codes, ages</td>
+</tr>
+<tr>
+<td><code>hash</code></td>
+<td><code>H_</code> plus a short fingerprint</td>
+<td>Same value always looks the same, but not readable</td>
+</tr>
+<tr>
+<td><code>shift</code></td>
+<td>A nearby date</td>
+<td>Dates that must stay dates, not just a year</td>
+</tr>
+</tbody>
+</table>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>invoice.pdf<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">CREDIT_CARD</span><span class="o">=</span>mask<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE</span><span class="o">=</span>generalize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE_ISO</span><span class="o">=</span>generalize
+</span></code></pre></div>
+<p>Types you do not list stay as stand-ins. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>.</p>
+<p>The mapping file still records how to put the original back when the written form is unique. Two dates that both become <code>2019</code> cannot both be restored uniquely.</p>
+<hr />
 <h2 id="check-the-masked-file-for-leftovers">Check the masked file for leftovers<a class="headerlink" href="#check-the-masked-file-for-leftovers" title="Permanent link">&para;</a></h2>
 <p>Hiding names is a first pass. A leftover email or a mistyped IBAN can still sit in the masked page.</p>
 <p>After <code>run</code>, the tool scans the result with the same cheap number/email search. It <strong>does not rewrite</strong> the file. It writes a report:</p>
 <p><code>data/stats/&lt;stem&gt;.residual_pii.json</code></p>
 <p>Stand-in labels such as <code>PERSON_1</code> or <code>IBAN_LIKE_1</code> are ignored. Real leftovers are listed.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Default: regex scan after every run</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Skip the scan</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--no-verify
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># Also ask the language model (slower)</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--verify-llm
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># Scan a file you already have</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Default: regex scan after every run</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Skip the scan</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--no-verify
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># Also ask the language model (slower)</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--verify-llm
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c1"># Scan a file you already have</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md
 </span></code></pre></div>
 <p>This is a helper, not a lock. Read the report (and the page) before you share.</p>
 <hr />
 <h2 id="limit-national-id-regexes-to-some-countries">Limit national-ID regexes to some countries<a class="headerlink" href="#limit-national-id-regexes-to-some-countries" title="Permanent link">&para;</a></h2>
 <p>The first, fast search knows ID shapes for 30+ countries. On a US contract that is extra noise: a Polish PESEL or an Indian Aadhaar pattern can fire on a random digit string.</p>
 <p><code>--countries</code> keeps <strong>every universal pattern</strong> (email, phone, URL, card, IBAN, IP, MAC, crypto, VIN, dates, amounts) and only the national IDs for the codes you list.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>--countries<span class="w"> </span>US,GB
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>--countries<span class="w"> </span>US,GB
 </span></code></pre></div>
 <p>That still finds emails and IBANs. It still finds a US SSN and a UK National Insurance number. It does <strong>not</strong> run the Polish, Indian, or Chinese national-ID patterns.</p>
 <p>Use ISO-2 codes (<code>US</code>, <code>GB</code>, <code>FR</code>, …), comma-separated, any case. Unknown codes stop the run with an error.</p>
 <p><strong>SDK</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span><span class="p">,</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="c1"># Same filter the CLI uses</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">only_us_gb</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># cfg.regex_patterns is already filtered</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span><span class="p">,</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># Same filter the CLI uses</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">only_us_gb</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># cfg.regex_patterns is already filtered</span>
 </span></code></pre></div>
 <p>This is a regex-stage setting only. The language model still reads the whole page and can name an ID from another country if the text is clear.</p>
 <hr />
 <h2 id="advanced-custom-first-stage-regex-sdk-only">Advanced: Custom First-Stage Regex (SDK only)<a class="headerlink" href="#advanced-custom-first-stage-regex-sdk-only" title="Permanent link">&para;</a></h2>
 <p>The hybrid approach runs a fast deterministic RE2 (google-re2) regex pass before every LLM call.
 You can supply your own set (or a filtered slice of the built-in collection):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Option A: completely custom</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="c1"># ...</span>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="p">}</span>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>
-</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="c1"># Option B: built-in library, limited to some countries (plus all universal keys)</span>
-</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span>
-</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>
-</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;FR&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;CN&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">])</span>
-</span><span id="__span-18-16"><a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>
-</span><span id="__span-18-17"><a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-18-18"><a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>
-</span><span id="__span-18-19"><a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
-</span><span id="__span-18-20"><a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
-</span><span id="__span-18-21"><a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
-</span><span id="__span-18-22"><a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
-</span><span id="__span-18-23"><a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-</span><span id="__span-18-24"><a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
-</span><span id="__span-18-25"><a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>    <span class="c1"># ... other config fields</span>
-</span><span id="__span-18-26"><a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># Option A: completely custom</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="c1"># ...</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">}</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="c1"># Option B: built-in library, limited to some countries (plus all universal keys)</span>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span>
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>
+</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;FR&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;CN&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">])</span>
+</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-19-18"><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a>
+</span><span id="__span-19-19"><a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
+</span><span id="__span-19-20"><a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
+</span><span id="__span-19-21"><a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+</span><span id="__span-19-22"><a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
+</span><span id="__span-19-23"><a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-19-24"><a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
+</span><span id="__span-19-25"><a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a>    <span class="c1"># ... other config fields</span>
+</span><span id="__span-19-26"><a id="__codelineno-19-26" name="__codelineno-19-26" href="#__codelineno-19-26"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>All regex patterns are RE2-safe (linear time, no ReDoS). Entity type keys (upper-cased) become the
 placeholder prefixes (IBAN_3, SSN_US_2, CRYPTO_ETH_1 ...). The LLM stage still runs afterwards and
