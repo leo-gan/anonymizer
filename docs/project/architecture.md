@@ -58,6 +58,10 @@ graph TD
     *   **Text/Fallback**: Uses `langchain_text_splitters.RecursiveCharacterTextSplitter`.
 *   This keeps individual requests within LLM token constraints and limits memory footprints.
 
+### Linkage-risk report
+*   After masking, the CLI scores clumps of stand-in types in the same passage (job + company + place).
+*   Result is `data/stats/<stem>.risk.json` (`high` / `medium` / `low`). The file is not rewritten. `pdf-anonymizer report` runs the same score later.
+
 ### Residual check (after replacement)
 *   The CLI re-runs the cheap regex pass on the masked text (unless `--no-verify`).
 *   Stand-in labels (`PERSON_1`, `IBAN_LIKE_1`) are ignored. Leftover emails or numbers are written to `data/stats/<stem>.residual_pii.json`.

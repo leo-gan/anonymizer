@@ -23,6 +23,7 @@ from pdf_anonymizer_core.utils import (
     deanonymize_file,
     save_results,
 )
+from pdf_anonymizer_core.risk import assess_linkage_risk, write_risk_report
 from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
 from typing_extensions import Annotated
 
@@ -148,6 +149,16 @@ def run(
             ),
         ),
     ] = None,
+    risk: Annotated[
+        bool,
+        typer.Option(
+            "--risk/--no-risk",
+            help=(
+                "After masking, score identity-clue clumps (job+company+place). "
+                "Writes data/stats/<stem>.risk.json. Does not change the file."
+            ),
+        ),
+    ] = True,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -275,6 +286,17 @@ def run(
                     "Residual check: %s leftover hit(s). Report: %s",
                     report["residual_count"],
                     report_path,
+                )
+
+            if risk:
+                risk_report = assess_linkage_risk(full_anonymized_text)
+                risk_path = write_risk_report(risk_report, anonymized_output_file)
+                logging.info(
+                    "Linkage risk: %s (%s high / %s medium windows). Report: %s",
+                    risk_report["overall"],
+                    risk_report["high_count"],
+                    risk_report["medium_count"],
+                    risk_path,
                 )
 
 
@@ -410,6 +432,41 @@ def verify(
     if report["residual_count"]:
         for hit in report["regex_hits"] + report["llm_hits"]:
             logging.info("  leftover %s: %s", hit["type"], hit["text"])
+
+
+@app.command("report")
+def report_risk(
+    anonymized_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to an already anonymized file.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+) -> None:
+    """Score identity-clue clumps in a masked file. Does not change the file."""
+    text = anonymized_file.read_text(encoding="utf-8")
+    risk_report = assess_linkage_risk(text)
+    risk_path = write_risk_report(risk_report, str(anonymized_file))
+    logging.info(
+        "Linkage risk: %s (%s high / %s medium windows). Report: %s",
+        risk_report["overall"],
+        risk_report["high_count"],
+        risk_report["medium_count"],
+        risk_path,
+    )
+    for window in risk_report["windows"]:
+        if window["level"] in {"high", "medium"}:
+            logging.info(
+                "  %s: %s — %s",
+                window["level"],
+                ", ".join(window["types"]),
+                window["reason"],
+            )
 
 
 if __name__ == "__main__":

@@ -118,6 +118,15 @@ See `conf.py`, `regex_ner.py`, and `validators.py`.
 
 Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`) go in `operators={"CREDIT_CARD": "mask"}` on `anonymize_file`.
 
+To score identity-clue clumps in masked text (report only):
+
+```python
+from pdf_anonymizer_core.risk import assess_linkage_risk, write_risk_report
+
+report = assess_linkage_risk(anonymized_text)
+write_risk_report(report, "data/anonymized/note.anonymized.md")
+```
+
 To scan a masked string for leftovers (report only, no rewrite):
 
 ```python

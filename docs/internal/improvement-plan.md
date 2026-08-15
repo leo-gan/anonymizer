@@ -12,7 +12,7 @@
 - [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
 - [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
 - [x] 6. Generalization and per-entity operators — done 2026-08-15, [PR #45](https://github.com/leo-gan/anonymizer/pull/45)
-- [ ] 7. Quasi-identifier / linkage risk report
+- [x] 7. Quasi-identifier / linkage risk report — done 2026-08-15, [PR #46](https://github.com/leo-gan/anonymizer/pull/46)
 - [ ] 8. HIPAA Safe Harbor entity profile
 
 ---
@@ -38,7 +38,7 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 | *k*-anonymity / ℓ-diversity / *t*-closeness | Not implemented (tabular models; do not rewrite PDFs with them) |
 | Synthetic data | Not implemented |
 | Cryptographic methods | Mapping stored as plaintext |
-| Re-ID / attack simulation | Residual regex scan after `run` / `verify` (`data/stats/<stem>.residual_pii.json`); deanonymize stats still `unused` / `not_found` |
+| Re-ID / attack simulation | Residual regex scan + linkage-risk report (`*.residual_pii.json`, `*.risk.json`) |
 
 Known code facts to attach to:
 
@@ -182,6 +182,8 @@ Known code facts to attach to:
 ---
 
 ### 7. Quasi-identifier / linkage risk report
+
+**Status:** done (2026-08-15) — [PR #46](https://github.com/leo-gan/anonymizer/pull/46) (`feat/linkage-risk-report`)
 
 **Technique:** *k*-anonymity as a **diagnostic**, not a PDF rewriter. Sweeney, Dalenius, Netflix.
 

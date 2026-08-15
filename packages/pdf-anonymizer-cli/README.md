@@ -81,6 +81,9 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--verify-llm`: Also ask the language model to hunt for leftovers.
 - `--mapping-passphrase TEXT`: Lock the mapping as `*.mapping.json.enc`. Also `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON.
 - `--operator TYPE=op`: How to write a type (`replace`, `mask`, `hash`, `generalize`, `shift`). Repeatable. Default is `replace`.
+- `--risk / --no-risk`: After masking, score identity-clue clumps (default: on). Writes `data/stats/<stem>.risk.json`.
+
+`pdf-anonymizer report FILE` runs the same linkage-risk score on an already-masked file.
 
 `pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 

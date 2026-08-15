@@ -30,6 +30,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 | `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`. |
+| `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
 
 ### Configuration Profiles
 
@@ -95,6 +96,18 @@ To use any model not listed in the aliases, pass the string as `provider/model-n
 ```bash
 pdf-anonymizer run doc.pdf --model-name "google/gemini-2.0-flash-exp"
 ```
+
+---
+
+## The `report` Command (linkage risk)
+
+Score identity-clue clumps in an already-masked file. Does not change the file.
+
+```bash
+pdf-anonymizer report data/anonymized/notes.anonymized.md
+```
+
+The report is `data/stats/<stem>.risk.json`. `run` already writes this unless you pass `--no-risk`.
 
 ---
 
