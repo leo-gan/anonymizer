@@ -9,7 +9,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from pdf_anonymizer_core.conf import (
     DEFAULT_ANONYMIZED_DIR,
@@ -28,6 +28,63 @@ _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 def looks_like_placeholder(text: str) -> bool:
     """True if ``text`` is a stand-in label such as PERSON_1 or IBAN_LIKE_2."""
     return bool(text and _PLACEHOLDER_PATTERN.match(text.strip()))
+
+
+_PLACEHOLDER_PARSE = re.compile(r"^([A-Z][A-Z0-9_]*)_([0-9]+)(?:\.v_([0-9]+))?$")
+
+
+def mapping_to_original_to_written(raw: Dict[str, str]) -> Dict[str, str]:
+    """Accept either placeholder→original or original→placeholder."""
+    keys_ph = sum(1 for key in raw if isinstance(key, str) and looks_like_placeholder(key))
+    vals_ph = sum(
+        1 for val in raw.values() if isinstance(val, str) and looks_like_placeholder(val)
+    )
+    if keys_ph >= vals_ph:
+        out: Dict[str, str] = {}
+        for placeholder, original in raw.items():
+            if isinstance(original, str) and isinstance(placeholder, str):
+                out.setdefault(original, placeholder)
+        return out
+    return {str(k): str(v) for k, v in raw.items()}
+
+
+def load_seed_mapping(
+    mapping_path: str, mapping_passphrase: Optional[str] = None
+) -> Dict[str, str]:
+    """Load a mapping file as original → written form (placeholder or fake)."""
+    with open(mapping_path, "r", encoding="utf-8") as handle:
+        raw = json.load(handle)
+    loaded = load_mapping_payload(raw, mapping_passphrase)
+    return mapping_to_original_to_written(loaded)
+
+
+def seed_placeholder_state(
+    orig_to_written: Dict[str, str],
+) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, int], Dict[str, int]]:
+    """Turn an existing original→written map into placeholder assignment state."""
+    mapping = dict(orig_to_written)
+    base_placeholders: Dict[str, str] = {}
+    counts: Dict[str, int] = {}
+    variation_counts: Dict[str, int] = {}
+    for original, written in mapping.items():
+        if not isinstance(written, str):
+            continue
+        parsed = _PLACEHOLDER_PARSE.match(written)
+        if not parsed:
+            base_placeholders[original] = written
+            continue
+        type_name, number, variation = (
+            parsed.group(1),
+            int(parsed.group(2)),
+            parsed.group(3),
+        )
+        counts[type_name] = max(counts.get(type_name, 0), number)
+        main = f"{type_name}_{number}"
+        if variation is None:
+            base_placeholders[original] = main
+        else:
+            variation_counts[main] = max(variation_counts.get(main, 0), int(variation))
+    return mapping, base_placeholders, counts, variation_counts
 
 
 def consolidate_mapping(

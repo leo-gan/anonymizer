@@ -15,7 +15,7 @@
 - [x] 7. Quasi-identifier / linkage risk report — done 2026-08-15, [PR #46](https://github.com/leo-gan/anonymizer/pull/46)
 - [x] 8. HIPAA Safe Harbor entity profile — done 2026-08-15, [PR #47](https://github.com/leo-gan/anonymizer/pull/47)
 - [x] 9. Format-preserving synthetic replacements — done 2026-08-15, [PR #48](https://github.com/leo-gan/anonymizer/pull/48)
-- [ ] 10. Cross-document consistent placeholders
+- [x] 10. Cross-document consistent placeholders — done 2026-08-15, [PR #49](https://github.com/leo-gan/anonymizer/pull/49)
 - [ ] 11. Allowlist / denylist gazetteers
 - [ ] 12. Span-based replacement
 - [ ] 13. TAB-style eval harness
@@ -249,6 +249,8 @@ Known code facts to attach to:
 ---
 
 ### 10. Cross-document consistent placeholders
+
+**Status:** done (2026-08-15) — [PR #49](https://github.com/leo-gan/anonymizer/pull/49) (`feat/cross-document-placeholders`)
 
 **Technique:** pseudonymization for longitudinal studies.  
 **Why:** Batch mode treats each file alone. `John Doe` is `PERSON_1` in file A and `PERSON_7` in file B.
