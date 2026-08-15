@@ -25,6 +25,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--prompt-name` | `simple` \| `detailed` | `detailed` | Instruction style sent to the language model (overrides profile). `detailed` also hides identity clues. `simple` does not. |
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
 | `--anonymized-entities` | `PATH` | *None* | Path to a text file containing custom entities to search for and anonymize. |
+| `--countries` | `TEXT` | *all* | ISO-2 codes for national-ID regexes, comma-separated (`US,GB`). Email, IBAN, cards, and other universal patterns always stay. |
 
 ### Configuration Profiles
 
@@ -44,6 +45,9 @@ pdf-anonymizer run contract.pdf -p best-quality
 
 # Fast + cheap batch of notes with a local model
 pdf-anonymizer run notes/*.md -p best-cost --model-name "ollama/phi4-mini"
+
+# Only US and UK national-ID patterns (email, IBAN, cards still run)
+pdf-anonymizer run contract.pdf --countries US,GB
 ```
 
 See the [Recipes & Common Workflows](recipes.md) page for more profile usage patterns.

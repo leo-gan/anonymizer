@@ -115,6 +115,15 @@ VIN check digit, and a few national IDs). Failures are kept and labeled `TYPE_LI
 check are unchanged. Listing `IBAN` in a type filter also includes `IBAN_LIKE`.
 See `conf.py`, `regex_ner.py`, and `validators.py`.
 
+To keep only some countries' national-ID regexes (plus every universal pattern):
+
+```python
+from pdf_anonymizer_core.conf import filter_regex_patterns, get_config_for_profile, ConfigProfile
+
+only_us_gb = filter_regex_patterns(["US", "GB"])
+cfg = get_config_for_profile(ConfigProfile.BEST_SPEED, countries=["US", "GB"])
+```
+
 ---
 
 ## See Also

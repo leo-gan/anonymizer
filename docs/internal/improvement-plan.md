@@ -8,7 +8,7 @@
 
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
 - [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
-- [ ] 3. Country filter for regex patterns
+- [x] 3. Country filter for regex patterns — done 2026-08-14, `feat/regex-country-filter`
 - [ ] 4. Residual-PII verification pass
 - [ ] 5. Encrypted mapping file
 - [ ] 6. Generalization and per-entity operators
@@ -46,6 +46,7 @@ Known code facts to attach to:
 - `core.py`: replacement is whole-document string match, not character spans.
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Recipes already call the mapping file “the key”; it is not encrypted.
+- National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
 
 ---
 
@@ -99,6 +100,8 @@ Known code facts to attach to:
 ---
 
 ### 3. Country filter for regex patterns
+
+**Status:** done (2026-08-14) — `feat/regex-country-filter` (PR link after open)
 
 **Technique:** data removal, less noise. Already designed in `conf.py` comments, not exposed.
 
