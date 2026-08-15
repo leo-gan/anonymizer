@@ -861,6 +861,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#wrong-looking-numbers-are-not-treated-as-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrong-looking numbers are not treated as found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#anonymize-only-specific-entity-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1102,6 +1113,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#wrong-looking-numbers-are-not-treated-as-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrong-looking numbers are not treated as found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#anonymize-only-specific-entity-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1314,6 +1336,19 @@
 - Monitor <code>app.log</code> (written to the current working directory)
 - Run inside a script that collects exit codes</p>
 <hr />
+<h2 id="wrong-looking-numbers-are-not-treated-as-found">Wrong-looking numbers are not treated as found<a class="headerlink" href="#wrong-looking-numbers-are-not-treated-as-found" title="Permanent link">&para;</a></h2>
+<p>A string of digits can <em>look</em> like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.</p>
+<p><strong>Think of it like this.</strong> Shops do not only check that a card has 16 digits. They also run a tiny extra sum (often called a Luhn check) to see if the number was mistyped. Bank accounts (IBAN), vehicle numbers (VIN), and some national IDs have the same kind of extra digit.</p>
+<p>The first, fast search still looks only at <em>shape</em>. Right after a hit, the tool runs that extra sum when one exists.</p>
+<ul>
+<li>If the sum <strong>passes</strong>, the stand-in keeps the real name: <code>IBAN_1</code>, <code>CREDIT_CARD_2</code>.</li>
+<li>If the sum <strong>fails</strong>, the number is <strong>still hidden</strong>. The stand-in says so: <code>IBAN_LIKE_1</code>, <code>CREDIT_CARD_LIKE_1</code>. A mistyped IBAN does not stay on the page.</li>
+</ul>
+<p>What gets this extra check today: credit cards, IBANs, vehicle identification numbers, US medical NPI, Canadian SIN, Spanish DNI/NIE, Chinese resident ID, Indian Aadhaar, Brazilian CPF, Italian tax code, and Polish PESEL.</p>
+<p>What does <strong>not</strong>: emails, phones, names, and any type with no well-known extra digit. Those stay “shape only” and never get a <code>_LIKE</code> label.</p>
+<p>You do not turn this on or off. It always runs on the regex stage. The search patterns themselves did not change.</p>
+<p>If you pass a type list (<code>--anonymized-entities</code>) with <code>IBAN</code>, mistyped IBANs (<code>IBAN_LIKE</code>) are included. You do not have to list both.</p>
+<hr />
 <h2 id="anonymize-only-specific-entity-types">Anonymize Only Specific Entity Types<a class="headerlink" href="#anonymize-only-specific-entity-types" title="Permanent link">&para;</a></h2>
 <p>Use a text file containing the entity types you care about (one per line, uppercase).</p>
 <p>Example filter file (<code>only-people-orgs.txt</code>):</p>
@@ -1323,7 +1358,7 @@
 <p>Run:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>document.pdf<span class="w"> </span>--anonymized-entities<span class="w"> </span>only-people-orgs.txt
 </span></code></pre></div>
-<p>Only entities whose <code>type</code> matches one of the listed values (after the hybrid Regex + LLM stage) will be replaced. Everything else stays in clear text.</p>
+<p>Only entities whose <code>type</code> matches one of the listed values (after the hybrid Regex + LLM stage) will be replaced. Everything else stays in clear text. Listing <code>IBAN</code> also hides <code>IBAN_LIKE</code> (mistyped IBANs). You do not list the <code>_LIKE</code> name yourself unless you want only the look-alikes.</p>
 <p>This is useful when you want to protect names and companies but leave dates, addresses, or other categories untouched.</p>
 <p>If you also want to hide identity clues (phrases that point to one person without naming them), include <code>INDIRECT</code> on its own line. Those clues are only found when you use the <strong>detailed</strong> instructions (<code>-p best-quality</code> or <code>--prompt-name detailed</code>).</p>
 <p>See the example file at <code>packages/pdf-anonymizer-cli/entities.example.txt</code>.</p>

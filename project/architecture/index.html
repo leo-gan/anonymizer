@@ -927,6 +927,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#regex-first-pass-with-checksums" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regex first pass (with checksums)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#llm-entity-identification" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1124,6 +1135,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#regex-first-pass-with-checksums" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regex first pass (with checksums)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#llm-entity-identification" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1303,6 +1325,11 @@
 </ul>
 </li>
 <li>This keeps individual requests within LLM token constraints and limits memory footprints.</li>
+</ul>
+<h3 id="regex-first-pass-with-checksums">Regex first pass (with checksums)<a class="headerlink" href="#regex-first-pass-with-checksums" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Each chunk is scanned with the RE2 pattern library (emails, cards, IBANs, national IDs, and so on).</li>
+<li>A hit that has a cheap extra digit check (card Luhn, IBAN mod-97, VIN check digit, a few national IDs) is relabeled <code>TYPE_LIKE</code> if that check fails (for example <code>IBAN_LIKE</code>). The text is still replaced. A verified hit keeps the real type and wins if both labels appear for the same span. Listing <code>IBAN</code> in <code>--anonymized-entities</code> also includes <code>IBAN_LIKE</code>.</li>
 </ul>
 <h3 id="llm-entity-identification">LLM Entity Identification<a class="headerlink" href="#llm-entity-identification" title="Permanent link">&para;</a></h3>
 <ul>
