@@ -63,3 +63,109 @@ def test_no_variations(mocker: MockerFixture) -> None:
 
     assert anonymized_text.strip() == expected_text
     assert final_mapping == expected_mapping
+
+
+def test_checksum_failure_still_replaced_as_like(mocker: MockerFixture) -> None:
+    """A mistyped IBAN is hidden as IBAN_LIKE_1, not left in the clear."""
+    mocker.patch("os.path.getsize", return_value=0)
+    text = "Pay to GB00WEST12345698765432 today."
+    mocker.patch(
+        "pdf_anonymizer_core.core.load_and_extract_text_from_file",
+        return_value=(text, [text]),
+    )
+    mocker.patch("pdf_anonymizer_core.core.identify_entities_with_llm", return_value=[])
+    mocker.patch(
+        "pdf_anonymizer_core.core.extract_entities_via_regex",
+        return_value=[
+            {
+                "text": "GB00WEST12345698765432",
+                "type": "IBAN_LIKE",
+                "base_form": "GB00WEST12345698765432",
+            }
+        ],
+    )
+
+    anonymized_text, final_mapping = anonymize_file(
+        "dummy.pdf", 1000, "dummy_prompt", "dummy_model"
+    )
+
+    assert "GB00WEST12345698765432" not in anonymized_text
+    assert "IBAN_LIKE_1" in anonymized_text
+    assert final_mapping["GB00WEST12345698765432"] == "IBAN_LIKE_1"
+
+
+def test_iban_filter_includes_like_sibling(mocker: MockerFixture) -> None:
+    """Listing IBAN also hides IBAN_LIKE."""
+    mocker.patch("os.path.getsize", return_value=0)
+    text = "Pay DE89370400440532013000 or GB00WEST12345698765432."
+    mocker.patch(
+        "pdf_anonymizer_core.core.load_and_extract_text_from_file",
+        return_value=(text, [text]),
+    )
+    mocker.patch("pdf_anonymizer_core.core.identify_entities_with_llm", return_value=[])
+    mocker.patch(
+        "pdf_anonymizer_core.core.extract_entities_via_regex",
+        return_value=[
+            {
+                "text": "DE89370400440532013000",
+                "type": "IBAN",
+                "base_form": "DE89370400440532013000",
+            },
+            {
+                "text": "GB00WEST12345698765432",
+                "type": "IBAN_LIKE",
+                "base_form": "GB00WEST12345698765432",
+            },
+        ],
+    )
+
+    anonymized_text, _final_mapping = anonymize_file(
+        "dummy.pdf",
+        1000,
+        "dummy_prompt",
+        "dummy_model",
+        anonymized_entities=["IBAN"],
+    )
+
+    assert "DE89370400440532013000" not in anonymized_text
+    assert "GB00WEST12345698765432" not in anonymized_text
+    assert "IBAN_1" in anonymized_text
+    assert "IBAN_LIKE_1" in anonymized_text
+
+
+def test_verified_type_wins_over_like(mocker: MockerFixture) -> None:
+    """The same span labeled IBAN and IBAN_LIKE keeps the verified type."""
+    mocker.patch("os.path.getsize", return_value=0)
+    text = "IBAN DE89370400440532013000"
+    mocker.patch(
+        "pdf_anonymizer_core.core.load_and_extract_text_from_file",
+        return_value=(text, [text]),
+    )
+    mocker.patch(
+        "pdf_anonymizer_core.core.identify_entities_with_llm",
+        return_value=[
+            {
+                "text": "DE89370400440532013000",
+                "type": "IBAN_LIKE",
+                "base_form": "DE89370400440532013000",
+            }
+        ],
+    )
+    mocker.patch(
+        "pdf_anonymizer_core.core.extract_entities_via_regex",
+        return_value=[
+            {
+                "text": "DE89370400440532013000",
+                "type": "IBAN",
+                "base_form": "DE89370400440532013000",
+            }
+        ],
+    )
+
+    anonymized_text, final_mapping = anonymize_file(
+        "dummy.pdf", 1000, "dummy_prompt", "dummy_model"
+    )
+
+    assert "IBAN_1" in anonymized_text
+    assert "IBAN_LIKE" not in anonymized_text
+    assert final_mapping["DE89370400440532013000"] == "IBAN_1"

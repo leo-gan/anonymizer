@@ -108,6 +108,27 @@ For very large batch jobs you may want to:
 
 ---
 
+## Wrong-looking numbers are not treated as found
+
+A string of digits can *look* like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.
+
+**Think of it like this.** Shops do not only check that a card has 16 digits. They also run a tiny extra sum (often called a Luhn check) to see if the number was mistyped. Bank accounts (IBAN), vehicle numbers (VIN), and some national IDs have the same kind of extra digit.
+
+The first, fast search still looks only at *shape*. Right after a hit, the tool runs that extra sum when one exists.
+
+- If the sum **passes**, the stand-in keeps the real name: `IBAN_1`, `CREDIT_CARD_2`.
+- If the sum **fails**, the number is **still hidden**. The stand-in says so: `IBAN_LIKE_1`, `CREDIT_CARD_LIKE_1`. A mistyped IBAN does not stay on the page.
+
+What gets this extra check today: credit cards, IBANs, vehicle identification numbers, US medical NPI, Canadian SIN, Spanish DNI/NIE, Chinese resident ID, Indian Aadhaar, Brazilian CPF, Italian tax code, and Polish PESEL.
+
+What does **not**: emails, phones, names, and any type with no well-known extra digit. Those stay “shape only” and never get a `_LIKE` label.
+
+You do not turn this on or off. It always runs on the regex stage. The search patterns themselves did not change.
+
+If you pass a type list (`--anonymized-entities`) with `IBAN`, mistyped IBANs (`IBAN_LIKE`) are included. You do not have to list both.
+
+---
+
 ## Anonymize Only Specific Entity Types
 
 Use a text file containing the entity types you care about (one per line, uppercase).
@@ -125,7 +146,7 @@ Run:
 pdf-anonymizer run document.pdf --anonymized-entities only-people-orgs.txt
 ```
 
-Only entities whose `type` matches one of the listed values (after the hybrid Regex + LLM stage) will be replaced. Everything else stays in clear text.
+Only entities whose `type` matches one of the listed values (after the hybrid Regex + LLM stage) will be replaced. Everything else stays in clear text. Listing `IBAN` also hides `IBAN_LIKE` (mistyped IBANs). You do not list the `_LIKE` name yourself unless you want only the look-alikes.
 
 This is useful when you want to protect names and companies but leave dates, addresses, or other categories untouched.
 

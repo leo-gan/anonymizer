@@ -97,9 +97,9 @@ class TestUniversalPatterns(unittest.TestCase):
         self.assertIn("DEUTDEFF", bics)
 
     def test_vin(self):
-        text = "Vehicle 1HGCM82633A123456 and junk I0OQ1234567890123 (I/O/Q forbidden)"
+        text = "Vehicle 1HGCM82633A004352 and junk I0OQ1234567890123 (I/O/Q forbidden)"
         vins = _extract_texts(text, "VIN")
-        self.assertIn("1HGCM82633A123456", vins)
+        self.assertIn("1HGCM82633A004352", vins)
         self.assertNotIn("I0OQ1234567890123", [v for v in vins])  # pattern excludes I O Q
 
     def test_currency_and_date_iso(self):
@@ -114,14 +114,14 @@ class TestMandatoryCountries(unittest.TestCase):
     """Cover at least the 8 mandatory countries with representative high-value PII."""
 
     def test_us(self):
-        text = "SSN 123-45-6789  EIN 12-3456789  NPI 1234567890  Passport A12345678  DL X1234567"
+        text = "SSN 123-45-6789  EIN 12-3456789  NPI 1234567893  Passport A12345678  DL X1234567"
         types = set(_extract_types(text))
         self.assertIn("SSN_US", types)
         self.assertIn("EIN_US", types)
         self.assertIn("MEDICAL_NPI_US", types)
 
     def test_canada(self):
-        text = "SIN 123-456-789  CA passport AB123456"
+        text = "SIN 123-456-782  CA passport AB123456"
         types = set(_extract_types(text, only=["SIN_CA", "CA_PASSPORT"]))
         self.assertIn("SIN_CA", types)
 
@@ -145,20 +145,20 @@ class TestMandatoryCountries(unittest.TestCase):
         self.assertIn("CIF_ES", types)
 
     def test_italy(self):
-        text = "CF RSSMRA85M01H501Z  VAT IT01234567890"
+        text = "CF RSSMRA85M01H501Q  VAT IT01234567890"
         types = set(_extract_types(text))
         self.assertIn("CODICE_FISCALE_IT", types)
         self.assertIn("VAT_IT", types)
 
     def test_india(self):
-        text = "Aadhaar 1234 5678 9012  PAN ABCDE1234F  GSTIN 22AAAAA0000A1Z5"
+        text = "Aadhaar 2345 6789 0124  PAN ABCDE1234F  GSTIN 22AAAAA0000A1Z5"
         types = set(_extract_types(text))
         self.assertIn("AADHAAR_IN", types)
         self.assertIn("PAN_IN", types)
         self.assertIn("GSTIN_IN", types)
 
     def test_china(self):
-        text = "ID 110105199001011234  USCC 91310000MA0ABCDEFG  Passport E12345678"
+        text = "ID 110105199001011232  USCC 91310000MA0ABCDEFG  Passport E12345678"
         types = set(_extract_types(text))
         self.assertIn("RESIDENT_ID_CN", types)
         self.assertIn("UNIFIED_SOCIAL_CREDIT_CODE_CN", types)
@@ -210,6 +210,43 @@ class TestAdditionalCountries30Plus(unittest.TestCase):
         self.assertGreaterEqual(len(present) + 3, 30, "Need patterns touching at least ~30 countries")
 
 
+class TestChecksumFilter(unittest.TestCase):
+    """Shape matches stay; failed checks are labeled TYPE_LIKE, not dropped."""
+
+    def test_invalid_credit_card_is_labeled_like(self):
+        text = "good 4111 1111 1111 1111  bad 1234-5678-9012-3456"
+        ents = extract_entities_via_regex(
+            text, {"CREDIT_CARD": DEFAULT_REGEX_PATTERNS["CREDIT_CARD"]}
+        )
+        by_text = {e["text"]: e["type"] for e in ents}
+        self.assertEqual(by_text.get("4111 1111 1111 1111"), "CREDIT_CARD")
+        self.assertEqual(by_text.get("1234-5678-9012-3456"), "CREDIT_CARD_LIKE")
+
+    def test_invalid_iban_is_labeled_like(self):
+        text = "good DE89370400440532013000  bad GB00WEST12345698765432"
+        ents = extract_entities_via_regex(
+            text, {"IBAN": DEFAULT_REGEX_PATTERNS["IBAN"]}
+        )
+        by_text = {e["text"]: e["type"] for e in ents}
+        self.assertEqual(by_text.get("DE89370400440532013000"), "IBAN")
+        self.assertEqual(by_text.get("GB00WEST12345698765432"), "IBAN_LIKE")
+
+    def test_invalid_vin_is_labeled_like(self):
+        text = "good 1HGCM82633A004352  bad 1HGCM82633A123456"
+        ents = extract_entities_via_regex(text, {"VIN": DEFAULT_REGEX_PATTERNS["VIN"]})
+        by_text = {e["text"]: e["type"] for e in ents}
+        self.assertEqual(by_text.get("1HGCM82633A004352"), "VIN")
+        self.assertEqual(by_text.get("1HGCM82633A123456"), "VIN_LIKE")
+
+    def test_email_has_no_checksum_and_is_not_like(self):
+        ents = extract_entities_via_regex(
+            "write me at user@example.com",
+            {"EMAIL": DEFAULT_REGEX_PATTERNS["EMAIL"]},
+        )
+        self.assertEqual(ents[0]["type"], "EMAIL")
+        self.assertEqual(ents[0]["text"], "user@example.com")
+
+
 class TestNoFalsePositivesOnJunk(unittest.TestCase):
     def test_long_numeric_version_not_misread_as_ip(self):
         # Note: without look-ahead (RE2 limitation) a valid 4-octet prefix inside
@@ -234,9 +271,9 @@ class TestFullDefaultIntegration(unittest.TestCase):
         US customer SSN 987-65-4321 , CC 4242-4242-4242-4242
         Crypto donation 0xAbC1230000000000000000000000000000000000
         French client INSEE 1851075240027 VAT FRXX123456789
-        Indian Aadhaar 2345 6789 0123 PAN AAAPA1234A
-        Chinese resident 110101200001011234
-        VIN for the fleet: 1FTFW1EF5EFA00001   MAC 00:11:22:33:44:55
+        Indian Aadhaar 2345 6789 0124 PAN AAAPA1234A
+        Chinese resident 110101200001011232
+        VIN for the fleet: 1FTFW1EF0EFA00001   MAC 00:11:22:33:44:55
         """
         ents = extract_entities_via_regex(doc, DEFAULT_REGEX_PATTERNS)
         types = {e["type"] for e in ents}
@@ -264,7 +301,7 @@ class TestFullDefaultIntegration(unittest.TestCase):
         self.assertIn("alice.smith@acme.co.uk", texts)
         self.assertIn("DE89370400440532013000", texts)
         self.assertIn("4242-4242-4242-4242", texts)
-        self.assertIn("1FTFW1EF5EFA00001", texts)
+        self.assertIn("1FTFW1EF0EFA00001", texts)
 
 
 if __name__ == "__main__":

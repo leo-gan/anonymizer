@@ -37,10 +37,11 @@ DEFAULT_LOG_FILE: str = "app.log"
 # performance on large documents.
 #
 # DESIGN:
-# - Patterns are intentionally structural (not full checksum validation like Luhn or
-#   IBAN mod-97) because pure regex cannot perform arbitrary arithmetic. The fast regex
-#   stage is a high-recall filter; the subsequent LLM stage provides semantic validation
-#   and catches context-dependent or missed PII.
+# - Patterns are intentionally structural (RE2 cannot do Luhn, IBAN mod-97, etc.).
+#   After a match, validators.py runs a cheap, unambiguous check (cards, IBAN,
+#   VIN, NPI, and a few national IDs). Failures stay in the entity list as
+#   TYPE_LIKE (IBAN_LIKE, CREDIT_CARD_LIKE, ...) so mistyped numbers are still
+#   hidden. The LLM stage still follows for context-dependent or missed PII.
 # - Entity type keys use UPPER_SNAKE_CASE. Country-specific patterns are partitioned
 #   using ISO 3166-1 alpha-2 suffixes (e.g. SSN_US, NINO_GB, INSEE_FR, AADHAAR_IN,
 #   RESIDENT_ID_CN). This makes it trivial for callers to select a country subset:

@@ -109,8 +109,11 @@ The first-stage regex (hybrid NER) is now powered by the RE2 engine (`google-re2
 `DEFAULT_REGEX_PATTERNS` contains 70+ patterns partitioned by country (ISO-2 suffixes) covering
 emails, phones, URLs, credit cards, crypto, IBAN/BIC, VIN, MAC, IPv4/6, dates plus national IDs,
 tax IDs, driver licences, VAT/business numbers, passports, medical licenses etc. for 30+ countries
-(mandatory: US, CA, GB, ES, IT, FR, IN, CN + many others). See `conf.py` and `regex_ner.py`
-module docs for the complete list and how to supply a country-filtered or custom subset.
+(mandatory: US, CA, GB, ES, IT, FR, IN, CN + many others). After a structural match, `validators.py` runs a cheap checksum (Luhn, IBAN mod-97,
+VIN check digit, and a few national IDs). Failures are kept and labeled `TYPE_LIKE`
+(for example `IBAN_LIKE_1`) so a mistyped number is still hidden. Types with no
+check are unchanged. Listing `IBAN` in a type filter also includes `IBAN_LIKE`.
+See `conf.py`, `regex_ner.py`, and `validators.py`.
 
 ---
 
