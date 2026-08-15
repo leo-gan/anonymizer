@@ -5,6 +5,7 @@ import pytest
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.operators import (
     apply_operator,
+    fake_value,
     generalize_value,
     hash_value,
     mask_value,
@@ -20,6 +21,7 @@ class TestParseSpecs:
             "CREDIT_CARD": "mask",
             "DATE": "generalize",
         }
+        assert parse_operator_specs(["PERSON=fake"]) == {"PERSON": "fake"}
         with pytest.raises(ValueError, match="Unknown operator"):
             parse_operator_specs(["PERSON=redact"])
         with pytest.raises(ValueError, match="Invalid"):
@@ -68,6 +70,23 @@ class TestMaskHashGeneralizeShift:
 
     def test_replace_returns_placeholder(self) -> None:
         assert apply_operator("Ada", "PERSON", "PERSON_1", "replace") == "PERSON_1"
+
+    def test_fake_is_stable_per_base_form_and_secret(self) -> None:
+        a = fake_value("Ada Lovelace", "PERSON", "Ada Lovelace", "s")
+        b = fake_value("Ada", "PERSON", "Ada Lovelace", "s")
+        c = fake_value("Ada Lovelace", "PERSON", "Ada Lovelace", "other")
+        d = fake_value("Bob", "PERSON", "Bob", "s")
+        assert a == b
+        assert a != c
+        assert a != d
+        assert a != "Ada Lovelace"
+        assert " " in a
+
+    def test_fake_email_and_phone_shape(self) -> None:
+        email = fake_value("ada@old.com", "EMAIL", "ada@old.com", "s")
+        phone = fake_value("555-1234", "PHONE", "555-1234", "s")
+        assert "@" in email
+        assert phone.startswith("555-010")
 
 
 class TestAnonymizeWithOperators:

@@ -19,6 +19,7 @@ OPERATOR_MASK = "mask"
 OPERATOR_HASH = "hash"
 OPERATOR_GENERALIZE = "generalize"
 OPERATOR_SHIFT = "shift"
+OPERATOR_FAKE = "fake"
 
 OPERATORS = frozenset(
     {
@@ -27,8 +28,11 @@ OPERATORS = frozenset(
         OPERATOR_HASH,
         OPERATOR_GENERALIZE,
         OPERATOR_SHIFT,
+        OPERATOR_FAKE,
     }
 )
+
+DEFAULT_FAKE_SECRET = "pdf-anonymizer-fake"
 
 _ISO_DATE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})")
 _US_ZIP = re.compile(r"^(\d{5})(?:-\d{4})?$")
@@ -81,6 +85,7 @@ def apply_operator(
     placeholder: str,
     operator: str,
     base_form: Optional[str] = None,
+    secret: str = "",
 ) -> str:
     """Return the string to write in place of ``original``."""
     if operator == OPERATOR_REPLACE:
@@ -93,7 +98,67 @@ def apply_operator(
         return generalize_value(original, entity_type)
     if operator == OPERATOR_SHIFT:
         return shift_date_value(original, base_form or original)
+    if operator == OPERATOR_FAKE:
+        return fake_value(original, entity_type, base_form or original, secret)
     return placeholder
+
+
+def _fake_seed(secret: str, entity_type: str, base_form: str) -> int:
+    material = f"{secret or DEFAULT_FAKE_SECRET}:{entity_type.upper()}:{base_form}"
+    return int(hashlib.sha256(material.encode("utf-8")).hexdigest()[:16], 16)
+
+
+def fake_value(
+    original: str,
+    entity_type: str,
+    base_form: str,
+    secret: str = "",
+) -> str:
+    """Stable fake in the same shape family. Same base_form always matches."""
+    from faker import Faker
+
+    kind = parent_type(entity_type)
+    fake = Faker("en_US")
+    fake.seed_instance(_fake_seed(secret, kind, base_form))
+
+    if kind == "PERSON":
+        return fake.name()
+    if kind == "EMAIL":
+        return fake.safe_email()
+    if kind == "PHONE" or kind == "FAX":
+        return f"555-010{fake.random_int(0, 9)}"
+    if kind == "LOCATION":
+        return fake.city()
+    if kind == "ADDRESS":
+        return fake.street_address()
+    if kind == "ORGANIZATION":
+        return fake.company()
+    if kind == "JOB_TITLE":
+        return fake.job()
+    if kind.startswith("DATE"):
+        parsed = _parse_date(original)
+        year = parsed.year if parsed else fake.random_int(1980, 2020)
+        return fake.date_between(
+            start_date=date(year, 1, 1), end_date=date(year, 12, 28)
+        ).isoformat()
+    if kind == "AGE":
+        return str(fake.random_int(21, 80))
+    if kind in {"CREDIT_CARD"} or kind.startswith("CREDIT_CARD"):
+        body = f"{_fake_seed(secret, kind, base_form):016d}"[:12]
+        return f"4111 {body[0:4]} {body[4:8]} {body[8:12]}"
+    if kind.startswith("SSN") or kind == "SIN_CA":
+        tail = f"{_fake_seed(secret, kind, base_form) % 10000:04d}"
+        return f"000-00-{tail}"
+    if kind == "IBAN" or kind.endswith("IBAN"):
+        tail = f"{_fake_seed(secret, kind, base_form) % 10**10:010d}"
+        return f"GB00FAKE{tail}"
+    if kind in {"IPV4_ADDRESS", "IP_ADDRESS"}:
+        return f"203.0.113.{_fake_seed(secret, kind, base_form) % 254 + 1}"
+    if kind == "URL":
+        return f"https://example.test/{fake.slug()}"
+    if kind == "VIN":
+        return f"1HGCM8263{fake.random_int(0, 9)}A{fake.random_int(100000, 999999)}"
+    return fake.word().title()
 
 
 def hash_value(original: str) -> str:
