@@ -28,6 +28,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--countries` | `TEXT` | *all* | ISO-2 codes for national-ID regexes, comma-separated (`US,GB`). Email, IBAN, cards, and other universal patterns always stay. |
 | `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file. |
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
+| `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 
 ### Configuration Profiles
 
@@ -117,12 +118,13 @@ The `deanonymize` command reads an anonymized document, loads the JSON mapping f
 
 ### Syntax
 ```bash
-pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE
+pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TEXT]
 ```
 
 ### Arguments
 *   `ANONYMIZED_FILE`: Path to the file that was previously anonymized.
-*   `MAPPING_FILE`: Path to the JSON mapping file containing the original entity-to-placeholder pairings.
+*   `MAPPING_FILE`: Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
+*   `--mapping-passphrase`: Required for an encrypted mapping. Also read from `ANONYMIZER_MAPPING_KEY`.
 
 ### Output Destination
 This command creates a deanonymized version of the file. For example:

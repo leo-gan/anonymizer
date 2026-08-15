@@ -15,6 +15,7 @@ from pdf_anonymizer_core.conf import (
 )
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.llm_provider import configure_cache
+from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.prompts import detailed, simple
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
@@ -125,6 +126,17 @@ def run(
             help="Also ask the language model to hunt for leftovers (slower).",
         ),
     ] = False,
+    mapping_passphrase: Annotated[
+        Optional[str],
+        typer.Option(
+            "--mapping-passphrase",
+            help=(
+                "Lock the mapping file with AES-256-GCM. "
+                "Also read from ANONYMIZER_MAPPING_KEY. "
+                "Without this, the mapping is stored as plain JSON."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -215,11 +227,17 @@ def run(
             )
 
             anonymized_output_file, mapping_file = save_results(
-                full_anonymized_text, consolidated_placeholder_map, str(file_path)
+                full_anonymized_text,
+                consolidated_placeholder_map,
+                str(file_path),
+                mapping_passphrase=resolve_mapping_passphrase(mapping_passphrase),
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
-            logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
+            if mapping_file.endswith(".enc"):
+                logging.info(f"Encrypted mapping saved into '{mapping_file}'")
+            else:
+                logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
 
             if verify or verify_llm:
                 report = verify_anonymized_text(
@@ -266,14 +284,30 @@ def deanonymize(
             resolve_path=True,
         ),
     ],
+    mapping_passphrase: Annotated[
+        Optional[str],
+        typer.Option(
+            "--mapping-passphrase",
+            help=(
+                "Passphrase for an encrypted mapping file. "
+                "Also read from ANONYMIZER_MAPPING_KEY."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Deanonymize a file using a mapping file.
     """
     logging.info(f"Deanonymizing '{anonymized_file}' using '{mapping_file}'")
-    deanonymized_output_file, stats_file = deanonymize_file(
-        str(anonymized_file), str(mapping_file)
-    )
+    try:
+        deanonymized_output_file, stats_file = deanonymize_file(
+            str(anonymized_file),
+            str(mapping_file),
+            mapping_passphrase=resolve_mapping_passphrase(mapping_passphrase),
+        )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
     logging.info("Deanonymization complete!")
     logging.info(f"Deanonymized text saved into '{deanonymized_output_file}'")
     logging.info(f"Deanonymization statistics saved into '{stats_file}'")

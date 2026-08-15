@@ -17,6 +17,10 @@ from pdf_anonymizer_core.conf import (
     DEFAULT_MAPPINGS_DIR,
     DEFAULT_STATS_DIR,
 )
+from pdf_anonymizer_core.mapping_crypto import (
+    encrypt_mapping,
+    load_mapping_payload,
+)
 
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
@@ -73,7 +77,10 @@ def consolidate_mapping(
 
 
 def save_results(
-    full_anonymized_text: str, final_mapping: dict[str, str], file_path: str
+    full_anonymized_text: str,
+    final_mapping: dict[str, str],
+    file_path: str,
+    mapping_passphrase: str | None = None,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
@@ -82,6 +89,8 @@ def save_results(
         full_anonymized_text (str): The anonymized text.
         final_mapping (dict[str, str]): Mapping of original text -> placeholder.
         file_path (str): The path to the original file.
+        mapping_passphrase: If set, write ``*.mapping.json.enc`` (AES-256-GCM)
+            instead of plaintext JSON.
 
     Returns:
         tuple[str, str]: The paths to the anonymized text file and the mapping file.
@@ -106,16 +115,24 @@ def save_results(
     with open(anonymized_output_file, "w", encoding="utf-8") as f:
         f.write(full_anonymized_text)
 
-    mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
-    # Persist mapping as placeholder -> original for correct deanonymization
-    with open(mapping_file, "w", encoding="utf-8") as f:
-        json.dump(final_mapping, f, indent=4)
+    if mapping_passphrase:
+        mapping_file = f"{mappings_dir}/{file_stem}.mapping.json.enc"
+        payload = encrypt_mapping(final_mapping, mapping_passphrase)
+        with open(mapping_file, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=4)
+    else:
+        mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
+        # Persist mapping as placeholder -> original for correct deanonymization
+        with open(mapping_file, "w", encoding="utf-8") as f:
+            json.dump(final_mapping, f, indent=4)
 
     return anonymized_output_file, mapping_file
 
 
 def deanonymize_file(
-    anonymized_file_path: str, mapping_file_path: str
+    anonymized_file_path: str,
+    mapping_file_path: str,
+    mapping_passphrase: str | None = None,
 ) -> tuple[str, str]:
     """Deanonymize a file using a mapping file.
 
@@ -130,7 +147,8 @@ def deanonymize_file(
 
     Args:
         anonymized_file_path: Path to the previously anonymized document.
-        mapping_file_path: Path to the JSON mapping file.
+        mapping_file_path: Path to the JSON mapping file (plaintext or ``.enc``).
+        mapping_passphrase: Required when the mapping file is encrypted.
 
     Returns:
         A tuple (deanonymized_file_path, stats_file_path).
@@ -143,6 +161,8 @@ def deanonymize_file(
 
     with open(mapping_file_path, "r", encoding="utf-8") as f:
         raw_mapping = json.load(f)
+
+    raw_mapping = load_mapping_payload(raw_mapping, mapping_passphrase)
 
     # Detect mapping direction and normalize to placeholder -> original
     # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
