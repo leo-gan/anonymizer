@@ -1,0 +1,11 @@
+{
+  "name": "mini-tab",
+  "text": "Ada Lovelace (ada@example.com) lives in London. SSN 000-00-0000. Born 1815-12-10.",
+  "mentions": [
+    {"text": "Ada Lovelace", "type": "PERSON", "kind": "direct", "start": 0, "end": 12, "base_form": "Ada Lovelace"},
+    {"text": "ada@example.com", "type": "EMAIL", "kind": "direct", "start": 14, "end": 29, "base_form": "ada@example.com"},
+    {"text": "London", "type": "LOCATION", "kind": "quasi", "start": 40, "end": 46, "base_form": "London"},
+    {"text": "000-00-0000", "type": "SSN", "kind": "direct", "start": 52, "end": 63, "base_form": "000-00-0000"},
+    {"text": "1815-12-10", "type": "DATE_ISO", "kind": "quasi", "start": 70, "end": 80, "base_form": "1815-12-10"}
+  ]
+}

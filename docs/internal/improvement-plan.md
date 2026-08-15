@@ -18,7 +18,7 @@
 - [x] 10. Cross-document consistent placeholders — done 2026-08-15, [PR #49](https://github.com/leo-gan/anonymizer/pull/49)
 - [x] 11. Allowlist / denylist gazetteers — done 2026-08-15, [PR #50](https://github.com/leo-gan/anonymizer/pull/50)
 - [x] 12. Span-based replacement — done 2026-08-15, [PR #51](https://github.com/leo-gan/anonymizer/pull/51)
-- [ ] 13. TAB-style eval harness
+- [x] 13. TAB-style eval harness — done 2026-08-15, [PR #52](https://github.com/leo-gan/anonymizer/pull/52)
 - [ ] 14. OCR for scanned PDFs
 - [ ] 15. In-place PDF redaction
 - [ ] 16. Regex-only / offline mode
@@ -39,24 +39,26 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 
 | Technique (history.md) | Today |
 |---|---|
-| Data removal / identifier stripping | Hybrid RE2 + LLM NER, then global string replace |
-| Pseudonymization | Typed tokens + plaintext `data/mappings/*.json` |
-| Generalization / suppression | Not implemented |
+| Data removal / identifier stripping | Hybrid RE2 + LLM NER, then span-based replacement |
+| Pseudonymization | Typed tokens + `data/mappings/*.json` (optional AES-256-GCM) |
+| Generalization / suppression | Operators: `mask`, `hash`, `generalize`, `shift` (default still `replace`) |
 | Randomization / differential privacy | Not implemented (poor fit for reversible prose) |
 | *k*-anonymity / ℓ-diversity / *t*-closeness | Not implemented (tabular models; do not rewrite PDFs with them) |
-| Synthetic data | Not implemented |
-| Cryptographic methods | Mapping stored as plaintext |
-| Re-ID / attack simulation | Residual regex scan + linkage-risk report (`*.residual_pii.json`, `*.risk.json`) |
+| Synthetic data | Value-level `fake` operator (seeded Faker); not whole-document rewrite |
+| Cryptographic methods | Optional AES-256-GCM mapping (`*.mapping.json.enc`) |
+| Re-ID / attack simulation | Residual regex scan + linkage-risk report + TAB-style eval harness (`tests/eval/`) |
 
 Known code facts to attach to:
 
 - `conf.py`: regexes are still structural. After a match, `validators.py` runs a cheap check (Luhn, IBAN, VIN, a few national IDs). Failures stay hidden as `TYPE_LIKE` (`IBAN_LIKE_1`).
-- `core.py`: replacement is whole-document string match, not character spans.
+- `core.py`: replacement is span-based (locate in `full_text`, longest-first, write from the end). Shipped in [PR #51](https://github.com/leo-gan/anonymizer/pull/51).
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM).
-- `--operator TYPE=mask|hash|generalize|shift` changes how a type is written. Default remains `replace` (PERSON_1).
+- `--operator TYPE=mask|hash|generalize|shift|fake` changes how a type is written. Default remains `replace` (PERSON_1).
 - `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+). Not a compliance certificate.
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
+- `--keep-list` / `--deny-list` gazetteers. Keep wins if a phrase is on both lists.
+- `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). No product behavior change.
 
 ---
 
@@ -301,6 +303,8 @@ Known code facts to attach to:
 ---
 
 ### 13. TAB-style eval harness
+
+**Status:** done (2026-08-15) — [PR #52](https://github.com/leo-gan/anonymizer/pull/52) (`feat/eval-harness`)
 
 **Technique:** the open question in history.md: how do you measure leftover risk and utility?  
 **Why:** Unit tests cover regex and mapping, not privacy metrics. No recall split for direct vs quasi identifiers.
