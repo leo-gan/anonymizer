@@ -1116,6 +1116,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#regex-only-offline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regex-only / offline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leftover-check" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1813,6 +1824,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#regex-only-offline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regex-only / offline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leftover-check" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1972,9 +1994,15 @@
 <tbody>
 <tr>
 <td style="text-align: left;"><code>--config-profile</code> / <code>-p</code></td>
-<td style="text-align: left;"><code>best-quality</code> | <code>best-speed</code> | <code>best-cost</code></td>
+<td style="text-align: left;"><code>best-quality</code> | <code>best-speed</code> | <code>best-cost</code> | <code>regex-only</code></td>
 <td style="text-align: left;"><code>best-speed</code></td>
-<td style="text-align: left;">Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below).</td>
+<td style="text-align: left;">Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). <code>regex-only</code> skips the language model.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--no-llm</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">off</td>
+<td style="text-align: left;">Skip the language model. Only the RE2 regex stage runs. Names and identity clues will be missed. Same as <code>-p regex-only</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--characters-to-anonymize</code></td>
@@ -2115,6 +2143,15 @@
 <td>3,000</td>
 <td>3</td>
 <td>Cheap &amp; fast on long documents; no identity-clue hunt</td>
+</tr>
+<tr>
+<td><code>regex-only</code></td>
+<td>none</td>
+<td>simple</td>
+<td>200,000</td>
+<td>0</td>
+<td>1</td>
+<td>Offline / air-gapped: regex only. Names and identity clues are missed</td>
 </tr>
 </tbody>
 </table>
@@ -2268,6 +2305,8 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p>A number that <em>looks</em> like an IBAN or a card is still hidden if the extra check-digit fails. The stand-in says so: <code>IBAN_LIKE_1</code>, <code>CREDIT_CARD_LIKE_1</code>. A verified hit stays <code>IBAN_1</code>.</p>
 <h3 id="limit-national-id-patterns">Limit national-ID patterns<a class="headerlink" href="#limit-national-id-patterns" title="Permanent link">&para;</a></h3>
 <p><code>--countries US,GB</code> keeps every universal pattern (email, IBAN, cards, …) and only the national IDs for those countries.</p>
+<h3 id="regex-only-offline">Regex-only / offline<a class="headerlink" href="#regex-only-offline" title="Permanent link">&para;</a></h3>
+<p><code>--no-llm</code> or <code>-p regex-only</code> skips the language model. Emails, cards, IBANs, and other structured hits are still hidden (including <code>_LIKE</code> checksum failures). Operators, leftover scan, and linkage-risk still run. No API key is required. <strong>Names and identity clues will be missed.</strong> <code>--verify-llm</code> is ignored so the process stays offline.</p>
 <h3 id="leftover-check">Leftover check<a class="headerlink" href="#leftover-check" title="Permanent link">&para;</a></h3>
 <p><code>run</code> scans the masked page (unless <code>--no-verify</code>) and writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. <code>pdf-anonymizer verify</code> does the same later. <code>--verify-llm</code> also asks the language model. The file is not rewritten.</p>
 <h3 id="lock-the-mapping">Lock the mapping<a class="headerlink" href="#lock-the-mapping" title="Permanent link">&para;</a></h3>

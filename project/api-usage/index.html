@@ -1466,7 +1466,7 @@
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">write_residual_report</span><span class="p">(</span><span class="n">verify_anonymized_text</span><span class="p">(</span><span class="n">anonymized_text</span><span class="p">),</span> <span class="n">anonymized_path</span><span class="p">)</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">write_risk_report</span><span class="p">(</span><span class="n">assess_linkage_risk</span><span class="p">(</span><span class="n">anonymized_text</span><span class="p">),</span> <span class="n">anonymized_path</span><span class="p">)</span>
 </span></code></pre></div>
-<p>For the complete <code>anonymize_file</code> signature (including <code>chunk_overlap</code>, <code>regex_patterns</code>, <code>max_retries</code>, <code>operators</code>, <code>seed_mapping</code>, gazetteers, etc.) see the <a href="../api-reference/">auto-generated API Reference</a> or the Recipes page.</p>
+<p>For the complete <code>anonymize_file</code> signature (including <code>chunk_overlap</code>, <code>regex_patterns</code>, <code>max_retries</code>, <code>operators</code>, <code>seed_mapping</code>, gazetteers, <code>use_llm</code>, etc.) see the <a href="../api-reference/">auto-generated API Reference</a> or the Recipes page. Pass <code>use_llm=False</code> (or <code>-p regex-only</code> / <code>--no-llm</code> on the CLI) to skip the language model.</p>
 <hr />
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
