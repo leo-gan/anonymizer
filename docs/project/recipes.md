@@ -87,7 +87,7 @@ You can repeat step 4 any time you receive new output from the external system a
 
 ### Lock the mapping file
 
-By default the mapping is plain JSON. That is easy to use and easy to leak. You can lock it with a passphrase. The tool writes `*.mapping.json.enc` (AES-256-GCM) instead of `*.mapping.json`.
+By default the mapping is plain JSON. That is easy to use and easy to leak. You can lock it with a passphrase. The tool writes `*.mapping.json.enc` (AES-256-GCM, Argon2id, source-file AAD) instead of `*.mapping.json`. Both the locked file and a plaintext mapping are created atomically with mode `0600`.
 
 ```bash
 pdf-anonymizer run sensitive-report.pdf --mapping-passphrase 'a long secret'
@@ -102,6 +102,12 @@ pdf-anonymizer deanonymize \
 Without a passphrase, behavior is unchanged: plaintext `*.mapping.json`. An encrypted file cannot be opened without the passphrase. The masked document is still not enough to recover the names.
 
 Do not put the passphrase in the document, the mapping, or the log.
+
+`--ephemeral-mapping` skips `data/mappings/` entirely. Use that when the process will discard the vocabulary and you will not deanonymize later.
+
+`--source-sha256` on `deanonymize` rejects a map that was locked for a different source file (the hash is authenticated inside the envelope). `--mapping-in` does not require a matching hash, because that flag exists to reuse placeholders across documents.
+
+The architecture, threat model, trade-offs, and the tests that demonstrate the old holes versus the fix are in [Mapping encryption](mapping-security.md).
 
 ---
 

@@ -80,22 +80,6 @@ Researchers have developed many techniques to protect privacy. Major methods inc
 
 *Table: Comparison of anonymization techniques (strengths, weaknesses, typical uses).*
 
-### How this project uses these ideas (today)
-
-This page is a history lesson, not a product spec. The tool you can run (`pdf-anonymizer`) is a **reversible document pseudonymizer**. It hides words in a PDF, Markdown, or text file and keeps a separate map so you can put them back. It is **not** a *k*-anonymity rewriter and it does **not** add differential-privacy noise to prose.
-
-| Idea on this page | What the tool does today |
-|---|---|
-| Data removal (strip names, SSNs) | Hybrid RE2 regex + LLM, then span-based replacement. Mistyped IBANs become `IBAN_LIKE_1`, not leftover digits. |
-| Pseudonymization | Typed stand-ins (`PERSON_1`) plus `*.mapping.json`. Optional AES-256-GCM lock (`*.mapping.json.enc`). |
-| Generalization / suppression | Optional operators: year-only dates, ZIP3, age bands, masks, hashes. Default is still `PERSON_1`. |
-| Synthetic data | Value-level `fake` operator (same person → same invented name). Not a whole-document rewrite. |
-| Cryptographic methods | Optional encrypted mapping file. Not homomorphic encryption. |
-| Re-ID / attack simulation | Leftover regex scan (`*.residual_pii.json`), linkage-risk score (`*.risk.json`), and a TAB-style eval harness in `tests/eval/`. |
-| *k*-anonymity / DP / mixnets | Out of scope as document rewriters. Those models are for tables or networks, not narrative PDFs. |
-
-A flag-by-flag list lives on the [CLI History](../project/cli-usage.md#history) page. Worked examples live in [Recipes](../project/recipes.md).
-
 ## Legal, Regulatory and Policy Developments  
 - **OECD Guidelines (1980) & Fair Information Practices:** Early principles for data handling (collection limitation, purpose, security). Though not explicit on anonymization, they set the stage for later laws.  
 - **US Privacy Act (1974):** First U.S. federal law restricting personal data disclosure, requiring agencies to de-identify published records.  
@@ -173,6 +157,22 @@ timeline
     2020+ : Wide DP adoption in statistical agencies and tech industry  
 ```
 *Figure: Key milestones in anonymization history (see text for details and sources).*
+
+## How this project uses these ideas (today)
+
+This page is a history lesson, not a product spec. The tool you can run (`pdf-anonymizer`) is a **reversible document pseudonymizer**. It hides words in a PDF, Markdown, or text file and keeps a separate map so you can put them back. It is **not** a *k*-anonymity rewriter and it does **not** add differential-privacy noise to prose.
+
+| Idea on this page | What the tool does today |
+|---|---|
+| Data removal (strip names, SSNs) | Hybrid RE2 regex + LLM, then span-based replacement. Mistyped IBANs become `IBAN_LIKE_1`, not leftover digits. |
+| Pseudonymization | Typed stand-ins (`PERSON_1`) plus `*.mapping.json`. Optional AES-256-GCM + Argon2id lock (`*.mapping.json.enc`). |
+| Generalization / suppression | Optional operators: year-only dates, ZIP3, age bands, masks, hashes. Default is still `PERSON_1`. |
+| Synthetic data | Value-level `fake` operator (same person → same invented name). Not a whole-document rewrite. |
+| Cryptographic methods | Optional encrypted mapping file. Not homomorphic encryption. |
+| Re-ID / attack simulation | Leftover regex scan (`*.residual_pii.json`), linkage-risk score (`*.risk.json`), and a TAB-style eval harness in `tests/eval/`. |
+| *k*-anonymity / DP / mixnets | Out of scope as document rewriters. Those models are for tables or networks, not narrative PDFs. |
+
+A flag-by-flag list lives on the [CLI History](../project/cli-usage.md#history) page. Worked examples live in [Recipes](../project/recipes.md).
 
 ## References  
 - Chaum, D. *Untraceable Electronic Mail, Return Addresses, and Digital Pseudonyms* (Commun. ACM, 1981).  

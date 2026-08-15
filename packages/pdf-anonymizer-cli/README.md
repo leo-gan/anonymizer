@@ -82,7 +82,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--countries TEXT`: ISO-2 country codes for national-ID regexes, comma-separated (e.g. `US,GB`). Universal patterns (email, IBAN, cards, …) always stay. Default: all countries.
 - `--verify / --no-verify`: After masking, scan for leftovers (default: on). Writes `data/stats/<stem>.residual_pii.json`. Does not rewrite the file.
 - `--verify-llm`: Also ask the language model to hunt for leftovers.
-- `--mapping-passphrase TEXT`: Lock the mapping as `*.mapping.json.enc`. Also `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON.
+- `--mapping-passphrase TEXT`: Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id). Also `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON.
+- `--ephemeral-mapping`: Do not write `data/mappings/`. The vocabulary stays in this process only.
 - `--operator TYPE=op`: How to write a type (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`). Repeatable. Default is `replace`.
 - `--fake-secret TEXT`: Seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`.
 - `--risk / --no-risk`: After masking, score identity-clue clumps (default: on). Writes `data/stats/<stem>.risk.json`.
@@ -146,6 +147,7 @@ pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TE
 - `ANONYMIZED_FILE`: Path to the anonymized text file.
 - `MAPPING_FILE`: Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
 - `--mapping-passphrase`: Required for an encrypted mapping. Also `ANONYMIZER_MAPPING_KEY`.
+- `--source-sha256`: Optional. Expected SHA-256 of the original source file.
 
 **Example**:
 ```bash

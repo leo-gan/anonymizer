@@ -29,7 +29,7 @@ PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK 
 ## Key Highlights
 
 *   **Context-Aware Accuracy**: A fast RE2 regex stage (with checksums so mistyped IBANs become `IBAN_LIKE_1`, not leftover digits) plus an LLM that can hide identity clues, not only names.
-*   **Reversible by default**: Typed stand-ins (`PERSON_1`) plus a JSON mapping file. You can lock the map (`*.mapping.json.enc`), or write a type as a mask, a year, a hash, or a stable fake name instead.
+*   **Reversible by default**: Typed stand-ins (`PERSON_1`) plus a JSON mapping file. You can lock the map (`*.mapping.json.enc`), keep it only in memory, or write a type as a mask, a year, a hash, or a stable fake name instead.
 *   **Checks after masking**: A leftover scan (`*.residual_pii.json`) and a linkage-risk score (`*.risk.json`). Reports only — they do not rewrite the page.
 *   **Privacy First & Cost Effective**: Fully compatible with local, offline models using **Ollama** (e.g., Gemma 2, Phi 3/4). Also supports **Google Gemini**, **Anthropic Claude**, **OpenAI GPT**, **Hugging Face**, and **OpenRouter**.
 *   **Built for Scale**: Implements an intelligent stream-based chunking mechanism designed to reliably handle files up to **1GB** without running out of context windows or memory.

@@ -138,12 +138,23 @@ def run(
         typer.Option(
             "--mapping-passphrase",
             help=(
-                "Lock the mapping file with AES-256-GCM. "
+                "Lock the mapping file with AES-256-GCM and Argon2id. "
                 "Also read from ANONYMIZER_MAPPING_KEY. "
                 "Without this, the mapping is stored as plain JSON."
             ),
         ),
     ] = None,
+    ephemeral_mapping: Annotated[
+        bool,
+        typer.Option(
+            "--ephemeral-mapping/--persist-mapping",
+            help=(
+                "Keep the mapping only in this process. Nothing is written "
+                "under data/mappings/. Later deanonymization is impossible "
+                "unless you already saved the map yourself. Default: persist."
+            ),
+        ),
+    ] = False,
     operator: Annotated[
         Optional[List[str]],
         typer.Option(
@@ -275,7 +286,9 @@ def run(
     logging.info(f"  --model-name: {config.model_name}")
     if country_list:
         logging.info(f"  --countries: {country_list}")
-        logging.info(f"  --regex-patterns: {len(config.regex_patterns)} after country filter")
+        logging.info(
+            f"  --regex-patterns: {len(config.regex_patterns)} after country filter"
+        )
     if operator_map:
         logging.info(f"  --operator: {operator_map}")
 
@@ -290,7 +303,9 @@ def run(
     entities_to_anonymize = None
     if anonymized_entities:
         with open(anonymized_entities, "r") as f:
-            entities_to_anonymize = [line.strip() for line in f.readlines() if line.strip()]
+            entities_to_anonymize = [
+                line.strip() for line in f.readlines() if line.strip()
+            ]
         logging.info(f"  --anonymized-entities: {entities_to_anonymize}")
 
     if entity_profile is not None:
@@ -303,10 +318,7 @@ def run(
             )
         else:
             entities_to_anonymize = profile_types
-        if (
-            entity_profile == EntityProfile.HIPAA_SAFE_HARBOR
-            and prompt_name is None
-        ):
+        if entity_profile == EntityProfile.HIPAA_SAFE_HARBOR and prompt_name is None:
             prompt_template = hipaa.prompt_template
         logging.info(
             "  --entity-profile: %s (aid, not a compliance certificate)",
@@ -370,10 +382,13 @@ def run(
                 consolidated_placeholder_map,
                 str(file_path),
                 mapping_passphrase=passphrase,
+                ephemeral_mapping=ephemeral_mapping,
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
-            if mapping_file.endswith(".enc"):
+            if ephemeral_mapping or not mapping_file:
+                logging.info("Ephemeral mapping: vocabulary was not written to disk.")
+            elif mapping_file.endswith(".enc"):
                 logging.info(f"Encrypted mapping saved into '{mapping_file}'")
             else:
                 logging.info(f"Mapping vocabulary saved into '{mapping_file}'")
@@ -444,6 +459,16 @@ def deanonymize(
             ),
         ),
     ] = None,
+    source_sha256: Annotated[
+        Optional[str],
+        typer.Option(
+            "--source-sha256",
+            help=(
+                "Expected SHA-256 of the original source document. "
+                "Rejects a mapping that was locked for a different file."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Deanonymize a file using a mapping file.
@@ -454,6 +479,7 @@ def deanonymize(
             str(anonymized_file),
             str(mapping_file),
             mapping_passphrase=resolve_mapping_passphrase(mapping_passphrase),
+            expected_source_sha256=source_sha256,
         )
     except ValueError as exc:
         logging.error("%s", exc)

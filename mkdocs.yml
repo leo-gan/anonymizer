@@ -125,5 +125,6 @@ nav:
     - SDK & API Usage: project/api-usage.md
     - API Reference (auto): project/api-reference.md
     - Recipes & Common Workflows: project/recipes.md
+    - Mapping encryption: project/mapping-security.md
     - Troubleshooting: project/troubleshooting.md
     - Architecture Design: project/architecture.md

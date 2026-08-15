@@ -76,6 +76,7 @@ deanonymized_file_path, stats_file_path = deanonymize_file(
     "path/to/anonymized.md",
     "path/to/mapping.json",
     # mapping_passphrase="secret",  # required for *.mapping.json.enc
+    # expected_source_sha256="...",  # optional AAD check
 )
 
 print("Deanonymized file:", deanonymized_file_path)
