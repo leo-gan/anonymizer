@@ -48,6 +48,9 @@ from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.prompts import detailed
 
 # Example of programmatic usage
+# detailed.prompt_template also asks the model to hide identity clues:
+# phrases that point to one person without writing their name
+# (for example "the CEO of Tesla"). Use simple.prompt_template to skip that.
 text, mapping = anonymize_file(
     file_path="/path/to/file.pdf",
     prompt_template=detailed.prompt_template,

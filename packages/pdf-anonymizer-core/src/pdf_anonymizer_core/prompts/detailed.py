@@ -3,8 +3,9 @@
 This prompt instructs the LLM to:
 - Use deep contextual understanding
 - Return base_form for coreference handling
-- Identify a rich set of entity types including JOB_TITLE, ID, and DATE (birthdates only)
-- Explicitly handle variations and possessives
+- Identify a rich set of entity types including JOB_TITLE, ID, DATE (birthdates only),
+  and INDIRECT (phrases that point to one person without saying their name)
+- Explicitly handle variations, possessives, and implied identity
 
 Use this prompt (via pdf_anonymizer_core.prompts.detailed.prompt_template)
 when you want maximum accuracy (pairs well with BEST_QUALITY profile).
@@ -19,14 +20,19 @@ prompt_template = """
     2.  **Identify all PII** based on the guidelines below.
     3.  **Use contextual awareness.** For example, "Apple" as a fruit should not be identified, but "Apple Inc." as a company should.
     4.  **Handle variations.** For each entity identified, you must determine its base form. For example, the base form of "Mary's" is "Mary Smith" if the context refers to a person named Mary Smith. The base form of "Mr. John Doe" is "John Doe".
-    5.  **Return a single JSON object** with one key: "entities".
-    6.  The value of "entities" should be a list of JSON objects. Each object represents a PII entity and MUST have the following keys:
+    5.  **Find identity clues, not just names.** A sentence can point to one real person without ever writing their name. If a typical reader could tell *who* is meant (from the rest of the document, or from well-known public facts), you MUST list that phrase.
+        - If you know the person's name, set "type" to PERSON and "base_form" to that name.
+        - If you do not know the name, set "type" to INDIRECT and "base_form" to the identifying phrase (or a short stable version of it).
+        - Still list the company, city, and job title as their own entities when they appear.
+        - Do NOT mark a vague phrase such as "the CEO" or "a teacher in Austin" unless it is specific enough to pick out one person.
+    6.  **Return a single JSON object** with one key: "entities".
+    7.  The value of "entities" should be a list of JSON objects. Each object represents a PII entity and MUST have the following keys:
         - "text": The exact PII text found in the document.
-        - "type": The type of the entity (e.g., PERSON, ORGANIZATION).
+        - "type": The type of the entity (e.g., PERSON, ORGANIZATION, INDIRECT).
         - "base_form": The canonical or base form of the entity.
 
     ENTITY TYPES:
-    *   **PERSON:** Full names, first names, last names, middle names, and their variations (e.g., possessives, titles).
+    *   **PERSON:** Full names, first names, last names, middle names, and their variations (e.g., possessives, titles). Also use PERSON for a nameless phrase when you know which person it refers to; put their name in "base_form".
     *   **ADDRESS:** Street names, house numbers, city names, state/province names, postal codes, country names.
     *   **DATE:** Only birthdates. Do not identify other dates.
     *   **PHONE:** Any numerical sequences resembling phone numbers.
@@ -35,6 +41,7 @@ prompt_template = """
     *   **JOB_TITLE:** Specific roles or positions within organizations.
     *   **ID:** Any alphanumeric strings that appear to be account numbers or identifiers.
     *   **LOCATION:** Locations that are not full addresses, like cities or landmarks.
+    *   **INDIRECT:** A phrase that does not contain a person's name, but still points to one specific person (for example a unique job at a named company, or "the author of …"). Use this when you cannot name the person.
 
     Example 1:
     Text: "Mr. John Doe from Acme Inc. visited our office in Springfield yesterday. We discussed Mary's project."
@@ -55,6 +62,37 @@ prompt_template = """
         "entities": [
             {{"text": "John's", "type": "PERSON", "base_form": "John"}},
             {{"text": "The New York Times", "type": "ORGANIZATION", "base_form": "The New York Times"}}
+        ]
+    }}
+
+    Example 3:
+    Text: "We scheduled a meeting with the CEO of Tesla at his office in Austin."
+    Response:
+    {{
+        "entities": [
+            {{"text": "CEO of Tesla", "type": "PERSON", "base_form": "Elon Musk"}},
+            {{"text": "Tesla", "type": "ORGANIZATION", "base_form": "Tesla"}},
+            {{"text": "Austin", "type": "LOCATION", "base_form": "Austin"}}
+        ]
+    }}
+
+    Example 4:
+    Text: "I'm sitting here with the author of the 'Harry Potter' series."
+    Response:
+    {{
+        "entities": [
+            {{"text": "the author of the 'Harry Potter' series", "type": "PERSON", "base_form": "J.K. Rowling"}}
+        ]
+    }}
+
+    Example 5:
+    Text: "Please copy Acme Inc.'s only in-house patent counsel in Springfield on the filing."
+    Response:
+    {{
+        "entities": [
+            {{"text": "Acme Inc.'s only in-house patent counsel", "type": "INDIRECT", "base_form": "Acme Inc.'s only in-house patent counsel"}},
+            {{"text": "Acme Inc.", "type": "ORGANIZATION", "base_form": "Acme Inc."}},
+            {{"text": "Springfield", "type": "LOCATION", "base_form": "Springfield"}}
         ]
     }}
 

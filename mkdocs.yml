@@ -106,6 +106,10 @@ plugins:
             members_order: alphabetical
             show_signature_annotations: true
 
+# Internal maintainer notes under docs/internal/ must never ship to GitHub Pages.
+exclude_docs: |
+  /internal/
+
 nav:
   - Home: index.md
   - Privacy & Anonymization 101:

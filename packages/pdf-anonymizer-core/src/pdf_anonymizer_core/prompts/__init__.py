@@ -2,7 +2,8 @@
 
 Exposes two ready-to-use templates:
 
-- `detailed` : richer instructions, base_form support, more entity types.
+- `detailed` : richer instructions, base_form support, more entity types,
+  including INDIRECT (phrases that identify a person without naming them).
 - `simple`   : minimal, faster, lower token usage.
 
 Example:

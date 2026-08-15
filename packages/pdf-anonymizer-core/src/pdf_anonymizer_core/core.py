@@ -175,6 +175,7 @@ def anonymize_file(
         "PHONE": 4,
         "URL": 4,
         # LLM-detected semantic types (lower than strong regex matches)
+        "INDIRECT": 4,  # nameless phrase that still identifies one person
         "PERSON": 3,
         "ORGANIZATION": 2,
         "LOCATION": 1,

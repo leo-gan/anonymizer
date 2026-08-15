@@ -66,12 +66,16 @@ print("Google models:", google_models)
 ### Selecting a Prompt Template
 The package provides two pre-configured prompt styles: `simple` and `detailed`.
 
+`detailed` is the careful one. Besides names, emails, and similar labels, it asks the model to hide **identity clues**: phrases that point to one person without writing their name (for example "the CEO of Tesla", or "Acme Inc.'s only in-house patent counsel"). Those phrases come back as type `PERSON` (when the model knows the name) or type `INDIRECT` (when it does not). `simple` does not ask for this, so it stays cheaper.
+
 ```python
 from pdf_anonymizer_core.prompts import simple, detailed
 
-# Use the detailed prompt template (recommended)
+# Use the detailed prompt template (recommended when identity clues matter)
 prompt_text = detailed.prompt_template
 ```
+
+A slower, classroom-style explanation is in [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
 
 ---
 

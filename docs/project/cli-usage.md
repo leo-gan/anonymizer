@@ -22,7 +22,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | :--- | :--- | :--- | :--- |
 | `--config-profile` / `-p` | `best-quality` \| `best-speed` \| `best-cost` | `best-speed` | Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). |
 | `--characters-to-anonymize` | `INTEGER` | `100000` | The character size of each chunk sent to the LLM (overrides profile). |
-| `--prompt-name` | `simple` \| `detailed` | `detailed` | The type of instruction prompt sent to the LLM (overrides profile). |
+| `--prompt-name` | `simple` \| `detailed` | `detailed` | Instruction style sent to the language model (overrides profile). `detailed` also hides identity clues. `simple` does not. |
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
 | `--anonymized-entities` | `PATH` | *None* | Path to a text file containing custom entities to search for and anonymize. |
 
@@ -32,14 +32,14 @@ The `--config-profile` (or `-p`) flag is the recommended way to select quality/s
 
 | Profile        | Default Model           | Prompt   | Chunk Size | Overlap | Retries | Best For                          |
 |----------------|-------------------------|----------|------------|---------|---------|-----------------------------------|
-| `best-quality` | `gemini-2.5-pro`        | detailed | 15,000     | 2,000   | 5       | Highest accuracy (slower/costlier)|
-| `best-speed`   | `gemini-2.5-flash`      | simple   | 30,000     | 1,000   | 3       | Balanced (default)                |
-| `best-cost`    | `gemini-2.5-flash-lite` | simple   | 60,000     | 3,000   | 3       | Cheap & fast on long documents    |
+| `best-quality` | `gemini-2.5-pro`        | detailed | 15,000     | 2,000   | 5       | Highest accuracy; also hides identity clues (slower/costlier)|
+| `best-speed`   | `gemini-2.5-flash`      | simple   | 30,000     | 1,000   | 3       | Balanced (default); does not hunt for identity clues |
+| `best-cost`    | `gemini-2.5-flash-lite` | simple   | 60,000     | 3,000   | 3       | Cheap & fast on long documents; no identity-clue hunt |
 
 **Examples**
 
 ```bash
-# High accuracy on an important contract
+# High accuracy on an important contract (also hides identity clues)
 pdf-anonymizer run contract.pdf -p best-quality
 
 # Fast + cheap batch of notes with a local model

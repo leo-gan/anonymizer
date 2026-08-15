@@ -81,7 +81,7 @@ A powerful, open-source Java application designed for structuring tabular data. 
 A popular Python framework for detecting and redacting PII in unstructured text. It uses a combination of regular expressions (regexes) and classical Named Entity Recognition (NER) models (like Spacy or Hugging Face transformers).
 
 *   *How it works*: Regexes look for patterns like emails, phone numbers, or credit card structures. The NER model tags entities like `PERSON`, `LOCATION`, and `DATE`.
-*   *Limitation*: Classical NER models are sensitive to formatting, capitalization, and surrounding phrasing. They struggle when PII is implied rather than explicitly named. For example, in the sentence *"I'm sitting here with the author of the 'Harry Potter' series"*, Presidio might detect nothing, whereas an LLM knows "J.K. Rowling" is implied.
+*   *Limitation*: Classical NER models are sensitive to formatting, capitalization, and surrounding phrasing. They struggle when PII is implied rather than explicitly named. For example, in the sentence *"I'm sitting here with the author of the 'Harry Potter' series"*, Presidio might detect nothing, whereas an LLM knows "J.K. Rowling" is implied. PDF Anonymizer's **detailed** instructions now ask for that kind of identity clue on purpose. See [How PDF Anonymizer is Different](how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
 
 ---
 

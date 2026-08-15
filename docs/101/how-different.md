@@ -11,13 +11,54 @@ Here is what makes this project different.
 Traditional text anonymizers (like Microsoft Presidio) use regular expressions for patterns (e.g. emails) and classical Named Entity Recognition (NER) for words (e.g. names). This approach has severe limitations:
 
 *   **Syntax Sensitivity**: A misspelled name or unusual capitalisation (e.g. "sarah connor") can cause a classical NER model to miss the identifier entirely.
-*   **Indirect Identifiers**: Traditional tools cannot identify contextual PII. For instance, in:
+*   **Identity clues (not just names)**: A sentence can point to one real person without ever writing their name. See the full explanation below.
 
-    > *"We scheduled a meeting with the CEO of Tesla at his office in Austin."*
+*   **PDF Anonymizer's Advantage**: The careful (`detailed`) instructions now ask the language model to hide those identity clues, not only names, emails, and phone numbers. The faster (`simple`) instructions still look mainly for obvious labels, so they stay cheap.
 
-    A classical tool might mask "Austin", but it won't mask *"CEO of Tesla"*, which immediately identifies **Elon Musk** to any reader.
+---
 
-*   **PDF Anonymizer's Advantage**: By leveraging Large Language Models (LLMs), the tool acts like a human reader. It understands semantics, indirect references, and complex sentence structures, allowing it to catch hidden or contextual PII that rules miss.
+## Identity clues: when the name is missing, but everyone still knows who it is
+
+Imagine you are asked to hide people in a story. Crossing out every name is a good first step. It is not enough.
+
+Suppose a classmate writes:
+
+> "We scheduled a meeting with the CEO of Tesla at his office in Austin."
+
+There is no first name and no last name in that sentence. A simple name-finder will miss it. Any reader who follows the news still knows exactly which person is meant.
+
+That leftover phrase is an **identity clue**: words that do not *look* like a name, but still pick out one person.
+
+Here are three everyday cases the careful instructions now ask the model to catch:
+
+1. **Job + company + place.** "the CEO of Tesla … in Austin" points to one well-known person. The tool should hide the whole clue (`CEO of Tesla`), and still hide the company and the city if they appear.
+2. **Author of a famous work.** "the author of the 'Harry Potter' series" points to one writer, even if the writer's name is never written.
+3. **A one-of-a-kind role at a named company.** "Acme Inc.'s only in-house patent counsel" may not be a celebrity, but inside that company it still points to one employee. The tool should hide the whole phrase.
+
+### What the tool does with a clue
+
+- If the model **knows the person's name**, it treats the clue as that person. Later, if the real name also appears, both get the same stand-in label (for example `PERSON_1` and `PERSON_1.v_1`).
+- If the model **cannot name the person**, it still hides the phrase and labels it `INDIRECT_1`. The important part is that the identifying words leave the page.
+
+### What it should *not* hide
+
+Vague words are not identity clues. "the CEO" by itself, or "a teacher in Austin", could be many people. The instructions tell the model to leave those alone unless the rest of the sentence makes the person unique.
+
+### How to turn this on
+
+The default `best-speed` profile uses the short instructions, which do **not** hunt for these clues. Use the careful profile when this matters:
+
+```bash
+pdf-anonymizer run notes.pdf -p best-quality
+```
+
+Or keep your current profile and only switch the instructions:
+
+```bash
+pdf-anonymizer run notes.pdf --prompt-name detailed
+```
+
+This is still a helper, not a guarantee. A very unusual clue can be missed. If a document must be safe to share, a person should still read the result.
 
 ---
 
