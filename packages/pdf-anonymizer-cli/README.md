@@ -88,6 +88,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 
 - `--entity-profile hipaa-safe-harbor`: coverage aid for the 18 Safe Harbor identifier classes (year-only dates, ZIP3, age 90+). **Not a compliance certificate.**
 - `--mapping-in PATH`: reuse an existing mapping so the same person stays `PERSON_1` across files. Files in one `run` share the map automatically.
+- `--keep-list PATH`: phrases to leave visible (one per line).
+- `--deny-list PATH`: phrases that must be hidden even if detection missed them.
 
 `pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 

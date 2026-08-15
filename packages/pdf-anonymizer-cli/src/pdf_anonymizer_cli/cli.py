@@ -17,6 +17,7 @@ from pdf_anonymizer_core.conf import (
     types_for_entity_profile,
 )
 from pdf_anonymizer_core.core import anonymize_file
+from pdf_anonymizer_core.gazetteers import load_phrase_list
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.operators import parse_operator_specs
@@ -163,6 +164,30 @@ def run(
             ),
         ),
     ] = True,
+    keep_list: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--keep-list",
+            help="Phrases to leave visible (one per line). Wins over --deny-list.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ] = None,
+    deny_list: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--deny-list",
+            help="Phrases that must be hidden even if detection missed them (one per line).",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ] = None,
     mapping_in: Annotated[
         Optional[Path],
         typer.Option(
@@ -289,6 +314,13 @@ def run(
         )
         logging.info("  --operator after profile: %s", operator_map)
 
+    keep_phrases = load_phrase_list(str(keep_list)) if keep_list else None
+    deny_phrases = load_phrase_list(str(deny_list)) if deny_list else None
+    if keep_phrases:
+        logging.info("  --keep-list: %s phrase(s)", len(keep_phrases))
+    if deny_phrases:
+        logging.info("  --deny-list: %s phrase(s)", len(deny_phrases))
+
     logging.info(f"Found {len(file_paths)} file(s) to process.")
 
     seed_mapping = None
@@ -318,6 +350,8 @@ def run(
             operators=operator_map or None,
             fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
             seed_mapping=seed_mapping,
+            keep_list=keep_phrases,
+            deny_list=deny_phrases,
         )
 
         if full_anonymized_text and final_mapping:

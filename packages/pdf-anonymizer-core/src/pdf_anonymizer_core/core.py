@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Tuple
 from pdf_anonymizer_core.call_llm import identify_entities_with_llm
 from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
+from pdf_anonymizer_core.gazetteers import apply_deny_list, apply_keep_list
 from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
 from pdf_anonymizer_core.utils import seed_placeholder_state
@@ -42,6 +43,8 @@ def anonymize_file(
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
+    keep_list: Optional[List[str]] = None,
+    deny_list: Optional[List[str]] = None,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -83,6 +86,8 @@ def anonymize_file(
             person + type + secret always yields the same fake.
         seed_mapping: Optional original → written map from a previous file so
             the same person keeps PERSON_1 (or the same fake) across documents.
+        keep_list: Phrases that must stay visible even if detected.
+        deny_list: Phrases that must be replaced even if detection missed them.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -193,6 +198,7 @@ def anonymize_file(
         "ORGANIZATION": 2,
         "LOCATION": 1,
         "ADDRESS": 1,
+        "CUSTOM": 3,
     }
 
     def _type_priority(ent_type: str) -> int:
@@ -221,6 +227,11 @@ def anonymize_file(
             for e in deduped_entities
             if type_matches_filter(e["type"], anonymized_entities)
         ]
+
+    if deny_list:
+        entities_to_process = apply_deny_list(full_text, entities_to_process, deny_list)
+    if keep_list:
+        entities_to_process = apply_keep_list(entities_to_process, keep_list)
 
     logging.info(
         f"Collected {len(collected_entities)} total entities. "
