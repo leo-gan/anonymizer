@@ -1715,12 +1715,20 @@
 <td>A nearby date</td>
 <td>Dates that must stay dates, not just a year</td>
 </tr>
+<tr>
+<td><code>fake</code></td>
+<td><code>Jane Alvarez</code>, <code>555-0103</code></td>
+<td>Looks real; same person always gets the same fake</td>
+</tr>
 </tbody>
 </table>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>invoice.pdf<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">CREDIT_CARD</span><span class="o">=</span>mask<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE</span><span class="o">=</span>generalize<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE_ISO</span><span class="o">=</span>generalize
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="c1"># Invent stable fake names (same person → same fake)</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--operator<span class="w"> </span><span class="nv">PERSON</span><span class="o">=</span>fake<span class="w"> </span>--operator<span class="w"> </span><span class="nv">EMAIL</span><span class="o">=</span>fake
 </span></code></pre></div>
 <p>Types you do not list stay as stand-ins. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>.</p>
 <p>The mapping file still records how to put the original back when the written form is unique. Two dates that both become <code>2019</code> cannot both be restored uniquely.</p>
