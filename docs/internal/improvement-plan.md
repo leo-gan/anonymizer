@@ -7,7 +7,7 @@
 ## Progress
 
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
-- [ ] 2. Checksum validators on structured regex hits
+- [x] 2. Checksum validators on structured regex hits — done 2026-08-14, `feat/regex-checksum-validators`
 - [ ] 3. Country filter for regex patterns
 - [ ] 4. Residual-PII verification pass
 - [ ] 5. Encrypted mapping file
@@ -42,7 +42,7 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 
 Known code facts to attach to:
 
-- `conf.py`: regexes are structural, **not checksummed**.
+- `conf.py`: regexes are still structural. After a match, `validators.py` runs a cheap check (Luhn, IBAN, VIN, a few national IDs). Failures stay hidden as `TYPE_LIKE` (`IBAN_LIKE_1`).
 - `core.py`: replacement is whole-document string match, not character spans.
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Recipes already call the mapping file “the key”; it is not encrypted.
@@ -81,16 +81,19 @@ Known code facts to attach to:
 
 ### 2. Checksum validators on structured regex hits
 
-**Technique:** data removal with higher precision.  
-**Why:** `DEFAULT_REGEX_PATTERNS` is over-inclusive (`CREDIT_CARD`, `IBAN`, `MEDICAL_NPI_US`, many national IDs). False positives become tokens and destroy utility.
+**Status:** done (2026-08-14) — `feat/regex-checksum-validators` (PR link after open)
+
+**Technique:** data removal with higher precision, without leaving mistyped numbers in the clear.  
+**Why:** `DEFAULT_REGEX_PATTERNS` is over-inclusive (`CREDIT_CARD`, `IBAN`, `MEDICAL_NPI_US`, many national IDs). Shape-only hits used to become tokens or, if dropped, stay visible.
 
 **Do**
 
-- Add `validators.py` (or equivalent) with Luhn (cards, NPI), IBAN mod-97 + country length, VIN check digit, and a few national-ID checksums that are cheap and unambiguous.
-- After `extract_entities_via_regex`, drop checksum failures. Leave the miss for the LLM stage.
+- Add `validators.py` with Luhn (cards, NPI, Canadian SIN), IBAN mod-97 + country length, VIN check digit, and a few national-ID checksums.
+- After `extract_entities_via_regex`, **do not drop** checksum failures. Relabel them `TYPE_LIKE` (`IBAN_LIKE_1`). Verified hits stay `IBAN_1`.
+- Listing `IBAN` in `--anonymized-entities` also includes `IBAN_LIKE`.
 - Keep regex patterns themselves unchanged.
 
-**Touches:** new validator module, `regex_ner.py` or the merge step in `core.py`, `tests/test_regex_ner.py`.  
+**Touches:** `validators.py`, `regex_ner.py`, `core.py` (priority + type filter), tests, recipes / README.  
 **Prerequisite:** none.
 
 ---

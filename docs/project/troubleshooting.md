@@ -43,6 +43,7 @@ Common problems and how to resolve them.
   - A sentence may still point to one person without writing their name (an identity clue). The default `best-speed` profile does not hunt for those. Try `-p best-quality` (uses the `detailed` prompt and a stronger model by default).
   - Use `--anonymized-entities` only if you intentionally want to restrict the types.
   - Check `app.log` — it shows how many entities were found by Regex vs LLM per chunk.
+  - A number that *looks* like a card, IBAN, VIN, or national ID but fails the extra check-digit is still hidden, as `IBAN_LIKE_1` / `CREDIT_CARD_LIKE_1` and so on. That is expected for typos and example numbers such as `1234-5678-9012-3456`.
   - Very short documents or unusual formatting can reduce recall.
 
 ## LLM Returns Invalid JSON / Parsing Failures

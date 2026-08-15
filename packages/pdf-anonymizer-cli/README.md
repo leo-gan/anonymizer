@@ -4,6 +4,7 @@ A command-line interface for anonymizing PDF, Markdown, and plain text files usi
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Identity clues**: With `-p best-quality` or `--prompt-name detailed`, the tool also hides phrases that point to one person without writing their name (for example "the CEO of Tesla"). The default `best-speed` profile does not.
+- **Checksum labels**: After the fast number search, a real IBAN becomes `IBAN_1` and a mistyped one becomes `IBAN_LIKE_1`. Both are hidden. Same idea for cards, VINs, and a few national IDs.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.

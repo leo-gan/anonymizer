@@ -58,6 +58,10 @@ graph TD
     *   **Text/Fallback**: Uses `langchain_text_splitters.RecursiveCharacterTextSplitter`.
 *   This keeps individual requests within LLM token constraints and limits memory footprints.
 
+### Regex first pass (with checksums)
+*   Each chunk is scanned with the RE2 pattern library (emails, cards, IBANs, national IDs, and so on).
+*   A hit that has a cheap extra digit check (card Luhn, IBAN mod-97, VIN check digit, a few national IDs) is relabeled ``TYPE_LIKE`` if that check fails (for example ``IBAN_LIKE``). The text is still replaced. A verified hit keeps the real type and wins if both labels appear for the same span. Listing ``IBAN`` in ``--anonymized-entities`` also includes ``IBAN_LIKE``.
+
 ### LLM Entity Identification
 *   Each chunk is sent to the selected LLM provider along with the chosen prompt.
 *   The LLM returns structured JSON lists of detected entities, specifying their direct text and their base entity type (e.g. `PERSON`, `ORGANIZATION`, `DATE`, `LOCATION`).

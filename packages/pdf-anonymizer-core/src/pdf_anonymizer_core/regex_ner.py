@@ -48,15 +48,20 @@ and are used for placeholder generation (EMAIL_1, IBAN_7, DRIVERS_LICENSE_CA_2, 
 Only the keys you provide are used; there is no automatic merging with defaults
 unless you build your dict from DEFAULT_REGEX_PATTERNS.
 
-The function is intentionally tiny. It only does structural scanning. Semantic
-disambiguation, name coreference, and hard-to-regex PII remain the responsibility
-of the LLM stage that always follows.
+The function is intentionally tiny. It only does structural scanning, then
+runs a cheap checksum when one exists (Luhn, IBAN mod-97, VIN check digit,
+and a few national-ID checks). Failures are kept and relabeled TYPE_LIKE
+(for example IBAN_LIKE) so a mistyped number is still hidden. Semantic
+disambiguation, name coreference, and hard-to-regex PII remain the
+responsibility of the LLM stage that always follows.
 """
 
 import logging
 from typing import Dict, List, TypedDict
 
 import re2 as re
+
+from pdf_anonymizer_core.validators import has_checksum, like_type, passes_checksum
 
 
 class EntityDict(TypedDict):
@@ -68,6 +73,8 @@ class EntityDict(TypedDict):
 def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[EntityDict]:
     """
     Scans the text for PII using pre-configured regular expressions (RE2 engine).
+    Matches that fail a registered checksum (see validators.py) are kept and
+    labeled ``<TYPE>_LIKE`` (for example ``IBAN_LIKE``).
 
     Args:
         text: Input text to analyze.
@@ -90,10 +97,23 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
                 if not matched_text.strip():
                     continue
 
+                entity_type_upper = entity_type.upper()
+                if has_checksum(entity_type_upper) and not passes_checksum(
+                    entity_type_upper, matched_text
+                ):
+                    like = like_type(entity_type_upper)
+                    logging.debug(
+                        "Checksum failed for %s %r; labeling as %s",
+                        entity_type_upper,
+                        matched_text,
+                        like,
+                    )
+                    entity_type_upper = like
+
                 entities.append(
                     {
                         "text": matched_text,
-                        "type": entity_type.upper(),
+                        "type": entity_type_upper,
                         "base_form": matched_text,
                     }
                 )

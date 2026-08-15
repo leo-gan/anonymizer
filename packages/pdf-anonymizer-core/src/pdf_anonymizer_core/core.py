@@ -23,6 +23,7 @@ from pdf_anonymizer_core.call_llm import identify_entities_with_llm
 from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
+from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
 
 
 def anonymize_file(
@@ -182,6 +183,12 @@ def anonymize_file(
         "ADDRESS": 1,
     }
 
+    def _type_priority(ent_type: str) -> int:
+        upper = ent_type.upper()
+        if upper.endswith(LIKE_SUFFIX):
+            return type_priority.get(parent_type(upper), 0) - 1
+        return type_priority.get(upper, 0)
+
     best_entities: Dict[str, dict] = {}
     for ent in collected_entities:
         text = ent["text"]
@@ -190,18 +197,17 @@ def anonymize_file(
             best_entities[text] = ent
         else:
             existing_type = best_entities[text]["type"].upper()
-            if type_priority.get(ent_type, 0) > type_priority.get(existing_type, 0):
+            if _type_priority(ent_type) > _type_priority(existing_type):
                 best_entities[text] = ent
 
     deduped_entities = list(best_entities.values())
 
     entities_to_process = deduped_entities
     if anonymized_entities:
-        anonymized_entities_upper = [e.upper() for e in anonymized_entities]
         entities_to_process = [
             e
             for e in deduped_entities
-            if e["type"].upper() in anonymized_entities_upper
+            if type_matches_filter(e["type"], anonymized_entities)
         ]
 
     logging.info(
