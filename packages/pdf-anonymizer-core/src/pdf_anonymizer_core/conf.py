@@ -2,8 +2,8 @@
 
 This module defines:
 - Default constants and directories used by the anonymizer.
-- Three built-in ConfigProfiles (best-quality, best-speed, best-cost) that
-  bundle sensible combinations of model, prompt, chunk size, retries, etc.
+- Built-in ConfigProfiles (best-quality, best-speed, best-cost, regex-only)
+  that bundle model, prompt, chunk size, retries, and whether to call an LLM.
 - The AppConfig Pydantic model.
 - get_config_for_profile() helper (used heavily by the CLI).
 - Legacy enums (PromptEnum, ModelName, etc.) for compatibility and
@@ -98,7 +98,6 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "VIN": r"\b[A-HJ-NPR-Z0-9]{17}\b",
     # Common machine / log / API date-time formats (ISO-8601 and close variants)
     "DATE_ISO": r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})?)?\b",
-
     # ---------- UNITED STATES (US) ----------
     "SSN_US": r"\b\d{3}-\d{2}-\d{4}\b",
     "EIN_US": r"\b\d{2}-\d{7}\b",  # Employer Identification Number / US tax ID for businesses
@@ -108,88 +107,72 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "MEDICAL_NPI_US": r"\b[0-9]{10}\b",  # National Provider Identifier (10 digits)
     # Medical / DEA style controlled substance license (example structural)
     "MEDICAL_LICENSE_US": r"\b[A-Z]{1,2}\d{6,9}\b",
-
     # ---------- CANADA (CA) ----------
     "SIN_CA": r"\b\d{3}-\d{3}-\d{3}\b",  # Social Insurance Number
     "CA_PASSPORT": r"\b[A-Z]{2}\d{6}\b",
     "DRIVERS_LICENSE_CA": r"\b[A-Z]\d{4,5}-\d{5,6}-\d{5}\b|\b[A-Z0-9]{5,15}\b",  # varies by province
-
     # ---------- UNITED KINGDOM (GB) ----------
     "NINO_GB": r"\b[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}\d{6}[A-DFM]?\b",  # National Insurance Number
     "GB_PASSPORT": r"\b[0-9]{9}\b",
     "DRIVERS_LICENSE_GB": r"\b[A-Z9]{5}\d{6}[A-Z9]{2}\d[A-Z]{2}\b",  # 16 char UK DL number (approx structural)
     "VAT_GB": r"\bGB\d{9}\b|\bGB\d{12}\b|\bGBGD\d{3}\b|\bGBHA\d{3}\b",
     "COMPANIES_HOUSE_GB": r"\b(?:SC|NI|OC|SO)?\d{6,8}\b",  # Company number
-
     # ---------- FRANCE (FR) ----------
     "INSEE_FR": r"\b[12]\d{12,14}\b",  # NIR / INSEE (simplified for RE2 recall; LLM validates)
     "VAT_FR": r"\bFR[A-HJ-NP-Z0-9]{2}\d{9}\b",
     "DRIVERS_LICENSE_FR": r"\b[A-Z0-9]{12}\b",  # French permis (approx)
     "PASSPORT_FR": r"\b\d{2}[A-Z]{2}\d{5}\b",
-
     # ---------- SPAIN (ES) ----------
     "DNI_ES": r"\b\d{8}[A-HJ-NP-TV-Z]\b",
     "NIE_ES": r"\b[XYZ]\d{7}[A-HJ-NP-TV-Z]\b",
     "CIF_ES": r"\b[A-HJ-NP-S]\d{7}[A-J0-9]\b",  # Company tax ID
     "VAT_ES": r"\bES[A-Z0-9]\d{7}[A-Z0-9]\b",
     "DRIVERS_LICENSE_ES": r"\b[A-Z0-9]{9,10}\b",
-
     # ---------- ITALY (IT) ----------
     "CODICE_FISCALE_IT": r"\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b",
     "VAT_IT": r"\bIT\d{11}\b",
     "DRIVERS_LICENSE_IT": r"\b[A-Z0-9]{10}\b",
-
     # ---------- INDIA (IN) ----------
     "AADHAAR_IN": r"\b\d{4}\s?\d{4}\s?\d{4}\b",
     "PAN_IN": r"\b[A-Z]{5}\d{4}[A-Z]\b",  # Permanent Account Number
     "GSTIN_IN": r"\b\d{2}[A-Z]{5}\d{4}[A-Z]\d[A-Z0-9]{2}\b",
     "DRIVERS_LICENSE_IN": r"\b[A-Z]{2}\d{2}\s?\d{11}\b|\b[A-Z]{2}-\d{13}\b",
-
     # ---------- CHINA (CN) ----------
     "RESIDENT_ID_CN": r"\b\d{17}[\dXx]\b",  # 18-digit Resident Identity Card (last may be X)
     "UNIFIED_SOCIAL_CREDIT_CODE_CN": r"\b[A-Z0-9]{18}\b",  # USCC / 统一社会信用代码
     "PASSPORT_CN": r"\bE\d{8}\b|\bG\d{8}\b|\bS\d{8}\b",  # Common formats
-
     # ---------- GERMANY (DE) ----------
     "STEUER_ID_DE": r"\b\d{11}\b",  # Personal tax ID (11 digits)
     "VAT_DE": r"\bDE\d{9}\b",
     "PERSONALAUSWEIS_DE": r"\b[A-Z0-9]{9,10}\b",  # approx ID card / passport style
     "DRIVERS_LICENSE_DE": r"\b[A-Z0-9]{11,12}\b",
-
     # ---------- JAPAN (JP) ----------
     "MY_NUMBER_JP": r"\b\d{4}\s?\d{4}\s?\d{4}\b",  # 12-digit Individual Number
     "RESIDENT_CARD_JP": r"\b[A-Z]{2}\d{8}\b",  # approx
     "DRIVERS_LICENSE_JP": r"\b\d{12}\b",
-
     # ---------- SOUTH KOREA (KR) ----------
     "RESIDENT_REGISTRATION_KR": r"\b\d{6}-\d{7}\b",  # RRN (with dash)
     "BUSINESS_REG_KR": r"\b\d{3}-\d{2}-\d{5}\b",
-
     # ---------- AUSTRALIA (AU) / NEW ZEALAND (NZ) ----------
     "TFN_AU": r"\b\d{3}\s?\d{3}\s?\d{3}\b",  # Tax File Number
     "ABN_AU": r"\b\d{2}\s?\d{3}\s?\d{3}\s?\d{3}\b",  # Australian Business Number
     "DRIVERS_LICENSE_AU": r"\b[A-Z0-9]{8,10}\b",
     "IRD_NZ": r"\b\d{2,3}-\d{3,4}-\d{3}\b",  # IRD number (tax)
-
     # ---------- BRAZIL (BR) ----------
     "CPF_BR": r"\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b",  # Pessoa Física
     "CNPJ_BR": r"\b\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}\b",  # Pessoa Jurídica (business)
     "RG_BR": r"\b\d{2}\.?\d{3}\.?\d{3}-?[0-9X]\b",
-
     # ---------- MEXICO (MX) / ARGENTINA (AR) ----------
     "CURP_MX": r"\b[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d\b",
     "RFC_MX": r"\b[A-Z]{3,4}\d{6}[A-Z0-9]{3}\b",
     "DNI_AR": r"\b\d{8}\b",  # Argentine ID (often 8 digits + verification in context)
-
     # ---------- SOUTH AFRICA (ZA) ----------
     "ID_ZA": r"\b\d{13}\b",  # 13-digit SA ID
     "TAX_ZA": r"\b\d{10}\b",
-
     # ---------- SINGAPORE (SG) / HONG KONG (HK) / TAIWAN (TW) ----------
     "NRIC_SG": r"\b[SGT]\d{7}[A-Z]\b",  # National Registration Identity Card
     "HKID_HK": r"\b[A-Z]{1,2}\d{6}[0-9A]\b",
     "NATIONAL_ID_TW": r"\b[A-Z]\d{9}\b",
-
     # ---------- EUROPE (selected other) ----------
     "BSN_NL": r"\b\d{9}\b",  # Burgerservicenummer (NL)
     "VAT_NL": r"\bNL\d{9}B\d{2}\b",
@@ -205,7 +188,6 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "PPS_IE": r"\b\d{7}[A-W]\b",  # Personal Public Service Number (IE)
     "NIF_PT": r"\b\d{9}\b",
     "AMKA_GR": r"\b\d{11}\b",
-
     # ---------- MIDDLE EAST / OTHER ----------
     "ID_IL": r"\b\d{9}\b",  # Israeli ID (Teudat Zehut)
     "NATIONAL_ID_TR": r"\b\d{11}\b",  # Turkish TC Kimlik
@@ -213,7 +195,6 @@ DEFAULT_REGEX_PATTERNS: Dict[str, str] = {
     "NATIONAL_ID_TH": r"\b\d{13}\b",  # Thai ID
     "NRIC_MY": r"\b\d{6}-\d{2}-\d{4}\b",  # Malaysian
     "NIK_ID": r"\b\d{16}\b",  # Indonesian
-
     # ---------- Legacy / aliases kept for compatibility ----------
     "SSN": r"\b\d{3}-\d{2}-\d{4}\b",  # maps to US SSN
 }
@@ -322,6 +303,7 @@ class ConfigProfile(str, Enum):
     BEST_QUALITY = "best-quality"
     BEST_SPEED = "best-speed"
     BEST_COST = "best-cost"
+    REGEX_ONLY = "regex-only"
 
 
 class EntityProfile(str, Enum):
@@ -415,6 +397,17 @@ PROFILE_CONFIGS: Dict[ConfigProfile, Dict[str, Any]] = {
         "base_retry_delay": 1.0,
         "max_retry_delay": 15.0,
     },
+    ConfigProfile.REGEX_ONLY: {
+        "model_name": "none",
+        "prompt_name": "simple",
+        "chunk_size": 200000,
+        "chunk_overlap": 0,
+        "max_retries": 1,
+        "base_retry_delay": 1.0,
+        "max_retry_delay": 1.0,
+        "use_llm": False,
+        "enable_cache": False,
+    },
 }
 
 
@@ -437,6 +430,7 @@ class AppConfig(BaseModel):
     regex_patterns: Dict[str, str] = Field(
         default_factory=lambda: dict(DEFAULT_REGEX_PATTERNS)
     )
+    use_llm: bool = True
 
 
 def get_config_for_profile(
@@ -457,7 +451,8 @@ def get_config_for_profile(
     come from the chosen profile.
 
     Args:
-        profile: One of ConfigProfile.BEST_QUALITY, BEST_SPEED or BEST_COST.
+        profile: One of ConfigProfile.BEST_QUALITY, BEST_SPEED, BEST_COST,
+            or REGEX_ONLY.
         model_name: Optional override for the model (string or provider/model).
         prompt_name: Optional override ("simple" or "detailed").
         chunk_size: Optional override for characters_to_anonymize / chunk_size.
@@ -488,6 +483,8 @@ def get_config_for_profile(
         base_retry_delay=profile_defaults["base_retry_delay"],
         max_retry_delay=profile_defaults["max_retry_delay"],
         regex_patterns=filter_regex_patterns(countries),
+        use_llm=profile_defaults.get("use_llm", True),
+        enable_cache=profile_defaults.get("enable_cache", True),
     )
 
 

@@ -51,6 +51,42 @@ anonymized, mapping = anonymize_file(
 
 ---
 
+## Regex-only / offline (no language model)
+
+Air-gapped machines, structured logs, or a cheap first pass: skip the model. Only the RE2 regex stage runs. Checksums (`IBAN_LIKE_1`), `--countries`, `--operator`, leftover scan, and linkage-risk still run. **Names and identity clues will be missed.**
+
+**CLI**
+
+```bash
+pdf-anonymizer run access.log --no-llm
+# or
+pdf-anonymizer run access.log -p regex-only
+```
+
+No API key is required. `--verify-llm` is ignored in this mode so the process stays offline.
+
+**SDK (Python)**
+
+```python
+from pdf_anonymizer_core.core import anonymize_file
+from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
+
+config = get_config_for_profile(ConfigProfile.REGEX_ONLY)
+anonymized, mapping = anonymize_file(
+    file_path="access.log",
+    characters_to_anonymize=config.chunk_size,
+    prompt_template="",
+    model_name=config.model_name,
+    chunk_overlap=config.chunk_overlap,
+    regex_patterns=config.regex_patterns,
+    use_llm=False,
+)
+```
+
+`use_llm` defaults to True. Existing callers are unchanged.
+
+---
+
 ## Anonymize → Send to External AI / Service → Deanonymize Locally
 
 The classic reversible workflow: protect the original data, let an untrusted system (public ChatGPT, Claude, a third-party analysis service, translation pipeline, etc.) work on the masked version, then recover the real values locally.

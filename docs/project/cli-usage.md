@@ -20,7 +20,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 
 | Option | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--config-profile` / `-p` | `best-quality` \| `best-speed` \| `best-cost` | `best-speed` | Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). |
+| `--config-profile` / `-p` | `best-quality` \| `best-speed` \| `best-cost` \| `regex-only` | `best-speed` | Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). `regex-only` skips the language model. |
+| `--no-llm` | flag | off | Skip the language model. Only the RE2 regex stage runs. Names and identity clues will be missed. Same as `-p regex-only`. |
 | `--characters-to-anonymize` | `INTEGER` | `100000` | The character size of each chunk sent to the LLM (overrides profile). |
 | `--prompt-name` | `simple` \| `detailed` | `detailed` | Instruction style sent to the language model (overrides profile). `detailed` also hides identity clues. `simple` does not. |
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
@@ -47,6 +48,7 @@ The `--config-profile` (or `-p`) flag is the recommended way to select quality/s
 | `best-quality` | `gemini-2.5-pro`        | detailed | 15,000     | 2,000   | 5       | Highest accuracy; also hides identity clues (slower/costlier)|
 | `best-speed`   | `gemini-2.5-flash`      | simple   | 30,000     | 1,000   | 3       | Balanced (default); does not hunt for identity clues |
 | `best-cost`    | `gemini-2.5-flash-lite` | simple   | 60,000     | 3,000   | 3       | Cheap & fast on long documents; no identity-clue hunt |
+| `regex-only`   | none                    | simple   | 200,000    | 0       | 1       | Offline / air-gapped: regex only. Names and identity clues are missed |
 
 **Examples**
 
@@ -247,6 +249,10 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 ### Limit national-ID patterns
 
 `--countries US,GB` keeps every universal pattern (email, IBAN, cards, …) and only the national IDs for those countries.
+
+### Regex-only / offline
+
+`--no-llm` or `-p regex-only` skips the language model. Emails, cards, IBANs, and other structured hits are still hidden (including `_LIKE` checksum failures). Operators, leftover scan, and linkage-risk still run. No API key is required. **Names and identity clues will be missed.** `--verify-llm` is ignored so the process stays offline.
 
 ### Leftover check
 

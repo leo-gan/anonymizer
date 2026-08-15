@@ -68,7 +68,7 @@ def run(
         typer.Option(
             "--config-profile",
             "-p",
-            help="The configuration profile to use (best-quality, best-speed, best-cost).",
+            help="The configuration profile to use (best-quality, best-speed, best-cost, regex-only).",
             case_sensitive=False,
         ),
     ] = ConfigProfile.BEST_SPEED,
@@ -131,6 +131,18 @@ def run(
         typer.Option(
             "--verify-llm/--no-verify-llm",
             help="Also ask the language model to hunt for leftovers (slower).",
+        ),
+    ] = False,
+    no_llm: Annotated[
+        bool,
+        typer.Option(
+            "--no-llm",
+            help=(
+                "Skip the language model. Only the RE2 regex stage runs. "
+                "Checksums, country filter, operators, leftover scan, and "
+                "risk still run. Names and identity clues will be missed. "
+                "Same as -p regex-only. Default: use the model."
+            ),
         ),
     ] = False,
     mapping_passphrase: Annotated[
@@ -264,26 +276,38 @@ def run(
         logging.error("%s", exc)
         sys.exit(1)
 
-    # Configure LLM caching with values from configuration
-    configure_cache(
-        enabled=config.enable_cache,
-        cache_dir=config.cache_dir,
-        cache_file=config.cache_file,
-    )
+    use_llm = bool(config.use_llm) and not no_llm
+    if not use_llm:
+        logging.info(
+            "Regex-only / offline mode: skipping the language model. "
+            "Names and identity clues will be missed."
+        )
+        if verify_llm:
+            logging.warning("--verify-llm is ignored when the language model is off.")
+            verify_llm = False
 
-    provider_name, _ = get_provider_and_model_name(config.model_name)
-    if provider_name == "google":
-        if "gemini" in config.model_name and not os.getenv("GOOGLE_API_KEY"):
-            logging.error(
-                "Error: GOOGLE_API_KEY not found. Please set it in the .env file."
-            )
-            sys.exit(1)
+    if use_llm:
+        # Configure LLM caching with values from configuration
+        configure_cache(
+            enabled=config.enable_cache,
+            cache_dir=config.cache_dir,
+            cache_file=config.cache_file,
+        )
+
+        provider_name, _ = get_provider_and_model_name(config.model_name)
+        if provider_name == "google":
+            if "gemini" in config.model_name and not os.getenv("GOOGLE_API_KEY"):
+                logging.error(
+                    "Error: GOOGLE_API_KEY not found. Please set it in the .env file."
+                )
+                sys.exit(1)
 
     logging.info(f"Using configuration profile: {config_profile.value}")
     logging.info(f"  --file-paths: {file_paths}")
     logging.info(f"  --chunk-size: {config.chunk_size}")
     logging.info(f"  --chunk-overlap: {config.chunk_overlap}")
     logging.info(f"  --model-name: {config.model_name}")
+    logging.info(f"  --use-llm: {use_llm}")
     if country_list:
         logging.info(f"  --countries: {country_list}")
         logging.info(
@@ -364,6 +388,7 @@ def run(
             seed_mapping=seed_mapping,
             keep_list=keep_phrases,
             deny_list=deny_phrases,
+            use_llm=use_llm,
         )
 
         if full_anonymized_text and final_mapping:

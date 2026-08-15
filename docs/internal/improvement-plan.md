@@ -58,6 +58,7 @@ Known code facts to attach to:
 - `--operator TYPE=mask|hash|generalize|shift|fake` changes how a type is written. Default remains `replace` (PERSON_1).
 - `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+). Not a compliance certificate.
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
+- `--no-llm` / `-p regex-only` skips the language model. Regex, checksums, operators, verify, and risk still run. Names and identity clues are missed.
 - `--keep-list` / `--deny-list` gazetteers. Keep wins if a phrase is on both lists.
 - `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). No product behavior change.
 
@@ -353,6 +354,8 @@ Known code facts to attach to:
 ---
 
 ### 16. Regex-only / offline mode
+
+**Status:** in progress (2026-08-15) — `feat/regex-only-offline-mode`
 
 **Technique:** data removal without a language model.  
 **Why:** Air-gapped machines, cost, or structured logs where regex is enough.
