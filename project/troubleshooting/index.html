@@ -900,6 +900,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#encrypted-mapping-will-not-open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted mapping will not open
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-date-or-zip-cannot-be-restored-uniquely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A date or ZIP cannot be restored uniquely
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-entity-profile-hipaa-safe-harbor-is-not-a-certificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --entity-profile hipaa-safe-harbor is not a certificate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#llm-returns-invalid-json-parsing-failures" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1080,6 +1113,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#encrypted-mapping-will-not-open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted mapping will not open
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-date-or-zip-cannot-be-restored-uniquely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A date or ZIP cannot be restored uniquely
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-entity-profile-hipaa-safe-harbor-is-not-a-certificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --entity-profile hipaa-safe-harbor is not a certificate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#llm-returns-invalid-json-parsing-failures" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1180,7 +1246,10 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>HUGGING_FACE_TOKEN=&quot;hf_...&quot;
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>OPENROUTER_API_KEY=&quot;sk-or-...&quot;
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>OLLAMA_HOST=&quot;http://localhost:11434&quot;
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>ANONYMIZER_MAPPING_KEY=&quot;a long secret&quot;
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
 </span></code></pre></div>
+  - <code>ANONYMIZER_MAPPING_KEY</code> locks mapping files as <code>*.mapping.json.enc</code>. <code>ANONYMIZER_FAKE_SECRET</code> seeds <code>--operator TYPE=fake</code>. Neither is required.
   - For the SDK, load the environment variables yourself (e.g. with <code>python-dotenv</code> or <code>os.environ</code>).</p>
 </li>
 </ul>
@@ -1210,7 +1279,27 @@
 <li>Check <code>app.log</code> — it shows how many entities were found by Regex vs LLM per chunk.</li>
 <li>A number that <em>looks</em> like a card, IBAN, VIN, or national ID but fails the extra check-digit is still hidden, as <code>IBAN_LIKE_1</code> / <code>CREDIT_CARD_LIKE_1</code> and so on. That is expected for typos and example numbers such as <code>1234-5678-9012-3456</code>.</li>
 <li>After a run, check <code>data/stats/&lt;stem&gt;.residual_pii.json</code> (or <code>pdf-anonymizer verify …</code>). Leftover emails or numbers listed there were not hidden.</li>
+<li>Check <code>data/stats/&lt;stem&gt;.risk.json</code> (or <code>pdf-anonymizer report …</code>). A <strong>high</strong> score means leftover identity clumps (job + company + place), not that names were missed.</li>
+<li>A keep-list phrase stays visible on purpose. A deny-list phrase becomes <code>CUSTOM_n</code> even if regex and the model missed it.</li>
 <li>Very short documents or unusual formatting can reduce recall.</li>
+</ul>
+<h2 id="encrypted-mapping-will-not-open">Encrypted mapping will not open<a class="headerlink" href="#encrypted-mapping-will-not-open" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>deanonymize</code> fails on <code>*.mapping.json.enc</code>, or you only have a <code>.enc</code> file and no passphrase.</li>
+<li><strong>Fix</strong>:</li>
+<li>Pass the same <code>--mapping-passphrase</code> you used with <code>run</code>, or set <code>ANONYMIZER_MAPPING_KEY</code>.</li>
+<li>There is no recovery path. The masked document plus a locked map without the passphrase cannot put names back.</li>
+<li>Default <code>run</code> still writes plaintext <code>*.mapping.json</code> if you set no passphrase.</li>
+</ul>
+<h2 id="a-date-or-zip-cannot-be-restored-uniquely">A date or ZIP cannot be restored uniquely<a class="headerlink" href="#a-date-or-zip-cannot-be-restored-uniquely" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: After <code>--operator DATE=generalize</code> (or HIPAA year-only dates), two different originals both became <code>2019</code>.</li>
+<li><strong>Fix</strong>: That is expected. Generalize, mask, and hash are not always one-to-one. Use <code>replace</code> (the default <code>PERSON_1</code>) when you need a unique round-trip.</li>
+</ul>
+<h2 id="-entity-profile-hipaa-safe-harbor-is-not-a-certificate"><code>--entity-profile hipaa-safe-harbor</code> is not a certificate<a class="headerlink" href="#-entity-profile-hipaa-safe-harbor-is-not-a-certificate" title="Permanent link">&para;</a></h2>
+<ul>
+<li>That flag is a <strong>coverage aid</strong> (broader identifier classes, year-only dates, ZIP3, age 90+).</li>
+<li>It does <strong>not</strong> mean the file is legally de-identified. It does not hide pixels in a photo. A person still has to read the result.</li>
 </ul>
 <h2 id="llm-returns-invalid-json-parsing-failures">LLM Returns Invalid JSON / Parsing Failures<a class="headerlink" href="#llm-returns-invalid-json-parsing-failures" title="Permanent link">&para;</a></h2>
 <ul>

@@ -1191,7 +1191,14 @@
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a># Ollama Local Host (Optional, defaults to localhost:11434)
 </span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>OLLAMA_HOST=&quot;http://localhost:11434&quot;
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a># Optional: lock mapping files as *.mapping.json.enc (AES-256-GCM)
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>ANONYMIZER_MAPPING_KEY=&quot;a long secret&quot;
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a># Optional: seed for --operator TYPE=fake (same person → same fake)
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
 </span></code></pre></div>
+<p><code>ANONYMIZER_MAPPING_KEY</code> and <code>ANONYMIZER_FAKE_SECRET</code> are optional. Without them, maps stay plaintext JSON and <code>fake</code> uses a built-in constant seed (stable, not private).</p>
 <hr />
 <h2 id="verifying-the-setup">Verifying the Setup<a class="headerlink" href="#verifying-the-setup" title="Permanent link">&para;</a></h2>
 <p>To verify that the installation succeeded and all package internal references are valid, run the automated test suite:</p>

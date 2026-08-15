@@ -1200,13 +1200,15 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--prompt-name<span class="w"> </span>detailed
 </span></code></pre></div>
 <p>This is still a helper, not a guarantee. A very unusual clue can be missed. If a document must be safe to share, a person should still read the result.</p>
+<p>After <code>run</code>, two report files help you look: <code>*.residual_pii.json</code> (leftover emails or numbers) and <code>*.risk.json</code> (identity-clue clumps such as job + company + place). They do <strong>not</strong> rewrite the page.</p>
+<p>A flag-by-flag list of what landed is on the <a href="../../project/cli-usage/#history">CLI History</a> page.</p>
 <hr />
 <h2 id="reversible-masking-the-mapping-engine">Reversible Masking (The Mapping Engine)<a class="headerlink" href="#reversible-masking-the-mapping-engine" title="Permanent link">&para;</a></h2>
 <p>Many tools simply erase text or replace it with generic masks (like <code>&lt;REDACTED&gt;</code>), destroying the structure and utility of the document. </p>
 <p>PDF Anonymizer creates <strong>reversible placeholder mappings</strong>:</p>
 <ul>
-<li><strong>Placeholders retain context</strong>: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., <code>[PERSON_1]</code>, <code>[COMPANY_2]</code>, <code>[DATE_1]</code>). This preserves the grammar, flow, and structural meaning of the document.</li>
-<li><strong>Separate Cryptographic Map</strong>: The CLI outputs an anonymized document along with a JSON-formatted mapping file (e.g., <code>document.mapping.json</code>).</li>
+<li><strong>Placeholders retain context</strong>: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., <code>PERSON_1</code>, <code>ORGANIZATION_2</code>, <code>DATE_1</code>). This preserves the grammar, flow, and structural meaning of the document.</li>
+<li><strong>Separate mapping file</strong>: The CLI outputs an anonymized document along with a JSON mapping file (e.g., <code>document.mapping.json</code>). You can lock that file as <code>*.mapping.json.enc</code> (AES-256-GCM) with a passphrase. Default is still plaintext JSON.</li>
 <li><strong>Local Deanonymization</strong>: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's <code>deanonymize</code> command locally with the mapping file to restore the original names.</li>
 </ul>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Raw Document] -&gt; [PDF Anonymizer CLI]
@@ -1255,13 +1257,31 @@
 <td style="text-align: left;"><strong>Contextual PII detection</strong></td>
 <td style="text-align: left;"><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /> No (Regex/Static)</td>
 <td style="text-align: left;"><img alt="〰" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/3030.svg" title=":wavy_dash:" /> Limited</td>
-<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Yes (LLM semantic comprehension)</td>
+<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Yes (LLM + identity clues)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mistyped numbers</strong></td>
+<td style="text-align: left;">Often left in the clear</td>
+<td style="text-align: left;">Varies</td>
+<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Hidden as <code>IBAN_LIKE_1</code></td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Reversibility</strong></td>
 <td style="text-align: left;"><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /> No</td>
 <td style="text-align: left;"><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /> No</td>
-<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Yes (Separate JSON maps)</td>
+<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Yes (JSON map; optional lock)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>How a type is written</strong></td>
+<td style="text-align: left;">Usually one mask</td>
+<td style="text-align: left;">Usually one mask</td>
+<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> <code>replace</code> / <code>mask</code> / <code>hash</code> / <code>generalize</code> / <code>shift</code> / <code>fake</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Leftover / linkage check</strong></td>
+<td style="text-align: left;">Rare</td>
+<td style="text-align: left;">Rare</td>
+<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Report files only (no auto-rewrite)</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Local Offline Run</strong></td>

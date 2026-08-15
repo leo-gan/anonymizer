@@ -1386,7 +1386,7 @@
 <h3 id="reversible-vs-irreversible-anonymization">Reversible vs. Irreversible Anonymization<a class="headerlink" href="#reversible-vs-irreversible-anonymization" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Irreversible Anonymization (Redaction)</strong>: The original values are permanently destroyed. It is highly secure, but it limits downstream utility when you need to follow up or link records back to the source.</li>
-<li><strong>Reversible Anonymization (Masking &amp; Mapping)</strong>: Original PII is replaced with placeholders (e.g., <code>[PERSON_1]</code>, <code>[DATE_2]</code>), and a secure, encrypted mapping table is stored separately. The masked data can be sent to external entities (like AI models or third-party analysts), and the results can be mapped back to the individuals internally. This is the paradigm used by <strong>PDF Anonymizer</strong>.</li>
+<li><strong>Reversible Anonymization (Masking &amp; Mapping)</strong>: Original PII is replaced with placeholders (e.g., <code>PERSON_1</code>, <code>DATE_2</code>), and a mapping table is stored separately (plaintext JSON by default; you can lock it as <code>*.mapping.json.enc</code>). The masked data can be sent to external entities (like AI models or third-party analysts), and the results can be mapped back to the individuals internally. This is the paradigm used by <strong>PDF Anonymizer</strong>. It is GDPR <em>pseudonymization</em> while you still hold the map, not irreversible anonymization.</li>
 </ul>
 <hr />
 <h2 id="the-legal-compliance-landscape">The Legal Compliance Landscape<a class="headerlink" href="#the-legal-compliance-landscape" title="Permanent link">&para;</a></h2>

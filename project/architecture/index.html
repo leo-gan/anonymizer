@@ -1003,6 +1003,72 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#per-type-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-type operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keep-list-and-deny-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep-list and deny-list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-document-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-document maps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypted-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hipaa-coverage-aid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HIPAA coverage aid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tab-style-eval-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TAB-style eval harness
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1233,6 +1299,72 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#per-type-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-type operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keep-list-and-deny-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep-list and deny-list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-document-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-document maps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypted-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hipaa-coverage-aid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HIPAA coverage aid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tab-style-eval-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TAB-style eval harness
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1350,12 +1482,18 @@
     File[Input File: PDF, MD, TXT] --&gt; Ext[Text Extractor]
     Ext --&gt;|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --&gt; Chunk[Text Chunking]
-    Chunk --&gt;|Iterative Chunks| LLM[LLM Entity Identification]
-    LLM --&gt; Entity[Raw Entities List]
-    Entity --&gt; Cons[Base Form Consolidation]
+    Chunk --&gt; Regex[RE2 regex + checksums]
+    Chunk --&gt; LLM[LLM Entity Identification]
+    Regex --&gt; Merge[Merge detections]
+    LLM --&gt; Merge
+    Merge --&gt; Gaz[Keep-list / deny-list]
+    Gaz --&gt; Cons[Base Form Consolidation]
     Cons --&gt; MapGen[Placeholder Mapping Generator]
-    MapGen --&gt; Repl[Text Replacement Engine]
-    Repl --&gt; Output[Anonymized Markdown &amp; JSON Map]</code></pre>
+    MapGen --&gt; Ops[Per-type operators]
+    Ops --&gt; Repl[Span-based replacement]
+    Repl --&gt; Output[Anonymized Markdown and JSON map]
+    Output --&gt; Verify[Residual leftover scan]
+    Output --&gt; Risk[Linkage-risk score]</code></pre>
 <h3 id="text-extraction-pdf-conversion">Text Extraction &amp; PDF Conversion<a class="headerlink" href="#text-extraction-pdf-conversion" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Instead of traditional OCR or layout-unaware PDF parsing, the project uses <code>pymupdf4llm</code> to convert PDF files into clean, readable <strong>Markdown</strong>. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.</li>
@@ -1406,6 +1544,39 @@
 <li>Mentions are located in the full document with word-boundary rules.</li>
 <li>Overlapping hits are resolved longest-first (<code>John Doe</code> wins over the inner <code>John</code>).</li>
 <li>Slices are written from the end of the string so earlier offsets stay valid.</li>
+</ul>
+<h3 id="per-type-operators">Per-type operators<a class="headerlink" href="#per-type-operators" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Default write is still <code>replace</code> (<code>PERSON_1</code>).</li>
+<li><code>--operator TYPE=mask|hash|generalize|shift|fake</code> changes how that type is written. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>.</li>
+<li><code>fake</code> is seeded (<code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>) so the same person always gets the same invented name.</li>
+<li>Two dates that both become <code>2019</code> cannot both be restored uniquely.</li>
+</ul>
+<h3 id="keep-list-and-deny-list">Keep-list and deny-list<a class="headerlink" href="#keep-list-and-deny-list" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Keep-list phrases stay visible even if regex or the model found them.</li>
+<li>Deny-list phrases become <code>CUSTOM_n</code> even if detection missed them.</li>
+<li>Keep wins if the same phrase is on both lists.</li>
+</ul>
+<h3 id="cross-document-maps">Cross-document maps<a class="headerlink" href="#cross-document-maps" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>--mapping-in</code> seeds placeholder counts from an existing map (plaintext or encrypted).</li>
+<li>Files in one <code>run</code> share the growing map so Ada stays <code>PERSON_1</code>.</li>
+</ul>
+<h3 id="encrypted-mapping">Encrypted mapping<a class="headerlink" href="#encrypted-mapping" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Default remains plaintext <code>*.mapping.json</code>.</li>
+<li>A passphrase (<code>--mapping-passphrase</code> / <code>ANONYMIZER_MAPPING_KEY</code>) writes AES-256-GCM <code>*.mapping.json.enc</code>. <code>deanonymize</code> decrypts with the same key.</li>
+</ul>
+<h3 id="hipaa-coverage-aid">HIPAA coverage aid<a class="headerlink" href="#hipaa-coverage-aid" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>--entity-profile hipaa-safe-harbor</code> (and <code>prompts.hipaa</code>) asks for the identifier <em>classes</em> that apply to text and applies year-only dates, ZIP3, age <code>90+</code>.</li>
+<li>This is an aid, not a compliance certificate. Pixels in photos are not hidden.</li>
+</ul>
+<h3 id="tab-style-eval-harness">TAB-style eval harness<a class="headerlink" href="#tab-style-eval-harness" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>tests/eval/</code> scores mention-level and entity-level recall, split by direct vs quasi identifiers.</li>
+<li><code>scripts/eval_tab.py</code> runs the mini fixture. Tests and scripts only — no product change.</li>
 </ul>
 <hr />
 <h2 id="reversibility-the-mapping-engine">Reversibility &amp; The Mapping Engine<a class="headerlink" href="#reversibility-the-mapping-engine" title="Permanent link">&para;</a></h2>
