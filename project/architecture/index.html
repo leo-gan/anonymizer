@@ -993,10 +993,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#replacing-by-length-descending" class="md-nav__link">
+  <a href="#span-based-replacement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Replacing by Length Descending
+        Span-based replacement
       
     </span>
   </a>
@@ -1223,10 +1223,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#replacing-by-length-descending" class="md-nav__link">
+  <a href="#span-based-replacement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Replacing by Length Descending
+        Span-based replacement
       
     </span>
   </a>
@@ -1401,9 +1401,11 @@
 <li>Standard placeholders are created using the entity type and an incremental count (e.g., <code>PERSON_1</code>, <code>PERSON_2</code>).</li>
 <li><strong>Variations Handling</strong>: If an entity is a partial or varied reference of a base form (e.g. "John" vs. "John Doe"), a sub-variant placeholder is generated (e.g., <code>PERSON_1.v_1</code>). This tracks how the text refers to the individual without losing syntactic differences.</li>
 </ul>
-<h3 id="replacing-by-length-descending">Replacing by Length Descending<a class="headerlink" href="#replacing-by-length-descending" title="Permanent link">&para;</a></h3>
+<h3 id="span-based-replacement">Span-based replacement<a class="headerlink" href="#span-based-replacement" title="Permanent link">&para;</a></h3>
 <ul>
-<li>When masking the text, entities are replaced in descending order of string length. This prevents partial replacement bugs (e.g. replacing "John" in "John Doe" before trying to replace "John Doe").</li>
+<li>Mentions are located in the full document with word-boundary rules.</li>
+<li>Overlapping hits are resolved longest-first (<code>John Doe</code> wins over the inner <code>John</code>).</li>
+<li>Slices are written from the end of the string so earlier offsets stay valid.</li>
 </ul>
 <hr />
 <h2 id="reversibility-the-mapping-engine">Reversibility &amp; The Mapping Engine<a class="headerlink" href="#reversibility-the-mapping-engine" title="Permanent link">&para;</a></h2>
