@@ -18,7 +18,7 @@
 - [x] 10. Cross-document consistent placeholders — done 2026-08-15, [PR #49](https://github.com/leo-gan/anonymizer/pull/49)
 - [x] 11. Allowlist / denylist gazetteers — done 2026-08-15, [PR #50](https://github.com/leo-gan/anonymizer/pull/50)
 - [x] 12. Span-based replacement — done 2026-08-15, [PR #51](https://github.com/leo-gan/anonymizer/pull/51)
-- [x] 13. TAB-style eval harness — done 2026-08-15, `feat/eval-harness`
+- [x] 13. TAB-style eval harness — done 2026-08-15, [PR #52](https://github.com/leo-gan/anonymizer/pull/52)
 - [ ] 14. OCR for scanned PDFs
 - [ ] 15. In-place PDF redaction
 - [ ] 16. Regex-only / offline mode
@@ -304,7 +304,7 @@ Known code facts to attach to:
 
 ### 13. TAB-style eval harness
 
-**Status:** done (2026-08-15) — `feat/eval-harness` (PR link after open)
+**Status:** done (2026-08-15) — [PR #52](https://github.com/leo-gan/anonymizer/pull/52) (`feat/eval-harness`)
 
 **Technique:** the open question in history.md: how do you measure leftover risk and utility?  
 **Why:** Unit tests cover regex and mapping, not privacy metrics. No recall split for direct vs quasi identifiers.
