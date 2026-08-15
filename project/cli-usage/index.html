@@ -1330,6 +1330,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../troubleshooting/" class="md-nav__link">
         
   
@@ -1994,7 +2022,13 @@
 <td style="text-align: left;"><code>--mapping-passphrase</code></td>
 <td style="text-align: left;"><code>TEXT</code></td>
 <td style="text-align: left;"><em>none</em></td>
-<td style="text-align: left;">Lock the mapping as <code>*.mapping.json.enc</code> (AES-256-GCM). Also read from <code>ANONYMIZER_MAPPING_KEY</code>. Default: plaintext JSON.</td>
+<td style="text-align: left;">Lock the mapping as <code>*.mapping.json.enc</code> (AES-256-GCM + Argon2id, source-file AAD). Also read from <code>ANONYMIZER_MAPPING_KEY</code>. Default: plaintext JSON.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--ephemeral-mapping</code> / <code>--persist-mapping</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">persist</td>
+<td style="text-align: left;">Keep the mapping only in this process. Nothing is written under <code>data/mappings/</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--operator</code></td>
@@ -2153,13 +2187,14 @@
 <h2 id="the-deanonymize-command-reversal">The <code>deanonymize</code> Command (Reversal)<a class="headerlink" href="#the-deanonymize-command-reversal" title="Permanent link">&para;</a></h2>
 <p>The <code>deanonymize</code> command reads an anonymized document, loads the JSON mapping file containing placeholders and original PII, restores the original text, and writes the output file.</p>
 <h3 id="syntax_1">Syntax<a class="headerlink" href="#syntax_1" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span>ANONYMIZED_FILE<span class="w"> </span>MAPPING_FILE<span class="w"> </span><span class="o">[</span>--mapping-passphrase<span class="w"> </span>TEXT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span>ANONYMIZED_FILE<span class="w"> </span>MAPPING_FILE<span class="w"> </span><span class="o">[</span>--mapping-passphrase<span class="w"> </span>TEXT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--source-sha256<span class="w"> </span>HEX<span class="o">]</span>
 </span></code></pre></div>
 <h3 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>ANONYMIZED_FILE</code>: Path to the file that was previously anonymized.</li>
 <li><code>MAPPING_FILE</code>: Path to the JSON mapping file (plaintext or <code>*.mapping.json.enc</code>).</li>
 <li><code>--mapping-passphrase</code>: Required for an encrypted mapping. Also read from <code>ANONYMIZER_MAPPING_KEY</code>.</li>
+<li><code>--source-sha256</code>: Optional. Expected SHA-256 of the original source document. Rejects a mapping locked for a different file.</li>
 </ul>
 <h3 id="output-destination">Output Destination<a class="headerlink" href="#output-destination" title="Permanent link">&para;</a></h3>
 <p>This command creates a deanonymized version of the file. For example:
@@ -2236,7 +2271,7 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h3 id="leftover-check">Leftover check<a class="headerlink" href="#leftover-check" title="Permanent link">&para;</a></h3>
 <p><code>run</code> scans the masked page (unless <code>--no-verify</code>) and writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. <code>pdf-anonymizer verify</code> does the same later. <code>--verify-llm</code> also asks the language model. The file is not rewritten.</p>
 <h3 id="lock-the-mapping">Lock the mapping<a class="headerlink" href="#lock-the-mapping" title="Permanent link">&para;</a></h3>
-<p><code>--mapping-passphrase</code> (or <code>ANONYMIZER_MAPPING_KEY</code>) writes <code>*.mapping.json.enc</code> instead of plaintext JSON. <code>deanonymize</code> needs the same passphrase.</p>
+<p><code>--mapping-passphrase</code> (or <code>ANONYMIZER_MAPPING_KEY</code>) writes <code>*.mapping.json.enc</code> instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode <code>0600</code>. <code>deanonymize</code> needs the same passphrase. <code>--ephemeral-mapping</code> writes no mapping file at all. See <a href="../mapping-security/">Mapping encryption</a>.</p>
 <h3 id="how-a-type-is-written">How a type is written<a class="headerlink" href="#how-a-type-is-written" title="Permanent link">&para;</a></h3>
 <p><code>--operator TYPE=mask|hash|generalize|shift|fake</code> changes the mark on the page. Default remains <code>replace</code> (<code>PERSON_1</code>). Seed <code>fake</code> with <code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>.</p>
 <h3 id="linkage-risk-score">Linkage-risk score<a class="headerlink" href="#linkage-risk-score" title="Permanent link">&para;</a></h3>

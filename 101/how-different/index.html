@@ -948,6 +948,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../project/mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../project/troubleshooting/" class="md-nav__link">
         
   
@@ -1208,7 +1236,7 @@
 <p>PDF Anonymizer creates <strong>reversible placeholder mappings</strong>:</p>
 <ul>
 <li><strong>Placeholders retain context</strong>: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., <code>PERSON_1</code>, <code>ORGANIZATION_2</code>, <code>DATE_1</code>). This preserves the grammar, flow, and structural meaning of the document.</li>
-<li><strong>Separate mapping file</strong>: The CLI outputs an anonymized document along with a JSON mapping file (e.g., <code>document.mapping.json</code>). You can lock that file as <code>*.mapping.json.enc</code> (AES-256-GCM) with a passphrase. Default is still plaintext JSON.</li>
+<li><strong>Separate mapping file</strong>: The CLI outputs an anonymized document along with a JSON mapping file (e.g., <code>document.mapping.json</code>). You can lock that file as <code>*.mapping.json.enc</code> (AES-256-GCM + Argon2id) with a passphrase, or keep the map only in memory (<code>--ephemeral-mapping</code>). Default is still plaintext JSON.</li>
 <li><strong>Local Deanonymization</strong>: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's <code>deanonymize</code> command locally with the mapping file to restore the original names.</li>
 </ul>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Raw Document] -&gt; [PDF Anonymizer CLI]

@@ -794,6 +794,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../troubleshooting/" class="md-nav__link">
         
   
@@ -1566,7 +1594,10 @@
 <h3 id="encrypted-mapping">Encrypted mapping<a class="headerlink" href="#encrypted-mapping" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Default remains plaintext <code>*.mapping.json</code>.</li>
-<li>A passphrase (<code>--mapping-passphrase</code> / <code>ANONYMIZER_MAPPING_KEY</code>) writes AES-256-GCM <code>*.mapping.json.enc</code>. <code>deanonymize</code> decrypts with the same key.</li>
+<li>A passphrase (<code>--mapping-passphrase</code> / <code>ANONYMIZER_MAPPING_KEY</code>) writes AES-256-GCM + Argon2id <code>*.mapping.json.enc</code>. The source file SHA-256 and schema version are bound as GCM AAD. Mapping files (plain or locked) are written atomically as mode <code>0600</code>.</li>
+<li><code>--ephemeral-mapping</code> keeps the vocabulary in process memory only.</li>
+<li><code>deanonymize</code> decrypts with the same key. <code>--source-sha256</code> rejects a map locked for a different file.</li>
+<li>Design, threat model, trade-offs, and test notes: <a href="../mapping-security/">Mapping encryption</a>.</li>
 </ul>
 <h3 id="hipaa-coverage-aid">HIPAA coverage aid<a class="headerlink" href="#hipaa-coverage-aid" title="Permanent link">&para;</a></h3>
 <ul>

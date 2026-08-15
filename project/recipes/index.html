@@ -18,7 +18,7 @@
         <link rel="prev" href="../api-reference/">
       
       
-        <link rel="next" href="../troubleshooting/">
+        <link rel="next" href="../mapping-security/">
       
       
         
@@ -1113,6 +1113,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../troubleshooting/" class="md-nav__link">
         
   
@@ -1554,7 +1582,7 @@
 <p>You can repeat step 4 any time you receive new output from the external system as long as you still have the original mapping file.</p>
 <p><strong>Tip</strong>: The mapping file is the "key". Anyone who has it can put the real names back. Treat it like a password.</p>
 <h3 id="lock-the-mapping-file">Lock the mapping file<a class="headerlink" href="#lock-the-mapping-file" title="Permanent link">&para;</a></h3>
-<p>By default the mapping is plain JSON. That is easy to use and easy to leak. You can lock it with a passphrase. The tool writes <code>*.mapping.json.enc</code> (AES-256-GCM) instead of <code>*.mapping.json</code>.</p>
+<p>By default the mapping is plain JSON. That is easy to use and easy to leak. You can lock it with a passphrase. The tool writes <code>*.mapping.json.enc</code> (AES-256-GCM, Argon2id, source-file AAD) instead of <code>*.mapping.json</code>. Both the locked file and a plaintext mapping are created atomically with mode <code>0600</code>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>sensitive-report.pdf<span class="w"> </span>--mapping-passphrase<span class="w"> </span><span class="s1">&#39;a long secret&#39;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># or set ANONYMIZER_MAPPING_KEY in the environment</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -1565,6 +1593,9 @@
 </span></code></pre></div>
 <p>Without a passphrase, behavior is unchanged: plaintext <code>*.mapping.json</code>. An encrypted file cannot be opened without the passphrase. The masked document is still not enough to recover the names.</p>
 <p>Do not put the passphrase in the document, the mapping, or the log.</p>
+<p><code>--ephemeral-mapping</code> skips <code>data/mappings/</code> entirely. Use that when the process will discard the vocabulary and you will not deanonymize later.</p>
+<p><code>--source-sha256</code> on <code>deanonymize</code> rejects a map that was locked for a different source file (the hash is authenticated inside the envelope). <code>--mapping-in</code> does not require a matching hash, because that flag exists to reuse placeholders across documents.</p>
+<p>The architecture, threat model, trade-offs, and the tests that demonstrate the old holes versus the fix are in <a href="../mapping-security/">Mapping encryption</a>.</p>
 <hr />
 <h2 id="keep-some-phrases-always-hide-others">Keep some phrases, always hide others<a class="headerlink" href="#keep-some-phrases-always-hide-others" title="Permanent link">&para;</a></h2>
 <p>A keep-list is a file of phrases that must stay visible, even if the tool found them. Use this for your own company name, or for “Apple” when you mean the fruit.</p>

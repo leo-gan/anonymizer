@@ -573,23 +573,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Anonymization Techniques and Breakthroughs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-this-project-uses-these-ideas-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How this project uses these ideas (today)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -641,6 +624,17 @@
     <span class="md-ellipsis">
       
         Charts and Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-this-project-uses-these-ideas-today" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How this project uses these ideas (today)
       
     </span>
   </a>
@@ -959,6 +953,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../project/mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../project/troubleshooting/" class="md-nav__link">
         
   
@@ -1072,23 +1094,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Anonymization Techniques and Breakthroughs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-this-project-uses-these-ideas-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How this project uses these ideas (today)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1140,6 +1145,17 @@
     <span class="md-ellipsis">
       
         Charts and Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-this-project-uses-these-ideas-today" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How this project uses these ideas (today)
       
     </span>
   </a>
@@ -1304,47 +1320,6 @@ of naive de-identification. Technical advances include <em>k</em>-anonymity, <em
 </tbody>
 </table>
 <p><em>Table: Comparison of anonymization techniques (strengths, weaknesses, typical uses).</em></p>
-<h3 id="how-this-project-uses-these-ideas-today">How this project uses these ideas (today)<a class="headerlink" href="#how-this-project-uses-these-ideas-today" title="Permanent link">&para;</a></h3>
-<p>This page is a history lesson, not a product spec. The tool you can run (<code>pdf-anonymizer</code>) is a <strong>reversible document pseudonymizer</strong>. It hides words in a PDF, Markdown, or text file and keeps a separate map so you can put them back. It is <strong>not</strong> a <em>k</em>-anonymity rewriter and it does <strong>not</strong> add differential-privacy noise to prose.</p>
-<table>
-<thead>
-<tr>
-<th>Idea on this page</th>
-<th>What the tool does today</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Data removal (strip names, SSNs)</td>
-<td>Hybrid RE2 regex + LLM, then span-based replacement. Mistyped IBANs become <code>IBAN_LIKE_1</code>, not leftover digits.</td>
-</tr>
-<tr>
-<td>Pseudonymization</td>
-<td>Typed stand-ins (<code>PERSON_1</code>) plus <code>*.mapping.json</code>. Optional AES-256-GCM lock (<code>*.mapping.json.enc</code>).</td>
-</tr>
-<tr>
-<td>Generalization / suppression</td>
-<td>Optional operators: year-only dates, ZIP3, age bands, masks, hashes. Default is still <code>PERSON_1</code>.</td>
-</tr>
-<tr>
-<td>Synthetic data</td>
-<td>Value-level <code>fake</code> operator (same person → same invented name). Not a whole-document rewrite.</td>
-</tr>
-<tr>
-<td>Cryptographic methods</td>
-<td>Optional encrypted mapping file. Not homomorphic encryption.</td>
-</tr>
-<tr>
-<td>Re-ID / attack simulation</td>
-<td>Leftover regex scan (<code>*.residual_pii.json</code>), linkage-risk score (<code>*.risk.json</code>), and a TAB-style eval harness in <code>tests/eval/</code>.</td>
-</tr>
-<tr>
-<td><em>k</em>-anonymity / DP / mixnets</td>
-<td>Out of scope as document rewriters. Those models are for tables or networks, not narrative PDFs.</td>
-</tr>
-</tbody>
-</table>
-<p>A flag-by-flag list lives on the <a href="../../project/cli-usage/#history">CLI History</a> page. Worked examples live in <a href="../../project/recipes/">Recipes</a>.</p>
 <h2 id="legal-regulatory-and-policy-developments">Legal, Regulatory and Policy Developments<a class="headerlink" href="#legal-regulatory-and-policy-developments" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>OECD Guidelines (1980) &amp; Fair Information Practices:</strong> Early principles for data handling (collection limitation, purpose, security). Though not explicit on anonymization, they set the stage for later laws.  </li>
@@ -1409,6 +1384,47 @@ of naive de-identification. Technical advances include <em>k</em>-anonymity, <em
     2018 : GDPR enforcement (stronger data anonymization rules)
     2020+ : Wide DP adoption in statistical agencies and tech industry  </code></pre>
 <em>Figure: Key milestones in anonymization history (see text for details and sources).</em></p>
+<h2 id="how-this-project-uses-these-ideas-today">How this project uses these ideas (today)<a class="headerlink" href="#how-this-project-uses-these-ideas-today" title="Permanent link">&para;</a></h2>
+<p>This page is a history lesson, not a product spec. The tool you can run (<code>pdf-anonymizer</code>) is a <strong>reversible document pseudonymizer</strong>. It hides words in a PDF, Markdown, or text file and keeps a separate map so you can put them back. It is <strong>not</strong> a <em>k</em>-anonymity rewriter and it does <strong>not</strong> add differential-privacy noise to prose.</p>
+<table>
+<thead>
+<tr>
+<th>Idea on this page</th>
+<th>What the tool does today</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data removal (strip names, SSNs)</td>
+<td>Hybrid RE2 regex + LLM, then span-based replacement. Mistyped IBANs become <code>IBAN_LIKE_1</code>, not leftover digits.</td>
+</tr>
+<tr>
+<td>Pseudonymization</td>
+<td>Typed stand-ins (<code>PERSON_1</code>) plus <code>*.mapping.json</code>. Optional AES-256-GCM + Argon2id lock (<code>*.mapping.json.enc</code>).</td>
+</tr>
+<tr>
+<td>Generalization / suppression</td>
+<td>Optional operators: year-only dates, ZIP3, age bands, masks, hashes. Default is still <code>PERSON_1</code>.</td>
+</tr>
+<tr>
+<td>Synthetic data</td>
+<td>Value-level <code>fake</code> operator (same person → same invented name). Not a whole-document rewrite.</td>
+</tr>
+<tr>
+<td>Cryptographic methods</td>
+<td>Optional encrypted mapping file. Not homomorphic encryption.</td>
+</tr>
+<tr>
+<td>Re-ID / attack simulation</td>
+<td>Leftover regex scan (<code>*.residual_pii.json</code>), linkage-risk score (<code>*.risk.json</code>), and a TAB-style eval harness in <code>tests/eval/</code>.</td>
+</tr>
+<tr>
+<td><em>k</em>-anonymity / DP / mixnets</td>
+<td>Out of scope as document rewriters. Those models are for tables or networks, not narrative PDFs.</td>
+</tr>
+</tbody>
+</table>
+<p>A flag-by-flag list lives on the <a href="../../project/cli-usage/#history">CLI History</a> page. Worked examples live in <a href="../../project/recipes/">Recipes</a>.</p>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Chaum, D. <em>Untraceable Electronic Mail, Return Addresses, and Digital Pseudonyms</em> (Commun. ACM, 1981).  </li>

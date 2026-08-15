@@ -871,6 +871,34 @@
   
   
     <li class="md-nav__item">
+      <a href="project/mapping-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="project/troubleshooting/" class="md-nav__link">
         
   
@@ -1029,7 +1057,7 @@
 <h2 id="key-highlights">Key Highlights<a class="headerlink" href="#key-highlights" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Context-Aware Accuracy</strong>: A fast RE2 regex stage (with checksums so mistyped IBANs become <code>IBAN_LIKE_1</code>, not leftover digits) plus an LLM that can hide identity clues, not only names.</li>
-<li><strong>Reversible by default</strong>: Typed stand-ins (<code>PERSON_1</code>) plus a JSON mapping file. You can lock the map (<code>*.mapping.json.enc</code>), or write a type as a mask, a year, a hash, or a stable fake name instead.</li>
+<li><strong>Reversible by default</strong>: Typed stand-ins (<code>PERSON_1</code>) plus a JSON mapping file. You can lock the map (<code>*.mapping.json.enc</code>), keep it only in memory, or write a type as a mask, a year, a hash, or a stable fake name instead.</li>
 <li><strong>Checks after masking</strong>: A leftover scan (<code>*.residual_pii.json</code>) and a linkage-risk score (<code>*.risk.json</code>). Reports only — they do not rewrite the page.</li>
 <li><strong>Privacy First &amp; Cost Effective</strong>: Fully compatible with local, offline models using <strong>Ollama</strong> (e.g., Gemma 2, Phi 3/4). Also supports <strong>Google Gemini</strong>, <strong>Anthropic Claude</strong>, <strong>OpenAI GPT</strong>, <strong>Hugging Face</strong>, and <strong>OpenRouter</strong>.</li>
 <li><strong>Built for Scale</strong>: Implements an intelligent stream-based chunking mechanism designed to reliably handle files up to <strong>1GB</strong> without running out of context windows or memory.</li>
