@@ -4,6 +4,17 @@
 **Audience:** maintainers only  
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
+## Progress
+
+- [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
+- [ ] 2. Checksum validators on structured regex hits
+- [ ] 3. Country filter for regex patterns
+- [ ] 4. Residual-PII verification pass
+- [ ] 5. Encrypted mapping file
+- [ ] 6. Generalization and per-entity operators
+- [ ] 7. Quasi-identifier / linkage risk report
+- [ ] 8. HIPAA Safe Harbor entity profile
+
 ---
 
 ## Purpose
@@ -33,7 +44,7 @@ Known code facts to attach to:
 
 - `conf.py`: regexes are structural, **not checksummed**.
 - `core.py`: replacement is whole-document string match, not character spans.
-- `prompts/detailed.py`: asks for birthdates only; does not treat job + org + city as a linkage set.
+- `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Recipes already call the mapping file “the key”; it is not encrypted.
 
 ---
@@ -51,7 +62,7 @@ Known code facts to attach to:
 
 ### 1. Prompt: implied / contextual PII
 
-**Status:** done (2026-08-14) on `feat/implied-contextual-pii`
+**Status:** done (2026-08-14) — [PR #40](https://github.com/leo-gan/anonymizer/pull/40) (`feat/implied-contextual-pii`)
 
 **Technique:** data removal beyond named entities (Weld / Netflix lesson applied to prose).  
 **Why first:** hours of work, no API break, highest ROI per line. `how-different.md` claims we catch “CEO of Tesla”; the detailed prompt does not ask for that.
