@@ -159,8 +159,8 @@ Anonymize a meeting transcript using the default Gemini model:
 pdf-anonymizer run data/meeting_transcript.pdf
 ```
 *   **Outputs created**:
-    *   `data/meeting_transcript.anonymized.md` (the masked document)
-    *   `data/meeting_transcript.mapping.json` (the cryptographic key map)
+    *   `data/anonymized/meeting_transcript.anonymized.md` (the masked document)
+    *   `data/mappings/meeting_transcript.mapping.json` (the mapping file — treat it like a key)
 
 ### Example 2: Local Processing via Ollama
 To ensure data does not leave your local machine, use a locally running model:
@@ -178,22 +178,38 @@ pdf-anonymizer run book.md --characters-to-anonymize 50000 --prompt-name simple
 Revert the anonymization performed in Example 1:
 ```bash
 pdf-anonymizer deanonymize \
-  data/meeting_transcript.anonymized.md \
-  data/meeting_transcript.mapping.json
+  data/anonymized/meeting_transcript.anonymized.md \
+  data/mappings/meeting_transcript.mapping.json
 ```
 *   **Output created**:
-    *   `data/meeting_transcript.deanonymized.md`
+    *   `data/deanonymized/meeting_transcript.deanonymized.md`
+
+### Example 5: Newer flags in one command
+
+```bash
+pdf-anonymizer run notes.pdf contract.pdf \
+  -p best-quality \
+  --countries US,GB \
+  --operator CREDIT_CARD=mask \
+  --operator DATE=generalize \
+  --keep-list keep.txt \
+  --mapping-passphrase 'a long secret'
+```
+
+Files in the same `run` share one growing map, so the same person stays `PERSON_1`. See [Recipes](recipes.md) for keep-lists, HIPAA coverage aid, fake names, and `--mapping-in`.
 
 ---
 
 ## Output Files & Auditing
 
-Both commands write results under conventional directories (created automatically):
+`run`, `verify`, `report`, and `deanonymize` write under conventional directories (created automatically):
 
 *   `data/anonymized/<stem>.anonymized.md` (or `.txt`)
-*   `data/mappings/<stem>.mapping.json`
+*   `data/mappings/<stem>.mapping.json` (or `*.mapping.json.enc` when a passphrase is set)
 *   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`)
-*   `data/stats/<stem>.deanonymization_stat.json`
+*   `data/stats/<stem>.residual_pii.json` — leftovers found after masking (from `run` or `verify`)
+*   `data/stats/<stem>.risk.json` — identity-clue clumps (from `run` or `report`)
+*   `data/stats/<stem>.deanonymization_stat.json` — written by `deanonymize`
 
 The stats file contains:
 
@@ -211,6 +227,62 @@ The stats file contains:
 *   `not_found_mappings`: placeholders seen in the text with no corresponding entry in the map (may indicate a corrupted or partial mapping).
 
 These are useful for compliance/audit pipelines. See the [Recipes & Common Workflows](recipes.md) page for more details on working with mappings and stats.
+
+---
+
+## History
+
+What the command line can do today, in the order those abilities landed. Default behaviour stayed the same unless you pass a flag. None of this is a legal certificate.
+
+### Identity clues (not only names)
+
+The careful instructions (`--prompt-name detailed`, used by `-p best-quality`) hide phrases that still pick out one person when no name is written — for example "the CEO of Tesla in Austin". Those become `PERSON_1` or `INDIRECT_1`. The short instructions (`simple`, used by `best-speed` and `best-cost`) do not hunt for this.
+
+### Checksums and `_LIKE` labels
+
+A number that *looks* like an IBAN or a card is still hidden if the extra check-digit fails. The stand-in says so: `IBAN_LIKE_1`, `CREDIT_CARD_LIKE_1`. A verified hit stays `IBAN_1`.
+
+### Limit national-ID patterns
+
+`--countries US,GB` keeps every universal pattern (email, IBAN, cards, …) and only the national IDs for those countries.
+
+### Leftover check
+
+`run` scans the masked page (unless `--no-verify`) and writes `data/stats/<stem>.residual_pii.json`. `pdf-anonymizer verify` does the same later. `--verify-llm` also asks the language model. The file is not rewritten.
+
+### Lock the mapping
+
+`--mapping-passphrase` (or `ANONYMIZER_MAPPING_KEY`) writes `*.mapping.json.enc` instead of plaintext JSON. `deanonymize` needs the same passphrase.
+
+### How a type is written
+
+`--operator TYPE=mask|hash|generalize|shift|fake` changes the mark on the page. Default remains `replace` (`PERSON_1`). Seed `fake` with `--fake-secret` / `ANONYMIZER_FAKE_SECRET`.
+
+### Linkage-risk score
+
+`run` writes `data/stats/<stem>.risk.json` unless `--no-risk`. `pdf-anonymizer report` scores an already-masked file. Report only; the page is not changed.
+
+### HIPAA Safe Harbor coverage aid
+
+`--entity-profile hipaa-safe-harbor` asks for the identifier *classes* that apply to text and writes year-only dates, ZIP3, and ages over 89 as `90+`. **Not a compliance certificate.**
+
+### Same stand-in across files
+
+`--mapping-in existing.mapping.json` seeds `PERSON_1`. Files in one `run` share the growing map.
+
+### Keep-list and deny-list
+
+`--keep-list` leaves listed phrases visible. `--deny-list` hides listed phrases even if detection missed them (`CUSTOM_n`). Keep wins if both lists contain the same phrase.
+
+### Span-based replacement
+
+Replacement is by character interval, not a blind search-and-replace. The longer span wins when two hits overlap (`John Doe` over the inner `John`). No extra flag.
+
+### TAB-style eval harness
+
+`tests/eval/` and `scripts/eval_tab.py` score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.
+
+See [Recipes](recipes.md) for worked examples of each flag.
 
 ---
 

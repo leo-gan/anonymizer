@@ -16,7 +16,10 @@ Common problems and how to resolve them.
     HUGGING_FACE_TOKEN="hf_..."
     OPENROUTER_API_KEY="sk-or-..."
     OLLAMA_HOST="http://localhost:11434"
+    ANONYMIZER_MAPPING_KEY="a long secret"
+    ANONYMIZER_FAKE_SECRET="another long secret"
     ```
+  - `ANONYMIZER_MAPPING_KEY` locks mapping files as `*.mapping.json.enc`. `ANONYMIZER_FAKE_SECRET` seeds `--operator TYPE=fake`. Neither is required.
   - For the SDK, load the environment variables yourself (e.g. with `python-dotenv` or `os.environ`).
 
 ## Ollama Not Running or Model Not Found
@@ -45,7 +48,27 @@ Common problems and how to resolve them.
   - Check `app.log` — it shows how many entities were found by Regex vs LLM per chunk.
   - A number that *looks* like a card, IBAN, VIN, or national ID but fails the extra check-digit is still hidden, as `IBAN_LIKE_1` / `CREDIT_CARD_LIKE_1` and so on. That is expected for typos and example numbers such as `1234-5678-9012-3456`.
   - After a run, check `data/stats/<stem>.residual_pii.json` (or `pdf-anonymizer verify …`). Leftover emails or numbers listed there were not hidden.
+  - Check `data/stats/<stem>.risk.json` (or `pdf-anonymizer report …`). A **high** score means leftover identity clumps (job + company + place), not that names were missed.
+  - A keep-list phrase stays visible on purpose. A deny-list phrase becomes `CUSTOM_n` even if regex and the model missed it.
   - Very short documents or unusual formatting can reduce recall.
+
+## Encrypted mapping will not open
+
+- **Symptom**: `deanonymize` fails on `*.mapping.json.enc`, or you only have a `.enc` file and no passphrase.
+- **Fix**:
+  - Pass the same `--mapping-passphrase` you used with `run`, or set `ANONYMIZER_MAPPING_KEY`.
+  - There is no recovery path. The masked document plus a locked map without the passphrase cannot put names back.
+  - Default `run` still writes plaintext `*.mapping.json` if you set no passphrase.
+
+## A date or ZIP cannot be restored uniquely
+
+- **Symptom**: After `--operator DATE=generalize` (or HIPAA year-only dates), two different originals both became `2019`.
+- **Fix**: That is expected. Generalize, mask, and hash are not always one-to-one. Use `replace` (the default `PERSON_1`) when you need a unique round-trip.
+
+## `--entity-profile hipaa-safe-harbor` is not a certificate
+
+- That flag is a **coverage aid** (broader identifier classes, year-only dates, ZIP3, age 90+).
+- It does **not** mean the file is legally de-identified. It does not hide pixels in a photo. A person still has to read the result.
 
 ## LLM Returns Invalid JSON / Parsing Failures
 

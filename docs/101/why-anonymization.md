@@ -24,7 +24,7 @@ graph TD
 
 ### Reversible vs. Irreversible Anonymization
 *   **Irreversible Anonymization (Redaction)**: The original values are permanently destroyed. It is highly secure, but it limits downstream utility when you need to follow up or link records back to the source.
-*   **Reversible Anonymization (Masking & Mapping)**: Original PII is replaced with placeholders (e.g., `[PERSON_1]`, `[DATE_2]`), and a secure, encrypted mapping table is stored separately. The masked data can be sent to external entities (like AI models or third-party analysts), and the results can be mapped back to the individuals internally. This is the paradigm used by **PDF Anonymizer**.
+*   **Reversible Anonymization (Masking & Mapping)**: Original PII is replaced with placeholders (e.g., `PERSON_1`, `DATE_2`), and a mapping table is stored separately (plaintext JSON by default; you can lock it as `*.mapping.json.enc`). The masked data can be sent to external entities (like AI models or third-party analysts), and the results can be mapped back to the individuals internally. This is the paradigm used by **PDF Anonymizer**. It is GDPR *pseudonymization* while you still hold the map, not irreversible anonymization.
 
 ---
 

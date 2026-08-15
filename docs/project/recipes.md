@@ -156,7 +156,7 @@ pdf-anonymizer run \
   -p best-cost
 ```
 
-Each file is processed independently. Results are written using the original stem name into the conventional output directories (`data/anonymized/`, `data/mappings/`, etc.).
+Files in the same `run` **share a growing map**, so Ada stays `PERSON_1` from the first file to the last. Results are written using the original stem name into the conventional output directories (`data/anonymized/`, `data/mappings/`, etc.). Use `--mapping-in` to continue a later batch from an earlier map.
 
 For very large batch jobs you may want to:
 - Use the faster/cheaper profile (`best-cost` or `best-speed`)
@@ -517,6 +517,34 @@ cfg = get_config_for_profile(ConfigProfile.BEST_SPEED, countries=["US", "GB"])
 ```
 
 This is a regex-stage setting only. The language model still reads the whole page and can name an ID from another country if the text is clear.
+
+---
+
+## Replacement is by span, not a blind search
+
+The tool does **not** walk the page and replace every copy of the letters `May`. It finds each mention as a *span* (a start and end character), keeps the longer span when two hits overlap (`John Doe` wins over the inner `John`), and writes replacements from the end of the string so earlier offsets stay valid.
+
+You do not turn this on. It is how replacement always works now.
+
+There is no extra CLI flag.
+
+---
+
+## Score a gold fixture (TAB-style eval)
+
+Unit tests check regexes and mappings. They do not tell you “how many real names did we miss?”.
+
+`tests/eval/` is a tiny gold page plus a scorer. It reports mention-level and entity-level precision / recall / F1, split by **direct** identifiers (email, SSN, person) versus **quasi** identifiers (city, date). That split matters: a high score on cities can hide a poor score on names.
+
+```bash
+# Run the regex stage on the built-in mini fixture
+uv run python scripts/eval_tab.py
+
+# Or score your own predictions JSON
+uv run python scripts/eval_tab.py --fixture tests/eval/fixture.json --predictions pred.json
+```
+
+This is tests and scripts only. It does not change `run`. It is not a legal privacy proof.
 
 ---
 

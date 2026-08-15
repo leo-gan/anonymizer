@@ -15,12 +15,19 @@ from pdf_anonymizer_core.core import anonymize_file
 
 ### Parameters
 *   `file_path` (`str`): The absolute or relative path to the input document (supports `.pdf`, `.md`, `.txt`).
+*   `characters_to_anonymize` (`int`): Target character size of each chunk sent to the LLM.
 *   `prompt_template` (`str`): The prompt template string containing instructions for entity masking.
 *   `model_name` (`str`): The target model name (e.g. `"gemini-2.5-flash"`, `"google/gemini-2.5-pro"`, `"ollama/phi4-mini"`).
+*   `anonymized_entities` (`list[str]`, optional): Type filter (e.g. `["PERSON", "ORGANIZATION"]`). Listing `IBAN` also includes `IBAN_LIKE`.
+*   `regex_patterns` (`dict`, optional): First-stage RE2 map. Defaults to `DEFAULT_REGEX_PATTERNS`. Use `filter_regex_patterns(["US", "GB"])` to keep only some national IDs.
+*   `operators` (`dict[str, str]`, optional): Type → `replace` / `mask` / `hash` / `generalize` / `shift` / `fake`. Unlisted types stay `replace`.
+*   `fake_secret` (`str`, optional): Seed for `fake`. Same person + type + secret → same fake.
+*   `seed_mapping` (`dict[str, str]`, optional): Original → written map from a previous file so Ada stays `PERSON_1`.
+*   `keep_list` / `deny_list` (`list[str]`, optional): Phrases to leave visible, or to force-hide as `CUSTOM_n`. Keep wins if both lists contain the same phrase.
 
 ### Returns
 *   `anonymized_text` (`str`): The fully processed text with placeholders in place of PII.
-*   `mapping` (`dict[str, str]`): A dictionary mapping original entities to their assigned placeholders.
+*   `mapping` (`dict[str, str]`): A dictionary mapping original entities to their assigned placeholders (or other written form).
 
 ---
 
@@ -35,7 +42,8 @@ from pdf_anonymizer_core.utils import deanonymize_file
 
 ### Parameters
 *   `anonymized_file_path` (`str`): Path to the markdown or text file that has placeholders.
-*   `mapping_file_path` (`str`): Path to the JSON mapping file containing the original entity-to-placeholder mapping dictionary.
+*   `mapping_file_path` (`str`): Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
+*   `mapping_passphrase` (`str`, optional): Required when the mapping file is encrypted. Also used by the CLI via `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`.
 
 ### Returns
 *   `deanonymized_file_path` (`str`): Path to the written restored document.
@@ -64,12 +72,14 @@ print("Google models:", google_models)
 ```
 
 ### Selecting a Prompt Template
-The package provides two pre-configured prompt styles: `simple` and `detailed`.
+The package provides three pre-configured prompt styles: `simple`, `detailed`, and `hipaa`.
 
 `detailed` is the careful one. Besides names, emails, and similar labels, it asks the model to hide **identity clues**: phrases that point to one person without writing their name (for example "the CEO of Tesla", or "Acme Inc.'s only in-house patent counsel"). Those phrases come back as type `PERSON` (when the model knows the name) or type `INDIRECT` (when it does not). `simple` does not ask for this, so it stays cheaper.
 
+`hipaa` is the coverage aid used by `--entity-profile hipaa-safe-harbor`. It is **not** a compliance certificate.
+
 ```python
-from pdf_anonymizer_core.prompts import simple, detailed
+from pdf_anonymizer_core.prompts import simple, detailed, hipaa
 
 # Use the detailed prompt template (recommended when identity clues matter)
 prompt_text = detailed.prompt_template
@@ -97,8 +107,9 @@ model = "gemini-2.5-flash"
 print(f"Anonymizing {input_document} using {model}...")
 anonymized_text, mapping = anonymize_file(
     file_path=input_document,
+    characters_to_anonymize=30000,
     prompt_template=detailed.prompt_template,
-    model_name=model
+    model_name=model,
 )
 
 # 2. Inspect the outputs
@@ -146,7 +157,17 @@ from pdf_anonymizer_core.llm_provider import configure_cache
 configure_cache(enabled=True, cache_dir="my-cache", cache_file="responses.json")
 ```
 
-For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_patterns`, `max_retries`, etc.) see the [auto-generated API Reference](api-reference.md) or the Recipes page.
+Related helpers (report only, they do not rewrite text):
+
+```python
+from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
+from pdf_anonymizer_core.risk import assess_linkage_risk, write_risk_report
+
+write_residual_report(verify_anonymized_text(anonymized_text), anonymized_path)
+write_risk_report(assess_linkage_risk(anonymized_text), anonymized_path)
+```
+
+For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_patterns`, `max_retries`, `operators`, `seed_mapping`, gazetteers, etc.) see the [auto-generated API Reference](api-reference.md) or the Recipes page.
 
 ---
 
@@ -158,4 +179,3 @@ For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_p
 - **[Architecture Design](architecture.md)** — internals behind the functions documented here.
 - **[Installation & Setup](installation.md)** — how to set up the environment for the SDK.
 - **[Troubleshooting](troubleshooting.md)** — help with common SDK and CLI issues.
-- **[Architecture Design](architecture.md)** — how the anonymization pipeline, consolidation, and deanonymization actually work internally.

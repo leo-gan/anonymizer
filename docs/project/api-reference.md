@@ -35,6 +35,28 @@ The package ships two ready-to-use prompt templates.
 
 ::: pdf_anonymizer_core.prompts.simple
 
+::: pdf_anonymizer_core.prompts.hipaa
+
+---
+
+## Detection, operators, and reports
+
+::: pdf_anonymizer_core.regex_ner
+
+::: pdf_anonymizer_core.validators
+
+::: pdf_anonymizer_core.operators
+
+::: pdf_anonymizer_core.spans
+
+::: pdf_anonymizer_core.gazetteers
+
+::: pdf_anonymizer_core.verify
+
+::: pdf_anonymizer_core.risk
+
+::: pdf_anonymizer_core.mapping_crypto
+
 ---
 
 ## Low-Level Components (for advanced use / extension)
@@ -44,5 +66,3 @@ The package ships two ready-to-use prompt templates.
 ::: pdf_anonymizer_core.call_llm
 
 ::: pdf_anonymizer_core.load_and_extract
-
-::: pdf_anonymizer_core.regex_ner

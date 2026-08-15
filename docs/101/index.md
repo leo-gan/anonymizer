@@ -29,8 +29,10 @@ Explore the modules below to build a strong foundation in data privacy:
 ### [How PDF Anonymizer is Different](how-different.md)
 *   **Limitations of Legacy Systems**: Why traditional systems fail on complex, unstructured text.
 *   **Identity clues**: Why hiding names is not enough, and how the careful instructions hide phrases like "the CEO of Tesla".
-*   **Reversible Workflows**: The power of cryptographic entity mapping.
+*   **Reversible Workflows**: Typed stand-ins plus a separate mapping file (optional lock).
 *   **Local Execution**: Combining Ollama with local weights to prevent data from ever leaving your device.
+
+A flag-by-flag list of what the tool can do today is on the [CLI History](../project/cli-usage.md#history) page.
 
 ---
 
