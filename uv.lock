@@ -1133,7 +1133,7 @@ wheels = [
 
 [[package]]
 name = "pdf-anonymizer-cli"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "packages/pdf-anonymizer-cli" }
 dependencies = [
     { name = "pdf-anonymizer-core" },
@@ -1150,7 +1150,7 @@ requires-dist = [
 
 [[package]]
 name = "pdf-anonymizer-core"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "packages/pdf-anonymizer-core" }
 dependencies = [
     { name = "cryptography" },
@@ -1198,7 +1198,7 @@ provides-extras = ["google", "ollama", "huggingface", "openrouter", "openai", "a
 
 [[package]]
 name = "pdf-anonymizer-workspace"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
