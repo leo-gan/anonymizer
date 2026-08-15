@@ -72,7 +72,7 @@ def run(
     prompt_name: Annotated[
         Optional[PromptEnum],
         typer.Option(
-            help="Override prompt template to use for anonymization.",
+            help="Override prompt template. 'detailed' also hides identity clues (phrases that point to one person without naming them). 'simple' does not.",
             case_sensitive=False,
         ),
     ] = None,

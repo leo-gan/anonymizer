@@ -129,7 +129,45 @@ Only entities whose `type` matches one of the listed values (after the hybrid Re
 
 This is useful when you want to protect names and companies but leave dates, addresses, or other categories untouched.
 
+If you also want to hide identity clues (phrases that point to one person without naming them), include `INDIRECT` on its own line. Those clues are only found when you use the **detailed** instructions (`-p best-quality` or `--prompt-name detailed`).
+
 See the example file at `packages/pdf-anonymizer-cli/entities.example.txt`.
+
+---
+
+## Hide identity clues, not only names
+
+A name is the easy case. A harder case is a sentence that never writes the name, but still points to one person.
+
+**Think of it like this.** If you black out "Ada Lovelace" in a biography, that helps. If the next sentence still says "the person who wrote the first computer program in the 1840s", a careful reader can put the name back. That leftover sentence is an identity clue.
+
+The careful instructions (`detailed`) now ask the language model to find three common shapes of clue:
+
+| Everyday sentence | Why it still names someone | What should be hidden |
+|---|---|---|
+| "a meeting with the CEO of Tesla in Austin" | Job + famous company + city | the whole clue, plus the company and city |
+| "the author of the 'Harry Potter' series" | "Author of …" a unique work | the whole author phrase |
+| "Acme Inc.'s only in-house patent counsel" | A one-of-a-kind role at a named company | the whole role phrase |
+
+Use the careful profile so those instructions are actually sent:
+
+```bash
+pdf-anonymizer run interview-notes.pdf -p best-quality
+```
+
+Or keep another profile and only switch the instructions:
+
+```bash
+pdf-anonymizer run interview-notes.pdf --prompt-name detailed
+```
+
+**What you should see.** A clue may become `PERSON_1` (when the model knows the name) or `INDIRECT_1` (when it does not). Either way, the identifying words should leave the page.
+
+**What you should not expect.** The short instructions (`simple`, used by `best-speed` and `best-cost`) do not hunt for these clues. Vague words such as "the CEO" or "a teacher in Austin" should also stay, because they could be many people.
+
+This is a helper, not a lock. Read the result before you share it.
+
+A longer, slower explanation of the same idea lives in the 101 page [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
 
 ---
 

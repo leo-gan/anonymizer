@@ -6,6 +6,7 @@ This application anonymizes large PDF, Markdown, or Text files using a **hybrid 
 [![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
 
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
+- **Identity clues, not only names**: A sentence can point to one person without writing their name ("the CEO of Tesla", "the author of the 'Harry Potter' series"). The careful (`detailed`) instructions ask the language model to hide those phrases too. Use `-p best-quality` or `--prompt-name detailed`. The fast default does not. Plain-language explanation: [Identity clues](https://leo-gan.github.io/anonymizer/101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
 - **Fast & Safe Regex Pre-Filter (Hybrid NER)**: First stage uses the RE2 engine (`google-re2`) for linear-time, ReDoS-safe detection of 70+ structured PII patterns (emails, phones, URLs, credit cards, IBANs, crypto wallets, VINs, MACs, dates, currency, plus national IDs/tax IDs/driver licenses/VAT/business/government IDs etc.). Country-partitioned patterns cover 30+ jurisdictions (mandatory: USA, Canada, UK, Spain, Italy, France, India, China + DE, JP, BR, AU, NL, and many more). Regex results are priority-merged with the LLM stage. Full list and per-country details are in the core package docs and recipes.
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
@@ -82,6 +83,8 @@ Commonly you pick a configuration profile with `-p` / `--config-profile` (or let
 uv run pdf-anonymizer run contract.pdf -p best-quality
 uv run pdf-anonymizer run large-notes.md -p best-cost --model-name "ollama/phi4-mini"
 ```
+
+`best-quality` uses the careful instructions. Those also hide **identity clues** — phrases that pick out one person even when no name is written (for example "the CEO of Tesla"). The default `best-speed` profile skips that extra hunt so it stays fast.
 
 To deanonymize the file later:
 

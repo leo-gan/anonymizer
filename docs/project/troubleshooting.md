@@ -40,7 +40,7 @@ Common problems and how to resolve them.
 - **Symptom**: Output looks almost identical to the input.
 - **Possible causes & fixes**:
   - The document contains very little PII (or the LLM prompt style was too conservative).
-  - Try `-p best-quality` (uses the `detailed` prompt and a stronger model by default).
+  - A sentence may still point to one person without writing their name (an identity clue). The default `best-speed` profile does not hunt for those. Try `-p best-quality` (uses the `detailed` prompt and a stronger model by default).
   - Use `--anonymized-entities` only if you intentionally want to restrict the types.
   - Check `app.log` — it shows how many entities were found by Regex vs LLM per chunk.
   - Very short documents or unusual formatting can reduce recall.

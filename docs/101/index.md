@@ -28,7 +28,7 @@ Explore the modules below to build a strong foundation in data privacy:
 
 ### [How PDF Anonymizer is Different](how-different.md)
 *   **Limitations of Legacy Systems**: Why traditional systems fail on complex, unstructured text.
-*   **The LLM Paradigm Shift**: Using context-aware AI models to catch nuanced identifiers.
+*   **Identity clues**: Why hiding names is not enough, and how the careful instructions hide phrases like "the CEO of Tesla".
 *   **Reversible Workflows**: The power of cryptographic entity mapping.
 *   **Local Execution**: Combining Ollama with local weights to prevent data from ever leaving your device.
 

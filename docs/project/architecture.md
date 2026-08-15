@@ -61,6 +61,7 @@ graph TD
 ### LLM Entity Identification
 *   Each chunk is sent to the selected LLM provider along with the chosen prompt.
 *   The LLM returns structured JSON lists of detected entities, specifying their direct text and their base entity type (e.g. `PERSON`, `ORGANIZATION`, `DATE`, `LOCATION`).
+*   The **detailed** prompt also asks for **identity clues**: phrases that point to one person without writing their name. If the model knows who is meant, it uses type `PERSON` and puts the name in `base_form`. If it does not know the name, it uses type `INDIRECT`. The **simple** prompt does not ask for this. See [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
 
 ### Base Form Consolidation
 To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. John Smith" to the same individual):
