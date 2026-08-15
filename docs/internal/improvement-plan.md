@@ -14,7 +14,7 @@
 - [x] 6. Generalization and per-entity operators — done 2026-08-15, [PR #45](https://github.com/leo-gan/anonymizer/pull/45)
 - [x] 7. Quasi-identifier / linkage risk report — done 2026-08-15, [PR #46](https://github.com/leo-gan/anonymizer/pull/46)
 - [x] 8. HIPAA Safe Harbor entity profile — done 2026-08-15, [PR #47](https://github.com/leo-gan/anonymizer/pull/47)
-- [x] 9. Format-preserving synthetic replacements — done 2026-08-15, `feat/fake-operator`
+- [x] 9. Format-preserving synthetic replacements — done 2026-08-15, [PR #48](https://github.com/leo-gan/anonymizer/pull/48)
 - [ ] 10. Cross-document consistent placeholders
 - [ ] 11. Allowlist / denylist gazetteers
 - [ ] 12. Span-based replacement
@@ -231,7 +231,7 @@ Known code facts to attach to:
 
 ### 9. Format-preserving synthetic replacements
 
-**Status:** done (2026-08-15) — `feat/fake-operator` (PR link after open)
+**Status:** done (2026-08-15) — [PR #48](https://github.com/leo-gan/anonymizer/pull/48) (`feat/fake-operator`)
 
 **Technique:** synthetic data at *value* level, not whole-document GANs.  
 **Why:** Downstream readers (and LLMs) reason better over `Jane Alvarez` than `PERSON_1`. Raw values stay in the local mapping.
