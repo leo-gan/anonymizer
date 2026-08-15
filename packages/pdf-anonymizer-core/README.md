@@ -36,6 +36,8 @@ The core library itself does not load `.env` files. Environment variables must b
 - `OPENAI_API_KEY`: Required when using OpenAI models.
 - `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
+- `ANONYMIZER_MAPPING_KEY`: Optional passphrase for encrypted mapping files.
+- `ANONYMIZER_FAKE_SECRET`: Optional seed for the `fake` operator.
 
 ## API Usage
 
@@ -123,6 +125,10 @@ Pass `seed_mapping=` (original → written) into `anonymize_file` so the same pe
 `EntityProfile.HIPAA_SAFE_HARBOR` is a coverage aid for Safe Harbor identifier classes (year-only dates, ZIP3, age 90+). It is **not** a compliance certificate.
 
 Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`) go in `operators={"PERSON": "fake"}` on `anonymize_file`. Pass `fake_secret=` so the same person always gets the same fake.
+
+Replacement is span-based: mentions are located in the full document, the longer interval wins on overlap, and slices are written from the end.
+
+To score a gold fixture (mention vs entity recall, direct vs quasi) run `uv run python scripts/eval_tab.py`. Tests and scripts only.
 
 To score identity-clue clumps in masked text (report only):
 

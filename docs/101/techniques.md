@@ -98,5 +98,9 @@ A popular Python framework for detecting and redacting PII in unstructured text.
 
 ---
 
+**In this project.** PDF Anonymizer is the last row of that table (LLM-based masking with a map). You can also ask it to *mask*, *hash*, *generalize*, or invent a stable *fake* value for a type. It does **not** rewrite a PDF as a *k*-anonymous table or add differential-privacy noise to sentences. How those history-chapter ideas map onto flags is on the [History](history.md#how-this-project-uses-these-ideas-today) page and the [CLI History](../project/cli-usage.md#history).
+
+---
+
 **In this course:**  
 [← Previous: History](history.md) | [Course Overview](index.md) | [Next: How PDF Anonymizer is Different](how-different.md)

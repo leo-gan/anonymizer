@@ -40,12 +40,18 @@ graph TD
     File[Input File: PDF, MD, TXT] --> Ext[Text Extractor]
     Ext -->|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --> Chunk[Text Chunking]
-    Chunk -->|Iterative Chunks| LLM[LLM Entity Identification]
-    LLM --> Entity[Raw Entities List]
-    Entity --> Cons[Base Form Consolidation]
+    Chunk --> Regex[RE2 regex + checksums]
+    Chunk --> LLM[LLM Entity Identification]
+    Regex --> Merge[Merge detections]
+    LLM --> Merge
+    Merge --> Gaz[Keep-list / deny-list]
+    Gaz --> Cons[Base Form Consolidation]
     Cons --> MapGen[Placeholder Mapping Generator]
-    MapGen --> Repl[Text Replacement Engine]
-    Repl --> Output[Anonymized Markdown & JSON Map]
+    MapGen --> Ops[Per-type operators]
+    Ops --> Repl[Span-based replacement]
+    Repl --> Output[Anonymized Markdown and JSON map]
+    Output --> Verify[Residual leftover scan]
+    Output --> Risk[Linkage-risk score]
 ```
 
 ### Text Extraction & PDF Conversion
@@ -89,6 +95,33 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 *   Mentions are located in the full document with word-boundary rules.
 *   Overlapping hits are resolved longest-first (`John Doe` wins over the inner `John`).
 *   Slices are written from the end of the string so earlier offsets stay valid.
+
+### Per-type operators
+*   Default write is still `replace` (`PERSON_1`).
+*   `--operator TYPE=mask|hash|generalize|shift|fake` changes how that type is written. `CREDIT_CARD_LIKE` follows `CREDIT_CARD`.
+*   `fake` is seeded (`--fake-secret` / `ANONYMIZER_FAKE_SECRET`) so the same person always gets the same invented name.
+*   Two dates that both become `2019` cannot both be restored uniquely.
+
+### Keep-list and deny-list
+*   Keep-list phrases stay visible even if regex or the model found them.
+*   Deny-list phrases become `CUSTOM_n` even if detection missed them.
+*   Keep wins if the same phrase is on both lists.
+
+### Cross-document maps
+*   `--mapping-in` seeds placeholder counts from an existing map (plaintext or encrypted).
+*   Files in one `run` share the growing map so Ada stays `PERSON_1`.
+
+### Encrypted mapping
+*   Default remains plaintext `*.mapping.json`.
+*   A passphrase (`--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`) writes AES-256-GCM `*.mapping.json.enc`. `deanonymize` decrypts with the same key.
+
+### HIPAA coverage aid
+*   `--entity-profile hipaa-safe-harbor` (and `prompts.hipaa`) asks for the identifier *classes* that apply to text and applies year-only dates, ZIP3, age `90+`.
+*   This is an aid, not a compliance certificate. Pixels in photos are not hidden.
+
+### TAB-style eval harness
+*   `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers.
+*   `scripts/eval_tab.py` runs the mini fixture. Tests and scripts only — no product change.
 
 ---
 

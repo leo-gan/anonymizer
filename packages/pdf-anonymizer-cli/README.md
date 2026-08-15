@@ -5,6 +5,7 @@ A command-line interface for anonymizing PDF, Markdown, and plain text files usi
 - **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
 - **Identity clues**: With `-p best-quality` or `--prompt-name detailed`, the tool also hides phrases that point to one person without writing their name (for example "the CEO of Tesla"). The default `best-speed` profile does not.
 - **Checksum labels**: After the fast number search, a real IBAN becomes `IBAN_1` and a mistyped one becomes `IBAN_LIKE_1`. Both are hidden. Same idea for cards, VINs, and a few national IDs.
+- **Operators, reports, and lists**: `--operator TYPE=mask|hash|generalize|shift|fake`, leftover scan (`verify`), linkage-risk score (`report`), `--keep-list` / `--deny-list`, `--mapping-in`, optional locked maps, HIPAA coverage aid. See the [CLI History](https://leo-gan.github.io/anonymizer/project/cli-usage/#history).
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
@@ -41,6 +42,8 @@ The CLI will automatically load a `.env` file from the current directory or any 
 - `OPENAI_API_KEY`: Required when using OpenAI models.
 - `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
+- `ANONYMIZER_MAPPING_KEY`: Optional. Same as `--mapping-passphrase` (writes `*.mapping.json.enc`).
+- `ANONYMIZER_FAKE_SECRET`: Optional. Seed for `--operator TYPE=fake`.
 
 Example `.env` file:
 ```env
@@ -136,12 +139,13 @@ pdf-anonymizer run report.pdf --model-name "openai/gpt-4o"
 The `deanonymize` command reverts anonymization using a mapping file.
 
 ```bash
-pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE
+pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TEXT]
 ```
 
 **Arguments**:
 - `ANONYMIZED_FILE`: Path to the anonymized text file.
-- `MAPPING_FILE`: Path to the JSON mapping file.
+- `MAPPING_FILE`: Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
+- `--mapping-passphrase`: Required for an encrypted mapping. Also `ANONYMIZER_MAPPING_KEY`.
 
 **Example**:
 ```bash

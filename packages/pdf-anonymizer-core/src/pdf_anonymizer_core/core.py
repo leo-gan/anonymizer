@@ -51,8 +51,8 @@ def anonymize_file(
     Performs a two-stage entity detection (fast regex first pass followed by
     LLM-based semantic detection), deduplicates, consolidates base forms for
     coreference (e.g. "Dr. Smith" / "Smith"), generates typed placeholders
-    (PERSON_1, ORGANIZATION_3.v_1, ...), and performs length-descending safe
-    replacement to produce reversible anonymized output.
+    (PERSON_1, ORGANIZATION_3.v_1, ...), and replaces non-overlapping spans
+    (longest-first, written from the end) to produce reversible anonymized output.
 
     The function streams large inputs via chunking (Markdown-aware for PDF/MD)
     so that very large files (hundreds of MB) can be processed without
@@ -80,8 +80,8 @@ def anonymize_file(
         base_retry_delay: Base delay in seconds for retry backoff.
         max_retry_delay: Maximum delay cap for retry backoff.
         operators: Optional map of entity type → operator (replace, mask, hash,
-            generalize, shift). Types not listed keep ``replace``. ``CREDIT_CARD_LIKE``
-            follows ``CREDIT_CARD``.
+            generalize, shift, fake). Types not listed keep ``replace``.
+            ``CREDIT_CARD_LIKE`` follows ``CREDIT_CARD``.
         fake_secret: Optional seed material for the ``fake`` operator. Same
             person + type + secret always yields the same fake.
         seed_mapping: Optional original → written map from a previous file so

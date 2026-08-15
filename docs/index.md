@@ -28,8 +28,9 @@ PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK 
 
 ## Key Highlights
 
-*   **Context-Aware Accuracy**: Traditional systems rely on regex or fixed lists (NER), missing complex references. PDF Anonymizer uses LLMs to grasp the deep semantics and context of your documents.
-*   **100% Reversible**: Generate secure, deanonymizable files. Perfect for downstream workflows (like AI agents or translation) that require masking but must ultimately map back to original data.
+*   **Context-Aware Accuracy**: A fast RE2 regex stage (with checksums so mistyped IBANs become `IBAN_LIKE_1`, not leftover digits) plus an LLM that can hide identity clues, not only names.
+*   **Reversible by default**: Typed stand-ins (`PERSON_1`) plus a JSON mapping file. You can lock the map (`*.mapping.json.enc`), or write a type as a mask, a year, a hash, or a stable fake name instead.
+*   **Checks after masking**: A leftover scan (`*.residual_pii.json`) and a linkage-risk score (`*.risk.json`). Reports only — they do not rewrite the page.
 *   **Privacy First & Cost Effective**: Fully compatible with local, offline models using **Ollama** (e.g., Gemma 2, Phi 3/4). Also supports **Google Gemini**, **Anthropic Claude**, **OpenAI GPT**, **Hugging Face**, and **OpenRouter**.
 *   **Built for Scale**: Implements an intelligent stream-based chunking mechanism designed to reliably handle files up to **1GB** without running out of context windows or memory.
 
@@ -59,7 +60,9 @@ To deanonymize the file later:
 
 ```bash
 # Revert the anonymization
-pdf-anonymizer deanonymize data/sample.anonymized.md data/sample.mapping.json
+pdf-anonymizer deanonymize \
+  data/anonymized/sample.anonymized.md \
+  data/mappings/sample.mapping.json
 ```
 
 ---
@@ -78,4 +81,4 @@ We provide a pre-built example containing hybrid NER (Regex + LLM) and full roun
    uv run python scripts/demo_anonymize.py
    ```
 
-For many more real-world usage patterns (local-only processing, safe external LLM/agent workflows, batch jobs, entity-type filtering, profile selection, cache control, large documents, troubleshooting, etc.) see the dedicated **[Recipes & Common Workflows](project/recipes.md)** and **[Troubleshooting](project/troubleshooting.md)** pages. An auto-generated **[API Reference](project/api-reference.md)** is also available.
+For many more real-world usage patterns (local-only processing, locked maps, operators, HIPAA coverage aid, keep/deny lists, leftover checks, batch jobs, eval harness, troubleshooting, etc.) see the dedicated **[Recipes & Common Workflows](project/recipes.md)** and **[Troubleshooting](project/troubleshooting.md)** pages. An auto-generated **[API Reference](project/api-reference.md)** is also available. The CLI **[History](project/cli-usage.md#history)** lists what landed, flag by flag.

@@ -60,6 +60,10 @@ pdf-anonymizer run notes.pdf --prompt-name detailed
 
 This is still a helper, not a guarantee. A very unusual clue can be missed. If a document must be safe to share, a person should still read the result.
 
+After `run`, two report files help you look: `*.residual_pii.json` (leftover emails or numbers) and `*.risk.json` (identity-clue clumps such as job + company + place). They do **not** rewrite the page.
+
+A flag-by-flag list of what landed is on the [CLI History](../project/cli-usage.md#history) page.
+
 ---
 
 ## Reversible Masking (The Mapping Engine)
@@ -68,8 +72,8 @@ Many tools simply erase text or replace it with generic masks (like `<REDACTED>`
 
 PDF Anonymizer creates **reversible placeholder mappings**:
 
-- **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `[PERSON_1]`, `[COMPANY_2]`, `[DATE_1]`). This preserves the grammar, flow, and structural meaning of the document.
-- **Separate Cryptographic Map**: The CLI outputs an anonymized document along with a JSON-formatted mapping file (e.g., `document.mapping.json`).
+- **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `PERSON_1`, `ORGANIZATION_2`, `DATE_1`). This preserves the grammar, flow, and structural meaning of the document.
+- **Separate mapping file**: The CLI outputs an anonymized document along with a JSON mapping file (e.g., `document.mapping.json`). You can lock that file as `*.mapping.json.enc` (AES-256-GCM) with a passphrase. Default is still plaintext JSON.
 - **Local Deanonymization**: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's `deanonymize` command locally with the mapping file to restore the original names.
 
 ```
@@ -114,8 +118,11 @@ Large documents (like a 500-page clinical trial registry or a 1GB database expor
 
 | Feature | Legacy Regex/NER Tools | Generic Cloud Redactors | PDF Anonymizer |
 | :--- | :--- | :--- | :--- |
-| **Contextual PII detection** | :x: No (Regex/Static) | :wavy_dash: Limited | :white_check_mark: Yes (LLM semantic comprehension) |
-| **Reversibility** | :x: No | :x: No | :white_check_mark: Yes (Separate JSON maps) |
+| **Contextual PII detection** | :x: No (Regex/Static) | :wavy_dash: Limited | :white_check_mark: Yes (LLM + identity clues) |
+| **Mistyped numbers** | Often left in the clear | Varies | :white_check_mark: Hidden as `IBAN_LIKE_1` |
+| **Reversibility** | :x: No | :x: No | :white_check_mark: Yes (JSON map; optional lock) |
+| **How a type is written** | Usually one mask | Usually one mask | :white_check_mark: `replace` / `mask` / `hash` / `generalize` / `shift` / `fake` |
+| **Leftover / linkage check** | Rare | Rare | :white_check_mark: Report files only (no auto-rewrite) |
 | **Local Offline Run** | :white_check_mark: Yes | :x: No (Cloud only) | :white_check_mark: Yes (Via local Ollama models) |
 | **Large File Support** | :wavy_dash: High memory usage | :x: Limited by file size limits | :white_check_mark: Yes (Streaming chunks up to 1GB) |
 | **Monorepo Architecture** | :wavy_dash: Often monolithic | :x: Closed source | :white_check_mark: Yes (Separated Core SDK and CLI) |
