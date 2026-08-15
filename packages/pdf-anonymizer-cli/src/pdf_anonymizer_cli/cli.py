@@ -16,6 +16,7 @@ from pdf_anonymizer_core.conf import (
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
+from pdf_anonymizer_core.operators import parse_operator_specs
 from pdf_anonymizer_core.prompts import detailed, simple
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
@@ -137,6 +138,16 @@ def run(
             ),
         ),
     ] = None,
+    operator: Annotated[
+        Optional[List[str]],
+        typer.Option(
+            "--operator",
+            help=(
+                "How to write one type: TYPE=replace|mask|hash|generalize|shift. "
+                "Repeatable. Default for every type is replace (PERSON_1)."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -156,6 +167,12 @@ def run(
             chunk_size=characters_to_anonymize,
             countries=country_list,
         )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
+
+    try:
+        operator_map = parse_operator_specs(operator)
     except ValueError as exc:
         logging.error("%s", exc)
         sys.exit(1)
@@ -183,6 +200,8 @@ def run(
     if country_list:
         logging.info(f"  --countries: {country_list}")
         logging.info(f"  --regex-patterns: {len(config.regex_patterns)} after country filter")
+    if operator_map:
+        logging.info(f"  --operator: {operator_map}")
 
     # Select the appropriate prompt template
     prompt_templates: Dict[str, str] = {
@@ -214,6 +233,7 @@ def run(
             max_retries=config.max_retries,
             base_retry_delay=config.base_retry_delay,
             max_retry_delay=config.max_retry_delay,
+            operators=operator_map or None,
         )
 
         if full_anonymized_text and final_mapping:

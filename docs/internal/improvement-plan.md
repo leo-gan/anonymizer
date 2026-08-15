@@ -11,7 +11,7 @@
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
 - [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
 - [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
-- [ ] 6. Generalization and per-entity operators
+- [x] 6. Generalization and per-entity operators — done 2026-08-15, `feat/entity-operators`
 - [ ] 7. Quasi-identifier / linkage risk report
 - [ ] 8. HIPAA Safe Harbor entity profile
 
@@ -46,6 +46,7 @@ Known code facts to attach to:
 - `core.py`: replacement is whole-document string match, not character spans.
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM).
+- `--operator TYPE=mask|hash|generalize|shift` changes how a type is written. Default remains `replace` (PERSON_1).
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
 
 ---
@@ -158,6 +159,8 @@ Known code facts to attach to:
 ---
 
 ### 6. Generalization and per-entity operators
+
+**Status:** done (2026-08-15) — `feat/entity-operators` (PR link after open)
 
 **Technique:** generalization (the mechanism behind *k*-anonymity and HIPAA Safe Harbor) plus Presidio/Philter-style operators.  
 **Why:** one strategy (`PERSON_1`) is wrong for every type. Cards should be masked, dates year-only, ZIPs truncated, SSNs never left reversible in a released file if the user does not want that.
