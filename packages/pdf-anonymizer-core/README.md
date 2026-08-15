@@ -116,6 +116,8 @@ VIN check digit, and a few national IDs). Failures are kept and labeled `TYPE_LI
 check are unchanged. Listing `IBAN` in a type filter also includes `IBAN_LIKE`.
 See `conf.py`, `regex_ner.py`, and `validators.py`.
 
+Pass `keep_list=` / `deny_list=` phrase lists into `anonymize_file` (CLI: `--keep-list` / `--deny-list`). Keep wins if a phrase is on both.
+
 Pass `seed_mapping=` (original → written) into `anonymize_file` so the same person stays `PERSON_1` across documents. The CLI `--mapping-in` flag loads that file (including encrypted maps).
 
 `EntityProfile.HIPAA_SAFE_HARBOR` is a coverage aid for Safe Harbor identifier classes (year-only dates, ZIP3, age 90+). It is **not** a compliance certificate.

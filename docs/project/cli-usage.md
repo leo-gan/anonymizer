@@ -34,6 +34,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
 | `--entity-profile` | `hipaa-safe-harbor` | *none* | Coverage aid for HIPAA Safe Harbor identifier classes. **Not a compliance certificate.** |
 | `--mapping-in` | `PATH` | *none* | Seed stand-ins from an existing mapping so the same person stays `PERSON_1` across files. |
+| `--keep-list` | `PATH` | *none* | Phrases to leave visible (one per line). Wins if also on the deny-list. |
+| `--deny-list` | `PATH` | *none* | Phrases that must be hidden even if detection missed them. |
 
 ### Configuration Profiles
 

@@ -105,6 +105,28 @@ Do not put the passphrase in the document, the mapping, or the log.
 
 ---
 
+## Keep some phrases, always hide others
+
+A keep-list is a file of phrases that must stay visible, even if the tool found them. Use this for your own company name, or for “Apple” when you mean the fruit.
+
+A deny-list is a file of phrases that must be hidden, even if regex and the model missed them.
+
+One phrase per line. Lines starting with `#` are comments. If a phrase is on both lists, **keep wins**.
+
+```text
+# keep.txt
+Apple
+Acme Inc.
+```
+
+```bash
+pdf-anonymizer run notes.pdf --keep-list keep.txt --deny-list must-hide.txt
+```
+
+Deny-list hits become `CUSTOM_1`, `CUSTOM_2`, and so on.
+
+---
+
 ## Keep the same stand-in across files
 
 Each file used to start counting at `PERSON_1`. In a batch, Ada could be `PERSON_1` in notes.md and `PERSON_7` in contract.pdf.
