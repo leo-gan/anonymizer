@@ -375,6 +375,30 @@ The mapping file still records how to put the original back when the written for
 
 ---
 
+## Score leftover identity clumps (linkage risk)
+
+Hiding names is not the same as hiding *who it is*. If the masked page still says `JOB_TITLE_1 of ORGANIZATION_1 in LOCATION_1`, a reader can often put the name back.
+
+After `run`, the tool scores those clumps (unless `--no-risk`). It **does not change the file**. It writes:
+
+`data/stats/<stem>.risk.json`
+
+Levels:
+
+- **high** — job + company + place, or a nameless identity phrase (`INDIRECT_1`), or three identity clues in one passage
+- **medium** — two clues together (person + city, person + company)
+- **low** — only one kind of clue, or none
+
+```bash
+pdf-anonymizer run notes.pdf
+pdf-anonymizer run notes.pdf --no-risk
+pdf-anonymizer report data/anonymized/notes.anonymized.md
+```
+
+This is a warning light, not a proof of safety. A `low` score does not mean the page is safe to publish.
+
+---
+
 ## Check the masked file for leftovers
 
 Hiding names is a first pass. A leftover email or a mistyped IBAN can still sit in the masked page.
