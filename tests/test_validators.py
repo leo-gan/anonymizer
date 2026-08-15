@@ -107,3 +107,8 @@ class TestPassesChecksumDispatch:
         assert type_matches_filter("IBAN_LIKE", ["IBAN_LIKE"])
         assert not type_matches_filter("CREDIT_CARD", ["IBAN"])
         assert not type_matches_filter("PERSON", ["IBAN"])
+
+    def test_filter_matches_type_prefix(self) -> None:
+        assert type_matches_filter("DRIVERS_LICENSE_US", ["DRIVERS_LICENSE"])
+        assert type_matches_filter("DATE_ISO", ["DATE"])
+        assert not type_matches_filter("PERSON", ["PER"])

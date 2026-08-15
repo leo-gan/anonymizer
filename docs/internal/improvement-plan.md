@@ -13,7 +13,7 @@
 - [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
 - [x] 6. Generalization and per-entity operators — done 2026-08-15, [PR #45](https://github.com/leo-gan/anonymizer/pull/45)
 - [x] 7. Quasi-identifier / linkage risk report — done 2026-08-15, [PR #46](https://github.com/leo-gan/anonymizer/pull/46)
-- [ ] 8. HIPAA Safe Harbor entity profile
+- [x] 8. HIPAA Safe Harbor entity profile — done 2026-08-15, `feat/hipaa-entity-profile`
 
 ---
 
@@ -47,6 +47,7 @@ Known code facts to attach to:
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM).
 - `--operator TYPE=mask|hash|generalize|shift` changes how a type is written. Default remains `replace` (PERSON_1).
+- `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+). Not a compliance certificate.
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
 
 ---
@@ -200,6 +201,8 @@ Known code facts to attach to:
 ---
 
 ### 8. HIPAA Safe Harbor entity profile
+
+**Status:** done (2026-08-15) — `feat/hipaa-entity-profile` (PR link after open)
 
 **Technique:** legal standard from the same history chapter (HIPAA 2003, 18 identifiers).  
 **Why:** `--anonymized-entities` is a raw type list. Health users need a named profile.

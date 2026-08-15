@@ -85,6 +85,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 
 `pdf-anonymizer report FILE` runs the same linkage-risk score on an already-masked file.
 
+- `--entity-profile hipaa-safe-harbor`: coverage aid for the 18 Safe Harbor identifier classes (year-only dates, ZIP3, age 90+). **Not a compliance certificate.**
+
 `pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 
 **Models**:

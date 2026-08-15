@@ -401,12 +401,22 @@ def parent_type(entity_type: str) -> str:
 
 
 def type_matches_filter(entity_type: str, allowed: list[str] | set[str]) -> bool:
-    """True if ``entity_type`` is listed, or is the ``_LIKE`` sibling of a listed type."""
+    """True if the type is listed, is a ``_LIKE`` sibling, or matches a prefix.
+
+    A listed ``DRIVERS_LICENSE`` matches ``DRIVERS_LICENSE_US``.
+    A listed ``DATE`` matches ``DATE_ISO``.
+    """
     allowed_upper = {item.upper() for item in allowed}
     upper = entity_type.upper()
-    if upper in allowed_upper:
+    parent = parent_type(upper)
+    if upper in allowed_upper or parent in allowed_upper:
         return True
-    return parent_type(upper) in allowed_upper
+    for item in allowed_upper:
+        if upper.startswith(item + "_") or parent.startswith(item + "_"):
+            return True
+        if upper.endswith("_" + item) or parent.endswith("_" + item):
+            return True
+    return False
 
 
 def passes_checksum(entity_type: str, text: str) -> bool:

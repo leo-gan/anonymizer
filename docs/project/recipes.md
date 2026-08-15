@@ -348,6 +348,26 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
 ---
 
+## HIPAA Safe Harbor coverage aid
+
+Health notes mention more than names: visit dates, record numbers, small-area places, ages over 89.
+
+`--entity-profile hipaa-safe-harbor` is a **coverage aid**. It:
+
+- asks the careful prompt to look for the identifier *classes* that apply to text (the familiar list of 18 kinds: names, places smaller than a state, dates about a person, phones, emails, SSNs, record and plan numbers, licenses, vehicle and device IDs, URLs, IPs, and phrases for biometrics or face photos)
+- writes dates as a **year**, ZIP codes as **first three digits**, and ages over 89 as **90+**
+- does **not** hide pixels in a photo, and does **not** mean the file is legally de-identified
+
+This is **not** a HIPAA Safe Harbor certification. A person still has to read the result. Expert Determination is a different path and is not this flag.
+
+```bash
+pdf-anonymizer run clinic-note.pdf --entity-profile hipaa-safe-harbor
+```
+
+You can still add `--operator` (your choice wins) or `--anonymized-entities` (extra types are kept, not used to shrink the list).
+
+---
+
 ## Choose how a type is written (mask, year, hash)
 
 By default every find becomes a stand-in such as `PERSON_1` or `CREDIT_CARD_2`. That is best for sending the page to another AI and putting names back later.
