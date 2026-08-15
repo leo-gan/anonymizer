@@ -85,6 +85,7 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
         A list of EntityDict representing identified PII. "type" is always
         upper-cased. "base_form" currently equals the matched text (core
         consolidation may later promote variations to a longer base form).
+        Each hit also includes chunk-local ``start`` / ``end`` offsets.
     """
     entities: List[EntityDict] = []
 
@@ -115,6 +116,8 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
                         "text": matched_text,
                         "type": entity_type_upper,
                         "base_form": matched_text,
+                        "start": match.start(),
+                        "end": match.end(),
                     }
                 )
         except re.error as e:
