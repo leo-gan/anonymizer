@@ -29,6 +29,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file. |
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
+| `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`. |
 
 ### Configuration Profiles
 

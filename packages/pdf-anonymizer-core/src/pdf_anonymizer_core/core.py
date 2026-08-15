@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Tuple
 from pdf_anonymizer_core.call_llm import identify_entities_with_llm
 from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
+from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
 from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
 
@@ -37,6 +38,7 @@ def anonymize_file(
     max_retries: int = 3,
     base_retry_delay: float = 1.0,
     max_retry_delay: float = 10.0,
+    operators: Optional[Dict[str, str]] = None,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -71,6 +73,9 @@ def anonymize_file(
         max_retries: Maximum LLM call attempts per chunk (with exponential backoff).
         base_retry_delay: Base delay in seconds for retry backoff.
         max_retry_delay: Maximum delay cap for retry backoff.
+        operators: Optional map of entity type → operator (replace, mask, hash,
+            generalize, shift). Types not listed keep ``replace``. ``CREDIT_CARD_LIKE``
+            follows ``CREDIT_CARD``.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -261,6 +266,30 @@ def anonymize_file(
             final_mapping[entity_text] = variation_placeholder
         else:
             final_mapping[entity_text] = main_placeholder
+
+    if operators:
+        text_to_type: Dict[str, str] = {}
+        text_to_base: Dict[str, str] = {}
+        for entity in entities_to_process:
+            entity_text = entity["text"]
+            entity_type = entity["type"].upper()
+            base_form = entity.get("base_form") or entity_text
+            text_to_type[entity_text] = entity_type
+            text_to_base[entity_text] = base_form
+            if base_form not in text_to_type:
+                text_to_type[base_form] = entity_type
+                text_to_base[base_form] = base_form
+        transformed: Dict[str, str] = {}
+        for original, placeholder in final_mapping.items():
+            entity_type = text_to_type.get(original, "ID")
+            transformed[original] = apply_operator(
+                original,
+                entity_type,
+                placeholder,
+                operator_for_type(entity_type, operators),
+                text_to_base.get(original, original),
+            )
+        final_mapping = transformed
 
     anonymized_text = full_text
     if entities_to_process:

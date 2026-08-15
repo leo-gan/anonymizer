@@ -348,6 +348,33 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
 ---
 
+## Choose how a type is written (mask, year, hash)
+
+By default every find becomes a stand-in such as `PERSON_1` or `CREDIT_CARD_2`. That is best for sending the page to another AI and putting names back later.
+
+Sometimes you want a different mark:
+
+| Operator | What the reader sees | Good for |
+|---|---|---|
+| `replace` | `PERSON_1` (default) | Reversible stand-ins |
+| `mask` | `****-****-****-1111` | Cards, SSNs, phones (keep a little shape) |
+| `generalize` | `2019`, `021**`, `40-49` | Dates, ZIP codes, ages |
+| `hash` | `H_` plus a short fingerprint | Same value always looks the same, but not readable |
+| `shift` | A nearby date | Dates that must stay dates, not just a year |
+
+```bash
+pdf-anonymizer run invoice.pdf \
+  --operator CREDIT_CARD=mask \
+  --operator DATE=generalize \
+  --operator DATE_ISO=generalize
+```
+
+Types you do not list stay as stand-ins. `CREDIT_CARD_LIKE` follows `CREDIT_CARD`.
+
+The mapping file still records how to put the original back when the written form is unique. Two dates that both become `2019` cannot both be restored uniquely.
+
+---
+
 ## Check the masked file for leftovers
 
 Hiding names is a first pass. A leftover email or a mistyped IBAN can still sit in the masked page.
