@@ -167,7 +167,7 @@ write_residual_report(verify_anonymized_text(anonymized_text), anonymized_path)
 write_risk_report(assess_linkage_risk(anonymized_text), anonymized_path)
 ```
 
-For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_patterns`, `max_retries`, `operators`, `seed_mapping`, gazetteers, etc.) see the [auto-generated API Reference](api-reference.md) or the Recipes page.
+For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_patterns`, `max_retries`, `operators`, `seed_mapping`, gazetteers, `use_llm`, etc.) see the [auto-generated API Reference](api-reference.md) or the Recipes page. Pass `use_llm=False` (or `-p regex-only` / `--no-llm` on the CLI) to skip the language model.
 
 ---
 

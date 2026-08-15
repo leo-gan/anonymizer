@@ -111,6 +111,9 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 *   `--mapping-in` seeds placeholder counts from an existing map (plaintext or encrypted).
 *   Files in one `run` share the growing map so Ada stays `PERSON_1`.
 
+### Regex-only / offline
+*   `--no-llm` or `-p regex-only` skips the language model. Regex, checksums, operators, leftover scan, and risk still run. Names and identity clues are missed.
+
 ### Encrypted mapping
 *   Default remains plaintext `*.mapping.json`.
 *   A passphrase (`--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`) writes AES-256-GCM + Argon2id `*.mapping.json.enc`. The source file SHA-256 and schema version are bound as GCM AAD. Mapping files (plain or locked) are written atomically as mode `0600`.

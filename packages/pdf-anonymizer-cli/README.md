@@ -60,7 +60,8 @@ The `run` command anonymizes one or more files.
 
 ```bash
 pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
-  [-p | --config-profile {best-quality|best-speed|best-cost}] \
+  [-p | --config-profile {best-quality|best-speed|best-cost|regex-only}] \
+  [--no-llm] \
   [--characters-to-anonymize INTEGER] \
   [--prompt-name {simple|detailed}] \
   [--model-name TEXT] \
@@ -74,7 +75,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `FILE_PATH`: Path to one or several PDF, Markdown, or text files for anonymization.
 
 **Options**:
-- `-p, --config-profile {best-quality|best-speed|best-cost}`: The configuration profile to use. Profiles bundle sensible defaults for model, prompt, chunk size, overlap, and retries (default: `best-speed`). Individual flags (`--model-name`, `--prompt-name`, `--characters-to-anonymize`) act as overrides on top of the chosen profile.
+- `-p, --config-profile {best-quality|best-speed|best-cost|regex-only}`: The configuration profile to use. Profiles bundle sensible defaults for model, prompt, chunk size, overlap, and retries (default: `best-speed`). `regex-only` skips the language model. Individual flags (`--model-name`, `--prompt-name`, `--characters-to-anonymize`) act as overrides on top of the chosen profile.
+- `--no-llm`: Skip the language model. Only the RE2 regex stage runs. Names and identity clues will be missed. Same as `-p regex-only`.
 - `--characters-to-anonymize INTEGER`: Number of characters to process in each chunk (default: `100000`; overrides profile).
 - `--prompt-name [simple|detailed]`: The prompt template to use (default: `detailed`; overrides profile).
 - `--model-name TEXT`: The language model to use (overrides profile).

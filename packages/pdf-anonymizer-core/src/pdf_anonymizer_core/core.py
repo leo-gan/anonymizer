@@ -45,6 +45,7 @@ def anonymize_file(
     seed_mapping: Optional[Dict[str, str]] = None,
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
+    use_llm: bool = True,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -88,6 +89,9 @@ def anonymize_file(
             the same person keeps PERSON_1 (or the same fake) across documents.
         keep_list: Phrases that must stay visible even if detected.
         deny_list: Phrases that must be replaced even if detection missed them.
+        use_llm: When False, skip ``identify_entities_with_llm``. Regex,
+            checksums, operators, gazetteers, and span replacement still run.
+            Names and identity clues will be missed. Default True.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -119,6 +123,12 @@ def anonymize_file(
     # Accumulate all entities from all chunks
     collected_entities: List[dict] = []
 
+    if not use_llm:
+        logging.info(
+            "Regex-only / offline mode: skipping the language model. "
+            "Names and identity clues will be missed."
+        )
+
     for i, text_page in enumerate(text_pages):
         logging.info(f"Identifying entities in part {i + 1}/{len(text_pages)}...")
         start_time = time.time()
@@ -126,21 +136,25 @@ def anonymize_file(
         # 1st Stage: Regex NER
         regex_entities = extract_entities_via_regex(text_page, regex_patterns)
 
-        # 2nd Stage: LLM NER
-        llm_entities = identify_entities_with_llm(
-            text_page,
-            prompt_template,
-            model_name,
-            max_retries=max_retries,
-            base_retry_delay=base_retry_delay,
-            max_retry_delay=max_retry_delay,
-        )
+        # 2nd Stage: LLM NER (optional)
+        if use_llm:
+            llm_entities = identify_entities_with_llm(
+                text_page,
+                prompt_template,
+                model_name,
+                max_retries=max_retries,
+                base_retry_delay=base_retry_delay,
+                max_retry_delay=max_retry_delay,
+            )
+        else:
+            llm_entities = []
 
         end_time = time.time()
         duration = end_time - start_time
         minutes = int(duration // 60)
         seconds = int(duration % 60)
-        logging.info(f"   NER stage duration (Regex + LLM): {minutes}:{seconds:02d}")
+        stage = "Regex + LLM" if use_llm else "Regex only"
+        logging.info(f"   NER stage duration ({stage}): {minutes}:{seconds:02d}")
         logging.info(
             f"   Found {len(regex_entities)} via Regex, {len(llm_entities)} via LLM."
         )
