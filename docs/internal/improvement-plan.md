@@ -9,7 +9,7 @@
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
 - [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
-- [x] 4. Residual-PII verification pass — done 2026-08-14, `feat/residual-pii-verify`
+- [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
 - [ ] 5. Encrypted mapping file
 - [ ] 6. Generalization and per-entity operators
 - [ ] 7. Quasi-identifier / linkage risk report
@@ -119,7 +119,7 @@ Known code facts to attach to:
 
 ### 4. Residual-PII verification pass
 
-**Status:** done (2026-08-14) — `feat/residual-pii-verify` (PR link after open)
+**Status:** done (2026-08-14) — [PR #43](https://github.com/leo-gan/anonymizer/pull/43) (`feat/residual-pii-verify`)
 
 **Technique:** the “Attack Simulation” box in history.md; Ohm / Netflix / AOL.  
 **Why:** there is no check that the *output* is clean. Chunked LLM + regex can both miss.
