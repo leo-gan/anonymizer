@@ -15,7 +15,6 @@ and regex_ner docs for the full partitioned list).
 
 import logging
 import os
-import re
 import time
 from typing import Dict, List, Optional, Tuple
 
@@ -25,6 +24,7 @@ from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.gazetteers import apply_deny_list, apply_keep_list
 from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
+from pdf_anonymizer_core.spans import replace_entities
 from pdf_anonymizer_core.utils import seed_placeholder_state
 from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
 
@@ -326,20 +326,10 @@ def anonymize_file(
 
     anonymized_text = full_text
     if entities_to_process:
-        # Sort entities by length descending to match longer strings first
-        entities_to_process.sort(key=lambda e: len(e["text"]), reverse=True)
-
-        # Build selective boundary checks to prevent partial matching (e.g. "John" inside "Johnson")
-        def make_boundary_pattern(text: str) -> str:
-            prefix = r"\b" if text[0].isalnum() or text[0] == "_" else ""
-            suffix = r"\b" if text[-1].isalnum() or text[-1] == "_" else ""
-            return f"{prefix}{re.escape(text)}{suffix}"
-
-        pattern = re.compile(
-            "|".join(make_boundary_pattern(e["text"]) for e in entities_to_process)
-        )
-        anonymized_text = pattern.sub(
-            lambda m: final_mapping[m.group(0)], anonymized_text
+        anonymized_text = replace_entities(
+            full_text,
+            (entity["text"] for entity in entities_to_process),
+            final_mapping,
         )
 
     return anonymized_text, final_mapping

@@ -17,7 +17,7 @@
 - [x] 9. Format-preserving synthetic replacements — done 2026-08-15, [PR #48](https://github.com/leo-gan/anonymizer/pull/48)
 - [x] 10. Cross-document consistent placeholders — done 2026-08-15, [PR #49](https://github.com/leo-gan/anonymizer/pull/49)
 - [x] 11. Allowlist / denylist gazetteers — done 2026-08-15, [PR #50](https://github.com/leo-gan/anonymizer/pull/50)
-- [ ] 12. Span-based replacement
+- [x] 12. Span-based replacement — done 2026-08-15, `feat/span-replacement`
 - [ ] 13. TAB-style eval harness
 - [ ] 14. OCR for scanned PDFs
 - [ ] 15. In-place PDF redaction
@@ -284,6 +284,8 @@ Known code facts to attach to:
 ---
 
 ### 12. Span-based replacement
+
+**Status:** done (2026-08-15) — `feat/span-replacement` (PR link after open)
 
 **Technique:** engineering. Makes operators and generalization more correct.  
 **Why:** Global string replace can change `May` inside the wrong word. Regex `finditer` offsets are thrown away today.

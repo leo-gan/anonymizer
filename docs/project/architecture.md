@@ -85,8 +85,10 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 *   Standard placeholders are created using the entity type and an incremental count (e.g., `PERSON_1`, `PERSON_2`).
 *   **Variations Handling**: If an entity is a partial or varied reference of a base form (e.g. "John" vs. "John Doe"), a sub-variant placeholder is generated (e.g., `PERSON_1.v_1`). This tracks how the text refers to the individual without losing syntactic differences.
 
-### Replacing by Length Descending
-*   When masking the text, entities are replaced in descending order of string length. This prevents partial replacement bugs (e.g. replacing "John" in "John Doe" before trying to replace "John Doe").
+### Span-based replacement
+*   Mentions are located in the full document with word-boundary rules.
+*   Overlapping hits are resolved longest-first (`John Doe` wins over the inner `John`).
+*   Slices are written from the end of the string so earlier offsets stay valid.
 
 ---
 
