@@ -7,7 +7,7 @@
 ## Progress
 
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
-- [x] 2. Checksum validators on structured regex hits — done 2026-08-14, `feat/regex-checksum-validators`
+- [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
 - [ ] 3. Country filter for regex patterns
 - [ ] 4. Residual-PII verification pass
 - [ ] 5. Encrypted mapping file
@@ -81,7 +81,7 @@ Known code facts to attach to:
 
 ### 2. Checksum validators on structured regex hits
 
-**Status:** done (2026-08-14) — `feat/regex-checksum-validators` (PR link after open)
+**Status:** done (2026-08-14) — [PR #41](https://github.com/leo-gan/anonymizer/pull/41) (`feat/regex-checksum-validators`)
 
 **Technique:** data removal with higher precision, without leaving mistyped numbers in the clear.  
 **Why:** `DEFAULT_REGEX_PATTERNS` is over-inclusive (`CREDIT_CARD`, `IBAN`, `MEDICAL_NPI_US`, many national IDs). Shape-only hits used to become tokens or, if dropped, stay visible.
