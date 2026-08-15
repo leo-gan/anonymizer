@@ -24,6 +24,7 @@ from pdf_anonymizer_core.prompts import detailed, hipaa, simple
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
+    load_seed_mapping,
     save_results,
 )
 from pdf_anonymizer_core.risk import assess_linkage_risk, write_risk_report
@@ -162,6 +163,21 @@ def run(
             ),
         ),
     ] = True,
+    mapping_in: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--mapping-in",
+            help=(
+                "Existing mapping file so the same person stays PERSON_1 "
+                "across documents. Also used as the starting map for a batch."
+            ),
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ] = None,
     fake_secret: Annotated[
         Optional[str],
         typer.Option(
@@ -275,6 +291,16 @@ def run(
 
     logging.info(f"Found {len(file_paths)} file(s) to process.")
 
+    seed_mapping = None
+    passphrase = resolve_mapping_passphrase(mapping_passphrase)
+    if mapping_in is not None:
+        try:
+            seed_mapping = load_seed_mapping(str(mapping_in), passphrase)
+        except ValueError as exc:
+            logging.error("%s", exc)
+            sys.exit(1)
+        logging.info("  --mapping-in: %s (%s entries)", mapping_in, len(seed_mapping))
+
     for i, file_path in enumerate(file_paths, 1):
         logging.info("=" * 40)
         logging.info(f"Processing file {i}/{len(file_paths)}: {file_path}")
@@ -291,9 +317,11 @@ def run(
             max_retry_delay=config.max_retry_delay,
             operators=operator_map or None,
             fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
+            seed_mapping=seed_mapping,
         )
 
         if full_anonymized_text and final_mapping:
+            seed_mapping = final_mapping
             # The mapping from anonymize_file is original -> placeholder.
             # We will standardize on placeholder -> original for subsequent steps.
             placeholder_to_original = {v: k for k, v in final_mapping.items()}
@@ -307,7 +335,7 @@ def run(
                 full_anonymized_text,
                 consolidated_placeholder_map,
                 str(file_path),
-                mapping_passphrase=resolve_mapping_passphrase(mapping_passphrase),
+                mapping_passphrase=passphrase,
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

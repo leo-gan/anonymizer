@@ -105,6 +105,23 @@ Do not put the passphrase in the document, the mapping, or the log.
 
 ---
 
+## Keep the same stand-in across files
+
+Each file used to start counting at `PERSON_1`. In a batch, Ada could be `PERSON_1` in notes.md and `PERSON_7` in contract.pdf.
+
+`--mapping-in` starts from an existing map. Files in the same `run` command also share the growing map, so Ada stays `PERSON_1` from the first file to the last.
+
+```bash
+pdf-anonymizer run day1.md day2.md
+# day2 reuses the people found in day1
+
+pdf-anonymizer run day3.md --mapping-in data/mappings/day2.mapping.json
+```
+
+Encrypted maps work if you also pass `--mapping-passphrase` (or `ANONYMIZER_MAPPING_KEY`). Each file's mapping file is the combined map up to that file.
+
+---
+
 ## Batch Processing Multiple Files
 
 The CLI accepts multiple input paths.

@@ -24,6 +24,7 @@ from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTER
 from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
+from pdf_anonymizer_core.utils import seed_placeholder_state
 from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
 
 
@@ -40,6 +41,7 @@ def anonymize_file(
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    seed_mapping: Optional[Dict[str, str]] = None,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -79,6 +81,8 @@ def anonymize_file(
             follows ``CREDIT_CARD``.
         fake_secret: Optional seed material for the ``fake`` operator. Same
             person + type + secret always yields the same fake.
+        seed_mapping: Optional original → written map from a previous file so
+            the same person keeps PERSON_1 (or the same fake) across documents.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -226,6 +230,8 @@ def anonymize_file(
 
     # Consolidate base forms to handle variations like "John" vs "John Doe"
     base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
+    if seed_mapping:
+        base_forms.update(seed_mapping.keys())
     sorted_base_forms = sorted(list(base_forms), key=len, reverse=True)
     for entity in entities_to_process:
         base_form = entity.get("base_form")
@@ -236,11 +242,19 @@ def anonymize_file(
                 entity["base_form"] = potential_full_form
                 break
 
-    # Generate placeholders
-    final_mapping: Dict[str, str] = {}
-    placeholder_counts: Dict[str, int] = {}
-    base_entity_placeholders: Dict[str, str] = {}
-    variation_counters: Dict[str, int] = {}
+    # Generate placeholders (optionally seeded from a previous document)
+    if seed_mapping:
+        (
+            final_mapping,
+            base_entity_placeholders,
+            placeholder_counts,
+            variation_counters,
+        ) = seed_placeholder_state(seed_mapping)
+    else:
+        final_mapping = {}
+        placeholder_counts = {}
+        base_entity_placeholders = {}
+        variation_counters = {}
 
     for entity in entities_to_process:
         entity_text = entity["text"]
@@ -282,8 +296,12 @@ def anonymize_file(
             if base_form not in text_to_type:
                 text_to_type[base_form] = entity_type
                 text_to_base[base_form] = base_form
+        seeded_originals = set(seed_mapping) if seed_mapping else set()
         transformed: Dict[str, str] = {}
         for original, placeholder in final_mapping.items():
+            if original in seeded_originals:
+                transformed[original] = placeholder
+                continue
             entity_type = text_to_type.get(original, "ID")
             transformed[original] = apply_operator(
                 original,
