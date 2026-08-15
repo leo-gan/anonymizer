@@ -115,6 +115,15 @@ VIN check digit, and a few national IDs). Failures are kept and labeled `TYPE_LI
 check are unchanged. Listing `IBAN` in a type filter also includes `IBAN_LIKE`.
 See `conf.py`, `regex_ner.py`, and `validators.py`.
 
+To scan a masked string for leftovers (report only, no rewrite):
+
+```python
+from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
+
+report = verify_anonymized_text(anonymized_text)
+write_residual_report(report, "data/anonymized/note.anonymized.md")
+```
+
 To keep only some countries' national-ID regexes (plus every universal pattern):
 
 ```python

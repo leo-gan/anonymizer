@@ -9,7 +9,7 @@
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
 - [x] 2. Checksum validators on structured regex hits — done 2026-08-14, [PR #41](https://github.com/leo-gan/anonymizer/pull/41)
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
-- [ ] 4. Residual-PII verification pass
+- [x] 4. Residual-PII verification pass — done 2026-08-14, `feat/residual-pii-verify`
 - [ ] 5. Encrypted mapping file
 - [ ] 6. Generalization and per-entity operators
 - [ ] 7. Quasi-identifier / linkage risk report
@@ -38,7 +38,7 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 | *k*-anonymity / ℓ-diversity / *t*-closeness | Not implemented (tabular models; do not rewrite PDFs with them) |
 | Synthetic data | Not implemented |
 | Cryptographic methods | Mapping stored as plaintext |
-| Re-ID / attack simulation | Deanonymize stats only (`unused` / `not_found`) |
+| Re-ID / attack simulation | Residual regex scan after `run` / `verify` (`data/stats/<stem>.residual_pii.json`); deanonymize stats still `unused` / `not_found` |
 
 Known code facts to attach to:
 
@@ -119,19 +119,21 @@ Known code facts to attach to:
 
 ### 4. Residual-PII verification pass
 
+**Status:** done (2026-08-14) — `feat/residual-pii-verify` (PR link after open)
+
 **Technique:** the “Attack Simulation” box in history.md; Ohm / Netflix / AOL.  
 **Why:** there is no check that the *output* is clean. Chunked LLM + regex can both miss.
 
 **Do**
 
-- After replacement, re-run regex NER on the anonymized text (cheap, always).
-- Optionally a short LLM “find remaining PII” prompt behind a flag.
+- After replacement, re-run regex NER on the anonymized text (cheap, default on).
+- Optionally a short LLM “find remaining PII” prompt behind `--verify-llm`.
 - Write `data/stats/<stem>.residual_pii.json`.
-- CLI: `--verify` and/or `pdf-anonymizer verify`.
-- **Report first. Do not auto-rewrite** unless a later explicit flag is added.
+- CLI: `--verify` / `--no-verify` and `pdf-anonymizer verify`.
+- **Report first. Do not auto-rewrite.**
 
-**Touches:** new `verify.py`, CLI subcommand or flag, stats schema. Do not change the `anonymize_file` return contract unless necessary.  
-**Prerequisite:** none. Becomes more useful after (1) and (2).
+**Touches:** `verify.py`, CLI, recipes / README. `anonymize_file` return contract unchanged.  
+**Prerequisite:** none.
 
 ---
 

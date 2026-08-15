@@ -21,6 +21,11 @@ from pdf_anonymizer_core.conf import (
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
 
+def looks_like_placeholder(text: str) -> bool:
+    """True if ``text`` is a stand-in label such as PERSON_1 or IBAN_LIKE_2."""
+    return bool(text and _PLACEHOLDER_PATTERN.match(text.strip()))
+
+
 def consolidate_mapping(
     anonymized_text: str, mapping: Dict[str, str]
 ) -> Tuple[str, Dict[str, str]]:

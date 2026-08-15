@@ -62,7 +62,9 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
   [--prompt-name {simple|detailed}] \
   [--model-name TEXT] \
   [--anonymized-entities PATH] \
-  [--countries US,GB]
+  [--countries US,GB] \
+  [--verify / --no-verify] \
+  [--verify-llm]
 ```
 
 **Arguments**:
@@ -75,6 +77,10 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--model-name TEXT`: The language model to use (overrides profile).
 - `--anonymized-entities PATH`: Path to a file with a list of entities to anonymize.
 - `--countries TEXT`: ISO-2 country codes for national-ID regexes, comma-separated (e.g. `US,GB`). Universal patterns (email, IBAN, cards, …) always stay. Default: all countries.
+- `--verify / --no-verify`: After masking, scan for leftovers (default: on). Writes `data/stats/<stem>.residual_pii.json`. Does not rewrite the file.
+- `--verify-llm`: Also ask the language model to hunt for leftovers.
+
+`pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 
 **Models**:
 You can use any of the predefined models below, or specify a new model using the format `"provider/model-name"`. 
