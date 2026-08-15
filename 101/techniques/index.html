@@ -1366,7 +1366,7 @@
 <p>A popular Python framework for detecting and redacting PII in unstructured text. It uses a combination of regular expressions (regexes) and classical Named Entity Recognition (NER) models (like Spacy or Hugging Face transformers).</p>
 <ul>
 <li><em>How it works</em>: Regexes look for patterns like emails, phone numbers, or credit card structures. The NER model tags entities like <code>PERSON</code>, <code>LOCATION</code>, and <code>DATE</code>.</li>
-<li><em>Limitation</em>: Classical NER models are sensitive to formatting, capitalization, and surrounding phrasing. They struggle when PII is implied rather than explicitly named. For example, in the sentence <em>"I'm sitting here with the author of the 'Harry Potter' series"</em>, Presidio might detect nothing, whereas an LLM knows "J.K. Rowling" is implied.</li>
+<li><em>Limitation</em>: Classical NER models are sensitive to formatting, capitalization, and surrounding phrasing. They struggle when PII is implied rather than explicitly named. For example, in the sentence <em>"I'm sitting here with the author of the 'Harry Potter' series"</em>, Presidio might detect nothing, whereas an LLM knows "J.K. Rowling" is implied. PDF Anonymizer's <strong>detailed</strong> instructions now ask for that kind of identity clue on purpose. See <a href="../how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">How PDF Anonymizer is Different</a>.</li>
 </ul>
 <hr />
 <h2 id="technical-comparison-table">Technical Comparison Table<a class="headerlink" href="#technical-comparison-table" title="Permanent link">&para;</a></h2>

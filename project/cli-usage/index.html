@@ -1594,7 +1594,7 @@
 <td style="text-align: left;"><code>--prompt-name</code></td>
 <td style="text-align: left;"><code>simple</code> | <code>detailed</code></td>
 <td style="text-align: left;"><code>detailed</code></td>
-<td style="text-align: left;">The type of instruction prompt sent to the LLM (overrides profile).</td>
+<td style="text-align: left;">Instruction style sent to the language model (overrides profile). <code>detailed</code> also hides identity clues. <code>simple</code> does not.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--model-name</code></td>
@@ -1632,7 +1632,7 @@
 <td>15,000</td>
 <td>2,000</td>
 <td>5</td>
-<td>Highest accuracy (slower/costlier)</td>
+<td>Highest accuracy; also hides identity clues (slower/costlier)</td>
 </tr>
 <tr>
 <td><code>best-speed</code></td>
@@ -1641,7 +1641,7 @@
 <td>30,000</td>
 <td>1,000</td>
 <td>3</td>
-<td>Balanced (default)</td>
+<td>Balanced (default); does not hunt for identity clues</td>
 </tr>
 <tr>
 <td><code>best-cost</code></td>
@@ -1650,12 +1650,12 @@
 <td>60,000</td>
 <td>3,000</td>
 <td>3</td>
-<td>Cheap &amp; fast on long documents</td>
+<td>Cheap &amp; fast on long documents; no identity-clue hunt</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># High accuracy on an important contract</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># High accuracy on an important contract (also hides identity clues)</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>-p<span class="w"> </span>best-quality
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Fast + cheap batch of notes with a local model</span>

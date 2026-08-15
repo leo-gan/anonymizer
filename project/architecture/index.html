@@ -1308,6 +1308,7 @@
 <ul>
 <li>Each chunk is sent to the selected LLM provider along with the chosen prompt.</li>
 <li>The LLM returns structured JSON lists of detected entities, specifying their direct text and their base entity type (e.g. <code>PERSON</code>, <code>ORGANIZATION</code>, <code>DATE</code>, <code>LOCATION</code>).</li>
+<li>The <strong>detailed</strong> prompt also asks for <strong>identity clues</strong>: phrases that point to one person without writing their name. If the model knows who is meant, it uses type <code>PERSON</code> and puts the name in <code>base_form</code>. If it does not know the name, it uses type <code>INDIRECT</code>. The <strong>simple</strong> prompt does not ask for this. See <a href="../../101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">How PDF Anonymizer is Different</a>.</li>
 </ul>
 <h3 id="base-form-consolidation">Base Form Consolidation<a class="headerlink" href="#base-form-consolidation" title="Permanent link">&para;</a></h3>
 <p>To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. John Smith" to the same individual):

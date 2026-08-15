@@ -1355,11 +1355,13 @@
 </span></code></pre></div>
 <h3 id="selecting-a-prompt-template">Selecting a Prompt Template<a class="headerlink" href="#selecting-a-prompt-template" title="Permanent link">&para;</a></h3>
 <p>The package provides two pre-configured prompt styles: <code>simple</code> and <code>detailed</code>.</p>
+<p><code>detailed</code> is the careful one. Besides names, emails, and similar labels, it asks the model to hide <strong>identity clues</strong>: phrases that point to one person without writing their name (for example "the CEO of Tesla", or "Acme Inc.'s only in-house patent counsel"). Those phrases come back as type <code>PERSON</code> (when the model knows the name) or type <code>INDIRECT</code> (when it does not). <code>simple</code> does not ask for this, so it stays cheaper.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">simple</span><span class="p">,</span> <span class="n">detailed</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Use the detailed prompt template (recommended)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Use the detailed prompt template (recommended when identity clues matter)</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">prompt_text</span> <span class="o">=</span> <span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span>
 </span></code></pre></div>
+<p>A slower, classroom-style explanation is in <a href="../../101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">How PDF Anonymizer is Different</a>.</p>
 <hr />
 <h2 id="end-to-end-code-example">End-to-End Code Example<a class="headerlink" href="#end-to-end-code-example" title="Permanent link">&para;</a></h2>
 <p>Here is a complete script demonstrating how to programmatically anonymize a document, print the details, and then programmatically restore the text.</p>

@@ -610,6 +610,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity clues: when the name is missing, but everyone still knows who it is
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity clues: when the name is missing, but everyone still knows who it is">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-tool-does-with-a-clue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the tool does with a clue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-should-not-hide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it should not hide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-turn-this-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to turn this on
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reversible-masking-the-mapping-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -992,6 +1042,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity clues: when the name is missing, but everyone still knows who it is
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity clues: when the name is missing, but everyone still knows who it is">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-tool-does-with-a-clue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the tool does with a clue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-should-not-hide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it should not hide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-turn-this-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to turn this on
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reversible-masking-the-mapping-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1064,16 +1164,42 @@
 <ul>
 <li><strong>Syntax Sensitivity</strong>: A misspelled name or unusual capitalisation (e.g. "sarah connor") can cause a classical NER model to miss the identifier entirely.</li>
 <li>
-<p><strong>Indirect Identifiers</strong>: Traditional tools cannot identify contextual PII. For instance, in:</p>
-<blockquote>
-<p><em>"We scheduled a meeting with the CEO of Tesla at his office in Austin."</em></p>
-</blockquote>
-<p>A classical tool might mask "Austin", but it won't mask <em>"CEO of Tesla"</em>, which immediately identifies <strong>Elon Musk</strong> to any reader.</p>
+<p><strong>Identity clues (not just names)</strong>: A sentence can point to one real person without ever writing their name. See the full explanation below.</p>
 </li>
 <li>
-<p><strong>PDF Anonymizer's Advantage</strong>: By leveraging Large Language Models (LLMs), the tool acts like a human reader. It understands semantics, indirect references, and complex sentence structures, allowing it to catch hidden or contextual PII that rules miss.</p>
+<p><strong>PDF Anonymizer's Advantage</strong>: The careful (<code>detailed</code>) instructions now ask the language model to hide those identity clues, not only names, emails, and phone numbers. The faster (<code>simple</code>) instructions still look mainly for obvious labels, so they stay cheap.</p>
 </li>
 </ul>
+<hr />
+<h2 id="identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">Identity clues: when the name is missing, but everyone still knows who it is<a class="headerlink" href="#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine you are asked to hide people in a story. Crossing out every name is a good first step. It is not enough.</p>
+<p>Suppose a classmate writes:</p>
+<blockquote>
+<p>"We scheduled a meeting with the CEO of Tesla at his office in Austin."</p>
+</blockquote>
+<p>There is no first name and no last name in that sentence. A simple name-finder will miss it. Any reader who follows the news still knows exactly which person is meant.</p>
+<p>That leftover phrase is an <strong>identity clue</strong>: words that do not <em>look</em> like a name, but still pick out one person.</p>
+<p>Here are three everyday cases the careful instructions now ask the model to catch:</p>
+<ol>
+<li><strong>Job + company + place.</strong> "the CEO of Tesla … in Austin" points to one well-known person. The tool should hide the whole clue (<code>CEO of Tesla</code>), and still hide the company and the city if they appear.</li>
+<li><strong>Author of a famous work.</strong> "the author of the 'Harry Potter' series" points to one writer, even if the writer's name is never written.</li>
+<li><strong>A one-of-a-kind role at a named company.</strong> "Acme Inc.'s only in-house patent counsel" may not be a celebrity, but inside that company it still points to one employee. The tool should hide the whole phrase.</li>
+</ol>
+<h3 id="what-the-tool-does-with-a-clue">What the tool does with a clue<a class="headerlink" href="#what-the-tool-does-with-a-clue" title="Permanent link">&para;</a></h3>
+<ul>
+<li>If the model <strong>knows the person's name</strong>, it treats the clue as that person. Later, if the real name also appears, both get the same stand-in label (for example <code>PERSON_1</code> and <code>PERSON_1.v_1</code>).</li>
+<li>If the model <strong>cannot name the person</strong>, it still hides the phrase and labels it <code>INDIRECT_1</code>. The important part is that the identifying words leave the page.</li>
+</ul>
+<h3 id="what-it-should-not-hide">What it should <em>not</em> hide<a class="headerlink" href="#what-it-should-not-hide" title="Permanent link">&para;</a></h3>
+<p>Vague words are not identity clues. "the CEO" by itself, or "a teacher in Austin", could be many people. The instructions tell the model to leave those alone unless the rest of the sentence makes the person unique.</p>
+<h3 id="how-to-turn-this-on">How to turn this on<a class="headerlink" href="#how-to-turn-this-on" title="Permanent link">&para;</a></h3>
+<p>The default <code>best-speed</code> profile uses the short instructions, which do <strong>not</strong> hunt for these clues. Use the careful profile when this matters:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>-p<span class="w"> </span>best-quality
+</span></code></pre></div>
+<p>Or keep your current profile and only switch the instructions:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--prompt-name<span class="w"> </span>detailed
+</span></code></pre></div>
+<p>This is still a helper, not a guarantee. A very unusual clue can be missed. If a document must be safe to share, a person should still read the result.</p>
 <hr />
 <h2 id="reversible-masking-the-mapping-engine">Reversible Masking (The Mapping Engine)<a class="headerlink" href="#reversible-masking-the-mapping-engine" title="Permanent link">&para;</a></h2>
 <p>Many tools simply erase text or replace it with generic masks (like <code>&lt;REDACTED&gt;</code>), destroying the structure and utility of the document. </p>
@@ -1083,22 +1209,22 @@
 <li><strong>Separate Cryptographic Map</strong>: The CLI outputs an anonymized document along with a JSON-formatted mapping file (e.g., <code>document.mapping.json</code>).</li>
 <li><strong>Local Deanonymization</strong>: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's <code>deanonymize</code> command locally with the mapping file to restore the original names.</li>
 </ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[Raw Document] -&gt; [PDF Anonymizer CLI]
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                       |
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        +--------------+--------------+
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        |                             |
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a> [Anonymized Text]            [JSON Mapping File]
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a> (Sent to external API/Agent) (Kept in local secure vault)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        |                             |
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        v                             |
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a> [AI-Processed Text]                  |
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        |                             |
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        +--------------+--------------+
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                       |
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                       v
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>         [Local Deanonymize Command]
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                       |
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>            [Final Restored Document]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Raw Document] -&gt; [PDF Anonymizer CLI]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>                       |
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        +--------------+--------------+
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        |                             |
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a> [Anonymized Text]            [JSON Mapping File]
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a> (Sent to external API/Agent) (Kept in local secure vault)
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        |                             |
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        v                             |
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a> [AI-Processed Text]                  |
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        |                             |
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        +--------------+--------------+
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                       |
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                       v
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>         [Local Deanonymize Command]
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>                       |
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>            [Final Restored Document]
 </span></code></pre></div>
 <hr />
 <h2 id="privacy-first-and-cost-effective">Privacy-First and Cost-Effective<a class="headerlink" href="#privacy-first-and-cost-effective" title="Permanent link">&para;</a></h2>

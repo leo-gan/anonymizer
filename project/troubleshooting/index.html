@@ -1205,7 +1205,7 @@
 <li><strong>Symptom</strong>: Output looks almost identical to the input.</li>
 <li><strong>Possible causes &amp; fixes</strong>:</li>
 <li>The document contains very little PII (or the LLM prompt style was too conservative).</li>
-<li>Try <code>-p best-quality</code> (uses the <code>detailed</code> prompt and a stronger model by default).</li>
+<li>A sentence may still point to one person without writing their name (an identity clue). The default <code>best-speed</code> profile does not hunt for those. Try <code>-p best-quality</code> (uses the <code>detailed</code> prompt and a stronger model by default).</li>
 <li>Use <code>--anonymized-entities</code> only if you intentionally want to restrict the types.</li>
 <li>Check <code>app.log</code> — it shows how many entities were found by Regex vs LLM per chunk.</li>
 <li>Very short documents or unusual formatting can reduce recall.</li>

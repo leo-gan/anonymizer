@@ -872,6 +872,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hide-identity-clues-not-only-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hide identity clues, not only names
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#choose-and-override-configuration-profiles" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1102,6 +1113,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hide-identity-clues-not-only-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hide identity clues, not only names
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#choose-and-override-configuration-profiles" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1303,56 +1325,98 @@
 </span></code></pre></div>
 <p>Only entities whose <code>type</code> matches one of the listed values (after the hybrid Regex + LLM stage) will be replaced. Everything else stays in clear text.</p>
 <p>This is useful when you want to protect names and companies but leave dates, addresses, or other categories untouched.</p>
+<p>If you also want to hide identity clues (phrases that point to one person without naming them), include <code>INDIRECT</code> on its own line. Those clues are only found when you use the <strong>detailed</strong> instructions (<code>-p best-quality</code> or <code>--prompt-name detailed</code>).</p>
 <p>See the example file at <code>packages/pdf-anonymizer-cli/entities.example.txt</code>.</p>
+<hr />
+<h2 id="hide-identity-clues-not-only-names">Hide identity clues, not only names<a class="headerlink" href="#hide-identity-clues-not-only-names" title="Permanent link">&para;</a></h2>
+<p>A name is the easy case. A harder case is a sentence that never writes the name, but still points to one person.</p>
+<p><strong>Think of it like this.</strong> If you black out "Ada Lovelace" in a biography, that helps. If the next sentence still says "the person who wrote the first computer program in the 1840s", a careful reader can put the name back. That leftover sentence is an identity clue.</p>
+<p>The careful instructions (<code>detailed</code>) now ask the language model to find three common shapes of clue:</p>
+<table>
+<thead>
+<tr>
+<th>Everyday sentence</th>
+<th>Why it still names someone</th>
+<th>What should be hidden</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"a meeting with the CEO of Tesla in Austin"</td>
+<td>Job + famous company + city</td>
+<td>the whole clue, plus the company and city</td>
+</tr>
+<tr>
+<td>"the author of the 'Harry Potter' series"</td>
+<td>"Author of …" a unique work</td>
+<td>the whole author phrase</td>
+</tr>
+<tr>
+<td>"Acme Inc.'s only in-house patent counsel"</td>
+<td>A one-of-a-kind role at a named company</td>
+<td>the whole role phrase</td>
+</tr>
+</tbody>
+</table>
+<p>Use the careful profile so those instructions are actually sent:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>interview-notes.pdf<span class="w"> </span>-p<span class="w"> </span>best-quality
+</span></code></pre></div>
+<p>Or keep another profile and only switch the instructions:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>interview-notes.pdf<span class="w"> </span>--prompt-name<span class="w"> </span>detailed
+</span></code></pre></div>
+<p><strong>What you should see.</strong> A clue may become <code>PERSON_1</code> (when the model knows the name) or <code>INDIRECT_1</code> (when it does not). Either way, the identifying words should leave the page.</p>
+<p><strong>What you should not expect.</strong> The short instructions (<code>simple</code>, used by <code>best-speed</code> and <code>best-cost</code>) do not hunt for these clues. Vague words such as "the CEO" or "a teacher in Austin" should also stay, because they could be many people.</p>
+<p>This is a helper, not a lock. Read the result before you share it.</p>
+<p>A longer, slower explanation of the same idea lives in the 101 page <a href="../../101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">How PDF Anonymizer is Different</a>.</p>
 <hr />
 <h2 id="choose-and-override-configuration-profiles">Choose and Override Configuration Profiles<a class="headerlink" href="#choose-and-override-configuration-profiles" title="Permanent link">&para;</a></h2>
 <p>Profiles are the recommended way to select a quality/speed/cost tradeoff (see also the table in the <a href="../cli-usage/">CLI Reference</a>).</p>
 <p><strong>Quick introspection (Python)</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_QUALITY</span><span class="p">)</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>   <span class="c1"># see exactly what the profile resolved to</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_QUALITY</span><span class="p">)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>   <span class="c1"># see exactly what the profile resolved to</span>
 </span></code></pre></div>
 <p>Any scalar override (<code>model_name</code>, <code>prompt_name</code>, <code>chunk_size</code>) takes precedence.</p>
 <hr />
 <h2 id="use-the-python-sdk-in-pipelines-applications">Use the Python SDK in Pipelines / Applications<a class="headerlink" href="#use-the-python-sdk-in-pipelines-applications" title="Permanent link">&para;</a></h2>
 <p>Minimal end-to-end example using the helper that mirrors the CLI:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deanonymize_file</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># 1. Configure like the CLI would</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 2. Anonymize</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">anonymized_text</span><span class="p">,</span> <span class="n">raw_mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;data/contract.pdf&quot;</span><span class="p">,</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="n">chunk_overlap</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="n">max_retries</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>    <span class="n">base_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">base_retry_delay</span><span class="p">,</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>    <span class="n">max_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retry_delay</span><span class="p">,</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="p">)</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="c1"># 3. (Optional) Save the artifacts yourself</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anonymized_text</span><span class="p">)</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="n">placeholder_to_original</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">placeholder_to_original</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
-</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="c1"># 4. Later: restore</span>
-</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="n">deanonymized_file_path</span><span class="p">,</span> <span class="n">stats_file_path</span> <span class="o">=</span> <span class="n">deanonymize_file</span><span class="p">(</span>
-</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>    <span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span>
-</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>    <span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span>
-</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="p">)</span>
-</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deanonymized file saved to:&quot;</span><span class="p">,</span> <span class="n">deanonymized_file_path</span><span class="p">)</span>
-</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stats file saved to:&quot;</span><span class="p">,</span> <span class="n">stats_file_path</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deanonymize_file</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># 1. Configure like the CLI would</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># 2. Anonymize</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="n">anonymized_text</span><span class="p">,</span> <span class="n">raw_mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;data/contract.pdf&quot;</span><span class="p">,</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>    <span class="n">chunk_overlap</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>    <span class="n">max_retries</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>    <span class="n">base_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">base_retry_delay</span><span class="p">,</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>    <span class="n">max_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retry_delay</span><span class="p">,</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="p">)</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="c1"># 3. (Optional) Save the artifacts yourself</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anonymized_text</span><span class="p">)</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="n">placeholder_to_original</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">placeholder_to_original</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="c1"># 4. Later: restore</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="n">deanonymized_file_path</span><span class="p">,</span> <span class="n">stats_file_path</span> <span class="o">=</span> <span class="n">deanonymize_file</span><span class="p">(</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>    <span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span>
+</span><span id="__span-10-33"><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>    <span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span>
+</span><span id="__span-10-34"><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="p">)</span>
+</span><span id="__span-10-35"><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deanonymized file saved to:&quot;</span><span class="p">,</span> <span class="n">deanonymized_file_path</span><span class="p">)</span>
+</span><span id="__span-10-36"><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stats file saved to:&quot;</span><span class="p">,</span> <span class="n">stats_file_path</span><span class="p">)</span>
 </span></code></pre></div>
 <p>You can also pass a custom list for <code>anonymized_entities</code> or supply your own <code>regex_patterns</code> dict for the first-stage NER.</p>
 <hr />
@@ -1360,13 +1424,13 @@
 <p>After deanonymization the tool always writes a stats file:</p>
 <p><code>data/stats/&lt;stem&gt;.deanonymization_stat.json</code></p>
 <p>Example contents:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;anonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">&quot;mapping_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">&quot;deanonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">&quot;unused_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PERSON_7&quot;</span><span class="p">],</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">&quot;not_found_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;anonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;mapping_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;deanonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">&quot;unused_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PERSON_7&quot;</span><span class="p">],</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">&quot;not_found_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>unused_mappings</code>: placeholders that existed in the map but were never present in the anonymized text (harmless).</li>
@@ -1381,16 +1445,16 @@
 - Re-running the same document (or very similar chunks) is dramatically faster and cheaper.
 - Helps during development and iterative prompt tuning.</p>
 <p><strong>Disable or relocate the cache (SDK)</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.llm_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_cache</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">configure_cache</span><span class="p">(</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                    <span class="c1"># or True</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">cache_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">cache_file</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.llm_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_cache</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">configure_cache</span><span class="p">(</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                    <span class="c1"># or True</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">cache_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="n">cache_file</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_file</span><span class="p">,</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>The CLI always enables caching according to the profile's <code>AppConfig</code>. Delete or move the cache directory for a cold run.</p>
 <hr />
@@ -1401,7 +1465,7 @@
 <li>Start with the <code>best-cost</code> profile (larger chunks, fewer LLM calls).</li>
 <li>Increase <code>--characters-to-anonymize</code> further if your model has a large context window:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>huge-book.pdf<span class="w"> </span>-p<span class="w"> </span>best-cost<span class="w"> </span>--characters-to-anonymize<span class="w"> </span><span class="m">120000</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>huge-book.pdf<span class="w"> </span>-p<span class="w"> </span>best-cost<span class="w"> </span>--characters-to-anonymize<span class="w"> </span><span class="m">120000</span>
 </span></code></pre></div>
 <ul>
 <li>Use Markdown-aware splitting (automatic for <code>.pdf</code> and <code>.md</code>). Plain <code>.txt</code> falls back to recursive character splitting.</li>
@@ -1413,38 +1477,38 @@
 <h2 id="advanced-custom-first-stage-regex-sdk-only">Advanced: Custom First-Stage Regex (SDK only)<a class="headerlink" href="#advanced-custom-first-stage-regex-sdk-only" title="Permanent link">&para;</a></h2>
 <p>The hybrid approach runs a fast deterministic RE2 (google-re2) regex pass before every LLM call.
 You can supply your own set (or a filtered slice of the built-in collection):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span><span class="p">,</span> <span class="n">DEFAULT_REGEX_PATTERNS</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Option A: completely custom</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="c1"># ...</span>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">}</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
-</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1"># Option B: use the built-in library (RE2-powered, 30+ countries)</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="c1"># It includes: EMAIL, URL, CREDIT_CARD, IBAN, CRYPTO_*, VIN, MAC, IPV4/6,</span>
-</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="c1"># DATE_ISO, CURRENCY_AMOUNT, BIC_SWIFT + country partitioned IDs:</span>
-</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="c1"># SSN_US / SIN_CA / NINO_GB / INSEE_FR / DNI_ES / CODICE_FISCALE_IT / AADHAAR_IN / RESIDENT_ID_CN / ...</span>
-</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="c1"># VAT_*/EIN_*/business numbers, DRIVERS_LICENSE_*, PASSPORT_*, MEDICAL_* etc.</span>
-</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>    <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">DEFAULT_REGEX_PATTERNS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EMAIL&quot;</span><span class="p">,</span> <span class="s2">&quot;CREDIT_CARD&quot;</span><span class="p">,</span> <span class="s2">&quot;IBAN&quot;</span><span class="p">,</span> <span class="s2">&quot;SSN_US&quot;</span><span class="p">,</span> <span class="s2">&quot;SIN_CA&quot;</span><span class="p">,</span> <span class="s2">&quot;NINO_GB&quot;</span><span class="p">,</span> <span class="s2">&quot;INSEE_FR&quot;</span><span class="p">,</span>
-</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>             <span class="s2">&quot;RESIDENT_ID_CN&quot;</span><span class="p">,</span> <span class="s2">&quot;PAN_IN&quot;</span><span class="p">,</span> <span class="s2">&quot;VAT_FR&quot;</span><span class="p">,</span> <span class="s2">&quot;VAT_DE&quot;</span><span class="p">,</span> <span class="s2">&quot;DRIVERS_LICENSE_US&quot;</span><span class="p">)</span>
-</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="p">}</span>
-</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>
-</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>
-</span><span id="__span-12-25"><a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
-</span><span id="__span-12-26"><a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
-</span><span id="__span-12-27"><a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
-</span><span id="__span-12-28"><a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
-</span><span id="__span-12-29"><a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-</span><span id="__span-12-30"><a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
-</span><span id="__span-12-31"><a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>    <span class="c1"># ... other config fields</span>
-</span><span id="__span-12-32"><a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span><span class="p">,</span> <span class="n">DEFAULT_REGEX_PATTERNS</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># Option A: completely custom</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="c1"># ...</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="p">}</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="c1"># Option B: use the built-in library (RE2-powered, 30+ countries)</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="c1"># It includes: EMAIL, URL, CREDIT_CARD, IBAN, CRYPTO_*, VIN, MAC, IPV4/6,</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="c1"># DATE_ISO, CURRENCY_AMOUNT, BIC_SWIFT + country partitioned IDs:</span>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="c1"># SSN_US / SIN_CA / NINO_GB / INSEE_FR / DNI_ES / CODICE_FISCALE_IT / AADHAAR_IN / RESIDENT_ID_CN / ...</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># VAT_*/EIN_*/business numbers, DRIVERS_LICENSE_*, PASSPORT_*, MEDICAL_* etc.</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>    <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">DEFAULT_REGEX_PATTERNS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EMAIL&quot;</span><span class="p">,</span> <span class="s2">&quot;CREDIT_CARD&quot;</span><span class="p">,</span> <span class="s2">&quot;IBAN&quot;</span><span class="p">,</span> <span class="s2">&quot;SSN_US&quot;</span><span class="p">,</span> <span class="s2">&quot;SIN_CA&quot;</span><span class="p">,</span> <span class="s2">&quot;NINO_GB&quot;</span><span class="p">,</span> <span class="s2">&quot;INSEE_FR&quot;</span><span class="p">,</span>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>             <span class="s2">&quot;RESIDENT_ID_CN&quot;</span><span class="p">,</span> <span class="s2">&quot;PAN_IN&quot;</span><span class="p">,</span> <span class="s2">&quot;VAT_FR&quot;</span><span class="p">,</span> <span class="s2">&quot;VAT_DE&quot;</span><span class="p">,</span> <span class="s2">&quot;DRIVERS_LICENSE_US&quot;</span><span class="p">)</span>
+</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="p">}</span>
+</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>
+</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>
+</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
+</span><span id="__span-14-26"><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
+</span><span id="__span-14-27"><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+</span><span id="__span-14-28"><a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
+</span><span id="__span-14-29"><a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-14-30"><a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
+</span><span id="__span-14-31"><a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a>    <span class="c1"># ... other config fields</span>
+</span><span id="__span-14-32"><a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>All regex patterns are RE2-safe (linear time, no ReDoS). Entity type keys (upper-cased) become the
 placeholder prefixes (IBAN_3, SSN_US_2, CRYPTO_ETH_1 ...). The LLM stage still runs afterwards and
