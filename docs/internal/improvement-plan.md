@@ -11,7 +11,7 @@
 - [x] 3. Country filter for regex patterns — done 2026-08-14, [PR #42](https://github.com/leo-gan/anonymizer/pull/42)
 - [x] 4. Residual-PII verification pass — done 2026-08-14, [PR #43](https://github.com/leo-gan/anonymizer/pull/43)
 - [x] 5. Encrypted mapping file — done 2026-08-15, [PR #44](https://github.com/leo-gan/anonymizer/pull/44)
-- [x] 6. Generalization and per-entity operators — done 2026-08-15, `feat/entity-operators`
+- [x] 6. Generalization and per-entity operators — done 2026-08-15, [PR #45](https://github.com/leo-gan/anonymizer/pull/45)
 - [ ] 7. Quasi-identifier / linkage risk report
 - [ ] 8. HIPAA Safe Harbor entity profile
 
@@ -160,7 +160,7 @@ Known code facts to attach to:
 
 ### 6. Generalization and per-entity operators
 
-**Status:** done (2026-08-15) — `feat/entity-operators` (PR link after open)
+**Status:** done (2026-08-15) — [PR #45](https://github.com/leo-gan/anonymizer/pull/45) (`feat/entity-operators`)
 
 **Technique:** generalization (the mechanism behind *k*-anonymity and HIPAA Safe Harbor) plus Presidio/Philter-style operators.  
 **Why:** one strategy (`PERSON_1`) is wrong for every type. Cards should be masked, dates year-only, ZIPs truncated, SSNs never left reversible in a released file if the user does not want that.
