@@ -113,7 +113,10 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 
 ### Encrypted mapping
 *   Default remains plaintext `*.mapping.json`.
-*   A passphrase (`--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`) writes AES-256-GCM `*.mapping.json.enc`. `deanonymize` decrypts with the same key.
+*   A passphrase (`--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`) writes AES-256-GCM + Argon2id `*.mapping.json.enc`. The source file SHA-256 and schema version are bound as GCM AAD. Mapping files (plain or locked) are written atomically as mode `0600`.
+*   `--ephemeral-mapping` keeps the vocabulary in process memory only.
+*   `deanonymize` decrypts with the same key. `--source-sha256` rejects a map locked for a different file.
+*   Design, threat model, trade-offs, and test notes: [Mapping encryption](mapping-security.md).
 
 ### HIPAA coverage aid
 *   `--entity-profile hipaa-safe-harbor` (and `prompts.hipaa`) asks for the identifier *classes* that apply to text and applies year-only dates, ZIP3, age `90+`.

@@ -57,8 +57,10 @@ Common problems and how to resolve them.
 - **Symptom**: `deanonymize` fails on `*.mapping.json.enc`, or you only have a `.enc` file and no passphrase.
 - **Fix**:
   - Pass the same `--mapping-passphrase` you used with `run`, or set `ANONYMIZER_MAPPING_KEY`.
+  - If you passed `--source-sha256`, it must be the SHA-256 of the *original* source file that was locked, not the anonymized file.
   - There is no recovery path. The masked document plus a locked map without the passphrase cannot put names back.
   - Default `run` still writes plaintext `*.mapping.json` if you set no passphrase.
+  - `--ephemeral-mapping` never wrote a map. That run cannot be reversed from disk.
 
 ## A date or ZIP cannot be restored uniquely
 

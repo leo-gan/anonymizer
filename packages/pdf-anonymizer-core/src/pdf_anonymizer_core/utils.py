@@ -20,7 +20,9 @@ from pdf_anonymizer_core.conf import (
 from pdf_anonymizer_core.mapping_crypto import (
     encrypt_mapping,
     load_mapping_payload,
+    sha256_file,
 )
+from pdf_anonymizer_core.secure_io import write_private_json
 
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
@@ -35,9 +37,13 @@ _PLACEHOLDER_PARSE = re.compile(r"^([A-Z][A-Z0-9_]*)_([0-9]+)(?:\.v_([0-9]+))?$"
 
 def mapping_to_original_to_written(raw: Dict[str, str]) -> Dict[str, str]:
     """Accept either placeholder→original or original→placeholder."""
-    keys_ph = sum(1 for key in raw if isinstance(key, str) and looks_like_placeholder(key))
+    keys_ph = sum(
+        1 for key in raw if isinstance(key, str) and looks_like_placeholder(key)
+    )
     vals_ph = sum(
-        1 for val in raw.values() if isinstance(val, str) and looks_like_placeholder(val)
+        1
+        for val in raw.values()
+        if isinstance(val, str) and looks_like_placeholder(val)
     )
     if keys_ph >= vals_ph:
         out: Dict[str, str] = {}
@@ -138,6 +144,8 @@ def save_results(
     final_mapping: dict[str, str],
     file_path: str,
     mapping_passphrase: str | None = None,
+    *,
+    ephemeral_mapping: bool = False,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
@@ -146,11 +154,15 @@ def save_results(
         full_anonymized_text (str): The anonymized text.
         final_mapping (dict[str, str]): Mapping of original text -> placeholder.
         file_path (str): The path to the original file.
-        mapping_passphrase: If set, write ``*.mapping.json.enc`` (AES-256-GCM)
-            instead of plaintext JSON.
+        mapping_passphrase: If set, write ``*.mapping.json.enc`` (AES-256-GCM
+            + Argon2id) instead of plaintext JSON.
+        ephemeral_mapping: If true, never write a mapping file. The second
+            return value is an empty string. The caller already holds
+            ``final_mapping`` in memory.
 
     Returns:
-        tuple[str, str]: The paths to the anonymized text file and the mapping file.
+        tuple[str, str]: The paths to the anonymized text file and the mapping
+        file. The mapping path is ``""`` when ``ephemeral_mapping`` is true.
     """
     original_path = Path(file_path)
     file_stem = original_path.stem
@@ -159,7 +171,6 @@ def save_results(
     anonymized_dir = DEFAULT_ANONYMIZED_DIR
     mappings_dir = DEFAULT_MAPPINGS_DIR
     os.makedirs(anonymized_dir, exist_ok=True)
-    os.makedirs(mappings_dir, exist_ok=True)
 
     if file_extension == ".pdf":
         output_extension = ".md"
@@ -172,16 +183,25 @@ def save_results(
     with open(anonymized_output_file, "w", encoding="utf-8") as f:
         f.write(full_anonymized_text)
 
+    if ephemeral_mapping:
+        return anonymized_output_file, ""
+
+    source_digest = ""
+    if original_path.is_file():
+        source_digest = sha256_file(original_path)
+
     if mapping_passphrase:
         mapping_file = f"{mappings_dir}/{file_stem}.mapping.json.enc"
-        payload = encrypt_mapping(final_mapping, mapping_passphrase)
-        with open(mapping_file, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=4)
+        payload = encrypt_mapping(
+            final_mapping,
+            mapping_passphrase,
+            source_sha256=source_digest or None,
+        )
+        write_private_json(mapping_file, payload)
     else:
         mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
         # Persist mapping as placeholder -> original for correct deanonymization
-        with open(mapping_file, "w", encoding="utf-8") as f:
-            json.dump(final_mapping, f, indent=4)
+        write_private_json(mapping_file, final_mapping)
 
     return anonymized_output_file, mapping_file
 
@@ -190,6 +210,8 @@ def deanonymize_file(
     anonymized_file_path: str,
     mapping_file_path: str,
     mapping_passphrase: str | None = None,
+    *,
+    expected_source_sha256: str | None = None,
 ) -> tuple[str, str]:
     """Deanonymize a file using a mapping file.
 
@@ -206,6 +228,9 @@ def deanonymize_file(
         anonymized_file_path: Path to the previously anonymized document.
         mapping_file_path: Path to the JSON mapping file (plaintext or ``.enc``).
         mapping_passphrase: Required when the mapping file is encrypted.
+        expected_source_sha256: Optional SHA-256 of the original source
+            document. When set, an encrypted mapping locked to a different
+            file is rejected (AAD mismatch).
 
     Returns:
         A tuple (deanonymized_file_path, stats_file_path).
@@ -219,7 +244,11 @@ def deanonymize_file(
     with open(mapping_file_path, "r", encoding="utf-8") as f:
         raw_mapping = json.load(f)
 
-    raw_mapping = load_mapping_payload(raw_mapping, mapping_passphrase)
+    raw_mapping = load_mapping_payload(
+        raw_mapping,
+        mapping_passphrase,
+        source_sha256=expected_source_sha256,
+    )
 
     # Detect mapping direction and normalize to placeholder -> original
     # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
@@ -301,5 +330,10 @@ def deanonymize_file(
     }
     with open(stats_file, "w", encoding="utf-8") as f:
         json.dump(stats, f, indent=4)
+
+    # Drop in-process references to recovered PII. Python strings cannot be
+    # reliably overwritten; clearing the dicts is the explicit protocol.
+    raw_mapping.clear()
+    placeholder_to_original.clear()
 
     return deanonymized_file, stats_file

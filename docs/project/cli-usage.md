@@ -28,7 +28,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--countries` | `TEXT` | *all* | ISO-2 codes for national-ID regexes, comma-separated (`US,GB`). Email, IBAN, cards, and other universal patterns always stay. |
 | `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file. |
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
-| `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
+| `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id, source-file AAD). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
+| `--ephemeral-mapping` / `--persist-mapping` | flag | persist | Keep the mapping only in this process. Nothing is written under `data/mappings/`. |
 | `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`. |
 | `--fake-secret` | `TEXT` | built-in | Seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
 | `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
@@ -137,13 +138,14 @@ The `deanonymize` command reads an anonymized document, loads the JSON mapping f
 
 ### Syntax
 ```bash
-pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TEXT]
+pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TEXT] [--source-sha256 HEX]
 ```
 
 ### Arguments
 *   `ANONYMIZED_FILE`: Path to the file that was previously anonymized.
 *   `MAPPING_FILE`: Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
 *   `--mapping-passphrase`: Required for an encrypted mapping. Also read from `ANONYMIZER_MAPPING_KEY`.
+*   `--source-sha256`: Optional. Expected SHA-256 of the original source document. Rejects a mapping locked for a different file.
 
 ### Output Destination
 This command creates a deanonymized version of the file. For example:
@@ -252,7 +254,7 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 
 ### Lock the mapping
 
-`--mapping-passphrase` (or `ANONYMIZER_MAPPING_KEY`) writes `*.mapping.json.enc` instead of plaintext JSON. `deanonymize` needs the same passphrase.
+`--mapping-passphrase` (or `ANONYMIZER_MAPPING_KEY`) writes `*.mapping.json.enc` instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode `0600`. `deanonymize` needs the same passphrase. `--ephemeral-mapping` writes no mapping file at all. See [Mapping encryption](mapping-security.md).
 
 ### How a type is written
 

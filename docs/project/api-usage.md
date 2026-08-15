@@ -44,6 +44,7 @@ from pdf_anonymizer_core.utils import deanonymize_file
 *   `anonymized_file_path` (`str`): Path to the markdown or text file that has placeholders.
 *   `mapping_file_path` (`str`): Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
 *   `mapping_passphrase` (`str`, optional): Required when the mapping file is encrypted. Also used by the CLI via `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`.
+*   `expected_source_sha256` (`str`, optional, keyword-only): When set, an encrypted mapping locked to a different source file is rejected.
 
 ### Returns
 *   `deanonymized_file_path` (`str`): Path to the written restored document.
@@ -97,7 +98,7 @@ Here is a complete script demonstrating how to programmatically anonymize a docu
 import os
 import json
 from pdf_anonymizer_core.core import anonymize_file
-from pdf_anonymizer_core.utils import deanonymize_file
+from pdf_anonymizer_core.utils import deanonymize_file, save_results
 from pdf_anonymizer_core.prompts import detailed
 
 # 1. Anonymize the input file
@@ -119,15 +120,14 @@ print(anonymized_text[:500] + "\n...")
 print("\n--- Extracted Mappings ---")
 print(json.dumps(mapping, indent=2))
 
-# Save outputs to disk
-anonymized_path = "data/contract.anonymized.md"
-mapping_path = "data/contract.mapping.json"
-
-with open(anonymized_path, "w", encoding="utf-8") as f:
-    f.write(anonymized_text)
-
-with open(mapping_path, "w", encoding="utf-8") as f:
-    json.dump(mapping, f, indent=2)
+# Persist via save_results so the mapping is mode 0600 (not umask 0644).
+anonymized_path, mapping_path = save_results(
+    anonymized_text,
+    {v: k for k, v in mapping.items()},
+    input_document,
+    # mapping_passphrase="secret",  # optional lock
+    # ephemeral_mapping=True,      # never write data/mappings/
+)
 
 # 3. Deanonymize programmatically
 print(f"\nRestoring file from {anonymized_path} using {mapping_path}...")

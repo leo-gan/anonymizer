@@ -80,7 +80,7 @@ OPENROUTER_API_KEY="sk-or-v1-..."
 # Ollama Local Host (Optional, defaults to localhost:11434)
 OLLAMA_HOST="http://localhost:11434"
 
-# Optional: lock mapping files as *.mapping.json.enc (AES-256-GCM)
+# Optional: lock mapping files as *.mapping.json.enc (AES-256-GCM + Argon2id)
 ANONYMIZER_MAPPING_KEY="a long secret"
 
 # Optional: seed for --operator TYPE=fake (same person → same fake)

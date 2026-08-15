@@ -22,6 +22,7 @@
 - [ ] 14. OCR for scanned PDFs
 - [ ] 15. In-place PDF redaction
 - [ ] 16. Regex-only / offline mode
+- [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
 
 ---
 
@@ -40,12 +41,12 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 | Technique (history.md) | Today |
 |---|---|
 | Data removal / identifier stripping | Hybrid RE2 + LLM NER, then span-based replacement |
-| Pseudonymization | Typed tokens + `data/mappings/*.json` (optional AES-256-GCM) |
+| Pseudonymization | Typed tokens + `data/mappings/*.json` (optional AES-256-GCM + Argon2id; or in-memory only) |
 | Generalization / suppression | Operators: `mask`, `hash`, `generalize`, `shift` (default still `replace`) |
 | Randomization / differential privacy | Not implemented (poor fit for reversible prose) |
 | *k*-anonymity / ℓ-diversity / *t*-closeness | Not implemented (tabular models; do not rewrite PDFs with them) |
 | Synthetic data | Value-level `fake` operator (seeded Faker); not whole-document rewrite |
-| Cryptographic methods | Optional AES-256-GCM mapping (`*.mapping.json.enc`) |
+| Cryptographic methods | Optional AES-256-GCM + Argon2id mapping (`*.mapping.json.enc`), source-file AAD, `0600` writes |
 | Re-ID / attack simulation | Residual regex scan + linkage-risk report + TAB-style eval harness (`tests/eval/`) |
 
 Known code facts to attach to:
@@ -53,7 +54,7 @@ Known code facts to attach to:
 - `conf.py`: regexes are still structural. After a match, `validators.py` runs a cheap check (Luhn, IBAN, VIN, a few national IDs). Failures stay hidden as `TYPE_LIKE` (`IBAN_LIKE_1`).
 - `core.py`: replacement is span-based (locate in `full_text`, longest-first, write from the end). Shipped in [PR #51](https://github.com/leo-gan/anonymizer/pull/51).
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
-- Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM).
+- Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM + Argon2id, source SHA-256 AAD, atomic `0600`). `--ephemeral-mapping` never writes the map.
 - `--operator TYPE=mask|hash|generalize|shift|fake` changes how a type is written. Default remains `replace` (PERSON_1).
 - `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+). Not a compliance certificate.
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
@@ -364,6 +365,30 @@ Known code facts to attach to:
 
 **Touches:** `core.py`, CLI, recipes.  
 **Prerequisite:** none.
+
+---
+
+### 17. Secure mapping encryption workflow
+
+**Status:** done (2026-08-15) — [PR #54](https://github.com/leo-gan/anonymizer/pull/54) (`feat/secure-encryption-workflow`, hardens item 5)
+
+**Technique:** cryptographic methods + "secure the key", with a real threat model for local files.
+
+**Why:** Item 5 shipped AES-256-GCM + scrypt. That stopped a casual leaked-file read, but left holes: no Argon2id, no document binding (AAD), umask `0644` mapping files, no atomic write, no metadata checks before KDF, no memory wipe / `mlock` / `MADV_DONTDUMP`, no ephemeral mode.
+
+**Do**
+
+- Keep writing AES-256-GCM. Switch KDF to Argon2id (still decrypt v1 scrypt envelopes).
+- Bind source-document SHA-256 and schema version as GCM AAD.
+- Validate envelope metadata before any KDF or decrypt. Constant-time compares for auth checks.
+- Atomic `0600` writes (and `0700` mapping dir) for every mapping file, plaintext or encrypted.
+- Wipe derived keys and plaintext PII buffers; `mlock` + `MADV_DONTDUMP` where supported.
+- `--ephemeral-mapping`: never write `data/mappings/`.
+- Tests that show the old holes and the fix (AAD tamper, permissions, wipe).
+- Design note: `docs/project/mapping-security.md`.
+
+**Touches:** `mapping_crypto.py`, `secure_memory.py`, `secure_io.py`, `utils.py`, CLI, tests, project docs.  
+**Prerequisite:** none (rethink of item 5).
 
 ---
 

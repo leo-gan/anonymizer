@@ -73,7 +73,7 @@ Many tools simply erase text or replace it with generic masks (like `<REDACTED>`
 PDF Anonymizer creates **reversible placeholder mappings**:
 
 - **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `PERSON_1`, `ORGANIZATION_2`, `DATE_1`). This preserves the grammar, flow, and structural meaning of the document.
-- **Separate mapping file**: The CLI outputs an anonymized document along with a JSON mapping file (e.g., `document.mapping.json`). You can lock that file as `*.mapping.json.enc` (AES-256-GCM) with a passphrase. Default is still plaintext JSON.
+- **Separate mapping file**: The CLI outputs an anonymized document along with a JSON mapping file (e.g., `document.mapping.json`). You can lock that file as `*.mapping.json.enc` (AES-256-GCM + Argon2id) with a passphrase, or keep the map only in memory (`--ephemeral-mapping`). Default is still plaintext JSON.
 - **Local Deanonymization**: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's `deanonymize` command locally with the mapping file to restore the original names.
 
 ```
