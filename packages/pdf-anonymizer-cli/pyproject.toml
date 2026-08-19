@@ -12,6 +12,9 @@ dependencies = [
     "pdf-anonymizer-core",
 ]
 
+[project.optional-dependencies]
+excel = ["pdf-anonymizer-core[excel]"]
+
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"
 

@@ -1,9 +1,10 @@
-"""Table load/save, per-cell apply, and review flatten for CSV (Excel I/O is the [excel] extra)."""
+"""Table load/save, per-cell apply, and review flatten for CSV and Excel."""
 
 from __future__ import annotations
 
 import csv
 import io
+import logging
 import os
 from dataclasses import dataclass, field
 from datetime import date, datetime, time
@@ -125,6 +126,8 @@ def cell_to_search_text(value: Any) -> tuple[str, CellKind]:
         return value.isoformat(sep=" ", timespec="seconds"), "date"
     if isinstance(value, date) and not isinstance(value, datetime):
         return value.isoformat(), "date"
+    if isinstance(value, time):
+        return value.isoformat(timespec="seconds"), "date"
     return str(value), "text"
 
 
@@ -247,6 +250,177 @@ def load_csv(path: str) -> TableDocument:
     )
 
 
+def _check_table_file_size(path: str) -> None:
+    file_size = os.path.getsize(path)
+    if file_size > conf.MAX_TABLE_BYTES:
+        raise ValueError(
+            f"Table file exceeds the size limit of {conf.MAX_TABLE_BYTES} bytes."
+        )
+
+
+def _styled_is_formula(value: Any, data_type: Optional[str] = None) -> bool:
+    if data_type == "f":
+        return True
+    if isinstance(value, str) and value.startswith("="):
+        return True
+    return type(value).__name__ in {"ArrayFormula", "DataTableFormula"}
+
+
+def _formula_text(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    text = getattr(value, "text", None)
+    if isinstance(text, str):
+        return text
+    return str(value) if value is not None else ""
+
+
+def _excel_cell_is_formula(cell: Any) -> bool:
+    return _styled_is_formula(cell.value, getattr(cell, "data_type", None))
+
+
+def _xlsx_cell_replaced(cell: TableCell) -> bool:
+    initial, _kind = cell_to_search_text(cell.original)
+    return cell.search_text != initial
+
+
+def _open_xlsx_workbooks(path: str) -> tuple[Any, Any]:
+    from openpyxl import load_workbook
+
+    styled = None
+    try:
+        # Two live workbooks + TableDocument is peak RAM; save_results reloads
+        # then save_xlsx opens styled again (five loads per run).
+        styled = load_workbook(path, data_only=False, read_only=False, keep_vba=False)
+        values = load_workbook(path, data_only=True, read_only=True, keep_vba=False)
+    except ValueError:
+        if styled is not None:
+            styled.close()
+        raise
+    except Exception as exc:
+        if styled is not None:
+            styled.close()
+        raise ValueError(f"Cannot open workbook {path}") from exc
+    return styled, values
+
+
+def _cached_values_map(values_ws: Any) -> Dict[tuple[int, int], Any]:
+    cached: Dict[tuple[int, int], Any] = {}
+    if values_ws is None:
+        return cached
+    for row in values_ws.iter_rows():
+        for cell in row:
+            if cell.value is not None and cell.value != "":
+                cached[(cell.row, cell.column)] = cell.value
+    return cached
+
+
+def load_xlsx(path: str) -> TableDocument:
+    """Load .xlsx via openpyxl.
+
+    Comments, headers/footers, validation lists, charts, and pivot caches
+    are not walked and may retain identifiers.
+    """
+    _require_openpyxl()
+    _check_table_file_size(path)
+
+    styled, values = _open_xlsx_workbooks(path)
+    missing_cache = 0
+    nonempty = 0
+    sheets: list[TableSheet] = []
+    try:
+        values_by_name = {ws.title: ws for ws in values.worksheets}
+        # worksheets skips chartsheets; includes hidden / veryHidden.
+        for ws in styled.worksheets:
+            cached = _cached_values_map(values_by_name.get(ws.title))
+            merge_ranges = [str(rng) for rng in ws.merged_cells.ranges]
+            merge_origins = {
+                (rng.min_row, rng.min_col) for rng in ws.merged_cells.ranges
+            }
+            max_row = ws.max_row or 0
+            max_column = ws.max_column or 0
+            sheet = TableSheet(
+                name=ws.title,
+                hidden=ws.sheet_state != "visible",
+                max_row=max_row,
+                max_column=max_column,
+                merge_ranges=merge_ranges,
+            )
+            if max_row and max_column:
+                for row in ws.iter_rows(
+                    min_row=1, max_row=max_row, max_col=max_column
+                ):
+                    for scell in row:
+                        addr = (scell.row, scell.column)
+                        styled_value = scell.value
+                        cached_value = cached.get(addr)
+                        is_formula = _styled_is_formula(
+                            styled_value, getattr(scell, "data_type", None)
+                        )
+                        present = (
+                            is_formula
+                            or (styled_value is not None and styled_value != "")
+                            or cached_value is not None
+                            or addr in merge_origins
+                        )
+                        if not present:
+                            continue
+                        if is_formula:
+                            if cached_value is None:
+                                missing_cache += 1
+                                search_text = ""
+                                original: Any = None
+                            else:
+                                search_text, _kind = cell_to_search_text(
+                                    cached_value
+                                )
+                                original = cached_value
+                            kind: CellKind = "formula"
+                            formula = _formula_text(styled_value)
+                        else:
+                            value = (
+                                styled_value
+                                if styled_value is not None and styled_value != ""
+                                else cached_value
+                            )
+                            search_text, kind = cell_to_search_text(value)
+                            original = value
+                            formula = None
+                        if kind != "empty":
+                            nonempty += 1
+                            if nonempty > conf.MAX_TABLE_CELLS:
+                                raise ValueError(
+                                    "Table has more than "
+                                    f"{conf.MAX_TABLE_CELLS} non-empty cells."
+                                )
+                        elif addr not in merge_origins:
+                            continue
+                        sheet.cells.append(
+                            TableCell(
+                                sheet=sheet.name,
+                                row=scell.row,
+                                column=scell.column,
+                                search_text=search_text,
+                                original=original,
+                                kind=kind,
+                                number_format=scell.number_format,
+                                formula=formula,
+                            )
+                        )
+            sheets.append(sheet)
+    finally:
+        styled.close()
+        values.close()
+
+    if missing_cache:
+        logging.warning(
+            "%s formula(s) had no cached value; treating as empty.",
+            missing_cache,
+        )
+
+    return TableDocument(path=path, kind="xlsx", sheets=sheets)
+
+
 def load_table(path: str) -> TableDocument:
     suffix = Path(path).suffix.lower()
     if suffix in REJECT_SPREADSHEET_SUFFIXES:
@@ -254,8 +428,7 @@ def load_table(path: str) -> TableDocument:
     if suffix == ".csv":
         return load_csv(path)
     if suffix == ".xlsx":
-        _require_openpyxl()
-        raise ValueError(EXCEL_EXTRA_MESSAGE)
+        return load_xlsx(path)
     raise ValueError(f"Not a supported table file: {path}")
 
 
@@ -302,11 +475,58 @@ def save_csv(doc: TableDocument, path: str) -> None:
             writer.writerow(values)
 
 
+def save_xlsx(doc: TableDocument, path: str) -> None:
+    _require_openpyxl()
+    from openpyxl import load_workbook
+
+    try:
+        styled = load_workbook(doc.path, data_only=False, read_only=False, keep_vba=False)
+    except ValueError:
+        raise
+    except Exception as exc:
+        raise ValueError(f"Cannot open workbook {doc.path}") from exc
+
+    dropped = 0
+    try:
+        cells_by_sheet = {sheet.name: _cells_by_address(sheet) for sheet in doc.sheets}
+        for ws in styled.worksheets:
+            lookup = cells_by_sheet.get(ws.title, {})
+            recorded_formulas: set[tuple[int, int]] = set()
+            for (row, col), tcell in lookup.items():
+                excel_cell = ws.cell(row=row, column=col)
+                if tcell.kind == "formula" or _excel_cell_is_formula(excel_cell):
+                    dropped += 1
+                    recorded_formulas.add((row, col))
+                if _xlsx_cell_replaced(tcell):
+                    excel_cell.value = tcell.search_text
+                elif tcell.kind == "formula":
+                    excel_cell.value = tcell.original
+            max_row = ws.max_row or 0
+            max_column = ws.max_column or 0
+            if max_row and max_column:
+                for row_cells in ws.iter_rows(
+                    min_row=1, max_row=max_row, max_col=max_column
+                ):
+                    for excel_cell in row_cells:
+                        addr = (excel_cell.row, excel_cell.column)
+                        if addr in recorded_formulas:
+                            continue
+                        if _excel_cell_is_formula(excel_cell):
+                            dropped += 1
+                            excel_cell.value = None
+        styled.save(path)
+    finally:
+        styled.close()
+
+    if dropped:
+        logging.info("Dropped %s formula(s); wrote cached values.", dropped)
+
+
 def save_table(doc: TableDocument, path: str) -> None:
     suffix = Path(path).suffix.lower()
     if suffix == ".xlsx" or doc.kind == "xlsx":
-        _require_openpyxl()
-        raise ValueError(EXCEL_EXTRA_MESSAGE)
+        save_xlsx(doc, path)
+        return
     save_csv(doc, path)
 
 
