@@ -2,6 +2,8 @@
 
 This package provides the core functionality for the PDF/Text anonymizer, including text extraction, LLM-driven anonymization, and deanonymization logic. It is used by `pdf-anonymizer-cli`.
 
+- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, and Excel files.
+
 ## Installation
 
 Install the base package with your favorite package manager:
@@ -18,6 +20,7 @@ To use a specific LLM provider, you must install the corresponding extra. This h
 - **OpenRouter**: `pip install "pdf-anonymizer-core[openrouter]"`
 - **OpenAI**: `pip install "pdf-anonymizer-core[openai]"`
 - **Anthropic**: `pip install "pdf-anonymizer-core[anthropic]"`
+- **Excel** (`.xlsx`): `pip install "pdf-anonymizer-core[excel]"`
 
 You can also install multiple extras at once:
 

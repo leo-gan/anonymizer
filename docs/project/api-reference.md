@@ -13,6 +13,8 @@ It reflects the current public surface of `pdf-anonymizer-core`. The hand-writte
 
 ::: pdf_anonymizer_core.core.anonymize_file
 
+::: pdf_anonymizer_core.core.anonymize_tabular_file
+
 ::: pdf_anonymizer_core.utils.deanonymize_file
 
 ::: pdf_anonymizer_core.utils.consolidate_mapping
@@ -66,3 +68,17 @@ The package ships two ready-to-use prompt templates.
 ::: pdf_anonymizer_core.call_llm
 
 ::: pdf_anonymizer_core.load_and_extract
+
+---
+
+## Tables (CSV / Excel)
+
+::: pdf_anonymizer_core.tables.load_table
+
+::: pdf_anonymizer_core.tables.save_table
+
+::: pdf_anonymizer_core.tables.apply_mapping_to_table
+
+::: pdf_anonymizer_core.tables.flatten_table_for_review
+
+::: pdf_anonymizer_core.tables.load_review_text

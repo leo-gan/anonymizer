@@ -207,6 +207,76 @@ For very large batch jobs you may want to:
 
 ---
 
+## Anonymize a CSV or Excel roster
+
+A roster, export, or clinic list is a table. The same engine walks **cells** and writes a same-format spreadsheet plus the usual mapping. This is the same reversible pseudonymization as a PDF. It is **not** *k*-anonymity: leftover columns are not crowd-hidden.
+
+CSV works with the base install. Excel (`.xlsx`) needs the extra:
+
+```bash
+pip install "pdf-anonymizer-core[excel]"
+# or
+pip install "pdf-anonymizer-cli[excel]"
+```
+
+**CLI**
+
+```bash
+pdf-anonymizer run people.csv
+pdf-anonymizer run roster.xlsx
+```
+
+That writes:
+
+- `data/anonymized/people.anonymized.csv` (or `roster.anonymized.xlsx`)
+- `data/mappings/people.mapping.json`
+
+```bash
+pdf-anonymizer deanonymize \
+  data/anonymized/people.anonymized.csv \
+  data/mappings/people.mapping.json
+
+pdf-anonymizer verify data/anonymized/people.anonymized.csv
+pdf-anonymizer report data/anonymized/roster.anonymized.xlsx
+```
+
+No new flags. `--no-llm`, `--operator`, `--keep-list` / `--deny-list`, `--mapping-in`, and the rest work the same way as on a PDF. Files in one `run` still share a growing map (`people.csv notes.md`).
+
+**Notes**
+
+- **Formulas are never written back.** Excel: cached values only. A leftover `=A1` would restore a replaced name. CSV: only a cell whose raw value starts with `=` is treated as formula-like and written with a leading `'`. Deanonymize strips that `'` when the remainder still starts with `=`. E.164 phones such as `+1-555-0100` are **not** formulas and are left untouched.
+- **Size / RAM.** Hard limits: 50 MiB on disk, 500,000 non-empty cells. Spreadsheets load in memory. Peak for a large `.xlsx` is two live workbooks plus the cell table (hundreds of MiB possible at the cap). This is **not** the 1 GB text-chunking path.
+- **Regex skips number and date cells.** Regex runs on text and formula-cached strings only. An undashed numeric ID stored as an Excel number is **missed** on `--no-llm`. Store the dashed form as text, use a deny-list, or keep the language model on. There is no “9-digit integer ⇒ SSN” rule.
+- **Stored value, not display format.** A numeric `123456789` with format `000-00-0000` is still seen as `123456789`.
+- **Leftover risk.** Charts, comments, headers/footers, data-validation lists, defined names, and hyperlinks are not rewritten. A chart series or a header can still show a name. Delete those before sharing, or accept the residual.
+- `.xls`, `.xlsm`, `.ods`, and `.xlsb` are rejected. Re-save as `.xlsx` or export CSV.
+
+**SDK (Python)**
+
+`anonymize_file("people.csv")` still returns a 2-tuple. The string is a row-wise **review flatten** (for verify/risk), not spreadsheet bytes. To write a real `.csv` / `.xlsx`, call `anonymize_tabular_file` and pass `entity_texts` into `save_results`:
+
+```python
+from pdf_anonymizer_core.core import anonymize_tabular_file
+from pdf_anonymizer_core.utils import save_results
+
+review, mapping, entity_texts = anonymize_tabular_file(
+    "people.csv",
+    characters_to_anonymize=100000,
+    prompt_template="",
+    model_name="",
+    use_llm=False,
+)
+# mapping is original → written. Pass the CLI invert into save_results.
+save_results(
+    review,
+    {v: k for k, v in mapping.items()},
+    "people.csv",
+    entity_texts=entity_texts,
+)
+```
+
+---
+
 ## Wrong-looking numbers are not treated as found
 
 A string of digits can *look* like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.
@@ -412,6 +482,8 @@ The CLI always enables caching according to the profile's `AppConfig`. Delete or
 ## Processing Very Large Documents
 
 PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
+
+**Spreadsheets are in-memory.** CSV and Excel do **not** use this 1 GB streaming path. They are capped at 50 MiB / 500,000 non-empty cells and load the whole workbook. See [Anonymize a CSV or Excel roster](#anonymize-a-csv-or-excel-roster).
 
 **Practical tips**
 

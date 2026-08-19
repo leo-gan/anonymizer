@@ -23,6 +23,7 @@
 - [ ] 15. In-place PDF redaction
 - [x] 16. Regex-only / offline mode — done 2026-08-15, [PR #55](https://github.com/leo-gan/anonymizer/pull/55)
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
+- [ ] 18. CSV / Excel as an input format (cell-level PII masking)
 
 ---
 
@@ -61,6 +62,7 @@ Known code facts to attach to:
 - `--no-llm` / `-p regex-only` skips the language model. Regex, checksums, operators, verify, and risk still run. Names and identity clues are missed.
 - `--keep-list` / `--deny-list` gazetteers. Keep wins if a phrase is on both lists.
 - `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). No product behavior change.
+- `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
 
 ---
 
@@ -395,11 +397,34 @@ Known code facts to attach to:
 
 ---
 
+### 18. CSV / Excel as an input format (cell-level PII masking)
+
+**Status:** planned
+
+**Technique:** same reversible pseudonymization as PDF/MD/TXT, on table cells.  
+**Why:** Users have rosters and exports. This is not k-anonymity.
+
+**Do**
+
+- Parse `.csv` (stdlib) and `.xlsx` (`openpyxl` extra) as tables.
+- Per-cell regex on text/formula strings only; row-addressed LLM batches; per-cell `replace_entities` with the same entity-text key list as the text engine.
+- Write `.anonymized.csv` / `.anonymized.xlsx` plus the existing mapping file.
+- Deanonymize / verify / report on the same formats.
+- Reject `.xls`, `.xlsm`, ODS. Drop Excel formulas (cached values only); neutralize CSV cells that start with `=` with a leading `'`; do not treat `+` / `@` as formulas.
+- Do **not** implement k-anonymity / ℓ-diversity / t-closeness or a new store.
+
+**Touches:** `tables.py`, `core.py` dispatch, `utils.save_results` / `deanonymize_file`,
+CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.  
+**Prerequisite:** none.  
+**Version:** 0.17.0 when user-facing.
+
+---
+
 ## Out of scope
 
 | Technique | Why not as a core feature |
 |---|---|
-| *k*-anonymity / ℓ-diversity / *t*-closeness as a rewriter | Defined on tables of people, not narrative PDFs. Use (7) as a report. |
+| *k*-anonymity / ℓ-diversity / *t*-closeness as a rewriter | Defined on tables of people, not narrative PDFs. Use (7) as a report. Cell-level CSV/Excel masking (item 18) is still pseudonymization, not k-anonymity. |
 | Differential privacy on the document | Calibrated noise destroys prose; ε is meaningless on one contract. |
 | Mix / onion routing | Communication metadata, not document PII. |
 | Homomorphic encryption / MPC | Compute-on-encrypted-data; orthogonal to redaction. |

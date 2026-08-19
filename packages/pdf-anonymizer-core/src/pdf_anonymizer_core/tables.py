@@ -430,6 +430,11 @@ def load_xlsx(path: str) -> TableDocument:
 
 
 def load_table(path: str) -> TableDocument:
+    """Load a ``.csv`` or ``.xlsx`` file as a ``TableDocument``.
+
+    Raises ``ValueError`` for rejected spreadsheet suffixes, a missing
+    ``[excel]`` extra, or a file over the size / cell cap.
+    """
     suffix = Path(path).suffix.lower()
     if suffix in REJECT_SPREADSHEET_SUFFIXES:
         raise rejected_spreadsheet_error(path)
@@ -531,6 +536,7 @@ def save_xlsx(doc: TableDocument, path: str) -> None:
 
 
 def save_table(doc: TableDocument, path: str) -> None:
+    """Write ``doc`` as ``.csv`` or ``.xlsx``. Excel formulas are not persisted."""
     suffix = Path(path).suffix.lower()
     if suffix == ".xlsx" or doc.kind == "xlsx":
         save_xlsx(doc, path)
@@ -543,6 +549,7 @@ def apply_mapping_to_table(
     orig_to_written: Dict[str, str],
     entity_texts: Iterable[str],
 ) -> TableDocument:
+    """Replace detected entity texts in each cell. Does not use mapping keys."""
     texts = [text for text in entity_texts if text]
     if not texts:
         return doc
@@ -591,6 +598,7 @@ def flatten_table_for_review(doc: TableDocument, *, anonymized: bool = True) -> 
 
 
 def load_review_text(path: str) -> str:
+    """Load text for ``verify`` / ``report``. Tables are flattened row-wise."""
     if is_rejected_spreadsheet(path):
         raise rejected_spreadsheet_error(path)
     if is_tabular_path(path):

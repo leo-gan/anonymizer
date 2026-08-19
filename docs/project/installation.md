@@ -20,7 +20,7 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
     ```bash
     uv sync --group dev
     ```
-    This sync command will install the CLI, core library, and the dependencies for all supported LLM providers (`google`, `ollama`, `huggingface`, `openrouter`, `openai`, `anthropic`).
+    This sync command will install the CLI, core library, the Excel extra (`openpyxl`), and the dependencies for all supported LLM providers (`google`, `ollama`, `huggingface`, `openrouter`, `openai`, `anthropic`).
 
 3.  **Activate the virtual environment**:
     ```bash
@@ -36,13 +36,16 @@ If you are using `pdf-anonymizer-core` or `pdf-anonymizer-cli` in a separate ext
 To keep the installation footprint small, the core package uses **PEP 508 Extras** for specific LLM providers. Install only the providers you plan to use:
 
 ```bash
-# Base package only (no provider dependencies)
+# Base package only (no provider dependencies; CSV works here)
 pip install pdf-anonymizer-core
 
 # Install specific provider support
 pip install "pdf-anonymizer-core[google]"
 pip install "pdf-anonymizer-core[ollama]"
 pip install "pdf-anonymizer-core[openai,anthropic]"
+
+# Excel (.xlsx) input
+pip install "pdf-anonymizer-core[excel]"
 ```
 
 ### Available Extras
@@ -52,6 +55,7 @@ pip install "pdf-anonymizer-core[openai,anthropic]"
 *   `[openrouter]`: Installs client tools to query OpenRouter.
 *   `[openai]`: Installs the official OpenAI API SDK.
 *   `[anthropic]`: Installs the official Anthropic API SDK.
+*   `[excel]`: Installs `openpyxl` for `.xlsx` input. CSV uses the stdlib and needs no extra.
 
 ---
 

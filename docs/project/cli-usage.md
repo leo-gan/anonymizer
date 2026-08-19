@@ -14,7 +14,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 ```
 
 ### Arguments
-*   `FILE_PATH`: Space-separated list of paths to files (PDF, Markdown, or plain text).
+*   `FILE_PATH`: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, or Excel `.xlsx`).
 
 ### Options
 
@@ -113,6 +113,7 @@ Score identity-clue clumps in an already-masked file. Does not change the file.
 
 ```bash
 pdf-anonymizer report data/anonymized/notes.anonymized.md
+pdf-anonymizer report data/anonymized/roster.anonymized.xlsx
 ```
 
 The report is `data/stats/<stem>.risk.json`. `run` already writes this unless you pass `--no-risk`.
@@ -125,6 +126,7 @@ Scan an already-masked file. This only writes a report. It does not change the f
 
 ```bash
 pdf-anonymizer verify data/anonymized/notes.anonymized.md
+pdf-anonymizer verify data/anonymized/people.anonymized.csv
 pdf-anonymizer verify data/anonymized/notes.anonymized.md --verify-llm -p best-quality
 ```
 
@@ -208,9 +210,9 @@ Files in the same `run` share one growing map, so the same person stays `PERSON_
 
 `run`, `verify`, `report`, and `deanonymize` write under conventional directories (created automatically):
 
-*   `data/anonymized/<stem>.anonymized.md` (or `.txt`)
+*   `data/anonymized/<stem>.anonymized.md` (or `.txt`, `.csv`, `.xlsx`)
 *   `data/mappings/<stem>.mapping.json` (or `*.mapping.json.enc` when a passphrase is set)
-*   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`)
+*   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`, `.csv`, `.xlsx`)
 *   `data/stats/<stem>.residual_pii.json` — leftovers found after masking (from `run` or `verify`)
 *   `data/stats/<stem>.risk.json` — identity-clue clumps (from `run` or `report`)
 *   `data/stats/<stem>.deanonymization_stat.json` — written by `deanonymize`
@@ -289,6 +291,14 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### TAB-style eval harness
 
 `tests/eval/` and `scripts/eval_tab.py` score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.
+
+### CSV and Excel as inputs (cell-level masking)
+
+`pdf-anonymizer run people.csv` and `pdf-anonymizer run roster.xlsx` (with the `[excel]` extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, **not** *k*-anonymity. See [Anonymize a CSV or Excel roster](recipes.md#anonymize-a-csv-or-excel-roster).
+
+### PII-free files now write output + empty mapping
+
+A run that finds nothing still writes the output file and an empty mapping (`if full_anonymized_text is not None and final_mapping is not None`). That used to look like a failed run for every format, including PDF/MD/TXT.
 
 See [Recipes](recipes.md) for worked examples of each flag.
 

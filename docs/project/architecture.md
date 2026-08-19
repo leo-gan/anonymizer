@@ -37,7 +37,7 @@ When you run `pdf-anonymizer run`, the system executes the following sequential 
 
 ```mermaid
 graph TD
-    File[Input File: PDF, MD, TXT] --> Ext[Text Extractor]
+    File[Input File: PDF, MD, TXT, CSV, XLSX] --> Ext[Text Extractor]
     Ext -->|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --> Chunk[Text Chunking]
     Chunk --> Regex[RE2 regex + checksums]
@@ -57,6 +57,7 @@ graph TD
 ### Text Extraction & PDF Conversion
 *   Instead of traditional OCR or layout-unaware PDF parsing, the project uses `pymupdf4llm` to convert PDF files into clean, readable **Markdown**. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.
 *   For Markdown and Text files, standard file reads are executed.
+*   CSV and Excel skip this loader. See [Table path](#table-path-csv--excel).
 
 ### Semantic Chunking
 *   Depending on the `--characters-to-anonymize` parameter (default `100,000` characters), the text is sliced into chunks:
@@ -128,6 +129,15 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 ### TAB-style eval harness
 *   `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers.
 *   `scripts/eval_tab.py` runs the mini fixture. Tests and scripts only — no product change.
+
+### Table path (CSV / Excel)
+*   `.csv` and `.xlsx` never enter `load_and_extract_text_from_file`. `tables.load_table` walks cells; apply writes cells. The file is not flattened into one replacement buffer.
+*   **Regex** runs per-cell on `text` and formula-cached strings only. Number and date cells skip regex so employee IDs and quantities are not shredded.
+*   **LLM** sees row-addressed batches (`[Sheet!A2] Name: …`), including serialized number/date cells. A hit is kept only if `locate_spans` finds it in some cell.
+*   **Apply** is `replace_entities` on each cell's `search_text` with the same `entity["text"]` list the text engine uses.
+*   **Review flatten** (`v1 | v2 | …`, blank line after every row) is what `anonymize_file` returns for tables. `verify` and `report` score that flatten, not raw CSV bytes.
+*   Excel writes cached values only (no formulas). Charts, comments, headers/footers, validation lists, defined names, and hyperlinks are left as-is.
+*   This is still cell-level pseudonymization. It is not *k*-anonymity.
 
 ---
 
