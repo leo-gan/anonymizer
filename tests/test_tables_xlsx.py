@@ -79,10 +79,7 @@ def _any_formula(path: Path) -> bool:
                 for cell in row:
                     if cell.data_type == "f":
                         return True
-                    value = cell.value
-                    if isinstance(value, str) and value.startswith("="):
-                        return True
-                    if type(value).__name__ in {"ArrayFormula", "DataTableFormula"}:
+                    if type(cell.value).__name__ in {"ArrayFormula", "DataTableFormula"}:
                         return True
         return False
     finally:
@@ -265,6 +262,27 @@ class TestXlsxAnonymize:
         assert _any_formula(dest) is False
         assert load_workbook(dest)["Employees"]["G2"].value == "PERSON_1"
         assert load_workbook(dest)["Employees"]["A2"].value == "PERSON_1"
+
+    def test_cached_equals_string_is_not_written_as_formula(self, tmp_path) -> None:
+        src = tmp_path / "eq.xlsx"
+        wb = Workbook()
+        ws = wb.active
+        ws["A1"] = "Name"
+        ws["B1"] = "=A1"
+        wb.save(src)
+        wb.close()
+        doc = load_table(str(src))
+        formula = next(
+            cell for cell in doc.sheets[0].cells if cell.row == 1 and cell.column == 2
+        )
+        formula.original = "=A1"
+        formula.search_text = "=A1"
+        dest = tmp_path / "out.xlsx"
+        save_table(doc, str(dest))
+        assert _any_formula(dest) is False
+        written = load_workbook(dest).active["B1"]
+        assert written.data_type != "f"
+        assert written.value == "=A1"
 
     def test_notes_free_text_is_replaced(self, tmp_path, mocker) -> None:
         src = _build_roster(tmp_path / "roster.xlsx")

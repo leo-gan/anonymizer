@@ -284,6 +284,14 @@ def _xlsx_cell_replaced(cell: TableCell) -> bool:
     return cell.search_text != initial
 
 
+def _xlsx_assign_value(excel_cell: Any, value: Any) -> None:
+    # openpyxl treats a leading '=' as a formula; force a string type so a
+    # cached "=A1" cannot re-derive a replaced name.
+    excel_cell.value = value
+    if isinstance(value, str) and value.startswith("="):
+        excel_cell.data_type = "s"
+
+
 def _open_xlsx_workbooks(path: str) -> tuple[Any, Any]:
     from openpyxl import load_workbook
 
@@ -318,8 +326,8 @@ def _cached_values_map(values_ws: Any) -> Dict[tuple[int, int], Any]:
 def load_xlsx(path: str) -> TableDocument:
     """Load .xlsx via openpyxl.
 
-    Comments, headers/footers, validation lists, charts, and pivot caches
-    are not walked and may retain identifiers.
+    Comments, headers/footers, validation lists, defined names, hyperlinks,
+    charts, and pivot caches are not walked and may retain identifiers.
     """
     _require_openpyxl()
     _check_table_file_size(path)
@@ -498,9 +506,9 @@ def save_xlsx(doc: TableDocument, path: str) -> None:
                     dropped += 1
                     recorded_formulas.add((row, col))
                 if _xlsx_cell_replaced(tcell):
-                    excel_cell.value = tcell.search_text
+                    _xlsx_assign_value(excel_cell, tcell.search_text)
                 elif tcell.kind == "formula":
-                    excel_cell.value = tcell.original
+                    _xlsx_assign_value(excel_cell, tcell.original)
             max_row = ws.max_row or 0
             max_column = ws.max_column or 0
             if max_row and max_column:
@@ -511,7 +519,7 @@ def save_xlsx(doc: TableDocument, path: str) -> None:
                         addr = (excel_cell.row, excel_cell.column)
                         if addr in recorded_formulas:
                             continue
-                        if _excel_cell_is_formula(excel_cell):
+                        if getattr(excel_cell, "data_type", None) == "f":
                             dropped += 1
                             excel_cell.value = None
         styled.save(path)
