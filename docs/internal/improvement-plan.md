@@ -23,7 +23,7 @@
 - [ ] 15. In-place PDF redaction
 - [x] 16. Regex-only / offline mode — done 2026-08-15, [PR #55](https://github.com/leo-gan/anonymizer/pull/55)
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
-- [ ] 18. CSV / Excel as an input format (cell-level PII masking)
+- [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
 
 ---
 
@@ -399,7 +399,7 @@ Known code facts to attach to:
 
 ### 18. CSV / Excel as an input format (cell-level PII masking)
 
-**Status:** planned
+**Status:** done (2026-08-19) — [PR #56](https://github.com/leo-gan/anonymizer/pull/56) (CSV), [PR #57](https://github.com/leo-gan/anonymizer/pull/57) (Excel), [PR #58](https://github.com/leo-gan/anonymizer/pull/58) (docs / 0.17.0)
 
 **Technique:** same reversible pseudonymization as PDF/MD/TXT, on table cells.  
 **Why:** Users have rosters and exports. This is not k-anonymity.
