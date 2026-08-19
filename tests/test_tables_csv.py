@@ -276,6 +276,14 @@ class TestSaveResultsInvert:
         assert leftover.read_text(encoding="utf-8")
         assert "Ada" not in leftover.read_text(encoding="utf-8").splitlines()[-1]
 
+        out3, _mapping3 = save_results(
+            flatten,
+            {"PERSON_1": "Ada"},
+            str(src),
+            entity_texts=(t for t in ["Ada"]),
+        )
+        assert _grid(Path(out3))[1][0] == "PERSON_1"
+
     def test_colliding_mask_needs_engine_orig_map(self, tmp_path, monkeypatch) -> None:
         monkeypatch.chdir(tmp_path)
         src = tmp_path / "emails.csv"

@@ -215,7 +215,7 @@ def save_results(
                 "Pass the engine original→written map as orig_to_written=."
             )
         write_anonymized_table(
-            file_path, anonymized_output_file, apply_map, entity_texts
+            file_path, anonymized_output_file, apply_map, texts
         )
     else:
         with open(anonymized_output_file, "w", encoding="utf-8") as f:
