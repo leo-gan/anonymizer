@@ -383,8 +383,8 @@ def anonymize_file(
 
     Args:
         file_path: Path to the file to anonymize (.pdf, .md, .txt, .csv, or
-            .xlsx). ``.xlsx`` requires the ``[excel]`` extra and raises
-            ``ValueError`` until it is installed. ``.xls`` / ``.xlsm`` /
+            .xlsx). ``.xlsx`` succeeds when the ``[excel]`` extra is installed
+            and raises ``ValueError`` if it is missing. ``.xls`` / ``.xlsm`` /
             ``.ods`` / ``.xlsb`` are rejected.
         characters_to_anonymize: Target character size of each chunk sent to the LLM.
         prompt_template: The full prompt template string (use one from

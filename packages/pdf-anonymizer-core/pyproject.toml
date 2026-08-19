@@ -22,6 +22,7 @@ huggingface = ["huggingface-hub"]
 openrouter = ["openai"]
 openai = ["openai"]
 anthropic = ["anthropic"]
+excel = ["openpyxl>=3.1"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"
