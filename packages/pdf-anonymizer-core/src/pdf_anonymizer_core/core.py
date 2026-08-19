@@ -16,7 +16,9 @@ and regex_ner docs for the full partitioned list).
 import logging
 import os
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from pdf_anonymizer_core.call_llm import identify_entities_with_llm
 from pdf_anonymizer_core.conf import DEFAULT_CHUNK_OVERLAP, DEFAULT_REGEX_PATTERNS
@@ -24,9 +26,329 @@ from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.gazetteers import apply_deny_list, apply_keep_list
 from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
-from pdf_anonymizer_core.spans import replace_entities
+from pdf_anonymizer_core.spans import locate_spans, replace_entities
+from pdf_anonymizer_core.tables import (
+    REGEX_CELL_KINDS,
+    TableCell,
+    TableDocument,
+    TableSheet,
+    apply_mapping_to_table,
+    column_letter,
+    flatten_table_for_review,
+    header_labels,
+    is_rejected_spreadsheet,
+    is_tabular_path,
+    iter_cells,
+    load_table,
+    rejected_spreadsheet_error,
+)
 from pdf_anonymizer_core.utils import seed_placeholder_state
 from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
+
+_TYPE_PRIORITY = {
+    "CREDIT_CARD": 15,
+    "IBAN": 14,
+    "CRYPTO_BTC": 13,
+    "CRYPTO_ETH": 13,
+    "EMAIL": 12,
+    "SSN": 11,
+    "SSN_US": 11,
+    "SIN_CA": 11,
+    "NINO_GB": 11,
+    "INSEE_FR": 11,
+    "AADHAAR_IN": 11,
+    "RESIDENT_ID_CN": 11,
+    "EIN_US": 10,
+    "VAT_GB": 10,
+    "VAT_FR": 10,
+    "VAT_ES": 10,
+    "VAT_IT": 10,
+    "VAT_DE": 10,
+    "PAN_IN": 10,
+    "GSTIN_IN": 10,
+    "UNIFIED_SOCIAL_CREDIT_CODE_CN": 10,
+    "IPV4_ADDRESS": 9,
+    "IP_ADDRESS": 9,
+    "IPV6_ADDRESS": 9,
+    "MAC_ADDRESS": 8,
+    "VIN": 8,
+    "MEDICAL_NPI_US": 8,
+    "PASSPORT": 7,
+    "US_PASSPORT": 7,
+    "GB_PASSPORT": 7,
+    "DRIVERS_LICENSE_US": 6,
+    "DRIVERS_LICENSE_GB": 6,
+    "DRIVERS_LICENSE_FR": 6,
+    "DRIVERS_LICENSE_CA": 6,
+    "DATE_ISO": 5,
+    "CURRENCY_AMOUNT": 5,
+    "BIC_SWIFT": 5,
+    "PHONE": 4,
+    "URL": 4,
+    "INDIRECT": 4,
+    "PERSON": 3,
+    "ORGANIZATION": 2,
+    "LOCATION": 1,
+    "ADDRESS": 1,
+    "CUSTOM": 3,
+}
+
+
+def _type_priority(ent_type: str) -> int:
+    upper = ent_type.upper()
+    if upper.endswith(LIKE_SUFFIX):
+        return _TYPE_PRIORITY.get(parent_type(upper), 0) - 1
+    return _TYPE_PRIORITY.get(upper, 0)
+
+
+def collect_entities_from_chunks(
+    chunks: List[str],
+    *,
+    prompt_template: str,
+    model_name: str,
+    regex_patterns: Dict[str, str],
+    max_retries: int,
+    base_retry_delay: float,
+    max_retry_delay: float,
+    use_llm: bool,
+) -> List[dict]:
+    """Per chunk: extract_entities_via_regex then optional identify_entities_with_llm."""
+    collected_entities: List[dict] = []
+
+    if not use_llm:
+        logging.info(
+            "Regex-only / offline mode: skipping the language model. "
+            "Names and identity clues will be missed."
+        )
+
+    for i, text_page in enumerate(chunks):
+        logging.info(f"Identifying entities in part {i + 1}/{len(chunks)}...")
+        start_time = time.time()
+
+        regex_entities = extract_entities_via_regex(text_page, regex_patterns)
+
+        if use_llm:
+            llm_entities = identify_entities_with_llm(
+                text_page,
+                prompt_template,
+                model_name,
+                max_retries=max_retries,
+                base_retry_delay=base_retry_delay,
+                max_retry_delay=max_retry_delay,
+            )
+        else:
+            llm_entities = []
+
+        end_time = time.time()
+        duration = end_time - start_time
+        minutes = int(duration // 60)
+        seconds = int(duration % 60)
+        stage = "Regex + LLM" if use_llm else "Regex only"
+        logging.info(f"   NER stage duration ({stage}): {minutes}:{seconds:02d}")
+        logging.info(
+            f"   Found {len(regex_entities)} via Regex, {len(llm_entities)} via LLM."
+        )
+
+        collected_entities.extend(regex_entities)
+        collected_entities.extend(llm_entities)
+
+    return collected_entities
+
+
+def finalize_entities(
+    collected: List[dict],
+    full_text: str,
+    *,
+    anonymized_entities: Optional[List[str]],
+    keep_list: Optional[List[str]],
+    deny_list: Optional[List[str]],
+    apply_deny: bool = True,
+    seed_mapping: Optional[Dict[str, str]] = None,
+) -> List[dict]:
+    """Type-priority dedup, type filter, optional deny-list, keep-list, base-form merge."""
+    best_entities: Dict[str, dict] = {}
+    for ent in collected:
+        text = ent["text"]
+        ent_type = ent["type"].upper()
+        if text not in best_entities:
+            best_entities[text] = ent
+        else:
+            existing_type = best_entities[text]["type"].upper()
+            if _type_priority(ent_type) > _type_priority(existing_type):
+                best_entities[text] = ent
+
+    deduped_entities = list(best_entities.values())
+
+    entities_to_process = deduped_entities
+    if anonymized_entities:
+        entities_to_process = [
+            e
+            for e in deduped_entities
+            if type_matches_filter(e["type"], anonymized_entities)
+        ]
+
+    if apply_deny and deny_list:
+        entities_to_process = apply_deny_list(full_text, entities_to_process, deny_list)
+    if keep_list:
+        entities_to_process = apply_keep_list(entities_to_process, keep_list)
+
+    logging.info(
+        f"Collected {len(collected)} total entities. "
+        f"Deduplicated to {len(deduped_entities)}. "
+        f"Processing {len(entities_to_process)} filtered entities."
+    )
+
+    base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
+    if seed_mapping:
+        base_forms.update(seed_mapping.keys())
+    sorted_base_forms = sorted(list(base_forms), key=len, reverse=True)
+    for entity in entities_to_process:
+        base_form = entity.get("base_form")
+        if not base_form:
+            continue
+        for potential_full_form in sorted_base_forms:
+            if base_form != potential_full_form and base_form in potential_full_form:
+                entity["base_form"] = potential_full_form
+                break
+
+    return entities_to_process
+
+
+def build_mapping(
+    entities: List[dict],
+    *,
+    seed_mapping: Optional[Dict[str, str]],
+    operators: Optional[Dict[str, str]],
+    fake_secret: Optional[str],
+) -> Dict[str, str]:
+    """seed_placeholder_state, PERSON_n / .v_n, apply_operator."""
+    if seed_mapping:
+        (
+            final_mapping,
+            base_entity_placeholders,
+            placeholder_counts,
+            variation_counters,
+        ) = seed_placeholder_state(seed_mapping)
+    else:
+        final_mapping = {}
+        placeholder_counts = {}
+        base_entity_placeholders = {}
+        variation_counters = {}
+
+    for entity in entities:
+        entity_text = entity["text"]
+        entity_type = entity["type"].upper()
+        base_form = entity.get("base_form") or entity_text
+
+        if entity_text in final_mapping:
+            continue
+
+        if base_form not in base_entity_placeholders:
+            current_count = placeholder_counts.get(entity_type, 0) + 1
+            placeholder_counts[entity_type] = current_count
+            main_placeholder = f"{entity_type}_{current_count}"
+            base_entity_placeholders[base_form] = main_placeholder
+            if base_form not in final_mapping:
+                final_mapping[base_form] = main_placeholder
+
+        main_placeholder = base_entity_placeholders[base_form]
+
+        if entity_text != base_form:
+            current_variation_count = variation_counters.get(main_placeholder, 0) + 1
+            variation_counters[main_placeholder] = current_variation_count
+            variation_placeholder = f"{main_placeholder}.v_{current_variation_count}"
+            final_mapping[entity_text] = variation_placeholder
+        else:
+            final_mapping[entity_text] = main_placeholder
+
+    if operators:
+        text_to_type: Dict[str, str] = {}
+        text_to_base: Dict[str, str] = {}
+        for entity in entities:
+            entity_text = entity["text"]
+            entity_type = entity["type"].upper()
+            base_form = entity.get("base_form") or entity_text
+            text_to_type[entity_text] = entity_type
+            text_to_base[entity_text] = base_form
+            if base_form not in text_to_type:
+                text_to_type[base_form] = entity_type
+                text_to_base[base_form] = base_form
+        seeded_originals = set(seed_mapping) if seed_mapping else set()
+        transformed: Dict[str, str] = {}
+        for original, placeholder in final_mapping.items():
+            if original in seeded_originals:
+                transformed[original] = placeholder
+                continue
+            entity_type = text_to_type.get(original, "ID")
+            transformed[original] = apply_operator(
+                original,
+                entity_type,
+                placeholder,
+                operator_for_type(entity_type, operators),
+                text_to_base.get(original, original),
+                fake_secret or "",
+            )
+        final_mapping = transformed
+
+    return final_mapping
+
+
+def anonymize_text_content(
+    full_text: str,
+    text_pages: List[str],
+    *,
+    prompt_template: str,
+    model_name: str,
+    anonymized_entities: Optional[List[str]] = None,
+    regex_patterns: Optional[Dict[str, str]] = None,
+    max_retries: int = 3,
+    base_retry_delay: float = 1.0,
+    max_retry_delay: float = 10.0,
+    operators: Optional[Dict[str, str]] = None,
+    fake_secret: Optional[str] = None,
+    seed_mapping: Optional[Dict[str, str]] = None,
+    keep_list: Optional[List[str]] = None,
+    deny_list: Optional[List[str]] = None,
+    use_llm: bool = True,
+) -> Tuple[str, Dict[str, str]]:
+    if regex_patterns is None:
+        regex_patterns = DEFAULT_REGEX_PATTERNS
+
+    collected_entities = collect_entities_from_chunks(
+        text_pages,
+        prompt_template=prompt_template,
+        model_name=model_name,
+        regex_patterns=regex_patterns,
+        max_retries=max_retries,
+        base_retry_delay=base_retry_delay,
+        max_retry_delay=max_retry_delay,
+        use_llm=use_llm,
+    )
+    entities_to_process = finalize_entities(
+        collected_entities,
+        full_text,
+        anonymized_entities=anonymized_entities,
+        keep_list=keep_list,
+        deny_list=deny_list,
+        apply_deny=True,
+        seed_mapping=seed_mapping,
+    )
+
+    final_mapping = build_mapping(
+        entities_to_process,
+        seed_mapping=seed_mapping,
+        operators=operators,
+        fake_secret=fake_secret,
+    )
+
+    anonymized_text = full_text
+    if entities_to_process:
+        anonymized_text = replace_entities(
+            full_text,
+            (entity["text"] for entity in entities_to_process),
+            final_mapping,
+        )
+    return anonymized_text, final_mapping
 
 
 def anonymize_file(
@@ -105,6 +427,29 @@ def anonymize_file(
     if regex_patterns is None:
         regex_patterns = DEFAULT_REGEX_PATTERNS
 
+    if is_rejected_spreadsheet(file_path):
+        raise rejected_spreadsheet_error(file_path)
+    if is_tabular_path(file_path):
+        review, mapping, _entity_texts = anonymize_tabular_file(
+            file_path,
+            characters_to_anonymize,
+            prompt_template,
+            model_name,
+            anonymized_entities=anonymized_entities,
+            chunk_overlap=chunk_overlap,
+            regex_patterns=regex_patterns,
+            max_retries=max_retries,
+            base_retry_delay=base_retry_delay,
+            max_retry_delay=max_retry_delay,
+            operators=operators,
+            fake_secret=fake_secret,
+            seed_mapping=seed_mapping,
+            keep_list=keep_list,
+            deny_list=deny_list,
+            use_llm=use_llm,
+        )
+        return review, mapping
+
     file_size = os.path.getsize(file_path)
     full_text, text_pages = load_and_extract_text_from_file(
         file_path, characters_to_anonymize, chunk_overlap
@@ -120,230 +465,217 @@ def anonymize_file(
     logging.info(f"  - File size: {file_size / 1024:.2f} KB")
     logging.info(f"  - Extracted text size: {extracted_text_size / 1024:.2f} KB")
 
-    # Accumulate all entities from all chunks
+    return anonymize_text_content(
+        full_text,
+        text_pages,
+        prompt_template=prompt_template,
+        model_name=model_name,
+        anonymized_entities=anonymized_entities,
+        regex_patterns=regex_patterns,
+        max_retries=max_retries,
+        base_retry_delay=base_retry_delay,
+        max_retry_delay=max_retry_delay,
+        operators=operators,
+        fake_secret=fake_secret,
+        seed_mapping=seed_mapping,
+        keep_list=keep_list,
+        deny_list=deny_list,
+        use_llm=use_llm,
+    )
+
+
+def _serialize_cell_line(sheet_name: str, cell: TableCell, label: str) -> str:
+    address = f"{sheet_name}!{column_letter(cell.column)}{cell.row}"
+    return f"[{address}] {label}: {cell.search_text}"
+
+
+def _searchable_row_cells(sheet: TableSheet, row: int) -> List[TableCell]:
+    return [
+        cell
+        for cell in sheet.cells
+        if cell.row == row and cell.search_text
+    ]
+
+
+def _cell_label(cell: TableCell, labels: Dict[int, str]) -> str:
+    return labels.get(cell.column, f"Col {column_letter(cell.column)}")
+
+
+def _split_oversized_row(
+    sheet_name: str,
+    row: int,
+    cells: List[TableCell],
+    labels: Dict[int, str],
+    characters_to_anonymize: int,
+    splitter: RecursiveCharacterTextSplitter,
+) -> List[str]:
+    blocks: List[str] = []
+    row_header = f"## Row {row}"
+    for cell in sorted(cells, key=lambda item: item.column):
+        label = _cell_label(cell, labels)
+        line = _serialize_cell_line(sheet_name, cell, label)
+        if len(line) <= characters_to_anonymize:
+            blocks.append(f"{row_header}\n{line}")
+            continue
+        chunks = splitter.split_text(cell.search_text)
+        total = max(len(chunks), 1)
+        address = f"{sheet_name}!{column_letter(cell.column)}{cell.row}"
+        if not chunks:
+            chunks = [cell.search_text]
+            total = 1
+        for index, chunk in enumerate(chunks, start=1):
+            blocks.append(
+                f"{row_header}\n[{address}] {label} (part {index}/{total}): {chunk}"
+            )
+    return blocks
+
+
+def build_llm_batches(doc: TableDocument, characters_to_anonymize: int) -> List[str]:
+    """Row-addressed LLM prompts. Overlap is not applied across rows."""
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=max(characters_to_anonymize, 1),
+        chunk_overlap=0,
+    )
+    batches: List[str] = []
+    for sheet in doc.sheets:
+        labels = header_labels(sheet)
+        units: List[str] = []
+        for row in range(1, sheet.max_row + 1):
+            cells = _searchable_row_cells(sheet, row)
+            if not cells:
+                continue
+            row_header = f"## Row {row}"
+            lines = [
+                _serialize_cell_line(sheet.name, cell, _cell_label(cell, labels))
+                for cell in sorted(cells, key=lambda item: item.column)
+            ]
+            row_block = row_header + "\n" + "\n".join(lines)
+            if len(row_block) > characters_to_anonymize:
+                units.extend(
+                    _split_oversized_row(
+                        sheet.name,
+                        row,
+                        cells,
+                        labels,
+                        characters_to_anonymize,
+                        splitter,
+                    )
+                )
+            else:
+                units.append(row_block)
+
+        current: List[str] = [f"# Sheet: {sheet.name}"]
+        current_len = len(current[0])
+        for unit in units:
+            extra = 1 + len(unit)
+            if current_len + extra > characters_to_anonymize and len(current) > 1:
+                batches.append("\n".join(current))
+                current = [f"# Sheet: {sheet.name}"]
+                current_len = len(current[0])
+            current.append(unit)
+            current_len += extra
+        if len(current) > 1:
+            batches.append("\n".join(current))
+    return batches
+
+
+def _llm_entity_in_cells(entity_text: str, cells: Iterable[TableCell]) -> bool:
+    if not entity_text:
+        return False
+    for cell in cells:
+        if cell.search_text and locate_spans(cell.search_text, [entity_text]):
+            return True
+    return False
+
+
+def anonymize_tabular_file(
+    file_path: str,
+    characters_to_anonymize: int,
+    prompt_template: str,
+    model_name: str,
+    anonymized_entities: Optional[List[str]] = None,
+    chunk_overlap: int = DEFAULT_CHUNK_OVERLAP,
+    regex_patterns: Optional[Dict[str, str]] = None,
+    max_retries: int = 3,
+    base_retry_delay: float = 1.0,
+    max_retry_delay: float = 10.0,
+    operators: Optional[Dict[str, str]] = None,
+    fake_secret: Optional[str] = None,
+    seed_mapping: Optional[Dict[str, str]] = None,
+    keep_list: Optional[List[str]] = None,
+    deny_list: Optional[List[str]] = None,
+    use_llm: bool = True,
+) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
+    """Anonymize a CSV/Excel file cell by cell.
+
+    Returns ``(review_flatten, orig→written, entity_texts)``. ``entity_texts``
+    is the same ``entity["text"]`` list the text engine passes to
+    ``replace_entities``.
+    """
+    del chunk_overlap  # row boundaries replace chunk overlap
+    if regex_patterns is None:
+        regex_patterns = DEFAULT_REGEX_PATTERNS
+
+    if is_rejected_spreadsheet(file_path):
+        raise rejected_spreadsheet_error(file_path)
+
+    doc = load_table(file_path)
+    cells = list(iter_cells(doc))
     collected_entities: List[dict] = []
 
-    if not use_llm:
-        logging.info(
-            "Regex-only / offline mode: skipping the language model. "
-            "Names and identity clues will be missed."
+    for cell in cells:
+        if not cell.search_text or cell.kind not in REGEX_CELL_KINDS:
+            continue
+        collected_entities.extend(
+            extract_entities_via_regex(cell.search_text, regex_patterns)
         )
 
-    for i, text_page in enumerate(text_pages):
-        logging.info(f"Identifying entities in part {i + 1}/{len(text_pages)}...")
-        start_time = time.time()
-
-        # 1st Stage: Regex NER
-        regex_entities = extract_entities_via_regex(text_page, regex_patterns)
-
-        # 2nd Stage: LLM NER (optional)
-        if use_llm:
+    if use_llm:
+        batches = build_llm_batches(doc, characters_to_anonymize)
+        for i, batch in enumerate(batches):
+            logging.info(f"Identifying entities in table batch {i + 1}/{len(batches)}...")
             llm_entities = identify_entities_with_llm(
-                text_page,
+                batch,
                 prompt_template,
                 model_name,
                 max_retries=max_retries,
                 base_retry_delay=base_retry_delay,
                 max_retry_delay=max_retry_delay,
             )
-        else:
-            llm_entities = []
-
-        end_time = time.time()
-        duration = end_time - start_time
-        minutes = int(duration // 60)
-        seconds = int(duration % 60)
-        stage = "Regex + LLM" if use_llm else "Regex only"
-        logging.info(f"   NER stage duration ({stage}): {minutes}:{seconds:02d}")
+            for entity in llm_entities:
+                text = entity.get("text") or ""
+                if _llm_entity_in_cells(text, cells):
+                    collected_entities.append(entity)
+    else:
         logging.info(
-            f"   Found {len(regex_entities)} via Regex, {len(llm_entities)} via LLM."
+            "Regex-only / offline mode: skipping the language model. "
+            "Names and identity clues will be missed."
         )
-
-        collected_entities.extend(regex_entities)
-        collected_entities.extend(llm_entities)
-
-    # Deduplicate entities by text, prioritizing more specific types if matched multiple times.
-    # Higher numbers win. Financial, government ID, crypto, and network identifiers
-    # receive elevated priority because they are high-risk and unambiguous.
-    type_priority = {
-        # Highest sensitivity / unambiguous structured PII (regex-first wins)
-        "CREDIT_CARD": 15,
-        "IBAN": 14,
-        "CRYPTO_BTC": 13,
-        "CRYPTO_ETH": 13,
-        "EMAIL": 12,
-        "SSN": 11,
-        "SSN_US": 11,
-        "SIN_CA": 11,
-        "NINO_GB": 11,
-        "INSEE_FR": 11,
-        "AADHAAR_IN": 11,
-        "RESIDENT_ID_CN": 11,
-        "EIN_US": 10,
-        "VAT_GB": 10,
-        "VAT_FR": 10,
-        "VAT_ES": 10,
-        "VAT_IT": 10,
-        "VAT_DE": 10,
-        "PAN_IN": 10,
-        "GSTIN_IN": 10,
-        "UNIFIED_SOCIAL_CREDIT_CODE_CN": 10,
-        "IPV4_ADDRESS": 9,
-        "IP_ADDRESS": 9,  # legacy
-        "IPV6_ADDRESS": 9,
-        "MAC_ADDRESS": 8,
-        "VIN": 8,
-        "MEDICAL_NPI_US": 8,
-        "PASSPORT": 7,
-        "US_PASSPORT": 7,
-        "GB_PASSPORT": 7,
-        "DRIVERS_LICENSE_US": 6,
-        "DRIVERS_LICENSE_GB": 6,
-        "DRIVERS_LICENSE_FR": 6,
-        "DRIVERS_LICENSE_CA": 6,
-        "DATE_ISO": 5,
-        "CURRENCY_AMOUNT": 5,
-        "BIC_SWIFT": 5,
-        "PHONE": 4,
-        "URL": 4,
-        # LLM-detected semantic types (lower than strong regex matches)
-        "INDIRECT": 4,  # nameless phrase that still identifies one person
-        "PERSON": 3,
-        "ORGANIZATION": 2,
-        "LOCATION": 1,
-        "ADDRESS": 1,
-        "CUSTOM": 3,
-    }
-
-    def _type_priority(ent_type: str) -> int:
-        upper = ent_type.upper()
-        if upper.endswith(LIKE_SUFFIX):
-            return type_priority.get(parent_type(upper), 0) - 1
-        return type_priority.get(upper, 0)
-
-    best_entities: Dict[str, dict] = {}
-    for ent in collected_entities:
-        text = ent["text"]
-        ent_type = ent["type"].upper()
-        if text not in best_entities:
-            best_entities[text] = ent
-        else:
-            existing_type = best_entities[text]["type"].upper()
-            if _type_priority(ent_type) > _type_priority(existing_type):
-                best_entities[text] = ent
-
-    deduped_entities = list(best_entities.values())
-
-    entities_to_process = deduped_entities
-    if anonymized_entities:
-        entities_to_process = [
-            e
-            for e in deduped_entities
-            if type_matches_filter(e["type"], anonymized_entities)
-        ]
 
     if deny_list:
-        entities_to_process = apply_deny_list(full_text, entities_to_process, deny_list)
-    if keep_list:
-        entities_to_process = apply_keep_list(entities_to_process, keep_list)
-
-    logging.info(
-        f"Collected {len(collected_entities)} total entities. "
-        f"Deduplicated to {len(deduped_entities)}. "
-        f"Processing {len(entities_to_process)} filtered entities."
-    )
-
-    # Consolidate base forms to handle variations like "John" vs "John Doe"
-    base_forms = {e.get("base_form") for e in entities_to_process if e.get("base_form")}
-    if seed_mapping:
-        base_forms.update(seed_mapping.keys())
-    sorted_base_forms = sorted(list(base_forms), key=len, reverse=True)
-    for entity in entities_to_process:
-        base_form = entity.get("base_form")
-        if not base_form:
-            continue
-        for potential_full_form in sorted_base_forms:
-            if base_form != potential_full_form and base_form in potential_full_form:
-                entity["base_form"] = potential_full_form
-                break
-
-    # Generate placeholders (optionally seeded from a previous document)
-    if seed_mapping:
-        (
-            final_mapping,
-            base_entity_placeholders,
-            placeholder_counts,
-            variation_counters,
-        ) = seed_placeholder_state(seed_mapping)
-    else:
-        final_mapping = {}
-        placeholder_counts = {}
-        base_entity_placeholders = {}
-        variation_counters = {}
-
-    for entity in entities_to_process:
-        entity_text = entity["text"]
-        entity_type = entity["type"].upper()
-        base_form = entity.get("base_form") or entity_text
-
-        if entity_text in final_mapping:
-            continue
-
-        if base_form not in base_entity_placeholders:
-            # New base entity, create main placeholder
-            current_count = placeholder_counts.get(entity_type, 0) + 1
-            placeholder_counts[entity_type] = current_count
-            main_placeholder = f"{entity_type}_{current_count}"
-            base_entity_placeholders[base_form] = main_placeholder
-            if base_form not in final_mapping:
-                final_mapping[base_form] = main_placeholder
-
-        main_placeholder = base_entity_placeholders[base_form]
-
-        if entity_text != base_form:
-            # It's a variation, create variation placeholder
-            current_variation_count = variation_counters.get(main_placeholder, 0) + 1
-            variation_counters[main_placeholder] = current_variation_count
-            variation_placeholder = f"{main_placeholder}.v_{current_variation_count}"
-            final_mapping[entity_text] = variation_placeholder
-        else:
-            final_mapping[entity_text] = main_placeholder
-
-    if operators:
-        text_to_type: Dict[str, str] = {}
-        text_to_base: Dict[str, str] = {}
-        for entity in entities_to_process:
-            entity_text = entity["text"]
-            entity_type = entity["type"].upper()
-            base_form = entity.get("base_form") or entity_text
-            text_to_type[entity_text] = entity_type
-            text_to_base[entity_text] = base_form
-            if base_form not in text_to_type:
-                text_to_type[base_form] = entity_type
-                text_to_base[base_form] = base_form
-        seeded_originals = set(seed_mapping) if seed_mapping else set()
-        transformed: Dict[str, str] = {}
-        for original, placeholder in final_mapping.items():
-            if original in seeded_originals:
-                transformed[original] = placeholder
+        for cell in cells:
+            if not cell.search_text:
                 continue
-            entity_type = text_to_type.get(original, "ID")
-            transformed[original] = apply_operator(
-                original,
-                entity_type,
-                placeholder,
-                operator_for_type(entity_type, operators),
-                text_to_base.get(original, original),
-                fake_secret or "",
-            )
-        final_mapping = transformed
+            collected_entities.extend(apply_deny_list(cell.search_text, [], deny_list))
 
-    anonymized_text = full_text
-    if entities_to_process:
-        anonymized_text = replace_entities(
-            full_text,
-            (entity["text"] for entity in entities_to_process),
-            final_mapping,
-        )
-
-    return anonymized_text, final_mapping
+    entities_to_process = finalize_entities(
+        collected_entities,
+        "",
+        anonymized_entities=anonymized_entities,
+        keep_list=keep_list,
+        deny_list=deny_list,
+        apply_deny=False,
+        seed_mapping=seed_mapping,
+    )
+    final_mapping = build_mapping(
+        entities_to_process,
+        seed_mapping=seed_mapping,
+        operators=operators,
+        fake_secret=fake_secret,
+    )
+    entity_texts = tuple(
+        entity["text"] for entity in entities_to_process if entity.get("text")
+    )
+    apply_mapping_to_table(doc, final_mapping, entity_texts)
+    review = flatten_table_for_review(doc, anonymized=True)
+    return review, final_mapping, entity_texts

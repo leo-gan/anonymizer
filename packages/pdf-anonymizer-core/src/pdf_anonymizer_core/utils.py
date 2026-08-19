@@ -9,7 +9,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 
 from pdf_anonymizer_core.conf import (
     DEFAULT_ANONYMIZED_DIR,
@@ -23,6 +23,15 @@ from pdf_anonymizer_core.mapping_crypto import (
     sha256_file,
 )
 from pdf_anonymizer_core.secure_io import write_private_json
+from pdf_anonymizer_core.tables import (
+    flatten_table_for_review,
+    is_tabular_path,
+    iter_cells,
+    load_table,
+    save_table,
+    unneutralize_csv_equals,
+    write_anonymized_table,
+)
 
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
@@ -146,6 +155,7 @@ def save_results(
     mapping_passphrase: str | None = None,
     *,
     ephemeral_mapping: bool = False,
+    entity_texts: Optional[Iterable[str]] = None,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
@@ -159,6 +169,8 @@ def save_results(
         ephemeral_mapping: If true, never write a mapping file. The second
             return value is an empty string. The caller already holds
             ``final_mapping`` in memory.
+        entity_texts: Detected ``entity["text"]`` values used to apply the
+            mapping. Required for table paths; ignored for text.
 
     Returns:
         tuple[str, str]: The paths to the anonymized text file and the mapping
@@ -180,8 +192,19 @@ def save_results(
     anonymized_output_file = (
         f"{anonymized_dir}/{file_stem}.anonymized{output_extension}"
     )
-    with open(anonymized_output_file, "w", encoding="utf-8") as f:
-        f.write(full_anonymized_text)
+    if is_tabular_path(file_path):
+        if entity_texts is None:
+            raise ValueError(
+                "save_results() on a table requires entity_texts= "
+                "(the same entity['text'] list the engine applied)."
+            )
+        orig_to_written = mapping_to_original_to_written(final_mapping)
+        write_anonymized_table(
+            file_path, anonymized_output_file, orig_to_written, entity_texts
+        )
+    else:
+        with open(anonymized_output_file, "w", encoding="utf-8") as f:
+            f.write(full_anonymized_text)
 
     if ephemeral_mapping:
         return anonymized_output_file, ""
@@ -204,6 +227,32 @@ def save_results(
         write_private_json(mapping_file, final_mapping)
 
     return anonymized_output_file, mapping_file
+
+
+def restore_placeholders_in_text(
+    text: str, placeholder_to_original: Dict[str, str]
+) -> tuple[str, set[str]]:
+    """Replace longest-first ``PLACEHOLDER`` / ``PLACEHOLDER.v_n`` tokens."""
+    used_placeholders: set[str] = set()
+    sorted_placeholders = sorted(
+        placeholder_to_original.keys(), key=len, reverse=True
+    )
+    if not sorted_placeholders:
+        return text, used_placeholders
+
+    pattern = re.compile(
+        r"\b("
+        + "|".join(re.escape(placeholder) for placeholder in sorted_placeholders)
+        + r")(?:\.v_\d+)?\b"
+    )
+
+    def replace_match(match: re.Match[str]) -> str:
+        full_match = match.group(0)
+        base_placeholder = match.group(1)
+        used_placeholders.add(full_match)
+        return placeholder_to_original[base_placeholder]
+
+    return pattern.sub(replace_match, text), used_placeholders
 
 
 def deanonymize_file(
@@ -238,9 +287,6 @@ def deanonymize_file(
             - unused_mappings: placeholders in the map that did not appear in text
             - not_found_mappings: placeholders seen in text but missing from the map
     """
-    with open(anonymized_file_path, "r", encoding="utf-8") as f:
-        anonymized_text = f.read()
-
     with open(mapping_file_path, "r", encoding="utf-8") as f:
         raw_mapping = json.load(f)
 
@@ -273,28 +319,30 @@ def deanonymize_file(
             if isinstance(placeholder, str):
                 placeholder_to_original.setdefault(placeholder, original)
 
-    deanonymized_text = anonymized_text
-    used_placeholders = set()  # track actual placeholders (including variations) found
-
-    # Replace placeholders by longest first to avoid partial overlaps
     sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
+    tabular = is_tabular_path(anonymized_file_path)
 
-    if sorted_placeholders:
-        # Match base and its variations: PERSON_1 and PERSON_1.v_1, PERSON_1.v_2, ...
-        # We use a single regex pass for all placeholders to avoid ReDoS and performance bottlenecks.
-        pattern = re.compile(
-            r"\b("
-            + "|".join(re.escape(p) for p in sorted_placeholders)
-            + r")(?:\.v_\d+)?\b"
+    if tabular:
+        doc = load_table(anonymized_file_path)
+        anonymized_text = flatten_table_for_review(doc, anonymized=True)
+        used_placeholders: set[str] = set()
+        for cell in iter_cells(doc):
+            if not cell.search_text:
+                continue
+            restored, cell_used = restore_placeholders_in_text(
+                cell.search_text, placeholder_to_original
+            )
+            used_placeholders |= cell_used
+            if doc.kind == "csv":
+                restored = unneutralize_csv_equals(restored)
+            if restored != cell.search_text:
+                cell.search_text = restored
+    else:
+        with open(anonymized_file_path, "r", encoding="utf-8") as f:
+            anonymized_text = f.read()
+        deanonymized_text, used_placeholders = restore_placeholders_in_text(
+            anonymized_text, placeholder_to_original
         )
-
-        def replace_match(match):
-            full_match = match.group(0)
-            base_placeholder = match.group(1)
-            used_placeholders.add(full_match)
-            return placeholder_to_original[base_placeholder]
-
-        deanonymized_text = pattern.sub(replace_match, deanonymized_text)
 
     # Gather stats
     all_placeholders_in_text = set(
@@ -317,8 +365,11 @@ def deanonymize_file(
     os.makedirs(stats_dir, exist_ok=True)
 
     deanonymized_file = f"{deanonymized_dir}/{file_stem}.deanonymized{output_extension}"
-    with open(deanonymized_file, "w", encoding="utf-8") as f:
-        f.write(deanonymized_text)
+    if tabular:
+        save_table(doc, deanonymized_file)
+    else:
+        with open(deanonymized_file, "w", encoding="utf-8") as f:
+            f.write(deanonymized_text)
 
     stats_file = f"{stats_dir}/{file_stem}.deanonymization_stat.json"
     stats = {

@@ -21,6 +21,10 @@ DEFAULT_PROMPT_NAME: str = "detailed"
 DEFAULT_MODEL_NAME: str = "gemini-2.5-flash"
 DEFAULT_CHUNK_OVERLAP: int = 1000
 
+# In-memory caps for CSV / Excel. Spreadsheets are not streamed.
+MAX_TABLE_BYTES: int = 50 * 1024 * 1024
+MAX_TABLE_CELLS: int = 500_000
+
 # Directories and file paths
 DEFAULT_ANONYMIZED_DIR: str = "data/anonymized"
 DEFAULT_MAPPINGS_DIR: str = "data/mappings"

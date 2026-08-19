@@ -1,0 +1,5 @@
+Name,Email,SSN,Phone,Notes,City,ID,Formula,Concat,Empty
+Jane Doe,jane@acme.com,123-45-6789,555-123-4567,Called John Smith about the Austin office.,"Austin, TX","00123",=A1,"=""Jane""&"" Doe""",
+
+John Smith,john@example.com,111-22-3333,+1-555-0100,"He said hello
+to the team.",Boston,,,,
