@@ -14,7 +14,7 @@ This application anonymizes large PDF, Markdown, or Text files using a **hybrid 
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
-- **Multi-Format**: Works with PDF, Markdown, and plain text files.
+- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, and Excel files.
 
 ## 📖 Documentation
 

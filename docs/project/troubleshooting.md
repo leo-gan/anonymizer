@@ -99,6 +99,37 @@ Common problems and how to resolve them.
   - Use `-p best-cost` (larger chunks).
   - Manually increase `--characters-to-anonymize` (e.g. 120000 or higher) when using a model with a large context window.
   - The tool uses Markdown-aware splitting for PDFs and `.md` files to preserve structure.
+  - CSV and Excel are **in-memory**. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.
+
+## Excel extra missing
+
+- **Symptom**: `Excel support requires the extra: pip install "pdf-anonymizer-core[excel]"`
+- **Fix**: `pip install "pdf-anonymizer-core[excel]"` or `pip install "pdf-anonymizer-cli[excel]"`. CSV does not need this extra.
+
+## Rejected spreadsheet formats
+
+- **Symptom**: `.xls`, `.xlsm`, `.ods`, or `.xlsb` is rejected with a convert-to-xlsx / export-CSV message.
+- **Fix**: Re-save as `.xlsx` or export CSV. Macro-enabled workbooks are not supported (macros can re-derive PII).
+
+## Formulas are dropped
+
+- **Symptom**: An Excel formula is gone; a CSV cell that started with `=` now starts with `'`.
+- **Fix**: That is intended. Excel writes cached values only so `=A1` cannot restore a replaced name. CSV prefixes `'` on cells whose raw value starts with `=`. `+1-555-0100` is a phone, not a formula, and is left untouched.
+
+## Charts, comments, and other leftovers
+
+- **Symptom**: A name still appears in a chart, comment, header/footer, data-validation list, defined name, or hyperlink.
+- **Fix**: Those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual.
+
+## Undashed numeric IDs missed on `--no-llm`
+
+- **Symptom**: An Excel integer such as `123456789` is still the same integer after `--no-llm`.
+- **Fix**: Regex does not run on number or date cells (it would shred employee IDs and quantities). Store the dashed form as text, use a deny-list, or keep the language model on. There is no “9-digit integer ⇒ SSN” rule.
+
+## Stored value, not display format
+
+- **Symptom**: A numeric cell formatted as `000-00-0000` was not treated as a dashed SSN.
+- **Fix**: Detection uses the stored value (`123456789`), not Excel’s display format.
 
 ## Output Files Not Where Expected
 

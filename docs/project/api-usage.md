@@ -6,7 +6,7 @@ Developers can integrate `pdf-anonymizer-core` directly into their Python applic
 
 ## `anonymize_file`
 
-The `anonymize_file` function reads, extracts, chunks, and masks a file, returning the final anonymized string and the mapped PII dictionary.
+The `anonymize_file` function reads, extracts, chunks, and masks a file, returning the final anonymized string and the mapped PII dictionary. For `.csv` / `.xlsx` the string is a row-wise **review flatten** (used by verify/risk), not spreadsheet bytes.
 
 ### Import Signature
 ```python
@@ -14,7 +14,7 @@ from pdf_anonymizer_core.core import anonymize_file
 ```
 
 ### Parameters
-*   `file_path` (`str`): The absolute or relative path to the input document (supports `.pdf`, `.md`, `.txt`).
+*   `file_path` (`str`): The absolute or relative path to the input document (supports `.pdf`, `.md`, `.txt`, `.csv`, `.xlsx`). Excel needs the `[excel]` extra.
 *   `characters_to_anonymize` (`int`): Target character size of each chunk sent to the LLM.
 *   `prompt_template` (`str`): The prompt template string containing instructions for entity masking.
 *   `model_name` (`str`): The target model name (e.g. `"gemini-2.5-flash"`, `"google/gemini-2.5-pro"`, `"ollama/phi4-mini"`).
@@ -26,8 +26,45 @@ from pdf_anonymizer_core.core import anonymize_file
 *   `keep_list` / `deny_list` (`list[str]`, optional): Phrases to leave visible, or to force-hide as `CUSTOM_n`. Keep wins if both lists contain the same phrase.
 
 ### Returns
-*   `anonymized_text` (`str`): The fully processed text with placeholders in place of PII.
+*   `anonymized_text` (`str`): The fully processed text with placeholders in place of PII. For tables this is the review flatten, not a CSV/Excel dump.
 *   `mapping` (`dict[str, str]`): A dictionary mapping original entities to their assigned placeholders (or other written form).
+
+---
+
+## `anonymize_tabular_file`
+
+Use this when you need to **write** a `.csv` / `.xlsx` via `save_results`. It returns a third value, `entity_texts`, that `save_results` requires on the table path.
+
+### Import Signature
+```python
+from pdf_anonymizer_core.core import anonymize_tabular_file
+from pdf_anonymizer_core.utils import save_results
+```
+
+### Returns
+*   `review` (`str`): Row-wise flatten of the masked table.
+*   `mapping` (`dict[str, str]`): Original → written, same as `anonymize_file`.
+*   `entity_texts` (`tuple[str, ...]`): The same `entity["text"]` list the text engine passes to `replace_entities`.
+
+```python
+review, mapping, entity_texts = anonymize_tabular_file(
+    "people.csv",
+    characters_to_anonymize=100000,
+    prompt_template="",
+    model_name="",
+    use_llm=False,
+)
+# Pass the CLI invert (placeholder → original). Do not pass an orig→written
+# mask/hash/fake map (for example {addr: "****"}).
+save_results(
+    review,
+    {v: k for k, v in mapping.items()},
+    "people.csv",
+    entity_texts=entity_texts,
+)
+```
+
+`save_results` without `entity_texts` on a table raises. It does not write a cleartext copy.
 
 ---
 
@@ -41,7 +78,7 @@ from pdf_anonymizer_core.utils import deanonymize_file
 ```
 
 ### Parameters
-*   `anonymized_file_path` (`str`): Path to the markdown or text file that has placeholders.
+*   `anonymized_file_path` (`str`): Path to the markdown, text, CSV, or Excel file that has placeholders.
 *   `mapping_file_path` (`str`): Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
 *   `mapping_passphrase` (`str`, optional): Required when the mapping file is encrypted. Also used by the CLI via `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`.
 *   `expected_source_sha256` (`str`, optional, keyword-only): When set, an encrypted mapping locked to a different source file is rejected.

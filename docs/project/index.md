@@ -34,6 +34,7 @@ The project contains two decoupled Python packages inside `packages/`:
 Contains all the core engines, including:
 
 *   Text extraction from PDF, Markdown, and plain text formats.
+*   Table loaders for CSV (stdlib) and Excel (`.xlsx`, `[excel]` extra): per-cell regex, row-addressed LLM batches, per-cell apply.
 *   Hybrid detection: RE2 regex (with checksums / `TYPE_LIKE`) plus LLM NER.
 *   LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).
 *   Prompt templates (`simple`, `detailed`, `hipaa`) and identity-clue detection.
@@ -60,7 +61,7 @@ To dive deeper into the technical details, navigate through the following guides
 - **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options (including `--config-profile`), custom model strings, and usage examples.
 - **[SDK & API Usage](api-usage.md)**: Learn how to import PDF Anonymizer as a Python library in your own applications.
 - **[API Reference (auto)](api-reference.md)**: Living signature reference generated from source docstrings.
-- **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, eval harness, batching, caching, and more.
+- **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.
 - **[Mapping encryption](mapping-security.md)**: Argon2id + AES-256-GCM envelopes, AAD, `0600` writes, ephemeral maps, and the tests that lock those in.
 - **[Troubleshooting](troubleshooting.md)**: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.
 - **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.
