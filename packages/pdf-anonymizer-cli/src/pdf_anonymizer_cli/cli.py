@@ -437,6 +437,7 @@ def run(
                 mapping_passphrase=passphrase,
                 ephemeral_mapping=ephemeral_mapping,
                 entity_texts=entity_texts,
+                orig_to_written=final_mapping if is_tabular_path(str(file_path)) else None,
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")
@@ -600,7 +601,11 @@ def verify(
         logging.error("%s", exc)
         sys.exit(1)
 
-    text = load_review_text(str(anonymized_file))
+    try:
+        text = load_review_text(str(anonymized_file))
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
     report = verify_anonymized_text(
         text,
         anonymized_file=str(anonymized_file),
@@ -637,7 +642,11 @@ def report_risk(
     ],
 ) -> None:
     """Score identity-clue clumps in a masked file. Does not change the file."""
-    text = load_review_text(str(anonymized_file))
+    try:
+        text = load_review_text(str(anonymized_file))
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
     risk_report = assess_linkage_risk(text)
     risk_path = write_risk_report(risk_report, str(anonymized_file))
     logging.info(

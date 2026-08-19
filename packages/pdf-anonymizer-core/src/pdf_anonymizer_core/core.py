@@ -382,7 +382,10 @@ def anonymize_file(
     exhausting context windows or memory.
 
     Args:
-        file_path: Path to the file to anonymize (.pdf, .md, or .txt).
+        file_path: Path to the file to anonymize (.pdf, .md, .txt, .csv, or
+            .xlsx). ``.xlsx`` requires the ``[excel]`` extra and raises
+            ``ValueError`` until it is installed. ``.xls`` / ``.xlsm`` /
+            ``.ods`` / ``.xlsb`` are rejected.
         characters_to_anonymize: Target character size of each chunk sent to the LLM.
         prompt_template: The full prompt template string (use one from
             pdf_anonymizer_core.prompts or supply your own).

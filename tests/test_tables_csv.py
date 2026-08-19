@@ -276,6 +276,52 @@ class TestSaveResultsInvert:
         assert leftover.read_text(encoding="utf-8")
         assert "Ada" not in leftover.read_text(encoding="utf-8").splitlines()[-1]
 
+    def test_colliding_mask_needs_engine_orig_map(self, tmp_path, monkeypatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        src = tmp_path / "emails.csv"
+        src.write_text("Email\nada@example.com\nalice@evil.com\n", encoding="utf-8")
+        review, mapping, entity_texts = anonymize_tabular_file(
+            str(src),
+            1000,
+            "unused",
+            "unused",
+            use_llm=False,
+            operators={"EMAIL": "mask"},
+        )
+        assert mapping["ada@example.com"] == mapping["alice@evil.com"]
+        invert = {written: original for original, written in mapping.items()}
+        assert len(invert) == 1
+        out, _mapping_path = save_results(
+            review,
+            invert,
+            str(src),
+            entity_texts=entity_texts,
+            orig_to_written=mapping,
+        )
+        rows = _grid(Path(out))
+        assert rows[1][0] == mapping["ada@example.com"]
+        assert rows[2][0] == mapping["alice@evil.com"]
+        assert "ada@example.com" not in rows[1] + rows[2]
+        assert "alice@evil.com" not in rows[1] + rows[2]
+
+        with pytest.raises(ValueError, match="orig_to_written"):
+            save_results(
+                review,
+                {"ada@example.com": mapping["ada@example.com"]},
+                str(src),
+                entity_texts=["ada@example.com"],
+            )
+
+
+class TestCsvRowWidths:
+    def test_ragged_rows_and_empty_field_rows_round_trip(self, tmp_path) -> None:
+        src = tmp_path / "ragged.csv"
+        src.write_bytes(b"a,b,c\n1,2\n\n,,,\n")
+        dest = tmp_path / "out.csv"
+        save_table(load_table(str(src)), str(dest))
+        assert _grid(dest) == _grid(src)
+        assert load_table(str(src)).sheets[0].row_widths == [3, 2, 0, 4]
+
 
 class TestVerifyAndRiskFlatten:
     def test_flatten_blank_lines_and_high_risk_row(self) -> None:
@@ -346,6 +392,19 @@ class TestVerifyAndRiskFlatten:
         report_result = runner.invoke(app, ["report", str(path)])
         assert report_result.exit_code == 0
         mocked.assert_called()
+
+    def test_verify_and_report_rejected_suffix_exits_without_traceback(
+        self, tmp_path
+    ) -> None:
+        path = tmp_path / "book.xls"
+        path.write_bytes(b"not-a-workbook")
+        runner = CliRunner()
+        verify_result = runner.invoke(app, ["verify", str(path)])
+        assert verify_result.exit_code == 1
+        assert "Traceback" not in (verify_result.output or "")
+        report_result = runner.invoke(app, ["report", str(path)])
+        assert report_result.exit_code == 1
+        assert "Traceback" not in (report_result.output or "")
 
 
 class TestRejectsAndLimits:

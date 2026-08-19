@@ -156,13 +156,15 @@ def save_results(
     *,
     ephemeral_mapping: bool = False,
     entity_texts: Optional[Iterable[str]] = None,
+    orig_to_written: Optional[Dict[str, str]] = None,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
 
     Args:
         full_anonymized_text (str): The anonymized text.
-        final_mapping (dict[str, str]): Mapping of original text -> placeholder.
+        final_mapping (dict[str, str]): Mapping written to the mapping file
+            (CLI invert: placeholder → original).
         file_path (str): The path to the original file.
         mapping_passphrase: If set, write ``*.mapping.json.enc`` (AES-256-GCM
             + Argon2id) instead of plaintext JSON.
@@ -171,6 +173,9 @@ def save_results(
             ``final_mapping`` in memory.
         entity_texts: Detected ``entity["text"]`` values used to apply the
             mapping. Required for table paths; ignored for text.
+        orig_to_written: Engine original → written map used to re-apply on
+            tables. Required for colliding mask/generalize/fake forms; when
+            omitted, ``mapping_to_original_to_written(final_mapping)`` is used.
 
     Returns:
         tuple[str, str]: The paths to the anonymized text file and the mapping
@@ -198,9 +203,19 @@ def save_results(
                 "save_results() on a table requires entity_texts= "
                 "(the same entity['text'] list the engine applied)."
             )
-        orig_to_written = mapping_to_original_to_written(final_mapping)
+        apply_map = (
+            orig_to_written
+            if orig_to_written is not None
+            else mapping_to_original_to_written(final_mapping)
+        )
+        texts = [text for text in entity_texts if text]
+        if texts and not any(text in apply_map for text in texts):
+            raise ValueError(
+                "save_results() entity_texts are not keys of orig_to_written. "
+                "Pass the engine original→written map as orig_to_written=."
+            )
         write_anonymized_table(
-            file_path, anonymized_output_file, orig_to_written, entity_texts
+            file_path, anonymized_output_file, apply_map, entity_texts
         )
     else:
         with open(anonymized_output_file, "w", encoding="utf-8") as f:

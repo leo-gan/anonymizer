@@ -1,8 +1,4 @@
-"""Table I/O and per-cell apply for CSV (Excel I/O is behind the [excel] extra).
-
-Parse as a table, walk cells, write cells. Detection still uses the text
-engine; this module only loads, flattens for review, and writes cells.
-"""
+"""Table load/save, per-cell apply, and review flatten for CSV (Excel I/O is the [excel] extra)."""
 
 from __future__ import annotations
 
@@ -62,6 +58,8 @@ class TableSheet:
     max_column: int
     cells: list[TableCell] = field(default_factory=list)
     merge_ranges: list[str] = field(default_factory=list)
+    # Per-row field counts from the source (0 = a truly empty line).
+    row_widths: list[int] = field(default_factory=list)
 
 
 @dataclass
@@ -205,12 +203,14 @@ def load_csv(path: str) -> TableDocument:
     rows = list(csv.reader(io.StringIO(text), dialect))
     max_row = len(rows)
     max_column = max((len(row) for row in rows), default=0)
+    row_widths = [len(row) for row in rows]
 
     sheet = TableSheet(
         name="Sheet1",
         hidden=False,
         max_row=max_row,
         max_column=max_column,
+        row_widths=row_widths,
     )
     nonempty = 0
     for row_idx, row in enumerate(rows, start=1):
@@ -275,6 +275,12 @@ def _csv_write_value(cell: Optional[TableCell]) -> Any:
     return "" if cell.original is None else cell.original
 
 
+def _row_width(sheet: TableSheet, row: int) -> int:
+    if sheet.row_widths and 0 <= row - 1 < len(sheet.row_widths):
+        return sheet.row_widths[row - 1]
+    return sheet.max_column
+
+
 def save_csv(doc: TableDocument, path: str) -> None:
     sheet = doc.sheets[0] if doc.sheets else TableSheet(
         name="Sheet1", hidden=False, max_row=0, max_column=0
@@ -285,14 +291,15 @@ def save_csv(doc: TableDocument, path: str) -> None:
     with open(path, "w", encoding=encoding, newline="") as handle:
         writer = csv.writer(handle, **dialect)
         for row in range(1, sheet.max_row + 1):
+            width = _row_width(sheet, row)
+            if width == 0:
+                writer.writerow([])
+                continue
             values = [
                 _csv_write_value(lookup.get((row, col)))
-                for col in range(1, sheet.max_column + 1)
+                for col in range(1, width + 1)
             ]
-            if values and all(value == "" for value in values):
-                writer.writerow([])
-            else:
-                writer.writerow(values)
+            writer.writerow(values)
 
 
 def save_table(doc: TableDocument, path: str) -> None:
