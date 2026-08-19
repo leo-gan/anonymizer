@@ -994,6 +994,72 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#excel-extra-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Excel extra missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rejected-spreadsheet-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected spreadsheet formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#formulas-are-dropped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulas are dropped
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#charts-comments-and-other-leftovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charts, comments, and other leftovers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#undashed-numeric-ids-missed-on-no-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undashed numeric IDs missed on --no-llm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stored-value-not-display-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stored value, not display format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-files-not-where-expected" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1207,6 +1273,72 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#excel-extra-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Excel extra missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rejected-spreadsheet-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected spreadsheet formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#formulas-are-dropped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulas are dropped
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#charts-comments-and-other-leftovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charts, comments, and other leftovers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#undashed-numeric-ids-missed-on-no-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undashed numeric IDs missed on --no-llm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stored-value-not-display-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stored value, not display format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-files-not-where-expected" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1358,6 +1490,37 @@
 <li>Use <code>-p best-cost</code> (larger chunks).</li>
 <li>Manually increase <code>--characters-to-anonymize</code> (e.g. 120000 or higher) when using a model with a large context window.</li>
 <li>The tool uses Markdown-aware splitting for PDFs and <code>.md</code> files to preserve structure.</li>
+<li>CSV and Excel are <strong>in-memory</strong>. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.</li>
+</ul>
+<h2 id="excel-extra-missing">Excel extra missing<a class="headerlink" href="#excel-extra-missing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>Excel support requires the extra: pip install "pdf-anonymizer-core[excel]"</code></li>
+<li><strong>Fix</strong>: <code>pip install "pdf-anonymizer-core[excel]"</code> or <code>pip install "pdf-anonymizer-cli[excel]"</code>. CSV does not need this extra.</li>
+</ul>
+<h2 id="rejected-spreadsheet-formats">Rejected spreadsheet formats<a class="headerlink" href="#rejected-spreadsheet-formats" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>.xls</code>, <code>.xlsm</code>, <code>.ods</code>, or <code>.xlsb</code> is rejected with a convert-to-xlsx / export-CSV message.</li>
+<li><strong>Fix</strong>: Re-save as <code>.xlsx</code> or export CSV. Macro-enabled workbooks are not supported (macros can re-derive PII).</li>
+</ul>
+<h2 id="formulas-are-dropped">Formulas are dropped<a class="headerlink" href="#formulas-are-dropped" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: An Excel formula is gone; a CSV cell that started with <code>=</code> now starts with <code>'</code>.</li>
+<li><strong>Fix</strong>: That is intended. Excel writes cached values only so <code>=A1</code> cannot restore a replaced name. CSV prefixes <code>'</code> on cells whose raw value starts with <code>=</code>. <code>+1-555-0100</code> is a phone, not a formula, and is left untouched.</li>
+</ul>
+<h2 id="charts-comments-and-other-leftovers">Charts, comments, and other leftovers<a class="headerlink" href="#charts-comments-and-other-leftovers" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: A name still appears in a chart, comment, header/footer, data-validation list, defined name, or hyperlink.</li>
+<li><strong>Fix</strong>: Those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual.</li>
+</ul>
+<h2 id="undashed-numeric-ids-missed-on-no-llm">Undashed numeric IDs missed on <code>--no-llm</code><a class="headerlink" href="#undashed-numeric-ids-missed-on-no-llm" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: An Excel integer such as <code>123456789</code> is still the same integer after <code>--no-llm</code>.</li>
+<li><strong>Fix</strong>: Regex does not run on number or date cells (it would shred employee IDs and quantities). Store the dashed form as text, use a deny-list, or keep the language model on. There is no “9-digit integer ⇒ SSN” rule.</li>
+</ul>
+<h2 id="stored-value-not-display-format">Stored value, not display format<a class="headerlink" href="#stored-value-not-display-format" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: A numeric cell formatted as <code>000-00-0000</code> was not treated as a dashed SSN.</li>
+<li><strong>Fix</strong>: Detection uses the stored value (<code>123456789</code>), not Excel’s display format.</li>
 </ul>
 <h2 id="output-files-not-where-expected">Output Files Not Where Expected<a class="headerlink" href="#output-files-not-where-expected" title="Permanent link">&para;</a></h2>
 <ul>

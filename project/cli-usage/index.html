@@ -1225,6 +1225,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSV and Excel as inputs (cell-level masking)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pii-free-files-now-write-output-empty-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PII-free files now write output + empty mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1933,6 +1955,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSV and Excel as inputs (cell-level masking)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pii-free-files-now-write-output-empty-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PII-free files now write output + empty mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1979,7 +2023,7 @@
 </span></code></pre></div>
 <h3 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>FILE_PATH</code>: Space-separated list of paths to files (PDF, Markdown, or plain text).</li>
+<li><code>FILE_PATH</code>: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, or Excel <code>.xlsx</code>).</li>
 </ul>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <table>
@@ -2210,13 +2254,15 @@
 <h2 id="the-report-command-linkage-risk">The <code>report</code> Command (linkage risk)<a class="headerlink" href="#the-report-command-linkage-risk" title="Permanent link">&para;</a></h2>
 <p>Score identity-clue clumps in an already-masked file. Does not change the file.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pdf-anonymizer<span class="w"> </span>report<span class="w"> </span>data/anonymized/notes.anonymized.md
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pdf-anonymizer<span class="w"> </span>report<span class="w"> </span>data/anonymized/roster.anonymized.xlsx
 </span></code></pre></div>
 <p>The report is <code>data/stats/&lt;stem&gt;.risk.json</code>. <code>run</code> already writes this unless you pass <code>--no-risk</code>.</p>
 <hr />
 <h2 id="the-verify-command-leftover-check">The <code>verify</code> Command (leftover check)<a class="headerlink" href="#the-verify-command-leftover-check" title="Permanent link">&para;</a></h2>
 <p>Scan an already-masked file. This only writes a report. It does not change the file.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md<span class="w"> </span>--verify-llm<span class="w"> </span>-p<span class="w"> </span>best-quality
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/people.anonymized.csv
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md<span class="w"> </span>--verify-llm<span class="w"> </span>-p<span class="w"> </span>best-quality
 </span></code></pre></div>
 <p>The report is <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. Stand-in labels such as <code>PERSON_1</code> are ignored. A leftover email or a mistyped IBAN is listed.</p>
 <p><code>run</code> already does the cheap regex scan unless you pass <code>--no-verify</code>.</p>
@@ -2275,9 +2321,9 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h2 id="output-files-auditing">Output Files &amp; Auditing<a class="headerlink" href="#output-files-auditing" title="Permanent link">&para;</a></h2>
 <p><code>run</code>, <code>verify</code>, <code>report</code>, and <code>deanonymize</code> write under conventional directories (created automatically):</p>
 <ul>
-<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>)</li>
+<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>)</li>
 <li><code>data/mappings/&lt;stem&gt;.mapping.json</code> (or <code>*.mapping.json.enc</code> when a passphrase is set)</li>
-<li><code>data/deanonymized/&lt;stem&gt;.deanonymized.md</code> (or <code>.txt</code>)</li>
+<li><code>data/deanonymized/&lt;stem&gt;.deanonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.residual_pii.json</code> — leftovers found after masking (from <code>run</code> or <code>verify</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.risk.json</code> — identity-clue clumps (from <code>run</code> or <code>report</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.deanonymization_stat.json</code> — written by <code>deanonymize</code></li>
@@ -2325,6 +2371,10 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p>Replacement is by character interval, not a blind search-and-replace. The longer span wins when two hits overlap (<code>John Doe</code> over the inner <code>John</code>). No extra flag.</p>
 <h3 id="tab-style-eval-harness">TAB-style eval harness<a class="headerlink" href="#tab-style-eval-harness" title="Permanent link">&para;</a></h3>
 <p><code>tests/eval/</code> and <code>scripts/eval_tab.py</code> score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.</p>
+<h3 id="csv-and-excel-as-inputs-cell-level-masking">CSV and Excel as inputs (cell-level masking)<a class="headerlink" href="#csv-and-excel-as-inputs-cell-level-masking" title="Permanent link">&para;</a></h3>
+<p><code>pdf-anonymizer run people.csv</code> and <code>pdf-anonymizer run roster.xlsx</code> (with the <code>[excel]</code> extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, <strong>not</strong> <em>k</em>-anonymity. See <a href="../recipes/#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a>.</p>
+<h3 id="pii-free-files-now-write-output-empty-mapping">PII-free files now write output + empty mapping<a class="headerlink" href="#pii-free-files-now-write-output-empty-mapping" title="Permanent link">&para;</a></h3>
+<p>A run that finds nothing still writes the output file and an empty mapping (<code>if full_anonymized_text is not None and final_mapping is not None</code>). That used to look like a failed run for every format, including PDF/MD/TXT.</p>
 <p>See <a href="../recipes/">Recipes</a> for worked examples of each flag.</p>
 <hr />
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>

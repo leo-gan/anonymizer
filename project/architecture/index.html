@@ -1108,6 +1108,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table-path-csv-excel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table path (CSV / Excel)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1415,6 +1426,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table-path-csv-excel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table path (CSV / Excel)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1529,7 +1551,7 @@
 <h2 id="the-processing-pipeline">The Processing Pipeline<a class="headerlink" href="#the-processing-pipeline" title="Permanent link">&para;</a></h2>
 <p>When you run <code>pdf-anonymizer run</code>, the system executes the following sequential steps:</p>
 <pre class="mermaid"><code>graph TD
-    File[Input File: PDF, MD, TXT] --&gt; Ext[Text Extractor]
+    File[Input File: PDF, MD, TXT, CSV, XLSX] --&gt; Ext[Text Extractor]
     Ext --&gt;|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --&gt; Chunk[Text Chunking]
     Chunk --&gt; Regex[RE2 regex + checksums]
@@ -1548,6 +1570,7 @@
 <ul>
 <li>Instead of traditional OCR or layout-unaware PDF parsing, the project uses <code>pymupdf4llm</code> to convert PDF files into clean, readable <strong>Markdown</strong>. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.</li>
 <li>For Markdown and Text files, standard file reads are executed.</li>
+<li>CSV and Excel skip this loader. See <a href="#table-path-csv--excel">Table path</a>.</li>
 </ul>
 <h3 id="semantic-chunking">Semantic Chunking<a class="headerlink" href="#semantic-chunking" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1634,6 +1657,16 @@
 <ul>
 <li><code>tests/eval/</code> scores mention-level and entity-level recall, split by direct vs quasi identifiers.</li>
 <li><code>scripts/eval_tab.py</code> runs the mini fixture. Tests and scripts only — no product change.</li>
+</ul>
+<h3 id="table-path-csv-excel">Table path (CSV / Excel)<a class="headerlink" href="#table-path-csv-excel" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>.csv</code> and <code>.xlsx</code> never enter <code>load_and_extract_text_from_file</code>. <code>tables.load_table</code> walks cells; apply writes cells. The file is not flattened into one replacement buffer.</li>
+<li><strong>Regex</strong> runs per-cell on <code>text</code> and formula-cached strings only. Number and date cells skip regex so employee IDs and quantities are not shredded.</li>
+<li><strong>LLM</strong> sees row-addressed batches (<code>[Sheet!A2] Name: …</code>), including serialized number/date cells. A hit is kept only if <code>locate_spans</code> finds it in some cell.</li>
+<li><strong>Apply</strong> is <code>replace_entities</code> on each cell's <code>search_text</code> with the same <code>entity["text"]</code> list the text engine uses.</li>
+<li><strong>Review flatten</strong> (<code>v1 | v2 | …</code>, blank line after every row) is what <code>anonymize_file</code> returns for tables. <code>verify</code> and <code>report</code> score that flatten, not raw CSV bytes.</li>
+<li>Excel writes cached values only (no formulas). Charts, comments, headers/footers, validation lists, defined names, and hyperlinks are left as-is.</li>
+<li>This is still cell-level pseudonymization. It is not <em>k</em>-anonymity.</li>
 </ul>
 <hr />
 <h2 id="reversibility-the-mapping-engine">Reversibility &amp; The Mapping Engine<a class="headerlink" href="#reversibility-the-mapping-engine" title="Permanent link">&para;</a></h2>

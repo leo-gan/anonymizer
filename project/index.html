@@ -1120,6 +1120,7 @@
 <p>Contains all the core engines, including:</p>
 <ul>
 <li>Text extraction from PDF, Markdown, and plain text formats.</li>
+<li>Table loaders for CSV (stdlib) and Excel (<code>.xlsx</code>, <code>[excel]</code> extra): per-cell regex, row-addressed LLM batches, per-cell apply.</li>
 <li>Hybrid detection: RE2 regex (with checksums / <code>TYPE_LIKE</code>) plus LLM NER.</li>
 <li>LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).</li>
 <li>Prompt templates (<code>simple</code>, <code>detailed</code>, <code>hipaa</code>) and identity-clue detection.</li>
@@ -1144,7 +1145,7 @@
 <li><strong><a href="cli-usage/">CLI Reference</a></strong>: Explore the command-line arguments, options (including <code>--config-profile</code>), custom model strings, and usage examples.</li>
 <li><strong><a href="api-usage/">SDK &amp; API Usage</a></strong>: Learn how to import PDF Anonymizer as a Python library in your own applications.</li>
 <li><strong><a href="api-reference/">API Reference (auto)</a></strong>: Living signature reference generated from source docstrings.</li>
-<li><strong><a href="recipes/">Recipes &amp; Common Workflows</a></strong>: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, eval harness, batching, caching, and more.</li>
+<li><strong><a href="recipes/">Recipes &amp; Common Workflows</a></strong>: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.</li>
 <li><strong><a href="mapping-security/">Mapping encryption</a></strong>: Argon2id + AES-256-GCM envelopes, AAD, <code>0600</code> writes, ephemeral maps, and the tests that lock those in.</li>
 <li><strong><a href="troubleshooting/">Troubleshooting</a></strong>: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.</li>
 <li><strong><a href="architecture/">Architecture Design</a></strong>: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.</li>

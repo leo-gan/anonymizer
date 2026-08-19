@@ -1169,7 +1169,7 @@
     Run <code>uv sync</code> to create a virtual environment and install all development tools alongside workspace members:
     <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
 </span></code></pre></div>
-    This sync command will install the CLI, core library, and the dependencies for all supported LLM providers (<code>google</code>, <code>ollama</code>, <code>huggingface</code>, <code>openrouter</code>, <code>openai</code>, <code>anthropic</code>).</p>
+    This sync command will install the CLI, core library, the Excel extra (<code>openpyxl</code>), and the dependencies for all supported LLM providers (<code>google</code>, <code>ollama</code>, <code>huggingface</code>, <code>openrouter</code>, <code>openai</code>, <code>anthropic</code>).</p>
 </li>
 <li>
 <p><strong>Activate the virtual environment</strong>:
@@ -1181,13 +1181,16 @@
 <h2 id="installing-as-a-library-dependency">Installing as a Library Dependency<a class="headerlink" href="#installing-as-a-library-dependency" title="Permanent link">&para;</a></h2>
 <p>If you are using <code>pdf-anonymizer-core</code> or <code>pdf-anonymizer-cli</code> in a separate external project, you can install them via <code>pip</code> or <code>uv</code>.</p>
 <p>To keep the installation footprint small, the core package uses <strong>PEP 508 Extras</strong> for specific LLM providers. Install only the providers you plan to use:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Base package only (no provider dependencies)</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Base package only (no provider dependencies; CSV works here)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-core
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Install specific provider support</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[google]&quot;</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[ollama]&quot;</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[openai,anthropic]&quot;</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Excel (.xlsx) input</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[excel]&quot;</span>
 </span></code></pre></div>
 <h3 id="available-extras">Available Extras<a class="headerlink" href="#available-extras" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1197,6 +1200,7 @@
 <li><code>[openrouter]</code>: Installs client tools to query OpenRouter.</li>
 <li><code>[openai]</code>: Installs the official OpenAI API SDK.</li>
 <li><code>[anthropic]</code>: Installs the official Anthropic API SDK.</li>
+<li><code>[excel]</code>: Installs <code>openpyxl</code> for <code>.xlsx</code> input. CSV uses the stdlib and needs no extra.</li>
 </ul>
 <hr />
 <h2 id="environment-variables-configuration">Environment Variables Configuration<a class="headerlink" href="#environment-variables-configuration" title="Permanent link">&para;</a></h2>
