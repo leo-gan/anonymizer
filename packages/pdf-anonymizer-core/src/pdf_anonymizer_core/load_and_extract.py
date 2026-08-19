@@ -19,6 +19,13 @@ from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
 )
 
+from pdf_anonymizer_core.tables import (
+    EXCEL_EXTRA_MESSAGE,
+    is_rejected_spreadsheet,
+    is_tabular_path,
+    rejected_spreadsheet_error,
+)
+
 
 def load_and_extract_text_from_pdf(
     file_path: str, characters_to_anonymize: int = 100000, chunk_overlap: int = 0
@@ -65,6 +72,15 @@ def load_and_extract_text_from_file(
     """
     path = Path(file_path)
     file_extension = path.suffix.lower()
+
+    if is_rejected_spreadsheet(file_path):
+        raise rejected_spreadsheet_error(file_path)
+    if is_tabular_path(file_path):
+        if file_extension == ".xlsx":
+            raise ValueError(EXCEL_EXTRA_MESSAGE)
+        raise ValueError(
+            f"{file_extension} files must be loaded as tables, not as plain text."
+        )
 
     try:
         if file_extension == ".pdf":
