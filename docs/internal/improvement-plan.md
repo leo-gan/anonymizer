@@ -546,7 +546,7 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 24. `encrypt` / format-preserving encryption operator
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #70](https://github.com/leo-gan/anonymizer/pull/70) (`feat/encrypt-operator`)  
 **Technique:** value-level crypto. Presidio encrypt/decrypt; Google AES-SIV / FPE-FFX; Philter FPE; NIST SP 800-38G AES-FF3-1.
 
 **In simple terms:** `replace` writes `PERSON_1` and keeps “Jane Doe” in the mapping file. Anyone who reads that file can undo the page. `encrypt` writes a locked token (`ENC1_…`) instead. The same secret always produces the same token, so Ada stays Ada across files. Deanonymize unlocks the token with `--encrypt-secret`. Those originals are not stored in the mapping. Format-preserving encryption (same number of digits) is not in this item.
