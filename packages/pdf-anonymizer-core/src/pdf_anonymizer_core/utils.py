@@ -24,6 +24,11 @@ from pdf_anonymizer_core.mapping_crypto import (
 )
 from pdf_anonymizer_core.secure_io import write_private_json
 from pdf_anonymizer_core.pdf_ocr import take_pdf_layout, write_layout_sidecar
+from pdf_anonymizer_core.pdf_output import (
+    OUTPUT_PDF_NOT_PDF_MESSAGE,
+    write_anonymized_pdf,
+    write_deanonymized_pdf,
+)
 from pdf_anonymizer_core.tables import (
     flatten_table_for_review,
     is_tabular_path,
@@ -166,6 +171,8 @@ def save_results(
     ephemeral_mapping: bool = False,
     entity_texts: Optional[Iterable[str]] = None,
     orig_to_written: Optional[Dict[str, str]] = None,
+    output_pdf: bool = False,
+    redact: bool = False,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
@@ -183,9 +190,13 @@ def save_results(
         entity_texts: Detected ``entity["text"]`` values used to apply the
             mapping. Required for table and Word paths; ignored for text.
         orig_to_written: Engine original → written map used to re-apply on
-            tables and Word files. Required for colliding mask/generalize/fake
-            forms; when omitted, ``mapping_to_original_to_written(final_mapping)``
-            is used.
+            tables, Word files, and native PDF writes. Required for colliding
+            mask/generalize/fake forms; when omitted,
+            ``mapping_to_original_to_written(final_mapping)`` is used.
+        output_pdf: Also write a sanitized ``.anonymized.pdf``. Markdown is
+            still written. Only valid for ``.pdf`` inputs.
+        redact: Irreversible native PDF: black boxes, no stand-in text.
+            Implies ``output_pdf``.
 
     Returns:
         tuple[str, str]: The paths to the anonymized text file and the mapping
@@ -246,8 +257,26 @@ def save_results(
         if same_source:
             write_layout_sidecar(anonymized_output_file, layout_source, layout_words)
 
+    primary_output = anonymized_output_file
+    if output_pdf or redact:
+        if file_extension != ".pdf":
+            raise ValueError(OUTPUT_PDF_NOT_PDF_MESSAGE)
+        apply_map = (
+            orig_to_written
+            if orig_to_written is not None
+            else mapping_to_original_to_written(final_mapping)
+        )
+        texts = (
+            [text for text in entity_texts if text]
+            if entity_texts is not None
+            else list(apply_map.keys())
+        )
+        pdf_output = f"{anonymized_dir}/{file_stem}.anonymized.pdf"
+        write_anonymized_pdf(file_path, pdf_output, apply_map, texts, redact=redact)
+        primary_output = pdf_output
+
     if ephemeral_mapping:
-        return anonymized_output_file, ""
+        return primary_output, ""
 
     source_digest = ""
     if original_path.is_file():
@@ -266,7 +295,7 @@ def save_results(
         # Persist mapping as placeholder -> original for correct deanonymization
         write_private_json(mapping_file, final_mapping)
 
-    return anonymized_output_file, mapping_file
+    return primary_output, mapping_file
 
 
 def restore_placeholders_in_text(
@@ -360,6 +389,7 @@ def deanonymize_file(
     sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
     tabular = is_tabular_path(anonymized_file_path)
     word = is_word_path(anonymized_file_path)
+    native_pdf = Path(anonymized_file_path).suffix.lower() == ".pdf"
     deanonymized_text = ""
 
     if tabular:
@@ -390,6 +420,19 @@ def deanonymize_file(
             used_placeholders |= block_used
             if restored != block.search_text:
                 write_block_text(block, restored)
+    elif native_pdf:
+        try:
+            import pymupdf
+        except ImportError as exc:
+            raise ValueError("Deanonymizing a PDF requires pymupdf.") from exc
+        opened = pymupdf.open(anonymized_file_path)
+        try:
+            anonymized_text = "\n".join(page.get_text() or "" for page in opened)
+        finally:
+            opened.close()
+        deanonymized_text, used_placeholders = restore_placeholders_in_text(
+            anonymized_text, placeholder_to_original
+        )
     else:
         with open(anonymized_file_path, "r", encoding="utf-8") as f:
             anonymized_text = f.read()
@@ -422,6 +465,10 @@ def deanonymize_file(
         save_table(doc, deanonymized_file)
     elif word:
         save_docx(word_doc, deanonymized_file)
+    elif native_pdf:
+        write_deanonymized_pdf(
+            anonymized_file_path, deanonymized_file, placeholder_to_original
+        )
     else:
         with open(deanonymized_file, "w", encoding="utf-8") as f:
             f.write(deanonymized_text)

@@ -253,6 +253,27 @@ def run(
             ),
         ),
     ] = False,
+    output_pdf: Annotated[
+        bool,
+        typer.Option(
+            "--output-pdf/--no-output-pdf",
+            help=(
+                "Also write a sanitized native PDF (glyphs excised, metadata "
+                "wiped). Markdown is still written. PDF inputs only. "
+                "This is not a legal de-identification certificate."
+            ),
+        ),
+    ] = False,
+    redact: Annotated[
+        bool,
+        typer.Option(
+            "--redact/--no-redact",
+            help=(
+                "Irreversible native PDF: black boxes, no stand-in text. "
+                "Implies --output-pdf. Deanonymize cannot restore the page."
+            ),
+        ),
+    ] = False,
     entity_profile: Annotated[
         Optional[EntityProfile],
         typer.Option(
@@ -466,6 +487,11 @@ def run(
                 full_anonymized_text, placeholder_to_original
             )
 
+            want_pdf = output_pdf or redact
+            pdf_orig_to_written = {
+                original: placeholder
+                for placeholder, original in consolidated_placeholder_map.items()
+            }
             anonymized_output_file, mapping_file = save_results(
                 full_anonymized_text,
                 consolidated_placeholder_map,
@@ -476,8 +502,10 @@ def run(
                 orig_to_written=(
                     final_mapping
                     if is_tabular_path(str(file_path)) or is_word_path(str(file_path))
-                    else None
+                    else (pdf_orig_to_written if want_pdf else None)
                 ),
+                output_pdf=want_pdf,
+                redact=redact,
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

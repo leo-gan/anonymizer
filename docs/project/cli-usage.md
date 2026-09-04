@@ -39,6 +39,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--keep-list` | `PATH` | *none* | Phrases to leave visible (one per line). Wins if also on the deny-list. |
 | `--deny-list` | `PATH` | *none* | Phrases that must be hidden even if detection missed them. |
 | `--ocr` / `--no-ocr` | flag | off | If a PDF has no text layer, OCR it with Tesseract (must be on PATH). A scan with OCR off is an error, not an empty success file. |
+| `--output-pdf` / `--no-output-pdf` | flag | off | Also write a sanitized native PDF. Markdown is still written. PDF inputs only. Not a legal certificate. |
+| `--redact` / `--no-redact` | flag | off | Irreversible native PDF (black boxes, no stand-in). Implies `--output-pdf`. |
 
 ### Configuration Profiles
 
@@ -211,7 +213,7 @@ Files in the same `run` share one growing map, so the same person stays `PERSON_
 
 `run`, `verify`, `report`, and `deanonymize` write under conventional directories (created automatically):
 
-*   `data/anonymized/<stem>.anonymized.md` (or `.txt`, `.csv`, `.xlsx`, `.docx`)
+*   `data/anonymized/<stem>.anonymized.md` (or `.txt`, `.csv`, `.xlsx`, `.docx`; plus `.pdf` when `--output-pdf`)
 *   `data/mappings/<stem>.mapping.json` (or `*.mapping.json.enc` when a passphrase is set)
 *   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`, `.csv`, `.xlsx`, `.docx`)
 *   `data/stats/<stem>.residual_pii.json` — leftovers found after masking (from `run` or `verify`)
@@ -300,6 +302,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### Scanned PDFs (`--ocr`)
 
 A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass `--ocr` to recover words. A sidecar `*.anonymized.layout.json` stores page boxes for a later native-PDF write. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
+
+### Native PDF write (`--output-pdf`)
+
+Markdown stays the default. `--output-pdf` also writes `*.anonymized.pdf`: old glyphs are excised, `/Info` and XMP are wiped, attachments are dropped. `--redact` is irreversible (black boxes). Neither mode is a legal de-identification certificate. See [Write a native PDF](recipes.md#write-a-native-pdf).
 
 ### CSV and Excel as inputs (cell-level masking)
 

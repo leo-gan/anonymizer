@@ -75,6 +75,10 @@ The package ships two ready-to-use prompt templates.
 
 ::: pdf_anonymizer_core.pdf_ocr.write_layout_sidecar
 
+::: pdf_anonymizer_core.pdf_output.write_anonymized_pdf
+
+::: pdf_anonymizer_core.pdf_output.sanitize_pdf
+
 ---
 
 ## Tables (CSV / Excel)

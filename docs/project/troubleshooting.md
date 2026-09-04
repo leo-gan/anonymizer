@@ -102,6 +102,16 @@ Common problems and how to resolve them.
 - **Symptom**: `OCR requires the Tesseract binary on PATH.`
 - **Fix**: Install the Tesseract **system** package (`apt-get install tesseract-ocr` / `brew install tesseract`). There is no pip extra for this.
 
+## Native PDF still shows a name in an image
+
+- **Symptom**: A photo or letterhead still shows a name after `--output-pdf`.
+- **Fix**: The digital path excises text glyphs. It does not OCR images. Delete image-only letterhead, or accept the residual.
+
+## `--output-pdf` rejected on a text file
+
+- **Symptom**: `--output-pdf only applies to PDF inputs.`
+- **Fix**: That flag rewrites a PDF package. Use it on a `.pdf`.
+
 ## Large Files / Memory or Context Issues
 
 - **Symptom**: Out of memory, context length errors, or very slow runs.
