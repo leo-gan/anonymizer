@@ -133,5 +133,18 @@ def extract_entities_via_ner(
             if key in seen:
                 continue
             seen.add(key)
-            entities.append({"text": raw, "type": ent_type, "base_form": raw})
+            raw_score = hit.get("score")
+            if isinstance(raw_score, (int, float)):
+                score = max(0.0, min(1.0, float(raw_score)))
+            else:
+                score = 0.80
+            entities.append(
+                {
+                    "text": raw,
+                    "type": ent_type,
+                    "base_form": raw,
+                    "score": score,
+                    "source": "ner",
+                }
+            )
     return entities

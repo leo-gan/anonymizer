@@ -36,8 +36,20 @@ class TestAnonymizer(unittest.TestCase):
         # Asserts
         mock_get_provider.assert_called_once_with("google")
         expected_entities = [
-            {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
-            {"text": "New York", "type": "LOCATION", "base_form": "New York"},
+            {
+                "text": "John Doe",
+                "type": "PERSON",
+                "base_form": "John Doe",
+                "score": 0.7,
+                "source": "llm",
+            },
+            {
+                "text": "New York",
+                "type": "LOCATION",
+                "base_form": "New York",
+                "score": 0.7,
+                "source": "llm",
+            },
         ]
         self.assertEqual(entities, expected_entities)
 
@@ -71,8 +83,20 @@ class TestAnonymizer(unittest.TestCase):
         # Asserts
         mock_get_provider.assert_called_once_with("ollama")
         expected_entities = [
-            {"text": "John Doe", "type": "PERSON", "base_form": "John Doe"},
-            {"text": "New York", "type": "LOCATION", "base_form": "New York"},
+            {
+                "text": "John Doe",
+                "type": "PERSON",
+                "base_form": "John Doe",
+                "score": 0.7,
+                "source": "llm",
+            },
+            {
+                "text": "New York",
+                "type": "LOCATION",
+                "base_form": "New York",
+                "score": 0.7,
+                "source": "llm",
+            },
         ]
         self.assertEqual(entities, expected_entities)
 

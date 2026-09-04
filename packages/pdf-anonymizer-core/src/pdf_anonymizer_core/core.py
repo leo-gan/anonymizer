@@ -193,18 +193,25 @@ def finalize_entities(
     deny_list: Optional[List[str]],
     apply_deny: bool = True,
     seed_mapping: Optional[Dict[str, str]] = None,
+    min_confidence: float = 0.0,
 ) -> List[dict]:
     """Type-priority dedup, type filter, optional deny-list, keep-list, base-form merge."""
     best_entities: Dict[str, dict] = {}
     for ent in collected:
         text = ent["text"]
         ent_type = ent["type"].upper()
+        ent.setdefault("score", 1.0)
+        ent.setdefault("source", "regex")
         if text not in best_entities:
             best_entities[text] = ent
         else:
-            existing_type = best_entities[text]["type"].upper()
+            existing = best_entities[text]
+            existing_type = existing["type"].upper()
             if _type_priority(ent_type) > _type_priority(existing_type):
                 best_entities[text] = ent
+            elif _type_priority(ent_type) == _type_priority(existing_type):
+                if float(ent.get("score", 1.0)) > float(existing.get("score", 1.0)):
+                    best_entities[text] = ent
 
     deduped_entities = list(best_entities.values())
 
@@ -216,6 +223,14 @@ def finalize_entities(
             if type_matches_filter(e["type"], anonymized_entities)
         ]
 
+    # Filter before the deny-list so a required phrase is re-added at
+    # score 1.0 even if regex only found a weak TYPE_LIKE hit.
+    if min_confidence > 0:
+        entities_to_process = [
+            entity
+            for entity in entities_to_process
+            if float(entity.get("score", 1.0)) >= min_confidence
+        ]
     if apply_deny and deny_list:
         entities_to_process = apply_deny_list(full_text, entities_to_process, deny_list)
     if keep_list:
@@ -340,6 +355,7 @@ def anonymize_text_content(
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
     use_ner: bool = False,
+    min_confidence: float = 0.0,
 ) -> Tuple[str, Dict[str, str]]:
     if regex_patterns is None:
         regex_patterns = DEFAULT_REGEX_PATTERNS
@@ -362,6 +378,7 @@ def anonymize_text_content(
         keep_list=keep_list,
         deny_list=deny_list,
         apply_deny=True,
+        min_confidence=min_confidence,
         seed_mapping=seed_mapping,
     )
 
@@ -401,6 +418,7 @@ def anonymize_file(
     use_llm: bool = True,
     use_ner: bool = False,
     ocr: bool = False,
+    min_confidence: float = 0.0,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -454,6 +472,9 @@ def anonymize_file(
         use_ner: When True, run local span NER (GLiNER extra) for names and
             organizations. Default False so the SDK never downloads a
             checkpoint unless the caller asks.
+        min_confidence: Drop entities whose ``score`` is below this value
+            (0–1). Default 0 keeps today's accept-all behaviour. Scores are
+            recognizer hints, not calibrated probabilities.
         ocr: When True and a PDF has no text layer, run Tesseract via
             PyMuPDF and stash word boxes for a later native-PDF write.
             A scan with OCR off (or OCR that returns nothing) raises.
@@ -491,6 +512,7 @@ def anonymize_file(
             deny_list=deny_list,
             use_llm=use_llm,
             use_ner=use_ner,
+            min_confidence=min_confidence,
         )
         return review, mapping
 
@@ -515,6 +537,7 @@ def anonymize_file(
             deny_list=deny_list,
             use_llm=use_llm,
             use_ner=use_ner,
+            min_confidence=min_confidence,
         )
         return review, mapping
 
@@ -550,6 +573,7 @@ def anonymize_file(
         deny_list=deny_list,
         use_llm=use_llm,
         use_ner=use_ner,
+        min_confidence=min_confidence,
     )
 
 
@@ -671,6 +695,7 @@ def anonymize_tabular_file(
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
     use_ner: bool = False,
+    min_confidence: float = 0.0,
 ) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
     """Anonymize a CSV/Excel file cell by cell.
 
@@ -736,6 +761,7 @@ def anonymize_tabular_file(
         deny_list=deny_list,
         apply_deny=False,
         seed_mapping=seed_mapping,
+        min_confidence=min_confidence,
     )
     final_mapping = build_mapping(
         entities_to_process,
@@ -778,6 +804,7 @@ def anonymize_docx_file(
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
     use_ner: bool = False,
+    min_confidence: float = 0.0,
 ) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
     """Anonymize a Word ``.docx`` file paragraph by paragraph.
 
@@ -845,6 +872,7 @@ def anonymize_docx_file(
         deny_list=deny_list,
         apply_deny=False,
         seed_mapping=seed_mapping,
+        min_confidence=min_confidence,
     )
     final_mapping = build_mapping(
         entities_to_process,

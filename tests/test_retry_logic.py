@@ -25,7 +25,16 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         )
 
         self.assertEqual(
-            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+            entities,
+            [
+                {
+                    "text": "person",
+                    "type": "PERSON",
+                    "base_form": "person",
+                    "score": 0.7,
+                    "source": "llm",
+                }
+            ],
         )
         mock_provider.call.assert_called_once()
         mock_get_provider.assert_called_once_with("google")
@@ -54,7 +63,16 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         )
 
         self.assertEqual(
-            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+            entities,
+            [
+                {
+                    "text": "person",
+                    "type": "PERSON",
+                    "base_form": "person",
+                    "score": 0.7,
+                    "source": "llm",
+                }
+            ],
         )
         self.assertEqual(mock_provider.call.call_count, 3)
 
@@ -80,7 +98,16 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         )
 
         self.assertEqual(
-            entities, [{"text": "person", "type": "PERSON", "base_form": "person"}]
+            entities,
+            [
+                {
+                    "text": "person",
+                    "type": "PERSON",
+                    "base_form": "person",
+                    "score": 0.7,
+                    "source": "llm",
+                }
+            ],
         )
         self.assertEqual(mock_provider.call.call_count, 3)
 
