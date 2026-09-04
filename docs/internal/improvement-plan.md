@@ -29,7 +29,7 @@
 - [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
 - [x] 22. HTTP API + Docker — done 2026-09-04, [PR #67](https://github.com/leo-gan/anonymizer/pull/67)
 - [x] 23. Review / apply residual findings — done 2026-09-04, [PR #68](https://github.com/leo-gan/anonymizer/pull/68)
-- [ ] 24. `encrypt` / format-preserving encryption operator
+- [x] 24. `encrypt` / format-preserving encryption operator — done 2026-09-04, [PR #70](https://github.com/leo-gan/anonymizer/pull/70)
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [ ] 26. Optional table-only formal privacy engine
 - [ ] 27. Release hygiene (attestations, no-telemetry statement)
