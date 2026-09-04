@@ -1,0 +1,84 @@
+{
+  "name": "domain-pack",
+  "description": "Tiny labeled use-case pack. Synthetic values only. Covers the sectors in docs/101/why-anonymization.md.",
+  "documents": [
+    {
+      "name": "healthcare-discharge",
+      "domain": "healthcare",
+      "text": "Discharge summary for patient Jordan Hale, MRN 1847293, SSN 123-45-6789. Admitted 2024-03-12 to Riverside Medical Center. Callback 415-555-0134 or jhale@clinic.example. Attending: Dr. Priya Shah.",
+      "mentions": [
+        {"text": "Jordan Hale", "type": "PERSON", "kind": "direct", "base_form": "Jordan Hale"},
+        {"text": "1847293", "type": "MEDICAL_RECORD", "kind": "direct", "base_form": "1847293"},
+        {"text": "123-45-6789", "type": "SSN", "kind": "direct", "base_form": "123-45-6789"},
+        {"text": "2024-03-12", "type": "DATE_ISO", "kind": "quasi", "base_form": "2024-03-12"},
+        {"text": "Riverside Medical Center", "type": "ORGANIZATION", "kind": "quasi", "base_form": "Riverside Medical Center"},
+        {"text": "415-555-0134", "type": "PHONE", "kind": "direct", "base_form": "415-555-0134"},
+        {"text": "jhale@clinic.example", "type": "EMAIL", "kind": "direct", "base_form": "jhale@clinic.example"},
+        {"text": "Priya Shah", "type": "PERSON", "kind": "direct", "base_form": "Priya Shah"}
+      ]
+    },
+    {
+      "name": "legal-retainer",
+      "domain": "legal",
+      "text": "Retainer between Rivera & Cole LLP and client Elena Voss, email elena.voss@example.com, of 88 Market Street, Boston. Hearing 2025-01-20. Case CV-2025-4411.",
+      "mentions": [
+        {"text": "Rivera & Cole LLP", "type": "ORGANIZATION", "kind": "quasi", "base_form": "Rivera & Cole LLP"},
+        {"text": "Elena Voss", "type": "PERSON", "kind": "direct", "base_form": "Elena Voss"},
+        {"text": "elena.voss@example.com", "type": "EMAIL", "kind": "direct", "base_form": "elena.voss@example.com"},
+        {"text": "88 Market Street, Boston", "type": "ADDRESS", "kind": "quasi", "base_form": "88 Market Street, Boston"},
+        {"text": "2025-01-20", "type": "DATE_ISO", "kind": "quasi", "base_form": "2025-01-20"},
+        {"text": "CV-2025-4411", "type": "ID", "kind": "direct", "base_form": "CV-2025-4411"}
+      ]
+    },
+    {
+      "name": "government-benefits",
+      "domain": "government",
+      "text": "Department of Benefits notice for Marcus Chen, SSN 987-65-4321, 14 Oak Lane, Springfield. Case BEN-440192. Phone 202-555-0177. Effective 2023-11-01.",
+      "mentions": [
+        {"text": "Marcus Chen", "type": "PERSON", "kind": "direct", "base_form": "Marcus Chen"},
+        {"text": "987-65-4321", "type": "SSN", "kind": "direct", "base_form": "987-65-4321"},
+        {"text": "14 Oak Lane, Springfield", "type": "ADDRESS", "kind": "quasi", "base_form": "14 Oak Lane, Springfield"},
+        {"text": "BEN-440192", "type": "ID", "kind": "direct", "base_form": "BEN-440192"},
+        {"text": "202-555-0177", "type": "PHONE", "kind": "direct", "base_form": "202-555-0177"},
+        {"text": "2023-11-01", "type": "DATE_ISO", "kind": "quasi", "base_form": "2023-11-01"}
+      ]
+    },
+    {
+      "name": "research-survey",
+      "domain": "research",
+      "text": "Survey respondent Maya Ortiz (maya.ortiz@univ.example) connected from 203.0.113.44 on 2022-06-18. IRB protocol IRB-2022-881. Role: field interviewer.",
+      "mentions": [
+        {"text": "Maya Ortiz", "type": "PERSON", "kind": "direct", "base_form": "Maya Ortiz"},
+        {"text": "maya.ortiz@univ.example", "type": "EMAIL", "kind": "direct", "base_form": "maya.ortiz@univ.example"},
+        {"text": "203.0.113.44", "type": "IPV4_ADDRESS", "kind": "direct", "base_form": "203.0.113.44"},
+        {"text": "2022-06-18", "type": "DATE_ISO", "kind": "quasi", "base_form": "2022-06-18"},
+        {"text": "IRB-2022-881", "type": "ID", "kind": "direct", "base_form": "IRB-2022-881"},
+        {"text": "field interviewer", "type": "JOB_TITLE", "kind": "quasi", "base_form": "field interviewer"}
+      ]
+    },
+    {
+      "name": "finance-statement",
+      "domain": "finance",
+      "text": "Account holder Luis Romero, card 4111111111111111, IBAN GB82WEST12345698765432, email lromero@bank.example. Statement 2024-08-31.",
+      "mentions": [
+        {"text": "Luis Romero", "type": "PERSON", "kind": "direct", "base_form": "Luis Romero"},
+        {"text": "4111111111111111", "type": "CREDIT_CARD", "kind": "direct", "base_form": "4111111111111111"},
+        {"text": "GB82WEST12345698765432", "type": "IBAN", "kind": "direct", "base_form": "GB82WEST12345698765432"},
+        {"text": "lromero@bank.example", "type": "EMAIL", "kind": "direct", "base_form": "lromero@bank.example"},
+        {"text": "2024-08-31", "type": "DATE_ISO", "kind": "quasi", "base_form": "2024-08-31"}
+      ]
+    },
+    {
+      "name": "enterprise-ticket",
+      "domain": "enterprise",
+      "text": "Support ticket from Nora Kim (nora.kim@acme.example), employee login nkim, project Falcon. Callback +1 646-555-0199. Opened 2024-02-02.",
+      "mentions": [
+        {"text": "Nora Kim", "type": "PERSON", "kind": "direct", "base_form": "Nora Kim"},
+        {"text": "nora.kim@acme.example", "type": "EMAIL", "kind": "direct", "base_form": "nora.kim@acme.example"},
+        {"text": "nkim", "type": "ID", "kind": "direct", "base_form": "nkim"},
+        {"text": "+1 646-555-0199", "type": "PHONE", "kind": "direct", "base_form": "+1 646-555-0199"},
+        {"text": "2024-02-02", "type": "DATE_ISO", "kind": "quasi", "base_form": "2024-02-02"}
+      ]
+    }
+  ]
+}

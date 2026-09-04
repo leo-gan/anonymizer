@@ -27,5 +27,36 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Run tests
-        run: make test
+      - name: Run tests with coverage
+        run: make test-cov
+
+      - name: Public eval table
+        run: uv run python scripts/eval_public_table.py --output public_eval_table.md
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage.xml ]; then
+            python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse("coverage.xml").getroot()
+          rate = float(root.attrib.get("line-rate", 0)) * 100
+          print(f"Line coverage: {rate:.1f}%")
+          with open("coverage-percent.txt", "w", encoding="utf-8") as handle:
+              handle.write(f"{rate:.1f}\n")
+          PY
+            echo "### Coverage" >> "$GITHUB_STEP_SUMMARY"
+            echo "Line coverage: $(cat coverage-percent.txt)%" >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+            echo "### Public eval table" >> "$GITHUB_STEP_SUMMARY"
+            cat public_eval_table.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload coverage and eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: completeness
+          path: |
+            coverage.xml
+            public_eval_table.md

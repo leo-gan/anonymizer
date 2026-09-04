@@ -8,7 +8,7 @@ This is where data anonymization and reversible deanonymization become essential
 
 ## What is Anonymization?
 
-**Data Anonymization** is the process of destroying or modifying personal identifiers in a dataset so that the individuals whom the data describes can no longer be identified, directly or indirectly. 
+**Data Anonymization** is the process of destroying or modifying personal identifiers in a dataset so that the individuals whom the data describes can no longer be identified, directly or indirectly. Product meanings of *anonymization*, *pseudonymization*, and *PII* are on [Terminology](../project/terminology.md). 
 
 Under legal regimes like the European Union's General Data Protection Regulation (GDPR), if a dataset is truly anonymous, it is no longer considered "personal data" and is exempt from strict privacy regulations. This makes anonymization the ultimate goal for safe data sharing and retention.
 

@@ -109,22 +109,26 @@ plugins:
 # Internal maintainer notes under docs/internal/ must never ship to GitHub Pages.
 exclude_docs: |
   /internal/
+  /temp/
 
 nav:
   - Home: index.md
   - Privacy & Anonymization 101:
     - Course Overview: 101/index.md
+    - Terminology: project/terminology.md
     - Why Anonymize?: 101/why-anonymization.md
     - History: 101/history.md
     - Contemporary Techniques: 101/techniques.md
     - How PDF Anonymizer is Different: 101/how-different.md
   - Project Docs:
     - Overview: project/index.md
+    - Terminology: project/terminology.md
     - Installation: project/installation.md
     - CLI Reference: project/cli-usage.md
     - SDK & API Usage: project/api-usage.md
     - API Reference (auto): project/api-reference.md
     - Recipes & Common Workflows: project/recipes.md
+    - Gold corpus & eval: project/gold-corpus.md
     - Mapping encryption: project/mapping-security.md
     - Troubleshooting: project/troubleshooting.md
     - Architecture Design: project/architecture.md

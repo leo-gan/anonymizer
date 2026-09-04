@@ -6,7 +6,14 @@ app.log
 *.pdf
 .idea/
 /data/
+# Downloaded gold-corpus (TAB / Presidio / Gretel) is under /data/gold-corpus/
+coverage.xml
+.coverage
+htmlcov/
 dist/
 .pypirc
 # Built MkDocs site (never commit the generated HTML/JS/assets)
 site/
+
+# Local research dumps — never commit
+docs/temp/

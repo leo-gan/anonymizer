@@ -1,6 +1,6 @@
 # Contemporary Anonymization Techniques & Tools
 
-Over the past few decades, computer scientists and statisticians have developed a variety of frameworks to hide identities in datasets. Let's compare these contemporary techniques and review legacy tooling.
+Over the past few decades, computer scientists and statisticians have developed a variety of frameworks to hide identities in datasets. Let's compare these contemporary techniques and review legacy tooling. Short product meanings (*k*-anonymity, differential privacy, synthetic data) are on [Terminology](../project/terminology.md#techniques-this-tool-does-not-apply-to-prose).
 
 ---
 

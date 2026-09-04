@@ -27,7 +27,7 @@ Suppose a classmate writes:
 
 There is no first name and no last name in that sentence. A simple name-finder will miss it. Any reader who follows the news still knows exactly which person is meant.
 
-That leftover phrase is an **identity clue**: words that do not *look* like a name, but still pick out one person.
+That leftover phrase is an **identity clue**: words that do not *look* like a name, but still pick out one person. See [Terminology](../project/terminology.md#identifiers).
 
 Here are three everyday cases the careful instructions now ask the model to catch:
 

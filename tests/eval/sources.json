@@ -1,0 +1,87 @@
+{
+  "description": "Public anonymization / PII gold tests that make up this package's gold-corpus. Downloadable sources are fetched by scripts/download_gold_corpus.py into data/gold-corpus/ (gitignored). Sources marked downloadable=false are documented only.",
+  "sources": [
+    {
+      "id": "tab",
+      "name": "Text Anonymization Benchmark (TAB)",
+      "domain": "legal",
+      "license": "MIT",
+      "paper": "https://aclanthology.org/2022.cl-4.19/",
+      "homepage": "https://github.com/NorskRegnesentral/text-anonymization-benchmark",
+      "downloadable": true,
+      "notes": "Official GoldCorpus in evaluation.py. 1,268 English ECHR court cases with DIRECT/QUASI/NO_MASK identifier types. This is the dedicated public text-anonymization test."
+    },
+    {
+      "id": "presidio",
+      "name": "Presidio research synth_dataset_v2",
+      "domain": "general",
+      "license": "MIT",
+      "homepage": "https://github.com/microsoft/presidio-research",
+      "downloadable": true,
+      "notes": "Public synthetic eval set shipped with Microsoft Presidio research. The de-facto open test for Presidio-class PII recognizers."
+    },
+    {
+      "id": "gretel",
+      "name": "Gretel PII Masking EN v1 (test split)",
+      "domain": "multi",
+      "license": "Apache-2.0",
+      "homepage": "https://huggingface.co/datasets/gretelai/gretel-pii-masking-en-v1",
+      "downloadable": true,
+      "notes": "5,000 synthetic documents across ~47 industry domains (healthcare, banking, identity, government-adjacent, etc.) with span-locatable PII/PHI labels."
+    },
+    {
+      "id": "domain-pack",
+      "name": "In-repo use-case pack",
+      "domain": "multi",
+      "license": "MIT",
+      "homepage": "tests/eval/domain_pack.json",
+      "downloadable": false,
+      "notes": "Tiny committed fixture covering healthcare, legal, government, research, finance, and enterprise/AI. Always available without a download."
+    },
+    {
+      "id": "mini-tab",
+      "name": "In-repo mini TAB fixture",
+      "domain": "general",
+      "license": "MIT",
+      "homepage": "tests/eval/fixture.json",
+      "downloadable": false,
+      "notes": "Existing package public test from item 13 (PR #52)."
+    },
+    {
+      "id": "i2b2-n2c2",
+      "name": "i2b2 / n2c2 clinical de-identification challenges",
+      "domain": "healthcare",
+      "license": "PhysioNet DUA",
+      "homepage": "https://physionet.org/",
+      "downloadable": false,
+      "notes": "The classic clinical de-id gold (2006, 2014, 2016). Requires a credentialed PhysioNet account and a data-use agreement. Not auto-downloaded."
+    },
+    {
+      "id": "mimic-deid",
+      "name": "MIMIC de-identified notes",
+      "domain": "healthcare",
+      "license": "PhysioNet DUA",
+      "homepage": "https://physionet.org/content/mimiciv/",
+      "downloadable": false,
+      "notes": "Already de-identified EHR notes. Not a detection gold set, and not downloadable without a DUA."
+    },
+    {
+      "id": "kaggle-pii",
+      "name": "The Learning Agency Lab — PII Data Detection",
+      "domain": "research",
+      "license": "Competition terms",
+      "homepage": "https://www.kaggle.com/competitions/pii-detection-removal-from-educational-data",
+      "downloadable": false,
+      "notes": "Student-essay PII gold. Requires a Kaggle login. Not auto-downloaded."
+    },
+    {
+      "id": "mapa",
+      "name": "MAPA — Multilingual Anonymisation for Public Administrations",
+      "domain": "government",
+      "license": "ELRC-SHARE terms",
+      "homepage": "https://inception-project.github.io/use-cases/mapa/",
+      "downloadable": false,
+      "notes": "EU public-administration anonymization set on ELRC-SHARE. Registration required. Not auto-downloaded."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-.PHONY: install lint format test build-core build-cli clean-core clean-cli publish-core publish-cli publish-core-test publish-cli-test
+.PHONY: install lint format test test-cov gold-corpus gold-bench gold-table build-core build-cli clean-core clean-cli publish-core publish-cli publish-core-test publish-cli-test
 
 install:
 	uv pip install -e ./packages/pdf-anonymizer-core --system
@@ -14,6 +14,21 @@ format:
 
 test:
 	uv run pytest
+
+test-cov:
+	uv run pytest --cov=pdf_anonymizer_core --cov=pdf_anonymizer_cli --cov-report=term-missing --cov-report=xml:coverage.xml --cov-fail-under=$(COV_FAIL_UNDER)
+
+# Floor set after the first measured run on this branch (77%). Do not invent 90%.
+COV_FAIL_UNDER ?= 70
+
+gold-corpus:
+	uv run python scripts/download_gold_corpus.py
+
+gold-bench:
+	uv run python scripts/run_gold_benchmark.py --write-baseline
+
+gold-table:
+	uv run python scripts/eval_public_table.py --output tests/eval/baselines/public_eval_table.md
 
 docs-serve:
 	uv run mkdocs serve

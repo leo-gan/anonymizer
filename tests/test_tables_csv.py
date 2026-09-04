@@ -21,6 +21,7 @@ from pdf_anonymizer_core.tables import (
     TableSheet,
     apply_mapping_to_table,
     flatten_table_for_review,
+    load_csv,
     load_review_text,
     load_table,
     save_table,
@@ -413,6 +414,13 @@ class TestVerifyAndRiskFlatten:
         report_result = runner.invoke(app, ["report", str(path)])
         assert report_result.exit_code == 1
         assert "Traceback" not in (report_result.output or "")
+
+
+    def test_nul_bytes_are_a_value_error(self, tmp_path) -> None:
+        path = tmp_path / "bad.csv"
+        path.write_bytes(b"\x00")
+        with pytest.raises(ValueError, match="not readable"):
+            load_csv(str(path))
 
 
 class TestRejectsAndLimits:
