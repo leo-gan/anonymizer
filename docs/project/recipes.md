@@ -790,6 +790,32 @@ pdf-anonymizer verify data/anonymized/notes.anonymized.md
 
 This is a helper, not a lock. Read the report (and the page) before you share.
 
+To hide leftovers from that report (opt-in):
+
+```bash
+pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all
+```
+
+Or hide them on the same run:
+
+```bash
+pdf-anonymizer run notes.pdf --apply-residuals
+```
+
+`--accept` / `--skip` pick which leftovers to hide. On a TTY, `apply` without those flags asks about each one. Native PDF output is not rewritten; apply the Markdown file. See [The apply command](cli-usage.md#the-apply-command-hide-leftovers).
+
+---
+
+## Hide leftovers from a residual report
+
+The leftover list is a report. This step is how you accept some of those hits and rewrite the masked page.
+
+```bash
+pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all
+```
+
+`--accept accept.json` is a JSON list of the leftover strings to hide. `--skip skip.txt` is one phrase per line to leave visible. The mapping file gets the new stand-ins (`EMAIL_2`, …).
+
 ---
 
 ## Limit national-ID regexes to some countries

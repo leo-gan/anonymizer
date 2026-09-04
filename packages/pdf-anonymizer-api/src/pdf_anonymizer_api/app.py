@@ -162,12 +162,12 @@ def create_app():
             "Local HTTP wrapper around pdf-anonymizer-core. "
             "No authentication. Bind to localhost or a compose network."
         ),
-        version="0.24.0",
+        version="0.25.0",
     )
 
     @application.get("/health")
     def health() -> Dict[str, str]:
-        return {"status": "ok", "version": "0.24.0"}
+        return {"status": "ok", "version": "0.25.0"}
 
     @application.post("/anonymize")
     def anonymize(body: AnonymizeBody) -> Dict[str, Any]:

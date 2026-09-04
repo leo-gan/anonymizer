@@ -27,8 +27,9 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
 | `--anonymized-entities` | `PATH` | *None* | Path to a text file containing custom entities to search for and anonymize. |
 | `--countries` | `TEXT` | *all* | ISO-2 codes for national-ID regexes, comma-separated (`US,GB`). Email, IBAN, cards, and other universal patterns always stay. |
-| `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file. |
+| `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file unless `--apply-residuals`. |
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
+| `--apply-residuals` | flag | off | After the leftover scan, hide every leftover on this run. Implies `--verify`. |
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id, source-file AAD). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 | `--ephemeral-mapping` / `--persist-mapping` | flag | persist | Keep the mapping only in this process. Nothing is written under `data/mappings/`. |
 | `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`. |
@@ -140,6 +141,29 @@ pdf-anonymizer verify data/anonymized/notes.anonymized.md --verify-llm -p best-q
 The report is `data/stats/<stem>.residual_pii.json`. Stand-in labels such as `PERSON_1` are ignored. A leftover email or a mistyped IBAN is listed.
 
 `run` already does the cheap regex scan unless you pass `--no-verify`.
+
+---
+
+## The `apply` Command (hide leftovers)
+
+The leftover report does not rewrite the page. `apply` hides the leftovers you accept, using the same span engine as `run`.
+
+```bash
+# Hide every leftover in the report
+pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all
+
+# Hide only some phrases
+pdf-anonymizer apply data/stats/notes.residual_pii.json --accept accept.json
+
+# Leave some visible
+pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all --skip skip.txt
+```
+
+`--accept` / `--skip` are a JSON list of strings, a JSON object with an `accept` or `skip` key, or one phrase per line. On a TTY, if you pass neither `--accept-all` nor `--accept`, the command asks about each leftover.
+
+The anonymized file is rewritten in place. New stand-ins are added to the mapping. Native PDF output is not supported; apply the Markdown file instead.
+
+`run --apply-residuals` does the same thing for leftovers found on that run.
 
 ---
 
@@ -265,7 +289,11 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 
 ### Leftover check
 
-`run` scans the masked page (unless `--no-verify`) and writes `data/stats/<stem>.residual_pii.json`. `pdf-anonymizer verify` does the same later. `--verify-llm` also asks the language model. The file is not rewritten.
+`run` scans the masked page (unless `--no-verify`) and writes `data/stats/<stem>.residual_pii.json`. `pdf-anonymizer verify` does the same later. `--verify-llm` also asks the language model. The file is not rewritten unless you pass `--apply-residuals` or later run `pdf-anonymizer apply`.
+
+### Apply leftovers (`apply`)
+
+`pdf-anonymizer apply REPORT.json --accept-all` hides leftovers from a residual report. `--accept` / `--skip` pick which ones. Default `run` stays report-only. See [Hide leftovers from a residual report](recipes.md#hide-leftovers-from-a-residual-report).
 
 ### Lock the mapping
 

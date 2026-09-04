@@ -15,7 +15,7 @@ pdf-anonymizer-api = { workspace = true }
 
 [project]
 name = "pdf-anonymizer-workspace"
-version = "0.24.0"
+version = "0.25.0"
 dependencies = []
 
 [project.optional-dependencies]

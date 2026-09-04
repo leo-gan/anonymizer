@@ -107,6 +107,8 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 
 `pdf-anonymizer verify FILE` runs the same leftover scan on an already-masked file.
 
+`pdf-anonymizer apply REPORT.json --accept-all` hides leftovers from that report. `run --apply-residuals` does the same on the current run. Default stays report-only.
+
 **Models**:
 You can use any of the predefined models below, or specify a new model using the format `"provider/model-name"`. 
 For example: `--model-name "google/gemini-flash-latest"`.

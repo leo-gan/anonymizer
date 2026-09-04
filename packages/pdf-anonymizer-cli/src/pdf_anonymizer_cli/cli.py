@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -33,9 +34,20 @@ from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
     load_seed_mapping,
+    mapping_to_original_to_written,
     save_results,
 )
 from pdf_anonymizer_core.risk import assess_linkage_risk, write_risk_report
+from pdf_anonymizer_core.apply_residuals import (
+    apply_residual_hits,
+    default_mapping_out,
+    guess_mapping_path,
+    hits_from_report,
+    load_decision_list,
+    load_residual_report,
+    seed_mapping_from_path,
+    select_residual_hits,
+)
 from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
 from typing_extensions import Annotated
 
@@ -138,6 +150,16 @@ def run(
         typer.Option(
             "--verify-llm/--no-verify-llm",
             help="Also ask the language model to hunt for leftovers (slower).",
+        ),
+    ] = False,
+    apply_residuals: Annotated[
+        bool,
+        typer.Option(
+            "--apply-residuals/--no-apply-residuals",
+            help=(
+                "After the leftover scan, hide every leftover on this run. "
+                "Off by default. The scan still runs (implies --verify)."
+            ),
         ),
     ] = False,
     no_llm: Annotated[
@@ -316,6 +338,8 @@ def run(
     Anonymize one or more files by replacing PII with anonymized placeholders.
     """
     load_environment()
+    if apply_residuals:
+        verify = True
 
     country_list = None
     if countries:
@@ -584,6 +608,26 @@ def run(
                     report["residual_count"],
                     report_path,
                 )
+                if apply_residuals and report["residual_count"]:
+                    applied = apply_residual_hits(
+                        anonymized_output_file,
+                        hits_from_report(report),
+                        seed_mapping=mapping_to_original_to_written(
+                            consolidated_placeholder_map
+                        ),
+                        mapping_out=mapping_file or None,
+                        mapping_passphrase=passphrase,
+                        write_mapping=not ephemeral_mapping and bool(mapping_file),
+                    )
+                    report["rewritten"] = True
+                    report["applied"] = applied["applied"]
+                    report["skipped"] = []
+                    write_residual_report(report, anonymized_output_file)
+                    logging.info(
+                        "Applied %s leftover(s) to %s",
+                        len(applied["applied"]),
+                        anonymized_output_file,
+                    )
 
             if risk:
                 risk_report = assess_linkage_risk(full_anonymized_text)
@@ -783,6 +827,151 @@ def report_risk(
                 ", ".join(window["types"]),
                 window["reason"],
             )
+
+
+@app.command()
+def apply(
+    stats_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a residual report (*.residual_pii.json).",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+    accept_all: Annotated[
+        bool,
+        typer.Option(
+            "--accept-all/--no-accept-all",
+            help="Hide every leftover in the report (non-interactive).",
+        ),
+    ] = False,
+    accept: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--accept",
+            help="JSON list or one-phrase-per-line file of leftovers to hide.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
+    skip: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--skip",
+            help="JSON list or one-phrase-per-line file of leftovers to leave.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
+    mapping_file: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--mapping",
+            help="Mapping file to extend. Default: data/mappings/<stem>.mapping.json.",
+        ),
+    ] = None,
+    mapping_passphrase: Annotated[
+        Optional[str],
+        typer.Option(
+            "--mapping-passphrase",
+            help=(
+                "Passphrase for an encrypted mapping. "
+                "Also read from ANONYMIZER_MAPPING_KEY."
+            ),
+        ),
+    ] = None,
+    file_path: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--file",
+            help="Anonymized file to rewrite. Default: anonymized_file in the report.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
+) -> None:
+    """Hide leftovers listed in a residual report. Default is still report-only."""
+    load_environment()
+    try:
+        report = load_residual_report(str(stats_file))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
+
+    anonymized = str(file_path) if file_path else report.get("anonymized_file")
+    if not anonymized:
+        logging.error("Report has no anonymized_file. Pass --file.")
+        sys.exit(1)
+
+    hits = hits_from_report(report)
+    if not hits:
+        logging.info("No leftovers in the report.")
+        return
+
+    accept_list = load_decision_list(str(accept)) if accept else None
+    skip_list = load_decision_list(str(skip)) if skip else None
+
+    if not accept_all and accept_list is None:
+        if sys.stdin.isatty():
+            chosen: List[str] = []
+            for hit in hits:
+                if typer.confirm(
+                    f"Hide leftover {hit['type']} {hit['text']!r}?",
+                    default=True,
+                ):
+                    chosen.append(hit["text"])
+            accept_list = chosen
+        else:
+            logging.error("Non-interactive apply needs --accept-all or --accept FILE.")
+            sys.exit(1)
+
+    accepted, skipped = select_residual_hits(
+        hits,
+        accept=accept_list,
+        skip=skip_list,
+        accept_all=accept_all,
+    )
+    if not accepted:
+        logging.info("Nothing to apply.")
+        return
+
+    passphrase = resolve_mapping_passphrase(mapping_passphrase)
+    mapping_path = str(mapping_file) if mapping_file else guess_mapping_path(anonymized)
+    try:
+        seed = seed_mapping_from_path(mapping_path, passphrase)
+        result = apply_residual_hits(
+            anonymized,
+            accepted,
+            seed_mapping=seed,
+            mapping_out=mapping_path or default_mapping_out(anonymized),
+            mapping_passphrase=passphrase,
+        )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
+
+    report["rewritten"] = True
+    report["applied"] = result["applied"]
+    report["skipped"] = [hit["text"] for hit in skipped]
+    write_residual_report(report, anonymized)
+    logging.info(
+        "Applied %s leftover(s) to %s (skipped %s).",
+        len(result["applied"]),
+        anonymized,
+        len(skipped),
+    )
+    for text in result["applied"]:
+        logging.info("  hid %s", text)
 
 
 if __name__ == "__main__":

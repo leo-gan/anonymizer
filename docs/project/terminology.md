@@ -30,7 +30,8 @@ A **leftover** is a personal value that is still visible after anonymize. The jo
 |---|---|
 | **Leftover rate** | After anonymize, the share of gold mention strings still visible in the output. |
 | **Structured leftover** | Leftover rate on [structured identifiers](#identifiers) only (email, phone, SSN, card, IBAN, IP, ISO date). Regex-only should keep this near zero. Names are not in this number. |
-| **Residual scan** | A second cheap regex pass (optional LLM) on already-masked text. Writes `*.residual_pii.json`. It reports leftovers. It does not rewrite the page. |
+| **Residual scan** | A second cheap regex pass (optional LLM) on already-masked text. Writes `*.residual_pii.json`. It reports leftovers. It does not rewrite the page unless you opt in (`apply` / `--apply-residuals`). |
+| **Apply leftovers** | Opt-in rewrite: hide accepted leftover texts with the same span engine. Default stays report-only. |
 | **Red-team** | A test that fails the build if the residual file still contains structured leftovers. |
 
 A leftover can be a gold mention we never hid, or a structured value the residual scan finds that the gold labels never listed.
