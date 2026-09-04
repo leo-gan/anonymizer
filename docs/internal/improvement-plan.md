@@ -19,7 +19,7 @@
 - [x] 11. Allowlist / denylist gazetteers — done 2026-08-15, [PR #50](https://github.com/leo-gan/anonymizer/pull/50)
 - [x] 12. Span-based replacement — done 2026-08-15, [PR #51](https://github.com/leo-gan/anonymizer/pull/51)
 - [x] 13. TAB-style eval harness — done 2026-08-15, [PR #52](https://github.com/leo-gan/anonymizer/pull/52)
-- [ ] 14. OCR for scanned PDFs
+- [x] 14. OCR for scanned PDFs — done 2026-09-04, [PR #62](https://github.com/leo-gan/anonymizer/pull/62)
 - [ ] 15. In-place PDF redaction (vector rewrite + metadata sanitization)
 - [x] 16. Regex-only / offline mode — done 2026-08-15, [PR #55](https://github.com/leo-gan/anonymizer/pull/55)
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
@@ -339,7 +339,7 @@ Known code facts to attach to:
 
 ### 14. OCR for scanned PDFs
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #62](https://github.com/leo-gan/anonymizer/pull/62) (`feat/ocr-scanned-pdfs`)  
 **Technique:** coverage.  
 **Why:** Image-only PDFs yield empty text today (`pymupdf4llm` has nothing to read). SOTA (Presidio Image Redactor, Redactable, Azure scanned-PDF, Skyflow, Tonic Textual) OCR first. An empty extract that still writes `*.anonymized.md` is a silent compliance miss, not a hard error. See [`sota-research.md`](sota-research.md).
 
@@ -643,7 +643,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-Value-first order for **open** items (not a merge gate): **14** (scans) → **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
+Value-first order for **open** items (not a merge gate): **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
 
 ---
 
