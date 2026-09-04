@@ -25,6 +25,7 @@ The documentation includes:
 - **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
 - **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference for `run`, `verify`, `report`, and `deanonymize`, plus a [History](https://leo-gan.github.io/anonymizer/project/cli-usage/#history) of what landed.
 - **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
+- **[HTTP service & Docker](https://leo-gan.github.io/anonymizer/project/http-service/)**: `POST /anonymize` and the image in `packages/pdf-anonymizer-api`. No authentication.
 - **[API Reference (auto)](https://leo-gan.github.io/anonymizer/project/api-reference/)**: Auto-generated function signatures and details.
 - **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)**: Practical patterns (local Ollama, external LLM round-trips, batching, profiles, caching, debugging, etc.).
 - **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)**: Common issues and solutions.
@@ -32,10 +33,11 @@ The documentation includes:
 
 ## Project Structure
 
-This project is a monorepo containing two main packages:
+This project is a monorepo containing three packages:
 
 - **`packages/pdf-anonymizer-core`**: The core library containing the anonymization and deanonymization logic. See the [core README](./packages/pdf-anonymizer-core/README.md) for more details.
 - **`packages/pdf-anonymizer-cli`**: A command-line interface for using the anonymizer. See the [CLI README](./packages/pdf-anonymizer-cli/README.md) for detailed usage instructions.
+- **`packages/pdf-anonymizer-api`**: Optional local HTTP service. Depends on core only, not the CLI.
 
 ## Development Installation
 

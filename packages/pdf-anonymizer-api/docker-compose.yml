@@ -1,0 +1,31 @@
+# Local HTTP service. No authentication.
+# Published only on 127.0.0.1 so other machines cannot reach it.
+#
+# From the repository root:
+#   docker compose -f packages/pdf-anonymizer-api/docker-compose.yml up --build
+# From this directory:
+#   docker compose up --build
+#
+# Context is the repo root so the image can COPY pdf-anonymizer-core.
+# Docker reads .dockerignore from that context (the repo root file).
+#
+# Optional AppArmor: see apparmor/docker-anonymizer in this package.
+
+services:
+  anonymizer:
+    build:
+      context: ../..
+      dockerfile: packages/pdf-anonymizer-api/Dockerfile
+    image: pdf-anonymizer-api:local
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      HUGGING_FACE_TOKEN: ${HUGGING_FACE_TOKEN:-}
+      OLLAMA_HOST: ${OLLAMA_HOST:-}
+      ANONYMIZER_MAPPING_KEY: ${ANONYMIZER_MAPPING_KEY:-}
+      ANONYMIZER_FAKE_SECRET: ${ANONYMIZER_FAKE_SECRET:-}
+    restart: unless-stopped

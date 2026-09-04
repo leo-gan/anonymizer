@@ -11,14 +11,15 @@ packages = []
 [tool.uv.sources]
 pdf-anonymizer-core = { workspace = true }
 pdf-anonymizer-cli = { workspace = true }
+pdf-anonymizer-api = { workspace = true }
 
 [project]
 name = "pdf-anonymizer-workspace"
-version = "0.23.0"
+version = "0.24.0"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["ruff", "pytest", "pytest-mock", "pytest-cov", "hypothesis"]
+dev = ["ruff", "pytest", "pytest-mock", "pytest-cov", "hypothesis", "httpx"]
 
 [dependency-groups]
 # Use: `uv sync --group dev` to install a full dev environment including all providers
@@ -31,6 +32,7 @@ dev = [
   "hypothesis",
   "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic,excel,docx]",
   "pdf-anonymizer-cli",
+  "pdf-anonymizer-api",
   "mkdocs>=1.5.0",
   "mkdocs-material>=9.5.0",
   "mkdocstrings[python]>=0.26",
@@ -39,7 +41,8 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = [
   "packages/pdf-anonymizer-core/src",
-  "packages/pdf-anonymizer-cli/src"
+  "packages/pdf-anonymizer-cli/src",
+  "packages/pdf-anonymizer-api/src",
 ]
 addopts = "--strict-markers"
 

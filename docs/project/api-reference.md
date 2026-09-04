@@ -23,6 +23,10 @@ It reflects the current public surface of `pdf-anonymizer-core`. The hand-writte
 
 ::: pdf_anonymizer_core.utils.save_results
 
+::: pdf_anonymizer_api.app.create_app
+
+::: pdf_anonymizer_api.app.anonymize_text_request
+
 ---
 
 ## Configuration & Models

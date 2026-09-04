@@ -77,6 +77,23 @@ def mapping_to_original_to_written(raw: Dict[str, str]) -> Dict[str, str]:
     return {str(k): str(v) for k, v in raw.items()}
 
 
+def mapping_to_placeholder_original(raw: Dict[str, str]) -> Dict[str, str]:
+    """Accept either mapping direction; return placeholder → original."""
+    items = [
+        (key, val)
+        for key, val in raw.items()
+        if isinstance(key, str) and isinstance(val, str)
+    ]
+    keys_ph = sum(1 for key, _ in items if looks_like_placeholder(key))
+    vals_ph = sum(1 for _, val in items if looks_like_placeholder(val))
+    if keys_ph >= vals_ph:
+        return {key: val for key, val in items}
+    out: Dict[str, str] = {}
+    for original, placeholder in items:
+        out.setdefault(placeholder, original)
+    return out
+
+
 def load_seed_mapping(
     mapping_path: str, mapping_passphrase: Optional[str] = None
 ) -> Dict[str, str]:
@@ -237,13 +254,9 @@ def save_results(
                 "Pass the engine original→written map as orig_to_written=."
             )
         if is_word_path(file_path):
-            write_anonymized_docx(
-                file_path, anonymized_output_file, apply_map, texts
-            )
+            write_anonymized_docx(file_path, anonymized_output_file, apply_map, texts)
         else:
-            write_anonymized_table(
-                file_path, anonymized_output_file, apply_map, texts
-            )
+            write_anonymized_table(file_path, anonymized_output_file, apply_map, texts)
     else:
         with open(anonymized_output_file, "w", encoding="utf-8") as f:
             f.write(full_anonymized_text)
@@ -363,28 +376,7 @@ def deanonymize_file(
         source_sha256=expected_source_sha256,
     )
 
-    # Detect mapping direction and normalize to placeholder -> original
-    # Heuristic: if most keys look like placeholders (e.g., PERSON_1), treat as placeholder->original
-    placeholder_key_pattern = _PLACEHOLDER_PATTERN
-    keys_look_like_placeholders = sum(
-        1
-        for k in raw_mapping.keys()
-        if isinstance(k, str) and placeholder_key_pattern.match(k)
-    )
-    values_look_like_placeholders = sum(
-        1
-        for v in raw_mapping.values()
-        if isinstance(v, str) and placeholder_key_pattern.match(v)
-    )
-
-    if keys_look_like_placeholders >= values_look_like_placeholders:
-        placeholder_to_original = dict(raw_mapping)
-    else:
-        # Legacy: invert original -> placeholder to placeholder -> original
-        placeholder_to_original = {}
-        for original, placeholder in raw_mapping.items():
-            if isinstance(placeholder, str):
-                placeholder_to_original.setdefault(placeholder, original)
+    placeholder_to_original = mapping_to_placeholder_original(raw_mapping)
 
     sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
     tabular = is_tabular_path(anonymized_file_path)

@@ -42,7 +42,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--output-pdf` / `--no-output-pdf` | flag | off | Also write a sanitized native PDF. Markdown is still written. PDF inputs only. Not a legal certificate. |
 | `--redact` / `--no-redact` | flag | off | Irreversible native PDF (black boxes, no stand-in). Implies `--output-pdf`. |
 | `--ner` / `--no-ner` | flag | auto | Local span NER (GLiNER extra) for names and organizations. Auto-on when the extra is installed (except regex-only). `best-speed` / `best-cost` then skip the language model. |
-| `--min-confidence` | `0–1` | `0` | Drop entities whose recognizer score is below this value. Default 0 keeps every hit. Not a calibrated probability. |
+| `--min-confidence` | `0–1` | `0` | Drop spans whose [score](terminology.md#recognizer-source-and-score) is below this value. Default 0 keeps every hit. Not a calibrated probability. |
 
 ### Configuration Profiles
 
@@ -69,6 +69,8 @@ pdf-anonymizer run contract.pdf --countries US,GB
 ```
 
 See the [Recipes & Common Workflows](recipes.md) page for more profile usage patterns.
+
+The optional HTTP service is a separate package (`pdf-anonymizer-api`). It is not a CLI command. See [HTTP service and Docker](http-service.md).
 
 ---
 
@@ -307,7 +309,11 @@ A PDF with pages and no text layer used to look like a successful empty extract.
 
 ### Per-span confidence (`--min-confidence`)
 
-Every hit now carries a `score` (0–1) and a `source` (`regex`, `ner`, `llm`, or `deny-list`). A verified regex IBAN scores higher than `IBAN_LIKE`. `--min-confidence 0.8` drops the weaker ones. Default `0` keeps today’s accept-all behaviour. These numbers are recognizer hints, not calibrated probabilities. See [Drop low-score hits](recipes.md#drop-low-score-hits).
+A **recognizer** is one detector (regex, local NER, language model, or deny-list). Each hit stores `source` (which recognizer) and `score` (that recognizer’s 0–1 hint). `--min-confidence 0.8` drops weaker hits such as `IBAN_LIKE`. Default `0` keeps every hit. These numbers are not calibrated probabilities. Definitions: [Terminology](terminology.md#recognizer-source-and-score). Recipe: [Drop low-score hits](recipes.md#drop-low-score-hits).
+
+### HTTP service
+
+The HTTP process is the separate package `pdf-anonymizer-api`. It is not a CLI command. See [HTTP service and Docker](http-service.md).
 
 ### Local span NER (`--ner`)
 
@@ -336,6 +342,7 @@ See [Recipes](recipes.md) for worked examples of each flag.
 ## See Also
 
 - **[Recipes & Common Workflows](recipes.md)** — practical end-to-end examples (profiles, local models, external LLM workflows, caching, debugging).
+- **[HTTP service and Docker](http-service.md)** — `pdf-anonymizer-api`, compose, and `source` / `score` on the JSON response.
 - **[SDK & API Usage](api-usage.md)** — programmatic usage of the same core functions.
 - **[API Reference (auto)](api-reference.md)** — auto-generated function signatures.
 - **[Architecture Design](architecture.md)** — how chunking, hybrid detection, mapping, and reversal work internally.

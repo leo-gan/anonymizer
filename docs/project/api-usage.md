@@ -24,6 +24,8 @@ from pdf_anonymizer_core.core import anonymize_file
 *   `fake_secret` (`str`, optional): Seed for `fake`. Same person + type + secret → same fake.
 *   `seed_mapping` (`dict[str, str]`, optional): Original → written map from a previous file so Ada stays `PERSON_1`.
 *   `keep_list` / `deny_list` (`list[str]`, optional): Phrases to leave visible, or to force-hide as `CUSTOM_n`. Keep wins if both lists contain the same phrase.
+*   `min_confidence` (`float`, optional): Drop spans whose [score](terminology.md#recognizer-source-and-score) is below this value. Default `0` keeps every hit. Not a calibrated probability.
+*   `use_ner` (`bool`, optional): Run local span NER. SDK default `False` so a checkpoint is never downloaded unless you ask.
 
 ### Returns
 *   `anonymized_text` (`str`): The fully processed text with placeholders in place of PII. For tables this is the review flatten, not a CSV/Excel dump. For Word this is the part-wise flatten, not `.docx` bytes.
@@ -245,6 +247,7 @@ For the complete `anonymize_file` signature (including `chunk_overlap`, `regex_p
 
 ## See Also
 
+- **[HTTP service and Docker](http-service.md)** — `POST /anonymize` and the official image.
 - **[Recipes & Common Workflows](recipes.md)** — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files).
 - **[CLI Reference](cli-usage.md)** — the command-line surface that wraps the same core functions.
 - **[API Reference (auto)](api-reference.md)** — auto-generated detailed signatures.

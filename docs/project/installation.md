@@ -49,6 +49,9 @@ pip install "pdf-anonymizer-core[excel]"
 
 # Word (.docx) input
 pip install "pdf-anonymizer-core[docx]"
+
+# Local HTTP service (separate package; depends on core only)
+pip install pdf-anonymizer-api
 ```
 
 ### Available Extras
@@ -61,6 +64,7 @@ pip install "pdf-anonymizer-core[docx]"
 *   `[excel]`: Installs `openpyxl` for `.xlsx` input. CSV uses the stdlib and needs no extra.
 *   `[docx]`: Installs `python-docx` for `.docx` input. Legacy `.doc` and macro-enabled `.docm` are rejected.
 *   `[ner]`: Installs `gliner` for local span NER (names and organizations). Pulls PyTorch. Off until you install it; `best-speed` then skips the cloud language model.
+*   HTTP service is a **separate package**, `pdf-anonymizer-api`. It depends on core only, not the CLI. See [HTTP service and Docker](http-service.md).
 
 Scanned PDFs need the **Tesseract** binary on `PATH` and the `--ocr` flag. That is a system package, not a pip extra. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
 

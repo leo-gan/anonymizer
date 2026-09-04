@@ -22,6 +22,11 @@ Common problems and how to resolve them.
   - `ANONYMIZER_MAPPING_KEY` locks mapping files as `*.mapping.json.enc`. `ANONYMIZER_FAKE_SECRET` seeds `--operator TYPE=fake`. Neither is required.
   - For the SDK, load the environment variables yourself (e.g. with `python-dotenv` or `os.environ`).
 
+## HTTP service is missing
+
+- **Symptom**: `pdf-anonymizer-api` is not installed.
+- **Fix**: `pip install pdf-anonymizer-api`. Then `pdf-anonymizer-api --host 127.0.0.1 --port 8000`. There is no authentication. See [HTTP service and Docker](http-service.md).
+
 ## Ollama Not Running or Model Not Found
 
 - **Symptom**: Connection errors or "model not found" when using `ollama/...` models.

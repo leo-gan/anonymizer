@@ -209,15 +209,33 @@ For very large batch jobs you may want to:
 
 ## Drop low-score hits
 
-Each detected span now has a **score** (0–1) and a **source** (`regex`, `ner`, `llm`, or `deny-list`). A regex hit that passes its checksum (a real IBAN) scores higher than `IBAN_LIKE`. A deny-list phrase is 1.0. The language model’s JSON is uncalibrated and sits in the middle.
+A **recognizer** is one detector that looks at the text. This product runs up to four of them: the regex stage, optional local span NER, the language model, and the deny-list. Each hit it keeps is a **span** (a piece of text plus a type) with two extra fields:
 
-Default is still accept-all (`--min-confidence 0`). To hide only the stronger hits:
+- **`source`** — which recognizer proposed it (`regex`, `ner`, `llm`, or `deny-list`).
+- **`score`** — a number from 0 to 1 that *that* recognizer assigned.
+
+The score is a ranking hint, not a probability. `0.85` does not mean “85% chance this is PII.” The language model’s JSON is uncalibrated. The table of numbers lives in [Terminology](terminology.md#recognizer-source-and-score).
+
+**Think of it like this.** The regex stage is good at emails and IBANs and weak at names. The language model is the opposite. A deny-list phrase is something you already decided must go. The score lets you say “keep the strong regex hits, drop the shaky look-alikes” without editing prompts.
+
+Default is still accept-all (`--min-confidence 0`). Every hit is written. To hide only the stronger hits:
 
 ```bash
 pdf-anonymizer run notes.md --no-llm --min-confidence 0.8
 ```
 
-That can leave a mistyped IBAN visible. Use it when over-redaction is worse than a leftover `_LIKE` number. Do not treat the score as a legal or statistical probability.
+On a line such as `Pay DE89370400440532013000 or GB00WEST12345698765432`:
+
+| Text | Source | Score | At `--min-confidence 0.8` |
+|---|---|---|---|
+| `DE89370400440532013000` (checksum passes) | `regex` | 0.95 | Hidden as `IBAN_1` |
+| `GB00WEST12345698765432` (checksum fails) | `regex` | 0.55 | Left visible (`IBAN_LIKE` dropped) |
+
+That can leave a mistyped IBAN on the page. Use the flag when over-redaction is worse than a leftover `_LIKE` number.
+
+A deny-list phrase is re-added *after* the threshold, at score 1.0. `--deny-list` still hides “Ada” even if you also pass `--min-confidence 0.9`. The keep-list still wins if the same phrase is on both lists.
+
+The HTTP `POST /anonymize` response includes the `entities` list so you can see `source` and `score` for each hit. See [HTTP service](http-service.md).
 
 ---
 
@@ -905,8 +923,36 @@ You can also delete or move `data/cache/llm_responses.json` to force a cold run 
 
 ---
 
+## Run the HTTP service (or Docker)
+
+Pipelines that sit in front of a language model often want `POST /anonymize` rather than a subprocess. Install the extra and bind to this machine:
+
+```bash
+pip install pdf-anonymizer-api
+pdf-anonymizer-api --host 127.0.0.1 --port 8000
+```
+
+```bash
+curl -s http://127.0.0.1:8000/anonymize \
+  -H 'content-type: application/json' \
+  -d '{"text":"Write to ada@example.com","use_llm":false}'
+```
+
+The response includes `entities` with `source` and `score` so you can see which detector fired. Default `use_llm` is `false` on the service (regex-only, no API key). The CLI `run` command is unchanged.
+
+Or:
+
+```bash
+docker compose -f packages/pdf-anonymizer-api/docker-compose.yml up --build
+```
+
+Compose publishes `127.0.0.1:8000` only. There is no authentication. Full request table: [HTTP service and Docker](http-service.md).
+
+---
+
 ## See Also
 
+- **[HTTP service and Docker](http-service.md)** — `POST /anonymize`, compose, AppArmor.
 - **[CLI Reference](cli-usage.md)** — complete flag reference, model aliases, and the profiles table.
 - **[SDK & API Usage](api-usage.md)** — lower-level function signatures and returns.
 - **[API Reference (auto)](api-reference.md)** — living signature documentation generated from source docstrings.

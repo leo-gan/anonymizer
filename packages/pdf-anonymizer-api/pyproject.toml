@@ -1,31 +1,26 @@
 [project]
-name = "pdf-anonymizer-cli"
+name = "pdf-anonymizer-api"
 version = "0.24.0"
-description = "CLI for a tool to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
+description = "Local HTTP service for pdf-anonymizer-core. No authentication."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "typer",
-    "rich",
     "pdf-anonymizer-core>=0.24.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
 ]
-
-[project.optional-dependencies]
-excel = ["pdf-anonymizer-core[excel]"]
-docx = ["pdf-anonymizer-core[docx]"]
-ner = ["pdf-anonymizer-core[ner]"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"
 
+[project.scripts]
+pdf-anonymizer-api = "pdf_anonymizer_api.server:main"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-
-[project.scripts]
-pdf-anonymizer = "pdf_anonymizer_cli.cli:app"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
