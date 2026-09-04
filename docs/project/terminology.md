@@ -88,9 +88,39 @@ The eval code’s type lists live in `tests/eval/metrics.py` (`DIRECT_TYPES`, `Q
 | **Regex stage** / **RE2** | The first pass: regular expressions with the RE2 engine (linear time, no catastrophic backtracking). |
 | **Regex-only** | `--no-llm` / `-p regex-only`. No language model. Names and identity clues are missed. PR CI uses this so no API key is required. |
 | **LLM NER** | The language-model pass that finds names and, in `detailed`, identity clues. |
-| **NER** | Named-entity recognition. Item 20 (not shipped) is a local span model for `best-speed`. |
+| **NER** | Named-entity recognition. Optional local span model (GLiNER, `[ner]` extra) for names and organizations. |
 | **Span** | A character interval `[start, end)` in the full document. Replacement is span-based: the longer interval wins when two hits overlap. |
-| **Hybrid pipeline** | Regex first, then LLM, then merge and replace. |
+| **Hybrid pipeline** | Regex first, then optional NER, then optional LLM, then merge and replace. |
+
+---
+
+## Recognizer, source, and score
+
+Detection is not one function. Several **recognizers** look at the same text. Each one that fires writes a span, a type, a **source** (which recognizer it was), and a **score** (how strongly that recognizer believed the hit). `--min-confidence` can drop weak hits. Default `0` keeps every hit.
+
+These scores are **hints for ranking**, not a legal or statistical probability that the span is truly personal data. Do not treat `0.85` as “85% chance this is PII.”
+
+| Term | Meaning here |
+|---|---|
+| **Recognizer** | One detector that proposes spans. This product has four: regex, local span NER, the language model, and the deny-list. |
+| **Source** | Which recognizer proposed the span. Stored on the entity as `source`. Values: `regex`, `ner`, `llm`, `deny-list`. |
+| **Score** | A number from 0 to 1 that that recognizer assigned. Stored on the entity as `score`. |
+| **`--min-confidence`** | Drop any span whose score is below this number. Applied after type merge and before the deny-list, so a deny-list phrase is still replaced. |
+| **Checksum / verified hit** | A regex match that passed a cheap extra check (Luhn, IBAN, VIN, some national IDs). Score 0.95. |
+| **`TYPE_LIKE`** | A regex match that failed that extra check. Still hidden. Score 0.55. Example: `IBAN_LIKE_1`. |
+
+How each recognizer scores a hit:
+
+| Source | Typical score | What it means |
+|---|---|---|
+| `deny-list` | 1.0 | You listed the phrase. It is always replaced (unless the keep-list also has it). |
+| `regex` (checksum passed) | 0.95 | The shape matched and the extra digit check passed. |
+| `regex` (no checksum for this type) | 0.85 | The shape matched (email, phone, URL, …). There is no extra digit check. |
+| `ner` | model value, or 0.80 if the model omitted one | The local GLiNER model proposed a name, organization, place, address, or date. |
+| `llm` | 0.70 | The language model’s JSON listed this span. That JSON is uncalibrated. |
+| `regex` (`TYPE_LIKE`) | 0.55 | The shape matched and the extra digit check failed. Still hidden by default. |
+
+Worked examples: [Drop low-score hits](recipes.md#drop-low-score-hits). HTTP response field: [HTTP service](http-service.md).
 
 ---
 

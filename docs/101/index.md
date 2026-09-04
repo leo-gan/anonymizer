@@ -34,6 +34,10 @@ Words such as *pseudonymization*, *quasi-identifier*, *leftover*, and *gold corp
 *   **Reversible Workflows**: Typed stand-ins plus a separate mapping file (optional lock).
 *   **Local Execution**: Combining Ollama with local weights to prevent data from ever leaving your device.
 
+### [Bonus module](fairy-tale.md)
+*   **A fairy tale about serialization**: A princess, a scroll, and why a perfect copy is not a move.
+*   **The technical version**: Serialization, schema, and why the original must stay on your side of the river.
+
 A flag-by-flag list of what the tool can do today is on the [CLI History](../project/cli-usage.md#history) page.
 
 ---

@@ -1,6 +1,28 @@
-# Ignore:
+# Build context ignore for packages/pdf-anonymizer-api/Dockerfile.
+# Docker reads this from the context (repository root), not from the
+# Dockerfile's directory.
+.git
+.github
+.venv
+.pytest_cache
+.ruff_cache
+.hypothesis
+.idea
+**/__pycache__
+**/*.egg-info
+**/.pytest_cache
+site
+data
+docs
+tests
+scripts
+coverage.xml
+.coverage
+htmlcov
 app.log
-tests/data/2506.16406v1.pdf
-data/
-
+*.pdf
+dist
+build
+docs/temp
 .env
+.pypirc

@@ -83,7 +83,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src]
+          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
           options:
             show_source: true
             show_root_heading: true
@@ -97,7 +97,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src]
+          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
           options:
             show_source: true
             show_root_heading: true
@@ -120,12 +120,14 @@ nav:
     - History: 101/history.md
     - Contemporary Techniques: 101/techniques.md
     - How PDF Anonymizer is Different: 101/how-different.md
+    - Bonus module: 101/fairy-tale.md
   - Project Docs:
     - Overview: project/index.md
     - Terminology: project/terminology.md
     - Installation: project/installation.md
     - CLI Reference: project/cli-usage.md
     - SDK & API Usage: project/api-usage.md
+    - HTTP service & Docker: project/http-service.md
     - API Reference (auto): project/api-reference.md
     - Recipes & Common Workflows: project/recipes.md
     - Gold corpus & eval: project/gold-corpus.md

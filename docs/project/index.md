@@ -17,7 +17,8 @@ anonymizer/
 ├── docs/                       # MkDocs documentation source files
 ├── packages/
 │   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
-│   └── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
+│   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
+│   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
 ├── tests/                      # Global pytest test suite
 ├── Makefile                    # Developer shortcut commands
 ├── pyproject.toml              # Workspace and dev dependencies config
@@ -28,7 +29,7 @@ anonymizer/
 
 ## The Packages
 
-The project contains two decoupled Python packages inside `packages/`:
+The project contains three decoupled Python packages inside `packages/`:
 
 ### `pdf-anonymizer-core`
 Contains all the core engines, including:
@@ -44,6 +45,9 @@ Contains all the core engines, including:
 *   Residual leftover scan, linkage-risk report, TAB-style eval helpers.
 *   Streaming chunk utility to process large text files.
 *   Mapping and restoration engine for deanonymization.
+
+### `pdf-anonymizer-api`
+A FastAPI process that calls `pdf-anonymizer-core` only. It does not import the CLI. Install with `pip install pdf-anonymizer-api`.
 
 ### `pdf-anonymizer-cli`
 A CLI tool built on top of `pdf-anonymizer-core` that:
@@ -62,6 +66,7 @@ To dive deeper into the technical details, navigate through the following guides
 - **[Installation & Setup](installation.md)**: Learn how to set up the development environment using `uv`, manage packages, and define environment variables.
 - **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options (including `--config-profile`), custom model strings, and usage examples.
 - **[SDK & API Usage](api-usage.md)**: Learn how to import PDF Anonymizer as a Python library in your own applications.
+- **[HTTP service and Docker](http-service.md)**: `POST /anonymize` and the official image. No authentication.
 - **[API Reference (auto)](api-reference.md)**: Living signature reference generated from source docstrings.
 - **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.
 - **[Gold corpus & eval](gold-corpus.md)**: Why we measure leftover risk, what is in the gold corpus, and the download / benchmark / CI workflows.

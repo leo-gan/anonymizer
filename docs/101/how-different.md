@@ -132,4 +132,4 @@ Large documents (like a 500-page clinical trial registry or a 1GB database expor
 Now that you understand the concepts and the value of the PDF Anonymizer project, you are ready to dive into the **[Project Developer Documentation](../project/index.md)** to install and use it.
 
 **In this course:**  
-[← Previous: Contemporary Techniques](techniques.md) | [Course Overview](index.md)
+[← Previous: Contemporary Techniques](techniques.md) | [Course Overview](index.md) | [Next: Bonus module](fairy-tale.md)
