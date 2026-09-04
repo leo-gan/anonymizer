@@ -41,6 +41,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--ocr` / `--no-ocr` | flag | off | If a PDF has no text layer, OCR it with Tesseract (must be on PATH). A scan with OCR off is an error, not an empty success file. |
 | `--output-pdf` / `--no-output-pdf` | flag | off | Also write a sanitized native PDF. Markdown is still written. PDF inputs only. Not a legal certificate. |
 | `--redact` / `--no-redact` | flag | off | Irreversible native PDF (black boxes, no stand-in). Implies `--output-pdf`. |
+| `--ner` / `--no-ner` | flag | auto | Local span NER (GLiNER extra) for names and organizations. Auto-on when the extra is installed (except regex-only). `best-speed` / `best-cost` then skip the language model. |
 
 ### Configuration Profiles
 
@@ -302,6 +303,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### Scanned PDFs (`--ocr`)
 
 A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass `--ocr` to recover words. A sidecar `*.anonymized.layout.json` stores page boxes for a later native-PDF write. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
+
+### Local span NER (`--ner`)
+
+`pip install "pdf-anonymizer-core[ner]"` (or the CLI extra) installs GLiNER. Then `-p best-speed` and `-p best-cost` use that local model for names and organizations and do **not** call the language model. `-p best-quality` may run NER first and still calls the LLM for identity clues. `--no-ner` keeps today’s LLM path. `--ner` without the extra is an error. See [Use local span NER](recipes.md#use-local-span-ner).
 
 ### Native PDF write (`--output-pdf`)
 

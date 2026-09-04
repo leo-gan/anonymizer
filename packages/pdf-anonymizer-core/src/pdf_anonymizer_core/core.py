@@ -27,6 +27,7 @@ from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.gazetteers import apply_deny_list, apply_keep_list
 from pdf_anonymizer_core.operators import apply_operator, operator_for_type
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
+from pdf_anonymizer_core.span_ner import extract_entities_via_ner
 from pdf_anonymizer_core.spans import locate_spans, replace_entities
 from pdf_anonymizer_core.tables import (
     REGEX_CELL_KINDS,
@@ -120,14 +121,20 @@ def collect_entities_from_chunks(
     base_retry_delay: float,
     max_retry_delay: float,
     use_llm: bool,
+    use_ner: bool = False,
 ) -> List[dict]:
-    """Per chunk: extract_entities_via_regex then optional identify_entities_with_llm."""
+    """Per chunk: regex, optional local span NER, optional LLM."""
     collected_entities: List[dict] = []
 
-    if not use_llm:
+    if not use_llm and not use_ner:
         logging.info(
             "Regex-only / offline mode: skipping the language model. "
             "Names and identity clues will be missed."
+        )
+    elif use_ner and not use_llm:
+        logging.info(
+            "Local span NER: skipping the language model. "
+            "Identity clues will be missed."
         )
 
     for i, text_page in enumerate(chunks):
@@ -135,6 +142,10 @@ def collect_entities_from_chunks(
         start_time = time.time()
 
         regex_entities = extract_entities_via_regex(text_page, regex_patterns)
+
+        ner_entities: List[dict] = []
+        if use_ner:
+            ner_entities = extract_entities_via_ner(text_page)
 
         if use_llm:
             llm_entities = identify_entities_with_llm(
@@ -152,13 +163,22 @@ def collect_entities_from_chunks(
         duration = end_time - start_time
         minutes = int(duration // 60)
         seconds = int(duration % 60)
-        stage = "Regex + LLM" if use_llm else "Regex only"
+        if use_llm and use_ner:
+            stage = "Regex + NER + LLM"
+        elif use_llm:
+            stage = "Regex + LLM"
+        elif use_ner:
+            stage = "Regex + NER"
+        else:
+            stage = "Regex only"
         logging.info(f"   NER stage duration ({stage}): {minutes}:{seconds:02d}")
         logging.info(
-            f"   Found {len(regex_entities)} via Regex, {len(llm_entities)} via LLM."
+            f"   Found {len(regex_entities)} via Regex, "
+            f"{len(ner_entities)} via NER, {len(llm_entities)} via LLM."
         )
 
         collected_entities.extend(regex_entities)
+        collected_entities.extend(ner_entities)
         collected_entities.extend(llm_entities)
 
     return collected_entities
@@ -319,6 +339,7 @@ def anonymize_text_content(
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
+    use_ner: bool = False,
 ) -> Tuple[str, Dict[str, str]]:
     if regex_patterns is None:
         regex_patterns = DEFAULT_REGEX_PATTERNS
@@ -332,6 +353,7 @@ def anonymize_text_content(
         base_retry_delay=base_retry_delay,
         max_retry_delay=max_retry_delay,
         use_llm=use_llm,
+        use_ner=use_ner,
     )
     entities_to_process = finalize_entities(
         collected_entities,
@@ -377,6 +399,7 @@ def anonymize_file(
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
+    use_ner: bool = False,
     ocr: bool = False,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
@@ -428,6 +451,9 @@ def anonymize_file(
         use_llm: When False, skip ``identify_entities_with_llm``. Regex,
             checksums, operators, gazetteers, and span replacement still run.
             Names and identity clues will be missed. Default True.
+        use_ner: When True, run local span NER (GLiNER extra) for names and
+            organizations. Default False so the SDK never downloads a
+            checkpoint unless the caller asks.
         ocr: When True and a PDF has no text layer, run Tesseract via
             PyMuPDF and stash word boxes for a later native-PDF write.
             A scan with OCR off (or OCR that returns nothing) raises.
@@ -464,6 +490,7 @@ def anonymize_file(
             keep_list=keep_list,
             deny_list=deny_list,
             use_llm=use_llm,
+            use_ner=use_ner,
         )
         return review, mapping
 
@@ -487,6 +514,7 @@ def anonymize_file(
             keep_list=keep_list,
             deny_list=deny_list,
             use_llm=use_llm,
+            use_ner=use_ner,
         )
         return review, mapping
 
@@ -521,6 +549,7 @@ def anonymize_file(
         keep_list=keep_list,
         deny_list=deny_list,
         use_llm=use_llm,
+        use_ner=use_ner,
     )
 
 
@@ -641,6 +670,7 @@ def anonymize_tabular_file(
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
+    use_ner: bool = False,
 ) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
     """Anonymize a CSV/Excel file cell by cell.
 
@@ -665,6 +695,8 @@ def anonymize_tabular_file(
         collected_entities.extend(
             extract_entities_via_regex(cell.search_text, regex_patterns)
         )
+        if use_ner:
+            collected_entities.extend(extract_entities_via_ner(cell.search_text))
 
     if use_llm:
         batches = build_llm_batches(doc, characters_to_anonymize)
@@ -745,6 +777,7 @@ def anonymize_docx_file(
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
+    use_ner: bool = False,
 ) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
     """Anonymize a Word ``.docx`` file paragraph by paragraph.
 
@@ -768,6 +801,8 @@ def anonymize_docx_file(
         collected_entities.extend(
             extract_entities_via_regex(block.search_text, regex_patterns)
         )
+        if use_ner:
+            collected_entities.extend(extract_entities_via_ner(block.search_text))
 
     full_text = flatten_docx_for_review(doc, anonymized=False)
     if use_llm:

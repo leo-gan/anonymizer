@@ -207,6 +207,30 @@ For very large batch jobs you may want to:
 
 ---
 
+## Use local span NER
+
+Names such as “Jane Doe” are not a regex job. The default `best-speed` profile asks a language model. Install the optional extra to do that locally on CPU:
+
+```bash
+pip install "pdf-anonymizer-core[ner]"
+# or
+pip install "pdf-anonymizer-cli[ner]"
+```
+
+That extra pulls **PyTorch** and a GLiNER checkpoint (`urchade/gliner_small-v2.1` by default) on first use.
+
+```bash
+pdf-anonymizer run notes.md -p best-speed --no-llm --ner
+```
+
+`--ner` is implied on `best-speed`, `best-cost`, and `best-quality` once the extra is installed. Speed and cost then skip the language model. Identity clues (“the CEO of Tesla”) stay on the LLM path (`-p best-quality`).
+
+`--no-ner` keeps the previous LLM `best-speed`. `--ner` without the extra is an error.
+
+This is not a flip of the default extra-less install. Item 19’s gold leftover/recall numbers are how a later change would decide to make NER the default even without the extra.
+
+---
+
 ## OCR a scanned PDF
 
 A PDF that is only pictures of pages has no text layer. `pymupdf4llm` then returns empty Markdown. That used to look like a successful run. It is now a hard error: the CLI exits non-zero and writes no `*.anonymized.md`.

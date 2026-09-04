@@ -1,6 +1,6 @@
 [project]
 name = "pdf-anonymizer-core"
-version = "0.21.0"
+version = "0.22.0"
 description = "A core library to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
@@ -24,6 +24,7 @@ openai = ["openai"]
 anthropic = ["anthropic"]
 excel = ["openpyxl>=3.1"]
 docx = ["python-docx>=1.1"]
+ner = ["gliner>=0.2.13"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"

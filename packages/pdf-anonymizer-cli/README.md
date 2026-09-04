@@ -24,6 +24,7 @@ Install the CLI with your favorite package manager. To use a specific LLM provid
 - **Anthropic**: `pip install "pdf-anonymizer-cli[anthropic]"`
 - **Excel** (`.xlsx`): `pip install "pdf-anonymizer-cli[excel]"`
 - **Word** (`.docx`): `pip install "pdf-anonymizer-cli[docx]"`
+- **Local NER**: `pip install "pdf-anonymizer-cli[ner]"`
 
 You can also install multiple extras at once:
 

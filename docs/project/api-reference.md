@@ -71,6 +71,10 @@ The package ships two ready-to-use prompt templates.
 
 ::: pdf_anonymizer_core.load_and_extract
 
+::: pdf_anonymizer_core.span_ner.extract_entities_via_ner
+
+::: pdf_anonymizer_core.span_ner.resolve_semantic_stages
+
 ::: pdf_anonymizer_core.pdf_ocr.ocr_pdf
 
 ::: pdf_anonymizer_core.pdf_ocr.write_layout_sidecar

@@ -74,7 +74,7 @@ Known code facts to attach to:
 - `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
 - `.docx` takes a Word path (`word.py`): per-paragraph regex on visible text (runs joined), part-wise LLM flatten, per-paragraph apply, native `.docx` write-back. Headers, footers, comments, field codes, and hyperlink targets are walked. `.doc` / `.docm` / `.dot*` are rejected (item 25).
 - PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). `--output-pdf` writes a sanitized native PDF (PyMuPDF redaction annotations + ``apply_redactions``, ``/Info``/XMP/attachments/layers wiped). `--redact` is irreversible black boxes. Markdown stays the default (item 15).
-- `best-speed` still calls an LLM for names. No GLiNER/spaCy span stage, no per-span confidence (items 20–21).
+- `best-speed` / `best-cost` use local span NER when the `[ner]` extra is installed (GLiNER, CPU). They then skip the language model. `best-quality` may run NER first and still calls the LLM for identity clues. No extra ⇒ today’s LLM `best-speed`. No per-span confidence (item 21).
 - Surface is CLI + SDK. No HTTP service, no Docker image (item 22). Residual/risk reports do not rewrite (item 23).
 
 ---
@@ -643,11 +643,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-<<<<<<< HEAD
-Value-first order for **open** items (not a merge gate): **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
-=======
-Value-first order for **open** items (not a merge gate): **14** (scans) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **25** (DOCX) → **26** (tables) → **27** (release).
->>>>>>> d7e94fc (chore: mark improvement-plan item 15 done)
+Value-first order for **open** items (not a merge gate): **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
 
 ---
 
