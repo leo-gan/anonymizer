@@ -1205,6 +1205,7 @@
 <ul>
 <li>Text extraction from PDF, Markdown, and plain text formats.</li>
 <li>Table loaders for CSV (stdlib) and Excel (<code>.xlsx</code>, <code>[excel]</code> extra): per-cell regex, row-addressed LLM batches, per-cell apply.</li>
+<li>Word loader for <code>.docx</code> (<code>[docx]</code> extra): per-paragraph regex, part-wise flatten, native <code>.docx</code> write-back.</li>
 <li>Hybrid detection: RE2 regex (with checksums / <code>TYPE_LIKE</code>) plus LLM NER.</li>
 <li>LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).</li>
 <li>Prompt templates (<code>simple</code>, <code>detailed</code>, <code>hipaa</code>) and identity-clue detection.</li>

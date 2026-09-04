@@ -1304,6 +1304,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#word-docx-as-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word .docx as input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pii-free-files-now-write-output-empty-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2073,6 +2084,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#word-docx-as-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word .docx as input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pii-free-files-now-write-output-empty-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2129,7 +2151,7 @@
 </span></code></pre></div>
 <h3 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>FILE_PATH</code>: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, or Excel <code>.xlsx</code>).</li>
+<li><code>FILE_PATH</code>: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, Excel <code>.xlsx</code>, or Word <code>.docx</code>).</li>
 </ul>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <table>
@@ -2427,9 +2449,9 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h2 id="output-files-auditing">Output Files &amp; Auditing<a class="headerlink" href="#output-files-auditing" title="Permanent link">&para;</a></h2>
 <p><code>run</code>, <code>verify</code>, <code>report</code>, and <code>deanonymize</code> write under conventional directories (created automatically):</p>
 <ul>
-<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>)</li>
+<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.docx</code>)</li>
 <li><code>data/mappings/&lt;stem&gt;.mapping.json</code> (or <code>*.mapping.json.enc</code> when a passphrase is set)</li>
-<li><code>data/deanonymized/&lt;stem&gt;.deanonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>)</li>
+<li><code>data/deanonymized/&lt;stem&gt;.deanonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.docx</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.residual_pii.json</code> — leftovers found after masking (from <code>run</code> or <code>verify</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.risk.json</code> — identity-clue clumps (from <code>run</code> or <code>report</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.deanonymization_stat.json</code> — written by <code>deanonymize</code></li>
@@ -2481,6 +2503,8 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p><code>scripts/download_gold_corpus.py</code> installs TAB, Presidio, and Gretel under <code>data/gold-corpus/</code> (not in git). <code>scripts/run_gold_benchmark.py</code> scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See <a href="../gold-corpus/">Gold corpus &amp; eval</a>.</p>
 <h3 id="csv-and-excel-as-inputs-cell-level-masking">CSV and Excel as inputs (cell-level masking)<a class="headerlink" href="#csv-and-excel-as-inputs-cell-level-masking" title="Permanent link">&para;</a></h3>
 <p><code>pdf-anonymizer run people.csv</code> and <code>pdf-anonymizer run roster.xlsx</code> (with the <code>[excel]</code> extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, <strong>not</strong> <em>k</em>-anonymity. See <a href="../recipes/#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a>.</p>
+<h3 id="word-docx-as-input">Word <code>.docx</code> as input<a class="headerlink" href="#word-docx-as-input" title="Permanent link">&para;</a></h3>
+<p><code>pdf-anonymizer run letter.docx</code> (with the <code>[docx]</code> extra) walks paragraphs, table cells, headers, footers, footnotes, comments, field codes, and hyperlink targets, then writes <code>letter.anonymized.docx</code> plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. Legacy <code>.doc</code> and macro-enabled <code>.docm</code> are rejected. See <a href="../recipes/#anonymize-a-word-document">Anonymize a Word document</a>.</p>
 <h3 id="pii-free-files-now-write-output-empty-mapping">PII-free files now write output + empty mapping<a class="headerlink" href="#pii-free-files-now-write-output-empty-mapping" title="Permanent link">&para;</a></h3>
 <p>A run that finds nothing still writes the output file and an empty mapping (<code>if full_anonymized_text is not None and final_mapping is not None</code>). That used to look like a failed run for every format, including PDF/MD/TXT.</p>
 <p>See <a href="../recipes/">Recipes</a> for worked examples of each flag.</p>

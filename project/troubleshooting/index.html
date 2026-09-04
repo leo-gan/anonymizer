@@ -1089,6 +1089,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#word-extra-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word extra missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rejected-word-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected Word formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rejected-spreadsheet-formats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1115,6 +1137,17 @@
     <span class="md-ellipsis">
       
         Charts, comments, and other leftovers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#word-formatting-after-the-first-run-is-gone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word formatting after the first run is gone
       
     </span>
   </a>
@@ -1368,6 +1401,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#word-extra-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word extra missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rejected-word-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected Word formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rejected-spreadsheet-formats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1394,6 +1449,17 @@
     <span class="md-ellipsis">
       
         Charts, comments, and other leftovers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#word-formatting-after-the-first-run-is-gone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Word formatting after the first run is gone
       
     </span>
   </a>
@@ -1575,11 +1641,22 @@
 <li>Manually increase <code>--characters-to-anonymize</code> (e.g. 120000 or higher) when using a model with a large context window.</li>
 <li>The tool uses Markdown-aware splitting for PDFs and <code>.md</code> files to preserve structure.</li>
 <li>CSV and Excel are <strong>in-memory</strong>. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.</li>
+<li>Word <code>.docx</code> is <strong>in-memory</strong>. It is refused above 50 MiB or 100,000 non-empty paragraphs. That is not the 1 GB text-chunking path.</li>
 </ul>
 <h2 id="excel-extra-missing">Excel extra missing<a class="headerlink" href="#excel-extra-missing" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Symptom</strong>: <code>Excel support requires the extra: pip install "pdf-anonymizer-core[excel]"</code></li>
 <li><strong>Fix</strong>: <code>pip install "pdf-anonymizer-core[excel]"</code> or <code>pip install "pdf-anonymizer-cli[excel]"</code>. CSV does not need this extra.</li>
+</ul>
+<h2 id="word-extra-missing">Word extra missing<a class="headerlink" href="#word-extra-missing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>Word support requires the extra: pip install "pdf-anonymizer-core[docx]"</code></li>
+<li><strong>Fix</strong>: <code>pip install "pdf-anonymizer-core[docx]"</code> or <code>pip install "pdf-anonymizer-cli[docx]"</code>.</li>
+</ul>
+<h2 id="rejected-word-formats">Rejected Word formats<a class="headerlink" href="#rejected-word-formats" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>.doc</code>, <code>.docm</code>, <code>.dot</code>, <code>.dotm</code>, or <code>.dotx</code> is rejected with a convert-to-docx message.</li>
+<li><strong>Fix</strong>: Re-save as <code>.docx</code>. Macro-enabled documents are not supported (macros can re-derive PII).</li>
 </ul>
 <h2 id="rejected-spreadsheet-formats">Rejected spreadsheet formats<a class="headerlink" href="#rejected-spreadsheet-formats" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1594,7 +1671,12 @@
 <h2 id="charts-comments-and-other-leftovers">Charts, comments, and other leftovers<a class="headerlink" href="#charts-comments-and-other-leftovers" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Symptom</strong>: A name still appears in a chart, comment, header/footer, data-validation list, defined name, or hyperlink.</li>
-<li><strong>Fix</strong>: Those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual.</li>
+<li><strong>Fix</strong>: On <strong>spreadsheets</strong>, those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual. On <strong>Word</strong>, headers, footers, comments, field codes, and hyperlink targets <strong>are</strong> walked. Images, alt text, core properties (author), charts, and embedded objects are not.</li>
+</ul>
+<h2 id="word-formatting-after-the-first-run-is-gone">Word formatting after the first run is gone<a class="headerlink" href="#word-formatting-after-the-first-run-is-gone" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: A sentence that was partly bold or a second color is now one style.</li>
+<li><strong>Fix</strong>: Word splits one phrase across many runs. Replacement writes the new text into the first run and clears the rest, so later-run formatting is lost. Paragraph style is kept.</li>
 </ul>
 <h2 id="undashed-numeric-ids-missed-on-no-llm">Undashed numeric IDs missed on <code>--no-llm</code><a class="headerlink" href="#undashed-numeric-ids-missed-on-no-llm" title="Permanent link">&para;</a></h2>
 <ul>
