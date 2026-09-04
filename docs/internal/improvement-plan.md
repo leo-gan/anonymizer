@@ -27,7 +27,7 @@
 - [x] 19. Completeness testing (gold E2E, CI coverage, fuzz, leftover red-team) — done 2026-09-03, [PR #60](https://github.com/leo-gan/anonymizer/pull/60)
 - [x] 20. Local span NER (GLiNER-class) as `best-speed` — done 2026-09-04, [PR #65](https://github.com/leo-gan/anonymizer/pull/65)
 - [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
-- [ ] 22. HTTP API + Docker
+- [x] 22. HTTP API + Docker — done 2026-09-04, [PR #67](https://github.com/leo-gan/anonymizer/pull/67)
 - [ ] 23. Review / apply residual findings
 - [ ] 24. `encrypt` / format-preserving encryption operator
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
@@ -504,7 +504,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 22. HTTP API + Docker
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #67](https://github.com/leo-gan/anonymizer/pull/67) (`feat/http-api-docker`)  
 **Technique:** productization. Presidio and Philter are services.
 
 **Why:** Pipelines and “drop in front of an LLM” expect `POST /anonymize` and `POST /deanonymize`. The OS-report sandbox point is valid for **untrusted PDFs**, not Tor.
