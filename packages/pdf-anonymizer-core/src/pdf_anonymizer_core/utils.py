@@ -23,6 +23,7 @@ from pdf_anonymizer_core.mapping_crypto import (
     sha256_file,
 )
 from pdf_anonymizer_core.secure_io import write_private_json
+from pdf_anonymizer_core.pdf_ocr import take_pdf_layout, write_layout_sidecar
 from pdf_anonymizer_core.tables import (
     flatten_table_for_review,
     is_tabular_path,
@@ -236,6 +237,15 @@ def save_results(
         with open(anonymized_output_file, "w", encoding="utf-8") as f:
             f.write(full_anonymized_text)
 
+    layout_source, layout_words = take_pdf_layout()
+    if layout_words and layout_source:
+        try:
+            same_source = Path(layout_source).resolve() == original_path.resolve()
+        except OSError:
+            same_source = layout_source == file_path
+        if same_source:
+            write_layout_sidecar(anonymized_output_file, layout_source, layout_words)
+
     if ephemeral_mapping:
         return anonymized_output_file, ""
 
@@ -264,9 +274,7 @@ def restore_placeholders_in_text(
 ) -> tuple[str, set[str]]:
     """Replace longest-first ``PLACEHOLDER`` / ``PLACEHOLDER.v_n`` tokens."""
     used_placeholders: set[str] = set()
-    sorted_placeholders = sorted(
-        placeholder_to_original.keys(), key=len, reverse=True
-    )
+    sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
     if not sorted_placeholders:
         return text, used_placeholders
 

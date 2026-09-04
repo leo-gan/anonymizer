@@ -92,6 +92,16 @@ Common problems and how to resolve them.
     configure_cache(enabled=False)
     ```
 
+## Scanned PDF is refused
+
+- **Symptom**: `This PDF has pages but no extractable text (likely a scan).`
+- **Fix**: Install Tesseract on PATH and re-run with `--ocr`, or supply a PDF that already has a text layer. The tool will not write an empty “success” file.
+
+## Tesseract missing
+
+- **Symptom**: `OCR requires the Tesseract binary on PATH.`
+- **Fix**: Install the Tesseract **system** package (`apt-get install tesseract-ocr` / `brew install tesseract`). There is no pip extra for this.
+
 ## Large Files / Memory or Context Issues
 
 - **Symptom**: Out of memory, context length errors, or very slow runs.
