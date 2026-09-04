@@ -2451,6 +2451,11 @@
 <td><code>Jane Alvarez</code>, <code>555-0103</code></td>
 <td>Looks real; same person always gets the same fake</td>
 </tr>
+<tr>
+<td><code>encrypt</code></td>
+<td><code>ENC1_…</code> (AES-256-GCM token)</td>
+<td>Reversible with a secret; original not stored in the mapping</td>
+</tr>
 </tbody>
 </table>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>invoice.pdf<span class="w"> </span><span class="se">\</span>
@@ -2460,8 +2465,14 @@
 </span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>
 </span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="c1"># Invent stable fake names (same person → same fake)</span>
 </span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--operator<span class="w"> </span><span class="nv">PERSON</span><span class="o">=</span>fake<span class="w"> </span>--operator<span class="w"> </span><span class="nv">EMAIL</span><span class="o">=</span>fake
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>
+</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="c1"># Lock emails as tokens (not stored in the mapping file)</span>
+</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">EMAIL</span><span class="o">=</span>encrypt<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="w">  </span>--encrypt-secret<span class="w"> </span><span class="s1">&#39;a long secret&#39;</span>
 </span></code></pre></div>
 <p>Types you do not list stay as stand-ins. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>.</p>
+<p><code>encrypt</code> needs <code>--encrypt-secret</code> or <code>ANONYMIZER_ENCRYPT_SECRET</code>. The same secret always yields the same token. Deanonymize with that secret. The token is longer than the original (not format-preserving). Those originals are omitted from <code>*.mapping.json</code>.</p>
 <p>The mapping file still records how to put the original back when the written form is unique. Two dates that both become <code>2019</code> cannot both be restored uniquely.</p>
 <hr />
 <h2 id="score-leftover-identity-clumps-linkage-risk">Score leftover identity clumps (linkage risk)<a class="headerlink" href="#score-leftover-identity-clumps-linkage-risk" title="Permanent link">&para;</a></h2>

@@ -1233,6 +1233,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#encrypt-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypt operator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#apply-leftovers-apply" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2118,6 +2129,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#encrypt-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypt operator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#apply-leftovers-apply" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2450,7 +2472,7 @@
 <td style="text-align: left;"><code>--operator</code></td>
 <td style="text-align: left;"><code>TYPE=op</code></td>
 <td style="text-align: left;"><code>replace</code></td>
-<td style="text-align: left;">Repeatable. How to write a type: <code>replace</code>, <code>mask</code>, <code>hash</code>, <code>generalize</code>, <code>shift</code>, <code>fake</code>.</td>
+<td style="text-align: left;">Repeatable. How to write a type: <code>replace</code>, <code>mask</code>, <code>hash</code>, <code>generalize</code>, <code>shift</code>, <code>fake</code>, <code>encrypt</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--fake-secret</code></td>
@@ -2745,12 +2767,14 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p><code>--no-llm</code> or <code>-p regex-only</code> skips the language model. Emails, cards, IBANs, and other structured hits are still hidden (including <code>_LIKE</code> checksum failures). Operators, leftover scan, and linkage-risk still run. No API key is required. <strong>Names and identity clues will be missed.</strong> <code>--verify-llm</code> is ignored so the process stays offline.</p>
 <h3 id="leftover-check">Leftover check<a class="headerlink" href="#leftover-check" title="Permanent link">&para;</a></h3>
 <p><code>run</code> scans the masked page (unless <code>--no-verify</code>) and writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. <code>pdf-anonymizer verify</code> does the same later. <code>--verify-llm</code> also asks the language model. The file is not rewritten unless you pass <code>--apply-residuals</code> or later run <code>pdf-anonymizer apply</code>.</p>
+<h3 id="encrypt-operator">Encrypt operator<a class="headerlink" href="#encrypt-operator" title="Permanent link">&para;</a></h3>
+<p><code>--operator EMAIL=encrypt --encrypt-secret '…'</code> writes <code>ENC1_…</code> tokens. Deanonymize with the same secret. Those originals are not in the mapping file. See <a href="../recipes/#change-how-a-type-is-written">Change how a type is written</a>.</p>
 <h3 id="apply-leftovers-apply">Apply leftovers (<code>apply</code>)<a class="headerlink" href="#apply-leftovers-apply" title="Permanent link">&para;</a></h3>
 <p><code>pdf-anonymizer apply REPORT.json --accept-all</code> hides leftovers from a residual report. <code>--accept</code> / <code>--skip</code> pick which ones. Default <code>run</code> stays report-only. See <a href="../recipes/#hide-leftovers-from-a-residual-report">Hide leftovers from a residual report</a>.</p>
 <h3 id="lock-the-mapping">Lock the mapping<a class="headerlink" href="#lock-the-mapping" title="Permanent link">&para;</a></h3>
 <p><code>--mapping-passphrase</code> (or <code>ANONYMIZER_MAPPING_KEY</code>) writes <code>*.mapping.json.enc</code> instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode <code>0600</code>. <code>deanonymize</code> needs the same passphrase. <code>--ephemeral-mapping</code> writes no mapping file at all. See <a href="../mapping-security/">Mapping encryption</a>.</p>
 <h3 id="how-a-type-is-written">How a type is written<a class="headerlink" href="#how-a-type-is-written" title="Permanent link">&para;</a></h3>
-<p><code>--operator TYPE=mask|hash|generalize|shift|fake</code> changes the mark on the page. Default remains <code>replace</code> (<code>PERSON_1</code>). Seed <code>fake</code> with <code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>.</p>
+<p><code>--operator TYPE=mask|hash|generalize|shift|fake|encrypt</code> changes the mark on the page. Default remains <code>replace</code> (<code>PERSON_1</code>). Seed <code>fake</code> with <code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>. <code>encrypt</code> writes an AES-256-GCM token (<code>ENC1_…</code>) and needs <code>--encrypt-secret</code> / <code>ANONYMIZER_ENCRYPT_SECRET</code>. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).</p>
 <h3 id="linkage-risk-score">Linkage-risk score<a class="headerlink" href="#linkage-risk-score" title="Permanent link">&para;</a></h3>
 <p><code>run</code> writes <code>data/stats/&lt;stem&gt;.risk.json</code> unless <code>--no-risk</code>. <code>pdf-anonymizer report</code> scores an already-masked file. Report only; the page is not changed.</p>
 <h3 id="hipaa-safe-harbor-coverage-aid">HIPAA Safe Harbor coverage aid<a class="headerlink" href="#hipaa-safe-harbor-coverage-aid" title="Permanent link">&para;</a></h3>

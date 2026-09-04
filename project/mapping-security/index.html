@@ -1729,6 +1729,10 @@ trade-offs, and what the tests actually prove.</p>
 every original name back. The masked document without the map is still
 personal data under GDPR <em>pseudonymization</em>, but it is not an instant
 re-identification. A leaked <code>*.mapping.json</code> is.</p>
+<p><code>--operator TYPE=encrypt</code> is a different control: the <em>value</em> on the page is
+an AES-256-GCM token (<code>ENC1_…</code>). Those originals are <strong>not</strong> written into the
+mapping file. Reverse them with <code>--encrypt-secret</code> / <code>ANONYMIZER_ENCRYPT_SECRET</code>.
+That is not format-preserving encryption (the token is longer than the source).</p>
 <p>Default behaviour is unchanged: no passphrase still writes plaintext JSON.
 New capabilities are optional flags and a harder envelope when a passphrase
 <em>is</em> set.</p>

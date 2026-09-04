@@ -1820,7 +1820,7 @@
 <h3 id="per-type-operators">Per-type operators<a class="headerlink" href="#per-type-operators" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Default write is still <code>replace</code> (<code>PERSON_1</code>).</li>
-<li><code>--operator TYPE=mask|hash|generalize|shift|fake</code> changes how that type is written. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>.</li>
+<li><code>--operator TYPE=mask|hash|generalize|shift|fake|encrypt</code> changes how that type is written. <code>CREDIT_CARD_LIKE</code> follows <code>CREDIT_CARD</code>. <code>encrypt</code> is AES-256-GCM (<code>ENC1_…</code>), reversible with a secret, and those originals are omitted from the mapping file.</li>
 <li><code>fake</code> is seeded (<code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>) so the same person always gets the same invented name.</li>
 <li>Two dates that both become <code>2019</code> cannot both be restored uniquely.</li>
 </ul>
