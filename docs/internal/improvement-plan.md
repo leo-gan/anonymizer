@@ -26,7 +26,7 @@
 - [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
 - [x] 19. Completeness testing (gold E2E, CI coverage, fuzz, leftover red-team) — done 2026-09-03, [PR #60](https://github.com/leo-gan/anonymizer/pull/60)
 - [x] 20. Local span NER (GLiNER-class) as `best-speed` — done 2026-09-04, [PR #65](https://github.com/leo-gan/anonymizer/pull/65)
-- [ ] 21. Per-span confidence and recognizer provenance
+- [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
 - [ ] 22. HTTP API + Docker
 - [ ] 23. Review / apply residual findings
 - [ ] 24. `encrypt` / format-preserving encryption operator
@@ -485,7 +485,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 21. Per-span confidence and recognizer provenance
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #66](https://github.com/leo-gan/anonymizer/pull/66) (`feat/span-confidence`)  
 **Technique:** Presidio-style 0–1 score + which recognizer fired.
 
 **Why:** LLM JSON is uncalibrated. A threshold is how you trade recall vs over-redaction without editing prompts, and how item 20 gates the LLM.
