@@ -1,0 +1,102 @@
+name: Release
+
+# Create a GitHub Release (tag vX.Y.Z) to build both packages, attach
+# wheels + SHA-256 sums, and publish to PyPI.
+#
+# PyPI uses Trusted Publishing (OIDC). No API token is stored in this repo.
+# One-time setup on each PyPI project (pdf-anonymizer-core and
+# pdf-anonymizer-cli): add a GitHub trusted publisher
+#   owner: leo-gan
+#   repository: anonymizer
+#   workflow: release.yml
+#   environment: pypi
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Build core and CLI
+        run: |
+          make build-core
+          make build-cli
+          mkdir -p dist
+          cp packages/pdf-anonymizer-core/dist/* dist/
+          cp packages/pdf-anonymizer-cli/dist/* dist/
+          (cd dist && sha256sum * > SHA256SUMS)
+          echo "### SHA-256" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat dist/SHA256SUMS >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-packages
+          path: dist/
+
+  attach-release-assets:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-packages
+          path: dist
+
+      - name: Attach wheels and checksums to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" dist/* \
+            --repo "${{ github.repository }}" --clobber
+
+  publish-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pdf-anonymizer-cli/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-packages
+          path: dist
+
+      - name: Drop checksum file from the PyPI upload
+        run: rm -f dist/SHA256SUMS
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+          packages-dir: dist

@@ -37,6 +37,7 @@ Use the `Makefile` for convenience (or run the underlying `uv run` commands dire
 | Build docs              | `make docs-build` or `uv run mkdocs build --strict` | Produces `site/` (ignored by git) |
 | Build distribution packages | `make build-core` / `make build-cli` | Uses `uvx --from build ...` |
 | Clean build artifacts   | `make clean-core` / `make clean-cli` |       |
+| Publish to PyPI         | GitHub Release `vX.Y.Z`              | See [Releasing](#releasing) |
 
 ### Running the CLI during development
 
@@ -69,6 +70,16 @@ print(anonymize_file('data/sample.pdf', 50000, detailed.prompt_template, 'gemini
 - Please keep docstrings in the Python source reasonably complete — they feed the API reference.
 
 After editing docs you can preview with `uv run mkdocs serve`.
+
+## Releasing
+
+Versions live in three `pyproject.toml` files and must stay the same: the workspace root, `packages/pdf-anonymizer-core`, and `packages/pdf-anonymizer-cli`.
+
+1. Land the version bump on `main`.
+2. Create a GitHub Release tagged `vX.Y.Z` on `leo-gan/anonymizer` (use **Generate release notes**; categories come from `.github/release.yml`).
+3. The [Release](../.github/workflows/release.yml) workflow builds both packages, attaches wheels and `SHA256SUMS` to that release, and publishes to PyPI.
+
+PyPI upload uses Trusted Publishing (OIDC), not a stored token. Each of `pdf-anonymizer-core` and `pdf-anonymizer-cli` needs a GitHub trusted publisher: owner `leo-gan`, repository `anonymizer`, workflow `release.yml`, environment `pypi`.
 
 ## Pull Requests
 
