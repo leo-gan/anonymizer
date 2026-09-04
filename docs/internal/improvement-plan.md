@@ -25,7 +25,7 @@
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
 - [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
 - [x] 19. Completeness testing (gold E2E, CI coverage, fuzz, leftover red-team) — done 2026-09-03, [PR #60](https://github.com/leo-gan/anonymizer/pull/60)
-- [ ] 20. Local span NER (GLiNER-class) as `best-speed`
+- [x] 20. Local span NER (GLiNER-class) as `best-speed` — done 2026-09-04, [PR #65](https://github.com/leo-gan/anonymizer/pull/65)
 - [ ] 21. Per-span confidence and recognizer provenance
 - [ ] 22. HTTP API + Docker
 - [ ] 23. Review / apply residual findings
