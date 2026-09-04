@@ -9,7 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     "typer",
     "rich",
-    "pdf-anonymizer-core",
+    "pdf-anonymizer-core>=0.21.0",
 ]
 
 [project.optional-dependencies]
