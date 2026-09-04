@@ -1289,6 +1289,7 @@
 <li><code>[anthropic]</code>: Installs the official Anthropic API SDK.</li>
 <li><code>[excel]</code>: Installs <code>openpyxl</code> for <code>.xlsx</code> input. CSV uses the stdlib and needs no extra.</li>
 <li><code>[docx]</code>: Installs <code>python-docx</code> for <code>.docx</code> input. Legacy <code>.doc</code> and macro-enabled <code>.docm</code> are rejected.</li>
+<li><code>[ner]</code>: Installs <code>gliner</code> for local span NER (names and organizations). Pulls PyTorch. Off until you install it; <code>best-speed</code> then skips the cloud language model.</li>
 </ul>
 <p>Scanned PDFs need the <strong>Tesseract</strong> binary on <code>PATH</code> and the <code>--ocr</code> flag. That is a system package, not a pip extra. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
 <hr />

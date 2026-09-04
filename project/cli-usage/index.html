@@ -1304,6 +1304,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#local-span-ner-ner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local span NER (--ner)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#native-pdf-write-output-pdf" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2106,6 +2117,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#local-span-ner-ner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local span NER (--ner)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#native-pdf-write-output-pdf" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2333,6 +2355,12 @@
 <td style="text-align: left;">flag</td>
 <td style="text-align: left;">off</td>
 <td style="text-align: left;">Irreversible native PDF (black boxes, no stand-in). Implies <code>--output-pdf</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--ner</code> / <code>--no-ner</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">auto</td>
+<td style="text-align: left;">Local span NER (GLiNER extra) for names and organizations. Auto-on when the extra is installed (except regex-only). <code>best-speed</code> / <code>best-cost</code> then skip the language model.</td>
 </tr>
 </tbody>
 </table>
@@ -2565,6 +2593,8 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p><code>scripts/download_gold_corpus.py</code> installs TAB, Presidio, and Gretel under <code>data/gold-corpus/</code> (not in git). <code>scripts/run_gold_benchmark.py</code> scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See <a href="../gold-corpus/">Gold corpus &amp; eval</a>.</p>
 <h3 id="scanned-pdfs-ocr">Scanned PDFs (<code>--ocr</code>)<a class="headerlink" href="#scanned-pdfs-ocr" title="Permanent link">&para;</a></h3>
 <p>A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass <code>--ocr</code> to recover words. A sidecar <code>*.anonymized.layout.json</code> stores page boxes for a later native-PDF write. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
+<h3 id="local-span-ner-ner">Local span NER (<code>--ner</code>)<a class="headerlink" href="#local-span-ner-ner" title="Permanent link">&para;</a></h3>
+<p><code>pip install "pdf-anonymizer-core[ner]"</code> (or the CLI extra) installs GLiNER. Then <code>-p best-speed</code> and <code>-p best-cost</code> use that local model for names and organizations and do <strong>not</strong> call the language model. <code>-p best-quality</code> may run NER first and still calls the LLM for identity clues. <code>--no-ner</code> keeps today’s LLM path. <code>--ner</code> without the extra is an error. See <a href="../recipes/#use-local-span-ner">Use local span NER</a>.</p>
 <h3 id="native-pdf-write-output-pdf">Native PDF write (<code>--output-pdf</code>)<a class="headerlink" href="#native-pdf-write-output-pdf" title="Permanent link">&para;</a></h3>
 <p>Markdown stays the default. <code>--output-pdf</code> also writes <code>*.anonymized.pdf</code>: old glyphs are excised, <code>/Info</code> and XMP are wiped, attachments are dropped. <code>--redact</code> is irreversible (black boxes). Neither mode is a legal de-identification certificate. See <a href="../recipes/#write-a-native-pdf">Write a native PDF</a>.</p>
 <h3 id="csv-and-excel-as-inputs-cell-level-masking">CSV and Excel as inputs (cell-level masking)<a class="headerlink" href="#csv-and-excel-as-inputs-cell-level-masking" title="Permanent link">&para;</a></h3>
