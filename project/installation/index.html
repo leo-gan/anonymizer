@@ -1290,6 +1290,7 @@
 <li><code>[excel]</code>: Installs <code>openpyxl</code> for <code>.xlsx</code> input. CSV uses the stdlib and needs no extra.</li>
 <li><code>[docx]</code>: Installs <code>python-docx</code> for <code>.docx</code> input. Legacy <code>.doc</code> and macro-enabled <code>.docm</code> are rejected.</li>
 </ul>
+<p>Scanned PDFs need the <strong>Tesseract</strong> binary on <code>PATH</code> and the <code>--ocr</code> flag. That is a system package, not a pip extra. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
 <hr />
 <h2 id="environment-variables-configuration">Environment Variables Configuration<a class="headerlink" href="#environment-variables-configuration" title="Permanent link">&para;</a></h2>
 <p>To run the anonymizer with cloud providers, you must supply API credentials. The CLI automatically loads a <code>.env</code> file from the directory where the command is executed or any parent directory. </p>

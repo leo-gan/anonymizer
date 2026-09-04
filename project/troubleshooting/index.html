@@ -1067,6 +1067,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#scanned-pdf-is-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scanned PDF is refused
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tesseract-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tesseract missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#large-files-memory-or-context-issues" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1379,6 +1401,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#scanned-pdf-is-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scanned PDF is refused
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tesseract-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tesseract missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#large-files-memory-or-context-issues" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1632,6 +1676,16 @@
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">configure_cache</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
+</ul>
+<h2 id="scanned-pdf-is-refused">Scanned PDF is refused<a class="headerlink" href="#scanned-pdf-is-refused" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>This PDF has pages but no extractable text (likely a scan).</code></li>
+<li><strong>Fix</strong>: Install Tesseract on PATH and re-run with <code>--ocr</code>, or supply a PDF that already has a text layer. The tool will not write an empty “success” file.</li>
+</ul>
+<h2 id="tesseract-missing">Tesseract missing<a class="headerlink" href="#tesseract-missing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>OCR requires the Tesseract binary on PATH.</code></li>
+<li><strong>Fix</strong>: Install the Tesseract <strong>system</strong> package (<code>apt-get install tesseract-ocr</code> / <code>brew install tesseract</code>). There is no pip extra for this.</li>
 </ul>
 <h2 id="large-files-memory-or-context-issues">Large Files / Memory or Context Issues<a class="headerlink" href="#large-files-memory-or-context-issues" title="Permanent link">&para;</a></h2>
 <ul>

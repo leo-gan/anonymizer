@@ -1293,6 +1293,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#scanned-pdfs-ocr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scanned PDFs (--ocr)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2073,6 +2084,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#scanned-pdfs-ocr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scanned PDFs (--ocr)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2271,6 +2293,12 @@
 <td style="text-align: left;"><code>PATH</code></td>
 <td style="text-align: left;"><em>none</em></td>
 <td style="text-align: left;">Phrases that must be hidden even if detection missed them.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--ocr</code> / <code>--no-ocr</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">off</td>
+<td style="text-align: left;">If a PDF has no text layer, OCR it with Tesseract (must be on PATH). A scan with OCR off is an error, not an empty success file.</td>
 </tr>
 </tbody>
 </table>
@@ -2501,6 +2529,8 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p><code>tests/eval/</code> and <code>scripts/eval_tab.py</code> score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.</p>
 <h3 id="gold-corpus-and-completeness-eval">Gold corpus and completeness eval<a class="headerlink" href="#gold-corpus-and-completeness-eval" title="Permanent link">&para;</a></h3>
 <p><code>scripts/download_gold_corpus.py</code> installs TAB, Presidio, and Gretel under <code>data/gold-corpus/</code> (not in git). <code>scripts/run_gold_benchmark.py</code> scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See <a href="../gold-corpus/">Gold corpus &amp; eval</a>.</p>
+<h3 id="scanned-pdfs-ocr">Scanned PDFs (<code>--ocr</code>)<a class="headerlink" href="#scanned-pdfs-ocr" title="Permanent link">&para;</a></h3>
+<p>A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass <code>--ocr</code> to recover words. A sidecar <code>*.anonymized.layout.json</code> stores page boxes for a later native-PDF write. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
 <h3 id="csv-and-excel-as-inputs-cell-level-masking">CSV and Excel as inputs (cell-level masking)<a class="headerlink" href="#csv-and-excel-as-inputs-cell-level-masking" title="Permanent link">&para;</a></h3>
 <p><code>pdf-anonymizer run people.csv</code> and <code>pdf-anonymizer run roster.xlsx</code> (with the <code>[excel]</code> extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, <strong>not</strong> <em>k</em>-anonymity. See <a href="../recipes/#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a>.</p>
 <h3 id="word-docx-as-input">Word <code>.docx</code> as input<a class="headerlink" href="#word-docx-as-input" title="Permanent link">&para;</a></h3>
