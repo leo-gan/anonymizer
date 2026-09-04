@@ -1304,6 +1304,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#native-pdf-write-output-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native PDF write (--output-pdf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2095,6 +2106,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#native-pdf-write-output-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native PDF write (--output-pdf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#csv-and-excel-as-inputs-cell-level-masking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2300,6 +2322,18 @@
 <td style="text-align: left;">off</td>
 <td style="text-align: left;">If a PDF has no text layer, OCR it with Tesseract (must be on PATH). A scan with OCR off is an error, not an empty success file.</td>
 </tr>
+<tr>
+<td style="text-align: left;"><code>--output-pdf</code> / <code>--no-output-pdf</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">off</td>
+<td style="text-align: left;">Also write a sanitized native PDF. Markdown is still written. PDF inputs only. Not a legal certificate.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--redact</code> / <code>--no-redact</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">off</td>
+<td style="text-align: left;">Irreversible native PDF (black boxes, no stand-in). Implies <code>--output-pdf</code>.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="configuration-profiles">Configuration Profiles<a class="headerlink" href="#configuration-profiles" title="Permanent link">&para;</a></h3>
@@ -2477,7 +2511,7 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h2 id="output-files-auditing">Output Files &amp; Auditing<a class="headerlink" href="#output-files-auditing" title="Permanent link">&para;</a></h2>
 <p><code>run</code>, <code>verify</code>, <code>report</code>, and <code>deanonymize</code> write under conventional directories (created automatically):</p>
 <ul>
-<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.docx</code>)</li>
+<li><code>data/anonymized/&lt;stem&gt;.anonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.docx</code>; plus <code>.pdf</code> when <code>--output-pdf</code>)</li>
 <li><code>data/mappings/&lt;stem&gt;.mapping.json</code> (or <code>*.mapping.json.enc</code> when a passphrase is set)</li>
 <li><code>data/deanonymized/&lt;stem&gt;.deanonymized.md</code> (or <code>.txt</code>, <code>.csv</code>, <code>.xlsx</code>, <code>.docx</code>)</li>
 <li><code>data/stats/&lt;stem&gt;.residual_pii.json</code> — leftovers found after masking (from <code>run</code> or <code>verify</code>)</li>
@@ -2531,6 +2565,8 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <p><code>scripts/download_gold_corpus.py</code> installs TAB, Presidio, and Gretel under <code>data/gold-corpus/</code> (not in git). <code>scripts/run_gold_benchmark.py</code> scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See <a href="../gold-corpus/">Gold corpus &amp; eval</a>.</p>
 <h3 id="scanned-pdfs-ocr">Scanned PDFs (<code>--ocr</code>)<a class="headerlink" href="#scanned-pdfs-ocr" title="Permanent link">&para;</a></h3>
 <p>A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass <code>--ocr</code> to recover words. A sidecar <code>*.anonymized.layout.json</code> stores page boxes for a later native-PDF write. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
+<h3 id="native-pdf-write-output-pdf">Native PDF write (<code>--output-pdf</code>)<a class="headerlink" href="#native-pdf-write-output-pdf" title="Permanent link">&para;</a></h3>
+<p>Markdown stays the default. <code>--output-pdf</code> also writes <code>*.anonymized.pdf</code>: old glyphs are excised, <code>/Info</code> and XMP are wiped, attachments are dropped. <code>--redact</code> is irreversible (black boxes). Neither mode is a legal de-identification certificate. See <a href="../recipes/#write-a-native-pdf">Write a native PDF</a>.</p>
 <h3 id="csv-and-excel-as-inputs-cell-level-masking">CSV and Excel as inputs (cell-level masking)<a class="headerlink" href="#csv-and-excel-as-inputs-cell-level-masking" title="Permanent link">&para;</a></h3>
 <p><code>pdf-anonymizer run people.csv</code> and <code>pdf-anonymizer run roster.xlsx</code> (with the <code>[excel]</code> extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, <strong>not</strong> <em>k</em>-anonymity. See <a href="../recipes/#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a>.</p>
 <h3 id="word-docx-as-input">Word <code>.docx</code> as input<a class="headerlink" href="#word-docx-as-input" title="Permanent link">&para;</a></h3>

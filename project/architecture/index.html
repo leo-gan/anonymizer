@@ -1028,6 +1028,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#native-pdf-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native PDF write
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#semantic-chunking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1357,6 +1368,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#native-pdf-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native PDF write
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#semantic-chunking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1679,6 +1701,14 @@
 <li>For Markdown and Text files, standard file reads are executed.</li>
 <li>CSV and Excel skip this loader. See <a href="#table-path-csv--excel">Table path</a>.</li>
 <li>Word <code>.docx</code> skips this loader. See <a href="#word-path-docx">Word path</a>.</li>
+</ul>
+<h3 id="native-pdf-write">Native PDF write<a class="headerlink" href="#native-pdf-write" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Markdown remains the default output for a PDF input.</li>
+<li><code>--output-pdf</code> opens the source with PyMuPDF, finds each original with <code>search_for</code>, adds a redaction annotation, then <code>apply_redactions</code>. That excises the old glyphs from the content stream. It is not an overlay-only black box.</li>
+<li>The reversible mode writes the stand-in (<code>EMAIL_1</code>) into the redaction. <code>--redact</code> fills the box black and does not write a stand-in. Deanonymize cannot restore a redacted page.</li>
+<li>Every native write sanitizes <code>/Info</code>, XMP, embedded files, leftover annotations, and optional-content groups, and saves with <code>garbage=4</code> (no incremental <code>/Prev</code> history).</li>
+<li>Rasterize-and-rebuild is the scan fallback (item 14), not the digital default. Images, form fields, and some vector drawings can still leak. This is not a legal de-identification certificate.</li>
 </ul>
 <h3 id="semantic-chunking">Semantic Chunking<a class="headerlink" href="#semantic-chunking" title="Permanent link">&para;</a></h3>
 <ul>
