@@ -523,7 +523,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 23. Review / apply residual findings
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #68](https://github.com/leo-gan/anonymizer/pull/68) (`feat/apply-residuals`)  
 **Technique:** close the leftover loop. Report-only (item 4) stays the default.
 
 **In simple terms:** After a run, the tool already looks at the masked page a second time and writes a leftover list (`*.residual_pii.json`). That list only *tells* you “this email is still visible.” It does not hide it. You have to edit the file yourself or run again with a deny-list.
