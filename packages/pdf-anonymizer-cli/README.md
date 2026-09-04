@@ -9,7 +9,7 @@ A command-line interface for anonymizing PDF, Markdown, and plain text files usi
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
-- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, and Excel files.
+- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`) files.
 
 
 ## Installation
@@ -23,6 +23,7 @@ Install the CLI with your favorite package manager. To use a specific LLM provid
 - **OpenAI**: `pip install "pdf-anonymizer-cli[openai]"`
 - **Anthropic**: `pip install "pdf-anonymizer-cli[anthropic]"`
 - **Excel** (`.xlsx`): `pip install "pdf-anonymizer-cli[excel]"`
+- **Word** (`.docx`): `pip install "pdf-anonymizer-cli[docx]"`
 
 You can also install multiple extras at once:
 
@@ -73,7 +74,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 ```
 
 **Arguments**:
-- `FILE_PATH`: Path to one or several PDF, Markdown, text, CSV, or Excel (`.xlsx`) files for anonymization.
+- `FILE_PATH`: Path to one or several PDF, Markdown, text, CSV, Excel (`.xlsx`), or Word (`.docx`) files for anonymization.
 
 **Options**:
 - `-p, --config-profile {best-quality|best-speed|best-cost|regex-only}`: The configuration profile to use. Profiles bundle sensible defaults for model, prompt, chunk size, overlap, and retries (default: `best-speed`). `regex-only` skips the language model. Individual flags (`--model-name`, `--prompt-name`, `--characters-to-anonymize`) act as overrides on top of the chosen profile.

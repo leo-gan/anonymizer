@@ -1,7 +1,8 @@
 """Core anonymization engine.
 
 This module provides the primary high-level entry point for anonymizing
-documents (PDF, Markdown, or plain text) using a hybrid Regex + LLM approach
+documents (PDF, Markdown, plain text, CSV, Excel, or Word) using a hybrid
+Regex + LLM approach
 with support for large files via chunking, entity consolidation, and reversible
 placeholder mapping.
 
@@ -41,6 +42,14 @@ from pdf_anonymizer_core.tables import (
     iter_cells,
     load_table,
     rejected_spreadsheet_error,
+)
+from pdf_anonymizer_core.word import (
+    apply_mapping_to_docx,
+    flatten_docx_for_review,
+    is_rejected_word,
+    is_word_path,
+    load_docx,
+    rejected_word_error,
 )
 from pdf_anonymizer_core.utils import seed_placeholder_state
 from pdf_anonymizer_core.validators import LIKE_SUFFIX, parent_type, type_matches_filter
@@ -382,10 +391,11 @@ def anonymize_file(
     exhausting context windows or memory.
 
     Args:
-        file_path: Path to the file to anonymize (.pdf, .md, .txt, .csv, or
-            .xlsx). ``.xlsx`` succeeds when the ``[excel]`` extra is installed
-            and raises ``ValueError`` if it is missing. ``.xls`` / ``.xlsm`` /
-            ``.ods`` / ``.xlsb`` are rejected.
+        file_path: Path to the file to anonymize (.pdf, .md, .txt, .csv,
+            .xlsx, or .docx). ``.xlsx`` needs the ``[excel]`` extra.
+            ``.docx`` needs the ``[docx]`` extra. ``.xls`` / ``.xlsm`` /
+            ``.ods`` / ``.xlsb`` and ``.doc`` / ``.docm`` / ``.dot`` /
+            ``.dotm`` / ``.dotx`` are rejected.
         characters_to_anonymize: Target character size of each chunk sent to the LLM.
         prompt_template: The full prompt template string (use one from
             pdf_anonymizer_core.prompts or supply your own).
@@ -429,6 +439,29 @@ def anonymize_file(
     """
     if regex_patterns is None:
         regex_patterns = DEFAULT_REGEX_PATTERNS
+
+    if is_rejected_word(file_path):
+        raise rejected_word_error(file_path)
+    if is_word_path(file_path):
+        review, mapping, _entity_texts = anonymize_docx_file(
+            file_path,
+            characters_to_anonymize,
+            prompt_template,
+            model_name,
+            anonymized_entities=anonymized_entities,
+            chunk_overlap=chunk_overlap,
+            regex_patterns=regex_patterns,
+            max_retries=max_retries,
+            base_retry_delay=base_retry_delay,
+            max_retry_delay=max_retry_delay,
+            operators=operators,
+            fake_secret=fake_secret,
+            seed_mapping=seed_mapping,
+            keep_list=keep_list,
+            deny_list=deny_list,
+            use_llm=use_llm,
+        )
+        return review, mapping
 
     if is_rejected_spreadsheet(file_path):
         raise rejected_spreadsheet_error(file_path)
@@ -493,11 +526,7 @@ def _serialize_cell_line(sheet_name: str, cell: TableCell, label: str) -> str:
 
 
 def _searchable_row_cells(sheet: TableSheet, row: int) -> List[TableCell]:
-    return [
-        cell
-        for cell in sheet.cells
-        if cell.row == row and cell.search_text
-    ]
+    return [cell for cell in sheet.cells if cell.row == row and cell.search_text]
 
 
 def _cell_label(cell: TableCell, labels: Dict[int, str]) -> str:
@@ -636,7 +665,9 @@ def anonymize_tabular_file(
     if use_llm:
         batches = build_llm_batches(doc, characters_to_anonymize)
         for i, batch in enumerate(batches):
-            logging.info(f"Identifying entities in table batch {i + 1}/{len(batches)}...")
+            logging.info(
+                f"Identifying entities in table batch {i + 1}/{len(batches)}..."
+            )
             llm_entities = identify_entities_with_llm(
                 batch,
                 prompt_template,
@@ -681,4 +712,110 @@ def anonymize_tabular_file(
     )
     apply_mapping_to_table(doc, final_mapping, entity_texts)
     review = flatten_table_for_review(doc, anonymized=True)
+    return review, final_mapping, entity_texts
+
+
+def _llm_entity_in_blocks(entity_text: str, blocks: Iterable) -> bool:
+    if not entity_text:
+        return False
+    for block in blocks:
+        if block.search_text and locate_spans(block.search_text, [entity_text]):
+            return True
+    return False
+
+
+def anonymize_docx_file(
+    file_path: str,
+    characters_to_anonymize: int,
+    prompt_template: str,
+    model_name: str,
+    anonymized_entities: Optional[List[str]] = None,
+    chunk_overlap: int = DEFAULT_CHUNK_OVERLAP,
+    regex_patterns: Optional[Dict[str, str]] = None,
+    max_retries: int = 3,
+    base_retry_delay: float = 1.0,
+    max_retry_delay: float = 10.0,
+    operators: Optional[Dict[str, str]] = None,
+    fake_secret: Optional[str] = None,
+    seed_mapping: Optional[Dict[str, str]] = None,
+    keep_list: Optional[List[str]] = None,
+    deny_list: Optional[List[str]] = None,
+    use_llm: bool = True,
+) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
+    """Anonymize a Word ``.docx`` file paragraph by paragraph.
+
+    Returns ``(review_flatten, orig→written, entity_texts)``. ``entity_texts``
+    is the same ``entity["text"]`` list the text engine passes to
+    ``replace_entities``.
+    """
+    if regex_patterns is None:
+        regex_patterns = DEFAULT_REGEX_PATTERNS
+
+    if is_rejected_word(file_path):
+        raise rejected_word_error(file_path)
+
+    doc = load_docx(file_path)
+    blocks = list(doc.blocks)
+    collected_entities: List[dict] = []
+
+    for block in blocks:
+        if not block.search_text:
+            continue
+        collected_entities.extend(
+            extract_entities_via_regex(block.search_text, regex_patterns)
+        )
+
+    full_text = flatten_docx_for_review(doc, anonymized=False)
+    if use_llm:
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=max(characters_to_anonymize, 1),
+            chunk_overlap=max(chunk_overlap, 0),
+        )
+        chunks = splitter.split_text(full_text) if full_text.strip() else []
+        for i, chunk in enumerate(chunks):
+            logging.info(f"Identifying entities in Word chunk {i + 1}/{len(chunks)}...")
+            llm_entities = identify_entities_with_llm(
+                chunk,
+                prompt_template,
+                model_name,
+                max_retries=max_retries,
+                base_retry_delay=base_retry_delay,
+                max_retry_delay=max_retry_delay,
+            )
+            for entity in llm_entities:
+                text = entity.get("text") or ""
+                if _llm_entity_in_blocks(text, blocks):
+                    collected_entities.append(entity)
+    else:
+        logging.info(
+            "Regex-only / offline mode: skipping the language model. "
+            "Names and identity clues will be missed."
+        )
+
+    if deny_list:
+        for block in blocks:
+            if not block.search_text:
+                continue
+            collected_entities.extend(apply_deny_list(block.search_text, [], deny_list))
+
+    entities_to_process = finalize_entities(
+        collected_entities,
+        full_text,
+        anonymized_entities=anonymized_entities,
+        keep_list=keep_list,
+        deny_list=deny_list,
+        apply_deny=False,
+        seed_mapping=seed_mapping,
+    )
+    final_mapping = build_mapping(
+        entities_to_process,
+        seed_mapping=seed_mapping,
+        operators=operators,
+        fake_secret=fake_secret,
+    )
+    entity_texts = tuple(
+        entity["text"] for entity in entities_to_process if entity.get("text")
+    )
+    apply_mapping_to_docx(doc, final_mapping, entity_texts)
+    review = flatten_docx_for_review(doc, anonymized=True)
     return review, final_mapping, entity_texts

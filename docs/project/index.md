@@ -35,6 +35,7 @@ Contains all the core engines, including:
 
 *   Text extraction from PDF, Markdown, and plain text formats.
 *   Table loaders for CSV (stdlib) and Excel (`.xlsx`, `[excel]` extra): per-cell regex, row-addressed LLM batches, per-cell apply.
+*   Word loader for `.docx` (`[docx]` extra): per-paragraph regex, part-wise flatten, native `.docx` write-back.
 *   Hybrid detection: RE2 regex (with checksums / `TYPE_LIKE`) plus LLM NER.
 *   LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).
 *   Prompt templates (`simple`, `detailed`, `hipaa`) and identity-clue detection.

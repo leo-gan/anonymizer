@@ -15,6 +15,8 @@ It reflects the current public surface of `pdf-anonymizer-core`. The hand-writte
 
 ::: pdf_anonymizer_core.core.anonymize_tabular_file
 
+::: pdf_anonymizer_core.core.anonymize_docx_file
+
 ::: pdf_anonymizer_core.utils.deanonymize_file
 
 ::: pdf_anonymizer_core.utils.consolidate_mapping
@@ -82,3 +84,15 @@ The package ships two ready-to-use prompt templates.
 ::: pdf_anonymizer_core.tables.flatten_table_for_review
 
 ::: pdf_anonymizer_core.tables.load_review_text
+
+---
+
+## Word (DOCX)
+
+::: pdf_anonymizer_core.word.load_docx
+
+::: pdf_anonymizer_core.word.save_docx
+
+::: pdf_anonymizer_core.word.apply_mapping_to_docx
+
+::: pdf_anonymizer_core.word.flatten_docx_for_review

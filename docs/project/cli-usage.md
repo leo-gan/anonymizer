@@ -14,7 +14,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 ```
 
 ### Arguments
-*   `FILE_PATH`: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, or Excel `.xlsx`).
+*   `FILE_PATH`: Space-separated list of paths to files (PDF, Markdown, plain text, CSV, Excel `.xlsx`, or Word `.docx`).
 
 ### Options
 
@@ -210,9 +210,9 @@ Files in the same `run` share one growing map, so the same person stays `PERSON_
 
 `run`, `verify`, `report`, and `deanonymize` write under conventional directories (created automatically):
 
-*   `data/anonymized/<stem>.anonymized.md` (or `.txt`, `.csv`, `.xlsx`)
+*   `data/anonymized/<stem>.anonymized.md` (or `.txt`, `.csv`, `.xlsx`, `.docx`)
 *   `data/mappings/<stem>.mapping.json` (or `*.mapping.json.enc` when a passphrase is set)
-*   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`, `.csv`, `.xlsx`)
+*   `data/deanonymized/<stem>.deanonymized.md` (or `.txt`, `.csv`, `.xlsx`, `.docx`)
 *   `data/stats/<stem>.residual_pii.json` — leftovers found after masking (from `run` or `verify`)
 *   `data/stats/<stem>.risk.json` — identity-clue clumps (from `run` or `report`)
 *   `data/stats/<stem>.deanonymization_stat.json` — written by `deanonymize`
@@ -299,6 +299,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### CSV and Excel as inputs (cell-level masking)
 
 `pdf-anonymizer run people.csv` and `pdf-anonymizer run roster.xlsx` (with the `[excel]` extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, **not** *k*-anonymity. See [Anonymize a CSV or Excel roster](recipes.md#anonymize-a-csv-or-excel-roster).
+
+### Word `.docx` as input
+
+`pdf-anonymizer run letter.docx` (with the `[docx]` extra) walks paragraphs, table cells, headers, footers, footnotes, comments, field codes, and hyperlink targets, then writes `letter.anonymized.docx` plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. Legacy `.doc` and macro-enabled `.docm` are rejected. See [Anonymize a Word document](recipes.md#anonymize-a-word-document).
 
 ### PII-free files now write output + empty mapping
 

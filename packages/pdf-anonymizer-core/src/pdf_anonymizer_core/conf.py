@@ -25,6 +25,10 @@ DEFAULT_CHUNK_OVERLAP: int = 1000
 MAX_TABLE_BYTES: int = 50 * 1024 * 1024
 MAX_TABLE_CELLS: int = 500_000
 
+# In-memory caps for Word .docx. Documents are not streamed.
+MAX_DOCX_BYTES: int = 50 * 1024 * 1024
+MAX_DOCX_BLOCKS: int = 100_000
+
 # Directories and file paths
 DEFAULT_ANONYMIZED_DIR: str = "data/anonymized"
 DEFAULT_MAPPINGS_DIR: str = "data/mappings"

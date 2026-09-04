@@ -32,6 +32,14 @@ from pdf_anonymizer_core.tables import (
     unneutralize_csv_equals,
     write_anonymized_table,
 )
+from pdf_anonymizer_core.word import (
+    flatten_docx_for_review,
+    is_word_path,
+    load_docx,
+    save_docx,
+    write_anonymized_docx,
+    write_block_text,
+)
 
 _PLACEHOLDER_PATTERN = re.compile(r"^[A-Z_]+_[0-9]+(?:\.v_[0-9]+)?$")
 
@@ -172,10 +180,11 @@ def save_results(
             return value is an empty string. The caller already holds
             ``final_mapping`` in memory.
         entity_texts: Detected ``entity["text"]`` values used to apply the
-            mapping. Required for table paths; ignored for text.
+            mapping. Required for table and Word paths; ignored for text.
         orig_to_written: Engine original → written map used to re-apply on
-            tables. Required for colliding mask/generalize/fake forms; when
-            omitted, ``mapping_to_original_to_written(final_mapping)`` is used.
+            tables and Word files. Required for colliding mask/generalize/fake
+            forms; when omitted, ``mapping_to_original_to_written(final_mapping)``
+            is used.
 
     Returns:
         tuple[str, str]: The paths to the anonymized text file and the mapping
@@ -197,11 +206,12 @@ def save_results(
     anonymized_output_file = (
         f"{anonymized_dir}/{file_stem}.anonymized{output_extension}"
     )
-    if is_tabular_path(file_path):
+    structured = is_tabular_path(file_path) or is_word_path(file_path)
+    if structured:
         if entity_texts is None:
             raise ValueError(
-                "save_results() on a table requires entity_texts= "
-                "(the same entity['text'] list the engine applied)."
+                "save_results() on a table or Word document requires "
+                "entity_texts= (the same entity['text'] list the engine applied)."
             )
         apply_map = (
             orig_to_written
@@ -214,9 +224,14 @@ def save_results(
                 "save_results() entity_texts are not keys of orig_to_written. "
                 "Pass the engine original→written map as orig_to_written=."
             )
-        write_anonymized_table(
-            file_path, anonymized_output_file, apply_map, texts
-        )
+        if is_word_path(file_path):
+            write_anonymized_docx(
+                file_path, anonymized_output_file, apply_map, texts
+            )
+        else:
+            write_anonymized_table(
+                file_path, anonymized_output_file, apply_map, texts
+            )
     else:
         with open(anonymized_output_file, "w", encoding="utf-8") as f:
             f.write(full_anonymized_text)
@@ -336,6 +351,8 @@ def deanonymize_file(
 
     sorted_placeholders = sorted(placeholder_to_original.keys(), key=len, reverse=True)
     tabular = is_tabular_path(anonymized_file_path)
+    word = is_word_path(anonymized_file_path)
+    deanonymized_text = ""
 
     if tabular:
         doc = load_table(anonymized_file_path)
@@ -352,6 +369,19 @@ def deanonymize_file(
                 restored = unneutralize_csv_equals(restored)
             if restored != cell.search_text:
                 cell.search_text = restored
+    elif word:
+        word_doc = load_docx(anonymized_file_path)
+        anonymized_text = flatten_docx_for_review(word_doc, anonymized=True)
+        used_placeholders = set()
+        for block in word_doc.blocks:
+            if not block.search_text:
+                continue
+            restored, block_used = restore_placeholders_in_text(
+                block.search_text, placeholder_to_original
+            )
+            used_placeholders |= block_used
+            if restored != block.search_text:
+                write_block_text(block, restored)
     else:
         with open(anonymized_file_path, "r", encoding="utf-8") as f:
             anonymized_text = f.read()
@@ -382,6 +412,8 @@ def deanonymize_file(
     deanonymized_file = f"{deanonymized_dir}/{file_stem}.deanonymized{output_extension}"
     if tabular:
         save_table(doc, deanonymized_file)
+    elif word:
+        save_docx(word_doc, deanonymized_file)
     else:
         with open(deanonymized_file, "w", encoding="utf-8") as f:
             f.write(deanonymized_text)

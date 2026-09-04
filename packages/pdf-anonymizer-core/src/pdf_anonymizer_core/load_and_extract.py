@@ -1,5 +1,7 @@
 """Text extraction and semantic chunking for PDF, Markdown, and plain text.
 
+CSV, Excel, and Word files do not use this loader.
+
 Uses pymupdf4llm for high-quality PDF → Markdown conversion (preserves
 structure useful for LLMs) and langchain text splitters:
 - MarkdownTextSplitter for .pdf and .md (respects headers/code blocks)
@@ -24,6 +26,11 @@ from pdf_anonymizer_core.tables import (
     is_rejected_spreadsheet,
     is_tabular_path,
     rejected_spreadsheet_error,
+)
+from pdf_anonymizer_core.word import (
+    is_rejected_word,
+    is_word_path,
+    rejected_word_error,
 )
 
 
@@ -103,6 +110,12 @@ def load_and_extract_text_from_file(
     path = Path(file_path)
     file_extension = path.suffix.lower()
 
+    if is_rejected_word(file_path):
+        raise rejected_word_error(file_path)
+    if is_word_path(file_path):
+        raise ValueError(
+            ".docx files must be loaded as Word documents, not as plain text."
+        )
     if is_rejected_spreadsheet(file_path):
         raise rejected_spreadsheet_error(file_path)
     if is_tabular_path(file_path):
