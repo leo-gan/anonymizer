@@ -38,6 +38,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--mapping-in` | `PATH` | *none* | Seed stand-ins from an existing mapping so the same person stays `PERSON_1` across files. |
 | `--keep-list` | `PATH` | *none* | Phrases to leave visible (one per line). Wins if also on the deny-list. |
 | `--deny-list` | `PATH` | *none* | Phrases that must be hidden even if detection missed them. |
+| `--ocr` / `--no-ocr` | flag | off | If a PDF has no text layer, OCR it with Tesseract (must be on PATH). A scan with OCR off is an error, not an empty success file. |
 
 ### Configuration Profiles
 
@@ -295,6 +296,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### Gold corpus and completeness eval
 
 `scripts/download_gold_corpus.py` installs TAB, Presidio, and Gretel under `data/gold-corpus/` (not in git). `scripts/run_gold_benchmark.py` scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See [Gold corpus & eval](gold-corpus.md).
+
+### Scanned PDFs (`--ocr`)
+
+A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass `--ocr` to recover words. A sidecar `*.anonymized.layout.json` stores page boxes for a later native-PDF write. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
 
 ### CSV and Excel as inputs (cell-level masking)
 

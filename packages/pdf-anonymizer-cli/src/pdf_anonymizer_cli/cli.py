@@ -242,6 +242,17 @@ def run(
             ),
         ),
     ] = None,
+    ocr: Annotated[
+        bool,
+        typer.Option(
+            "--ocr/--no-ocr",
+            help=(
+                "If a PDF has no text layer, OCR it with Tesseract (must be "
+                "on PATH). Off by default. A scan with OCR off is an error, "
+                "not an empty success file."
+            ),
+        ),
+    ] = False,
     entity_profile: Annotated[
         Optional[EntityProfile],
         typer.Option(
@@ -438,6 +449,7 @@ def run(
                     keep_list=keep_phrases,
                     deny_list=deny_phrases,
                     use_llm=use_llm,
+                    ocr=ocr,
                 )
         except ValueError as exc:
             logging.error("%s", exc)

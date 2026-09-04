@@ -377,6 +377,7 @@ def anonymize_file(
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
     use_llm: bool = True,
+    ocr: bool = False,
 ) -> Tuple[Optional[str], Optional[Dict[str, str]]]:
     """Anonymize a file by processing its text content.
 
@@ -427,6 +428,9 @@ def anonymize_file(
         use_llm: When False, skip ``identify_entities_with_llm``. Regex,
             checksums, operators, gazetteers, and span replacement still run.
             Names and identity clues will be missed. Default True.
+        ocr: When True and a PDF has no text layer, run Tesseract via
+            PyMuPDF and stash word boxes for a later native-PDF write.
+            A scan with OCR off (or OCR that returns nothing) raises.
 
     Returns:
         A tuple (anonymized_text, mapping) where:
@@ -488,7 +492,7 @@ def anonymize_file(
 
     file_size = os.path.getsize(file_path)
     full_text, text_pages = load_and_extract_text_from_file(
-        file_path, characters_to_anonymize, chunk_overlap
+        file_path, characters_to_anonymize, chunk_overlap, ocr=ocr
     )
 
     if not text_pages:

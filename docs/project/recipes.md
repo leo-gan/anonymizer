@@ -207,6 +207,32 @@ For very large batch jobs you may want to:
 
 ---
 
+## OCR a scanned PDF
+
+A PDF that is only pictures of pages has no text layer. `pymupdf4llm` then returns empty Markdown. That used to look like a successful run. It is now a hard error: the CLI exits non-zero and writes no `*.anonymized.md`.
+
+To recover words, install **Tesseract** (a system package, not a pip extra) and pass `--ocr`:
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install tesseract-ocr
+# macOS
+brew install tesseract
+
+pdf-anonymizer run scan.pdf --ocr --no-llm
+```
+
+That writes the usual anonymized Markdown and mapping, plus `data/anonymized/scan.anonymized.layout.json`. The layout file lists each OCR word and its page box so a later native-PDF redact pass can find the same spans.
+
+**Notes**
+
+- OCR is slower and less accurate than a real text layer. Prefer a digitally created PDF when you have one.
+- `--ocr` does nothing extra when the PDF already has extractable text.
+- If Tesseract is missing, the error says to install the binary. There is no `[ocr]` wheel today.
+- If OCR itself returns nothing, that is also an error, not an empty success file.
+
+---
+
 ## Anonymize a CSV or Excel roster
 
 A roster, export, or clinic list is a table. The same engine walks **cells** and writes a same-format spreadsheet plus the usual mapping. This is the same reversible pseudonymization as a PDF. It is **not** *k*-anonymity: leftover columns are not crowd-hidden.

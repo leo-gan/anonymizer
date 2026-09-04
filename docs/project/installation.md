@@ -61,6 +61,8 @@ pip install "pdf-anonymizer-core[docx]"
 *   `[excel]`: Installs `openpyxl` for `.xlsx` input. CSV uses the stdlib and needs no extra.
 *   `[docx]`: Installs `python-docx` for `.docx` input. Legacy `.doc` and macro-enabled `.docm` are rejected.
 
+Scanned PDFs need the **Tesseract** binary on `PATH` and the `--ocr` flag. That is a system package, not a pip extra. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
+
 ---
 
 ## Environment Variables Configuration

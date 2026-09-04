@@ -56,6 +56,7 @@ graph TD
 
 ### Text Extraction & PDF Conversion
 *   Instead of traditional OCR or layout-unaware PDF parsing, the project uses `pymupdf4llm` to convert PDF files into clean, readable **Markdown**. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.
+*   A PDF with pages and no text layer is a hard error. `--ocr` runs Tesseract through PyMuPDF and writes word boxes to `*.anonymized.layout.json` so a later native-PDF redact pass can use the same spans. OCR is slower and less accurate than a real text layer.
 *   For Markdown and Text files, standard file reads are executed.
 *   CSV and Excel skip this loader. See [Table path](#table-path-csv--excel).
 *   Word `.docx` skips this loader. See [Word path](#word-path-docx).
