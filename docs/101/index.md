@@ -8,7 +8,9 @@ Data is the lifeblood of modern technology, but sharing it carries immense respo
 
 ## Course Curriculum
 
-Explore the modules below to build a strong foundation in data privacy:
+Explore the modules below to build a strong foundation in data privacy.
+
+Words such as *pseudonymization*, *quasi-identifier*, *leftover*, and *gold corpus* are defined once on **[Terminology](../project/terminology.md)**.
 
 ### [Why Anonymize?](why-anonymization.md)
 *   **The Foundation of Privacy**: Why raw data cannot simply be shared.

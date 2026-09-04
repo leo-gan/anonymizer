@@ -132,7 +132,7 @@ Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`) go
 
 Replacement is span-based: mentions are located in the full document, the longer interval wins on overlap, and slices are written from the end.
 
-To score a gold fixture (mention vs entity recall, direct vs quasi) run `uv run python scripts/eval_tab.py`. Tests and scripts only.
+To score a gold fixture (mention vs entity recall, direct vs quasi) run `uv run python scripts/eval_tab.py`. To install and score the public gold-corpus (TAB, Presidio, Gretel — not stored in git) see the site page **Gold corpus & eval**. Tests and scripts only.
 
 To score identity-clue clumps in masked text (report only):
 

@@ -57,11 +57,13 @@ A CLI tool built on top of `pdf-anonymizer-core` that:
 
 To dive deeper into the technical details, navigate through the following guides:
 
+- **[Terminology](terminology.md)**: One list of product words (pseudonymization, leftover, gold corpus, mention vs entity). Other pages should link here.
 - **[Installation & Setup](installation.md)**: Learn how to set up the development environment using `uv`, manage packages, and define environment variables.
 - **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options (including `--config-profile`), custom model strings, and usage examples.
 - **[SDK & API Usage](api-usage.md)**: Learn how to import PDF Anonymizer as a Python library in your own applications.
 - **[API Reference (auto)](api-reference.md)**: Living signature reference generated from source docstrings.
 - **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.
+- **[Gold corpus & eval](gold-corpus.md)**: Why we measure leftover risk, what is in the gold corpus, and the download / benchmark / CI workflows.
 - **[Mapping encryption](mapping-security.md)**: Argon2id + AES-256-GCM envelopes, AAD, `0600` writes, ephemeral maps, and the tests that lock those in.
 - **[Troubleshooting](troubleshooting.md)**: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.
 - **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.

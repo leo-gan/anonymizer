@@ -292,6 +292,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 
 `tests/eval/` and `scripts/eval_tab.py` score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.
 
+### Gold corpus and completeness eval
+
+`scripts/download_gold_corpus.py` installs TAB, Presidio, and Gretel under `data/gold-corpus/` (not in git). `scripts/run_gold_benchmark.py` scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See [Gold corpus & eval](gold-corpus.md).
+
 ### CSV and Excel as inputs (cell-level masking)
 
 `pdf-anonymizer run people.csv` and `pdf-anonymizer run roster.xlsx` (with the `[excel]` extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, **not** *k*-anonymity. See [Anonymize a CSV or Excel roster](recipes.md#anonymize-a-csv-or-excel-roster).

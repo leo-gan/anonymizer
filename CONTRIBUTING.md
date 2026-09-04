@@ -61,8 +61,9 @@ print(anonymize_file('data/sample.pdf', 50000, detailed.prompt_template, 'gemini
 - Source lives in `docs/`.
 - The site is built with MkDocs + Material.
 - New practical examples go in `docs/project/recipes.md`.
+- Product words (leftover, gold corpus, quasi-identifier) go in `docs/project/terminology.md`. Do not invent a second definition on another page.
 - New CLI flags also belong on the [CLI History](docs/project/cli-usage.md#history) list.
-- Privacy-metric experiments go in `tests/eval/` (see `scripts/eval_tab.py`).
+- Privacy-metric experiments go in `tests/eval/`. Goals and workflows: [Gold corpus & eval](docs/project/gold-corpus.md). Completeness gates and fuzz live in `tests/eval/test_completeness.py` and `tests/test_fuzz.py`.
 - Hand-written usage guidance lives in `docs/project/`.
 - Auto-generated reference (via mkdocstrings) is at `docs/project/api-reference.md`.
 - Please keep docstrings in the Python source reasonably complete — they feed the API reference.

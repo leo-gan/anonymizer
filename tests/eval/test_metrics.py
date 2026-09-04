@@ -38,7 +38,12 @@ def test_regex_stage_on_fixture_finds_structured_direct() -> None:
     fixture = _load_fixture()
     ents = extract_entities_via_regex(fixture["text"], DEFAULT_REGEX_PATTERNS)
     predicted = [
-        {"text": e["text"], "type": e["type"], "start": e.get("start"), "end": e.get("end")}
+        {
+            "text": e["text"],
+            "type": e["type"],
+            "start": e.get("start"),
+            "end": e.get("end"),
+        }
         for e in ents
     ]
     report = evaluate_fixture(fixture, predicted)

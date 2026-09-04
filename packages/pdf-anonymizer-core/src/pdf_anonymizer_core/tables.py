@@ -203,7 +203,10 @@ def load_csv(path: str) -> TableDocument:
     dialect_kwargs = _dialect_kwargs(dialect)
     dialect_kwargs["lineterminator"] = _detect_lineterminator(text)
 
-    rows = list(csv.reader(io.StringIO(text), dialect))
+    try:
+        rows = list(csv.reader(io.StringIO(text), dialect))
+    except csv.Error as exc:
+        raise ValueError(f"CSV is not readable: {exc}") from exc
     max_row = len(rows)
     max_column = max((len(row) for row in rows), default=0)
     row_widths = [len(row) for row in rows]

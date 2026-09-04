@@ -646,7 +646,7 @@ There is no extra CLI flag.
 
 ## Score a gold fixture (TAB-style eval)
 
-Unit tests check regexes and mappings. They do not tell you “how many real names did we miss?”.
+Unit tests check regexes and mappings. They do not tell you “how many real names did we miss?”. Score names are defined on [Terminology](terminology.md#how-we-measure).
 
 `tests/eval/` is a tiny gold page plus a scorer. It reports mention-level and entity-level precision / recall / F1, split by **direct** identifiers (email, SSN, person) versus **quasi** identifiers (city, date). That split matters: a high score on cities can hide a poor score on names.
 
@@ -659,6 +659,21 @@ uv run python scripts/eval_tab.py --fixture tests/eval/fixture.json --prediction
 ```
 
 This is tests and scripts only. It does not change `run`. It is not a legal privacy proof.
+
+---
+
+## Gold-corpus benchmark
+
+Goals, sources, metrics, and CI gates are on **[Gold corpus & eval](gold-corpus.md)**. The commands are:
+
+```bash
+make gold-corpus          # download TAB / Presidio / Gretel into data/gold-corpus/
+make gold-bench           # regex-only baseline (no API key)
+make gold-table           # public eval table
+make test-cov             # PR suite: leftover gate, residual JSON, coverage, fuzz
+```
+
+This is tests and scripts only. It is not a legal privacy proof.
 
 ---
 

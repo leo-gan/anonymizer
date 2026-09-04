@@ -27,6 +27,34 @@ from pdf_anonymizer_core.tables import (
 )
 
 
+def _reject_empty_pdf_extract(file_path: str) -> None:
+    """Refuse a silent empty extract when the PDF is not a readable document.
+
+    Image-only PDFs with pages still return empty text today (item 14). A
+    zero-page or unreadable file must not look like a successful extract.
+    Missing files are left alone so mocked PDF tests keep working.
+    """
+    try:
+        import pymupdf
+    except ImportError:
+        raise ValueError("PDF extract is empty and pymupdf is not installed.")
+
+    try:
+        document = pymupdf.open(file_path)
+    except FileNotFoundError:
+        return
+    except Exception as exc:
+        raise ValueError(
+            f"PDF extract is empty and the file is not readable: {exc}"
+        ) from exc
+    try:
+        pages = document.page_count
+    finally:
+        document.close()
+    if pages < 1:
+        raise ValueError("PDF has no pages; refusing empty extract as success.")
+
+
 def load_and_extract_text_from_pdf(
     file_path: str, characters_to_anonymize: int = 100000, chunk_overlap: int = 0
 ) -> Tuple[str, List[str]]:
@@ -43,6 +71,8 @@ def load_and_extract_text_from_pdf(
     """
     try:
         md_text = pymupdf4llm.to_markdown(file_path, show_progress=False)
+        if not (md_text or "").strip():
+            _reject_empty_pdf_extract(file_path)
         splitter = MarkdownTextSplitter(
             chunk_size=characters_to_anonymize, chunk_overlap=chunk_overlap
         )
