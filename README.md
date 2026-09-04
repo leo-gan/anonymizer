@@ -1,6 +1,6 @@
 # 🦉🫥 PDF Anonymizer
 
-This application anonymizes large PDF, Markdown, or Text files using a **hybrid approach**: a fast, safe RE2-powered regex pre-filter (google-re2) followed by LLM-based semantic detection.
+This application anonymizes large PDF, Markdown, Text, CSV, Excel, or Word files using a **hybrid approach**: a fast, safe RE2-powered regex pre-filter (google-re2) followed by LLM-based semantic detection.
 
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
 [![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
@@ -14,7 +14,7 @@ This application anonymizes large PDF, Markdown, or Text files using a **hybrid 
 - **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
-- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, and Excel files.
+- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`) files.
 
 ## 📖 Documentation
 

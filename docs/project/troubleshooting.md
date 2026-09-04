@@ -100,11 +100,22 @@ Common problems and how to resolve them.
   - Manually increase `--characters-to-anonymize` (e.g. 120000 or higher) when using a model with a large context window.
   - The tool uses Markdown-aware splitting for PDFs and `.md` files to preserve structure.
   - CSV and Excel are **in-memory**. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.
+  - Word `.docx` is **in-memory**. It is refused above 50 MiB or 100,000 non-empty paragraphs. That is not the 1 GB text-chunking path.
 
 ## Excel extra missing
 
 - **Symptom**: `Excel support requires the extra: pip install "pdf-anonymizer-core[excel]"`
 - **Fix**: `pip install "pdf-anonymizer-core[excel]"` or `pip install "pdf-anonymizer-cli[excel]"`. CSV does not need this extra.
+
+## Word extra missing
+
+- **Symptom**: `Word support requires the extra: pip install "pdf-anonymizer-core[docx]"`
+- **Fix**: `pip install "pdf-anonymizer-core[docx]"` or `pip install "pdf-anonymizer-cli[docx]"`.
+
+## Rejected Word formats
+
+- **Symptom**: `.doc`, `.docm`, `.dot`, `.dotm`, or `.dotx` is rejected with a convert-to-docx message.
+- **Fix**: Re-save as `.docx`. Macro-enabled documents are not supported (macros can re-derive PII).
 
 ## Rejected spreadsheet formats
 
@@ -119,7 +130,12 @@ Common problems and how to resolve them.
 ## Charts, comments, and other leftovers
 
 - **Symptom**: A name still appears in a chart, comment, header/footer, data-validation list, defined name, or hyperlink.
-- **Fix**: Those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual.
+- **Fix**: On **spreadsheets**, those surfaces are not walked. Delete charts and clear headers/comments before sharing, or accept the residual. On **Word**, headers, footers, comments, field codes, and hyperlink targets **are** walked. Images, alt text, core properties (author), charts, and embedded objects are not.
+
+## Word formatting after the first run is gone
+
+- **Symptom**: A sentence that was partly bold or a second color is now one style.
+- **Fix**: Word splits one phrase across many runs. Replacement writes the new text into the first run and clears the rest, so later-run formatting is lost. Paragraph style is kept.
 
 ## Undashed numeric IDs missed on `--no-llm`
 

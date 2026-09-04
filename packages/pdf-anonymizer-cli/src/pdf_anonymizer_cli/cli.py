@@ -16,13 +16,18 @@ from pdf_anonymizer_core.conf import (
     operators_for_entity_profile,
     types_for_entity_profile,
 )
-from pdf_anonymizer_core.core import anonymize_file, anonymize_tabular_file
+from pdf_anonymizer_core.core import (
+    anonymize_docx_file,
+    anonymize_file,
+    anonymize_tabular_file,
+)
 from pdf_anonymizer_core.gazetteers import load_phrase_list
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.operators import parse_operator_specs
 from pdf_anonymizer_core.prompts import detailed, hipaa, simple
 from pdf_anonymizer_core.tables import is_tabular_path, load_review_text
+from pdf_anonymizer_core.word import is_word_path
 from pdf_anonymizer_core.utils import (
     consolidate_mapping,
     deanonymize_file,
@@ -375,7 +380,26 @@ def run(
         logging.info(f"Processing file {i}/{len(file_paths)}: {file_path}")
         entity_texts = None
         try:
-            if is_tabular_path(str(file_path)):
+            if is_word_path(str(file_path)):
+                full_anonymized_text, final_mapping, entity_texts = anonymize_docx_file(
+                    file_path=str(file_path),
+                    characters_to_anonymize=config.chunk_size,
+                    prompt_template=prompt_template,
+                    model_name=config.model_name,
+                    anonymized_entities=entities_to_anonymize,
+                    chunk_overlap=config.chunk_overlap,
+                    regex_patterns=config.regex_patterns,
+                    max_retries=config.max_retries,
+                    base_retry_delay=config.base_retry_delay,
+                    max_retry_delay=config.max_retry_delay,
+                    operators=operator_map or None,
+                    fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
+                    seed_mapping=seed_mapping,
+                    keep_list=keep_phrases,
+                    deny_list=deny_phrases,
+                    use_llm=use_llm,
+                )
+            elif is_tabular_path(str(file_path)):
                 full_anonymized_text, final_mapping, entity_texts = (
                     anonymize_tabular_file(
                         file_path=str(file_path),
@@ -437,7 +461,11 @@ def run(
                 mapping_passphrase=passphrase,
                 ephemeral_mapping=ephemeral_mapping,
                 entity_texts=entity_texts,
-                orig_to_written=final_mapping if is_tabular_path(str(file_path)) else None,
+                orig_to_written=(
+                    final_mapping
+                    if is_tabular_path(str(file_path)) or is_word_path(str(file_path))
+                    else None
+                ),
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

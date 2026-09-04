@@ -58,6 +58,7 @@ graph TD
 *   Instead of traditional OCR or layout-unaware PDF parsing, the project uses `pymupdf4llm` to convert PDF files into clean, readable **Markdown**. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.
 *   For Markdown and Text files, standard file reads are executed.
 *   CSV and Excel skip this loader. See [Table path](#table-path-csv--excel).
+*   Word `.docx` skips this loader. See [Word path](#word-path-docx).
 
 ### Semantic Chunking
 *   Depending on the `--characters-to-anonymize` parameter (default `100,000` characters), the text is sliced into chunks:
@@ -138,6 +139,15 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 *   **Review flatten** (`v1 | v2 | …`, blank line after every row) is what `anonymize_file` returns for tables. `verify` and `report` score that flatten, not raw CSV bytes.
 *   Excel writes cached values only (no formulas). Charts, comments, headers/footers, validation lists, defined names, and hyperlinks are left as-is.
 *   This is still cell-level pseudonymization. It is not *k*-anonymity.
+
+### Word path (DOCX)
+*   `.docx` never enters `load_and_extract_text_from_file`. `word.load_docx` walks visible paragraph text in the main document, headers, footers, footnotes, endnotes, comments, and glossary parts; apply writes those same nodes. Field codes (`w:instrText`) and external hyperlink targets are separate blocks.
+*   **Regex** runs per block on the concatenated visible text of each paragraph (runs are joined so `jane` + `@` + `acme.com` is one email).
+*   **LLM** sees the part-wise flatten. A hit is kept only if `locate_spans` finds it in some block.
+*   **Apply** is `replace_entities` on each block's `search_text` with the same `entity["text"]` list the text engine uses. Replacement text is written into the first `w:t` of the paragraph; later runs are cleared. Intra-run formatting after the first run is not preserved.
+*   **Review flatten** (`# Part: /word/document.xml` then paragraphs) is what `anonymize_file` returns for Word. `verify` and `report` score that flatten, not the ZIP bytes.
+*   Tracked-change deletions (`w:del`) are skipped. Images, alt text, core properties (author), charts, and embedded objects are left as-is.
+*   `.doc`, `.docm`, `.dot`, `.dotm`, and `.dotx` are rejected.
 
 ---
 

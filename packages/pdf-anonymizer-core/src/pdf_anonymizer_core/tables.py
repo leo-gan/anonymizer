@@ -601,11 +601,23 @@ def flatten_table_for_review(doc: TableDocument, *, anonymized: bool = True) -> 
 
 
 def load_review_text(path: str) -> str:
-    """Load text for ``verify`` / ``report``. Tables are flattened row-wise."""
+    """Load text for ``verify`` / ``report``. Tables and Word files are flattened."""
     if is_rejected_spreadsheet(path):
         raise rejected_spreadsheet_error(path)
     if is_tabular_path(path):
         return flatten_table_for_review(load_table(path), anonymized=True)
+    from pdf_anonymizer_core.word import (
+        flatten_docx_for_review,
+        is_rejected_word,
+        is_word_path,
+        load_docx,
+        rejected_word_error,
+    )
+
+    if is_rejected_word(path):
+        raise rejected_word_error(path)
+    if is_word_path(path):
+        return flatten_docx_for_review(load_docx(path), anonymized=True)
     return Path(path).read_text(encoding="utf-8")
 
 

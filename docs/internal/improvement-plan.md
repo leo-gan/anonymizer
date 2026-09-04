@@ -30,7 +30,7 @@
 - [ ] 22. HTTP API + Docker
 - [ ] 23. Review / apply residual findings
 - [ ] 24. `encrypt` / format-preserving encryption operator
-- [ ] 25. Native DOCX input/output
+- [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [ ] 26. Optional table-only formal privacy engine
 - [ ] 27. Release hygiene (attestations, no-telemetry statement)
 
@@ -72,6 +72,7 @@ Known code facts to attach to:
 - `--keep-list` / `--deny-list` gazetteers. Keep wins if a phrase is on both lists.
 - `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). `scripts/download_gold_corpus.py` installs TAB / Presidio / Gretel into `data/gold-corpus/` (not in git). Regex-only baseline: `tests/eval/baselines/gold_corpus_regex_only.json`. PR CI: committed gold leftover/recall gate, residual JSON red-team, `pytest-cov` floor, Hypothesis fuzz. Public eval table: `scripts/eval_public_table.py`. LLM path in unit tests is mocked; live LLM eval is opt-in.
 - `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
+- `.docx` takes a Word path (`word.py`): per-paragraph regex on visible text (runs joined), part-wise LLM flatten, per-paragraph apply, native `.docx` write-back. Headers, footers, comments, field codes, and hyperlink targets are walked. `.doc` / `.docm` / `.dot*` are rejected (item 25).
 - PDF path is `pymupdf4llm` → Markdown. Image-only PDFs extract empty text and continue (item 14). No native PDF write, no XMP/`/Info` wipe (item 15).
 - `best-speed` still calls an LLM for names. No GLiNER/spaCy span stage, no per-span confidence (items 20–21).
 - Surface is CLI + SDK. No HTTP service, no Docker image (item 22). Residual/risk reports do not rewrite (item 23).
@@ -559,7 +560,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 25. Native DOCX input/output
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #61](https://github.com/leo-gan/anonymizer/pull/61) (`feat/docx-input`)  
 **Technique:** next document format. Azure Document PII and Philter Desktop already do Word.
 
 **Why:** After native PDF, DOCX is the enterprise document users actually edit.
@@ -642,7 +643,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-Value-first order for **open** items (not a merge gate): **19** (prove it) → **14** (scans) → **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **25** (DOCX) → **26** (tables) → **27** (release). Ship 19 early so later items have a failing test to hang on.
+Value-first order for **open** items (not a merge gate): **14** (scans) → **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
 
 ---
 

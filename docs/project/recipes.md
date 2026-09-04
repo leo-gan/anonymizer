@@ -277,6 +277,74 @@ save_results(
 
 ---
 
+## Anonymize a Word document
+
+A letter, contract, or report is a Word file. The same engine walks **paragraphs** (body, tables, headers, footers, footnotes, comments) and writes a `.docx` plus the usual mapping. This is the same reversible pseudonymization as a PDF.
+
+Word (`.docx`) needs the extra:
+
+```bash
+pip install "pdf-anonymizer-core[docx]"
+# or
+pip install "pdf-anonymizer-cli[docx]"
+```
+
+**CLI**
+
+```bash
+pdf-anonymizer run letter.docx
+```
+
+That writes:
+
+- `data/anonymized/letter.anonymized.docx`
+- `data/mappings/letter.mapping.json`
+
+```bash
+pdf-anonymizer deanonymize \
+  data/anonymized/letter.anonymized.docx \
+  data/mappings/letter.mapping.json
+
+pdf-anonymizer verify data/anonymized/letter.anonymized.docx
+pdf-anonymizer report data/anonymized/letter.anonymized.docx
+```
+
+No new flags. `--no-llm`, `--operator`, `--keep-list` / `--deny-list`, `--mapping-in`, and the rest work the same way as on a PDF. Files in one `run` still share a growing map (`letter.docx notes.md`).
+
+**Notes**
+
+- **Runs are joined before detection.** Word often splits `jane@acme.com` across three runs. The loader concatenates visible `w:t` text in a paragraph so the email is one string. After replacement, the new text is written into the first run and later runs are cleared. Bold or color on those later runs is lost.
+- **Headers, footers, comments, and field codes are walked.** External hyperlink targets (`mailto:…`) are rewritten too.
+- **Size / RAM.** Hard limits: 50 MiB on disk, 100,000 non-empty paragraphs, fields, and hyperlink targets. The package loads in memory. This is **not** the 1 GB text-chunking path.
+- **Leftover risk.** Images, picture alt text, core properties (author / last modified by), charts, and embedded objects are not rewritten. Delete those before sharing, or accept the residual.
+- Tracked-change deletions (`w:del`) are skipped so rejected text is not treated as live PII.
+- `.doc`, `.docm`, `.dot`, `.dotm`, and `.dotx` are rejected. Re-save as `.docx`. Macro-enabled files are not supported (macros can re-derive PII).
+
+**SDK (Python)**
+
+`anonymize_file("letter.docx")` still returns a 2-tuple. The string is a part-wise **review flatten** (for verify/risk), not Word bytes. To write a real `.docx`, call `anonymize_docx_file` and pass `entity_texts` into `save_results`:
+
+```python
+from pdf_anonymizer_core.core import anonymize_docx_file
+from pdf_anonymizer_core.utils import save_results
+
+review, mapping, entity_texts = anonymize_docx_file(
+    "letter.docx",
+    characters_to_anonymize=100000,
+    prompt_template="",
+    model_name="",
+    use_llm=False,
+)
+save_results(
+    review,
+    {v: k for k, v in mapping.items()},
+    "letter.docx",
+    entity_texts=entity_texts,
+)
+```
+
+---
+
 ## Wrong-looking numbers are not treated as found
 
 A string of digits can *look* like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.
@@ -483,7 +551,7 @@ The CLI always enables caching according to the profile's `AppConfig`. Delete or
 
 PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 
-**Spreadsheets are in-memory.** CSV and Excel do **not** use this 1 GB streaming path. They are capped at 50 MiB / 500,000 non-empty cells and load the whole workbook. See [Anonymize a CSV or Excel roster](#anonymize-a-csv-or-excel-roster).
+**Spreadsheets and Word files are in-memory.** CSV, Excel, and `.docx` do **not** use this 1 GB streaming path. Spreadsheets are capped at 50 MiB / 500,000 non-empty cells. Word is capped at 50 MiB / 100,000 non-empty paragraphs. See [Anonymize a CSV or Excel roster](#anonymize-a-csv-or-excel-roster) and [Anonymize a Word document](#anonymize-a-word-document).
 
 **Practical tips**
 

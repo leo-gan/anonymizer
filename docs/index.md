@@ -2,7 +2,7 @@
 
 Welcome to the official documentation portal for the **PDF Anonymizer** project. 
 
-PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK designed to strip Personally Identifiable Information (PII) from large PDF, Markdown, and plain text documents using advanced large language models (LLMs). Crucially, the process is fully reversible: you can safely share your anonymized documents and later deanonymize them using local cryptographic maps.
+PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK designed to strip Personally Identifiable Information (PII) from large PDF, Markdown, plain text, CSV, Excel, and Word documents using advanced large language models (LLMs). Crucially, the process is fully reversible: you can safely share your anonymized documents and later deanonymize them using local cryptographic maps.
 
 <div class="grid cards" markdown="1">
 

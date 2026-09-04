@@ -13,6 +13,7 @@ from pdf_anonymizer_core.load_and_extract import load_and_extract_text_from_file
 from pdf_anonymizer_core.mapping_crypto import decrypt_mapping, validate_envelope
 from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
 from pdf_anonymizer_core.tables import load_csv, load_table
+from pdf_anonymizer_core.word import load_docx
 
 _FUZZ = settings(max_examples=40, deadline=2000)
 
@@ -87,6 +88,20 @@ def test_csv_loader_does_not_hang(data: bytes) -> None:
             return
         assert document.kind == "csv"
         load_table(str(path))
+
+
+@_FUZZ
+@given(st.binary(max_size=2048))
+def test_docx_loader_does_not_hang(data: bytes) -> None:
+    pytest.importorskip("docx")
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "fuzz.docx"
+        path.write_bytes(data)
+        try:
+            document = load_docx(str(path))
+        except (ValueError, OSError):
+            return
+        assert document.kind == "docx"
 
 
 def test_zero_page_pdf_is_not_success(tmp_path: Path) -> None:

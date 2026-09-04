@@ -20,7 +20,7 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
     ```bash
     uv sync --group dev
     ```
-    This sync command will install the CLI, core library, the Excel extra (`openpyxl`), and the dependencies for all supported LLM providers (`google`, `ollama`, `huggingface`, `openrouter`, `openai`, `anthropic`).
+    This sync command will install the CLI, core library, the Excel extra (`openpyxl`), the Word extra (`python-docx`), and the dependencies for all supported LLM providers (`google`, `ollama`, `huggingface`, `openrouter`, `openai`, `anthropic`).
 
 3.  **Activate the virtual environment**:
     ```bash
@@ -46,6 +46,9 @@ pip install "pdf-anonymizer-core[openai,anthropic]"
 
 # Excel (.xlsx) input
 pip install "pdf-anonymizer-core[excel]"
+
+# Word (.docx) input
+pip install "pdf-anonymizer-core[docx]"
 ```
 
 ### Available Extras
@@ -56,6 +59,7 @@ pip install "pdf-anonymizer-core[excel]"
 *   `[openai]`: Installs the official OpenAI API SDK.
 *   `[anthropic]`: Installs the official Anthropic API SDK.
 *   `[excel]`: Installs `openpyxl` for `.xlsx` input. CSV uses the stdlib and needs no extra.
+*   `[docx]`: Installs `python-docx` for `.docx` input. Legacy `.doc` and macro-enabled `.docm` are rejected.
 
 ---
 

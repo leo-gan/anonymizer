@@ -1,7 +1,7 @@
 [project]
 name = "pdf-anonymizer-cli"
-version = "0.18.0"
-description = "CLI for a tool to anonymize PDF, Markdown, and plain text files using LLMs."
+version = "0.19.0"
+description = "CLI for a tool to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
@@ -14,6 +14,7 @@ dependencies = [
 
 [project.optional-dependencies]
 excel = ["pdf-anonymizer-core[excel]"]
+docx = ["pdf-anonymizer-core[docx]"]
 
 [project.urls]
 repository = "https://github.com/leo-gan/anonymizer"

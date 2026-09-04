@@ -14,7 +14,7 @@ pdf-anonymizer-cli = { workspace = true }
 
 [project]
 name = "pdf-anonymizer-workspace"
-version = "0.18.0"
+version = "0.19.0"
 dependencies = []
 
 [project.optional-dependencies]
@@ -29,7 +29,7 @@ dev = [
   "pytest-mock",
   "pytest-cov",
   "hypothesis",
-  "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic,excel]",
+  "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic,excel,docx]",
   "pdf-anonymizer-cli",
   "mkdocs>=1.5.0",
   "mkdocs-material>=9.5.0",
