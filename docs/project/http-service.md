@@ -2,7 +2,7 @@
 
 The CLI is still the main surface. This page is the optional local HTTP wrapper around the same engine: `POST /anonymize`, `POST /deanonymize`, `POST /verify`, `POST /report`. There is **no authentication**. Bind to this machine or a compose network.
 
-Package version **0.24.0**. The HTTP layer is `pdf-anonymizer-api`. It depends on `pdf-anonymizer-core` only, not the CLI.
+The HTTP layer is `pdf-anonymizer-api`. It depends on `pdf-anonymizer-core` only, not the CLI.
 
 ---
 
@@ -38,7 +38,7 @@ The AppArmor profile is `packages/pdf-anonymizer-api/apparmor/docker-anonymizer`
 
 | Method | Path | What it does |
 |---|---|---|
-| `GET` | `/health` | `{"status": "ok", "version": "0.24.0"}` |
+| `GET` | `/health` | `{"status": "ok", "version": "<package version>"}` |
 | `POST` | `/anonymize` | Mask a string. Returns text, mapping, and the entity list. |
 | `POST` | `/deanonymize` | Put originals back from a mapping. |
 | `POST` | `/verify` | Residual leftover scan. Does not rewrite. |

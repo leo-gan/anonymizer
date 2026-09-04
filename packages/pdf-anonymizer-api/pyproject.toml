@@ -1,13 +1,13 @@
 [project]
 name = "pdf-anonymizer-api"
-version = "0.24.0"
+version = "0.25.0"
 description = "Local HTTP service for pdf-anonymizer-core. No authentication."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "pdf-anonymizer-core>=0.24.0",
+    "pdf-anonymizer-core>=0.25.0",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
 ]

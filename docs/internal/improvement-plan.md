@@ -76,7 +76,7 @@ Known code facts to attach to:
 - PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). `--output-pdf` writes a sanitized native PDF (PyMuPDF redaction annotations + ``apply_redactions``, ``/Info``/XMP/attachments/layers wiped). `--redact` is irreversible black boxes. Markdown stays the default (item 15).
 - `best-speed` / `best-cost` use local span NER when the `[ner]` extra is installed (GLiNER, CPU). They then skip the language model. `best-quality` may run NER first and still calls the LLM for identity clues. No extra ⇒ today’s LLM `best-speed`.
 - Every entity has `score` (0–1) and `source` (`regex` / `ner` / `llm` / `deny-list`). `--min-confidence` defaults to 0 (accept all). Verified regex scores higher than `TYPE_LIKE` (item 21).
-- Surface is CLI + SDK + optional HTTP package (`pdf-anonymizer-api`, core only). Dockerfile and compose live in that package. Bind localhost. No auth (item 22). Residual/risk reports do not rewrite (item 23).
+- Surface is CLI + SDK + optional HTTP package (`pdf-anonymizer-api`, core only). Dockerfile and compose live in that package. Bind localhost. No auth (item 22). Residual reports stay report-only unless you opt in: `pdf-anonymizer apply` or `run --apply-residuals` (item 23). Risk reports still do not rewrite.
 
 ---
 
@@ -525,6 +525,10 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 **Status:** not started  
 **Technique:** close the leftover loop. Report-only (item 4) stays the default.
+
+**In simple terms:** After a run, the tool already looks at the masked page a second time and writes a leftover list (`*.residual_pii.json`). That list only *tells* you “this email is still visible.” It does not hide it. You have to edit the file yourself or run again with a deny-list.
+
+This item adds an opt-in second step: you mark which leftovers to accept, and the tool rewrites the page with the same span engine it already uses. Default stays “report only.” A JSON or TTY accept/skip list is enough. A clickable review screen can wait.
 
 **Why:** `*.residual_pii.json` and `*.risk.json` do not rewrite. Operators cannot accept a leftover email and apply it.
 
