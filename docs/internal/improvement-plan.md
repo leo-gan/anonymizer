@@ -30,7 +30,7 @@
 - [ ] 22. HTTP API + Docker
 - [ ] 23. Review / apply residual findings
 - [ ] 24. `encrypt` / format-preserving encryption operator
-- [ ] 25. Native DOCX input/output
+- [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [ ] 26. Optional table-only formal privacy engine
 - [ ] 27. Release hygiene (attestations, no-telemetry statement)
 
@@ -560,7 +560,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 25. Native DOCX input/output
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #61](https://github.com/leo-gan/anonymizer/pull/61) (`feat/docx-input`)  
 **Technique:** next document format. Azure Document PII and Philter Desktop already do Word.
 
 **Why:** After native PDF, DOCX is the enterprise document users actually edit.
@@ -643,7 +643,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-Value-first order for **open** items (not a merge gate): **19** (prove it) → **14** (scans) → **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **25** (DOCX) → **26** (tables) → **27** (release). Ship 19 early so later items have a failing test to hang on.
+Value-first order for **open** items (not a merge gate): **14** (scans) → **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
 
 ---
 
