@@ -20,7 +20,7 @@
 - [x] 12. Span-based replacement — done 2026-08-15, [PR #51](https://github.com/leo-gan/anonymizer/pull/51)
 - [x] 13. TAB-style eval harness — done 2026-08-15, [PR #52](https://github.com/leo-gan/anonymizer/pull/52)
 - [x] 14. OCR for scanned PDFs — done 2026-09-04, [PR #62](https://github.com/leo-gan/anonymizer/pull/62)
-- [ ] 15. In-place PDF redaction (vector rewrite + metadata sanitization)
+- [x] 15. In-place PDF redaction (vector rewrite + metadata sanitization) — done 2026-09-04, [PR #63](https://github.com/leo-gan/anonymizer/pull/63)
 - [x] 16. Regex-only / offline mode — done 2026-08-15, [PR #55](https://github.com/leo-gan/anonymizer/pull/55)
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
 - [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
@@ -357,7 +357,7 @@ Known code facts to attach to:
 
 ### 15. In-place PDF redaction (vector rewrite + metadata sanitization)
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #63](https://github.com/leo-gan/anonymizer/pull/63) (`feat/native-pdf-redaction`)  
 **Technique:** different product surface; Adobe Sanitize / Redactable / Azure native-document class.  
 **Why:** The product name implies a safe PDF. Markdown export drops layout, fonts, headers, and multi-column geometry. Overlay-only black boxes leave selectable text in `/Contents`. Hidden XMP, `/Info`, `/Prev` incremental-save history, attachments, layers, and annotations leak identity even when body text is masked. See [`sota-research.md`](sota-research.md).
 
@@ -643,7 +643,11 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
+<<<<<<< HEAD
 Value-first order for **open** items (not a merge gate): **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
+=======
+Value-first order for **open** items (not a merge gate): **14** (scans) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **25** (DOCX) → **26** (tables) → **27** (release).
+>>>>>>> d7e94fc (chore: mark improvement-plan item 15 done)
 
 ---
 
