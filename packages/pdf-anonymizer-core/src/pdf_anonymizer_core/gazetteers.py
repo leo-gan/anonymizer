@@ -54,6 +54,14 @@ def apply_deny_list(
         if not match:
             continue
         found = match.group(0)
-        extra.append({"text": found, "type": "CUSTOM", "base_form": found})
+        extra.append(
+            {
+                "text": found,
+                "type": "CUSTOM",
+                "base_form": found,
+                "score": 1.0,
+                "source": "deny-list",
+            }
+        )
         already.add(found.lower())
     return list(entities) + extra

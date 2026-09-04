@@ -42,6 +42,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--output-pdf` / `--no-output-pdf` | flag | off | Also write a sanitized native PDF. Markdown is still written. PDF inputs only. Not a legal certificate. |
 | `--redact` / `--no-redact` | flag | off | Irreversible native PDF (black boxes, no stand-in). Implies `--output-pdf`. |
 | `--ner` / `--no-ner` | flag | auto | Local span NER (GLiNER extra) for names and organizations. Auto-on when the extra is installed (except regex-only). `best-speed` / `best-cost` then skip the language model. |
+| `--min-confidence` | `0–1` | `0` | Drop entities whose recognizer score is below this value. Default 0 keeps every hit. Not a calibrated probability. |
 
 ### Configuration Profiles
 
@@ -303,6 +304,10 @@ Replacement is by character interval, not a blind search-and-replace. The longer
 ### Scanned PDFs (`--ocr`)
 
 A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass `--ocr` to recover words. A sidecar `*.anonymized.layout.json` stores page boxes for a later native-PDF write. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
+
+### Per-span confidence (`--min-confidence`)
+
+Every hit now carries a `score` (0–1) and a `source` (`regex`, `ner`, `llm`, or `deny-list`). A verified regex IBAN scores higher than `IBAN_LIKE`. `--min-confidence 0.8` drops the weaker ones. Default `0` keeps today’s accept-all behaviour. These numbers are recognizer hints, not calibrated probabilities. See [Drop low-score hits](recipes.md#drop-low-score-hits).
 
 ### Local span NER (`--ner`)
 

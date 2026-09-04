@@ -112,8 +112,9 @@ def identify_entities_with_llm(
         max_retry_delay: Upper bound on backoff delay (seconds).
 
     Returns:
-        List of entity dicts (each with "text", "type", and optionally "base_form").
-        Returns [] on unrecoverable failure after retries.
+        List of entity dicts (each with "text", "type", "base_form",
+        "score" 0.70, and "source" "llm"). Returns [] on unrecoverable
+        failure after retries.
     """
     prompt = prompt_template.format(text=text)
 
@@ -133,7 +134,15 @@ def identify_entities_with_llm(
             # Validate and parse response using Pydantic
             result = IdentificationResult.model_validate_json(cleaned_response)
 
-            return [entity.model_dump() for entity in result.entities]
+            dumped: List[dict] = []
+            for entity in result.entities:
+                item = entity.model_dump()
+                item.setdefault("score", 0.70)
+                item.setdefault("source", "llm")
+                if not item.get("base_form"):
+                    item["base_form"] = item["text"]
+                dumped.append(item)
+            return dumped
 
         except Exception as e:
             is_retryable, category = classify_error(e)

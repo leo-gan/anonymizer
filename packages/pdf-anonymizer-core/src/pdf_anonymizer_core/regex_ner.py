@@ -110,6 +110,11 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
                         like,
                     )
                     entity_type_upper = like
+                    score = 0.55
+                elif has_checksum(entity_type_upper):
+                    score = 0.95
+                else:
+                    score = 0.85
 
                 entities.append(
                     {
@@ -118,6 +123,8 @@ def extract_entities_via_regex(text: str, patterns: Dict[str, str]) -> List[Enti
                         "base_form": matched_text,
                         "start": match.start(),
                         "end": match.end(),
+                        "score": score,
+                        "source": "regex",
                     }
                 )
         except re.error as e:

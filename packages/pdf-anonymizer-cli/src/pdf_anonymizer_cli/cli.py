@@ -287,6 +287,19 @@ def run(
             ),
         ),
     ] = None,
+    min_confidence: Annotated[
+        float,
+        typer.Option(
+            "--min-confidence",
+            help=(
+                "Drop entities whose recognizer score is below this value "
+                "(0–1). Default 0 keeps every hit. Not a calibrated "
+                "probability."
+            ),
+            min=0.0,
+            max=1.0,
+        ),
+    ] = 0.0,
     entity_profile: Annotated[
         Optional[EntityProfile],
         typer.Option(
@@ -463,6 +476,7 @@ def run(
                     deny_list=deny_phrases,
                     use_llm=use_llm,
                     use_ner=use_ner,
+                    min_confidence=min_confidence,
                 )
             elif is_tabular_path(str(file_path)):
                 full_anonymized_text, final_mapping, entity_texts = (
@@ -484,6 +498,7 @@ def run(
                         deny_list=deny_phrases,
                         use_llm=use_llm,
                         use_ner=use_ner,
+                        min_confidence=min_confidence,
                     )
                 )
             else:
@@ -506,6 +521,7 @@ def run(
                     use_llm=use_llm,
                     use_ner=use_ner,
                     ocr=ocr,
+                    min_confidence=min_confidence,
                 )
         except ValueError as exc:
             logging.error("%s", exc)

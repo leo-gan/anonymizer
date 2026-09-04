@@ -26,7 +26,7 @@
 - [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
 - [x] 19. Completeness testing (gold E2E, CI coverage, fuzz, leftover red-team) — done 2026-09-03, [PR #60](https://github.com/leo-gan/anonymizer/pull/60)
 - [x] 20. Local span NER (GLiNER-class) as `best-speed` — done 2026-09-04, [PR #65](https://github.com/leo-gan/anonymizer/pull/65)
-- [ ] 21. Per-span confidence and recognizer provenance
+- [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
 - [ ] 22. HTTP API + Docker
 - [ ] 23. Review / apply residual findings
 - [ ] 24. `encrypt` / format-preserving encryption operator
@@ -74,7 +74,8 @@ Known code facts to attach to:
 - `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
 - `.docx` takes a Word path (`word.py`): per-paragraph regex on visible text (runs joined), part-wise LLM flatten, per-paragraph apply, native `.docx` write-back. Headers, footers, comments, field codes, and hyperlink targets are walked. `.doc` / `.docm` / `.dot*` are rejected (item 25).
 - PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). `--output-pdf` writes a sanitized native PDF (PyMuPDF redaction annotations + ``apply_redactions``, ``/Info``/XMP/attachments/layers wiped). `--redact` is irreversible black boxes. Markdown stays the default (item 15).
-- `best-speed` / `best-cost` use local span NER when the `[ner]` extra is installed (GLiNER, CPU). They then skip the language model. `best-quality` may run NER first and still calls the LLM for identity clues. No extra ⇒ today’s LLM `best-speed`. No per-span confidence (item 21).
+- `best-speed` / `best-cost` use local span NER when the `[ner]` extra is installed (GLiNER, CPU). They then skip the language model. `best-quality` may run NER first and still calls the LLM for identity clues. No extra ⇒ today’s LLM `best-speed`.
+- Every entity has `score` (0–1) and `source` (`regex` / `ner` / `llm` / `deny-list`). `--min-confidence` defaults to 0 (accept all). Verified regex scores higher than `TYPE_LIKE` (item 21).
 - Surface is CLI + SDK. No HTTP service, no Docker image (item 22). Residual/risk reports do not rewrite (item 23).
 
 ---
@@ -484,7 +485,7 @@ CLI `verify`/`report`, extras, tests, recipes / CLI usage / architecture.
 
 ### 21. Per-span confidence and recognizer provenance
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #66](https://github.com/leo-gan/anonymizer/pull/66) (`feat/span-confidence`)  
 **Technique:** Presidio-style 0–1 score + which recognizer fired.
 
 **Why:** LLM JSON is uncalibrated. A threshold is how you trade recall vs over-redaction without editing prompts, and how item 20 gates the LLM.

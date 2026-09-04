@@ -69,6 +69,8 @@ class TestIndirectEntitiesRoundTrip:
                 "text": "Acme Inc.'s only in-house patent counsel",
                 "type": "INDIRECT",
                 "base_form": "Acme Inc.'s only in-house patent counsel",
+                "score": 0.7,
+                "source": "llm",
             }
         ]
 

@@ -207,6 +207,20 @@ For very large batch jobs you may want to:
 
 ---
 
+## Drop low-score hits
+
+Each detected span now has a **score** (0–1) and a **source** (`regex`, `ner`, `llm`, or `deny-list`). A regex hit that passes its checksum (a real IBAN) scores higher than `IBAN_LIKE`. A deny-list phrase is 1.0. The language model’s JSON is uncalibrated and sits in the middle.
+
+Default is still accept-all (`--min-confidence 0`). To hide only the stronger hits:
+
+```bash
+pdf-anonymizer run notes.md --no-llm --min-confidence 0.8
+```
+
+That can leave a mistyped IBAN visible. Use it when over-redaction is worse than a leftover `_LIKE` number. Do not treat the score as a legal or statistical probability.
+
+---
+
 ## Use local span NER
 
 Names such as “Jane Doe” are not a regex job. The default `best-speed` profile asks a language model. Install the optional extra to do that locally on CPU:
