@@ -20,7 +20,7 @@
 - [x] 12. Span-based replacement — done 2026-08-15, [PR #51](https://github.com/leo-gan/anonymizer/pull/51)
 - [x] 13. TAB-style eval harness — done 2026-08-15, [PR #52](https://github.com/leo-gan/anonymizer/pull/52)
 - [x] 14. OCR for scanned PDFs — done 2026-09-04, [PR #62](https://github.com/leo-gan/anonymizer/pull/62)
-- [ ] 15. In-place PDF redaction (vector rewrite + metadata sanitization)
+- [x] 15. In-place PDF redaction (vector rewrite + metadata sanitization) — done 2026-09-04, [PR #63](https://github.com/leo-gan/anonymizer/pull/63)
 - [x] 16. Regex-only / offline mode — done 2026-08-15, [PR #55](https://github.com/leo-gan/anonymizer/pull/55)
 - [x] 17. Secure mapping encryption workflow (Argon2id, AAD, 0600, ephemeral, wipe) — done 2026-08-15, [PR #54](https://github.com/leo-gan/anonymizer/pull/54)
 - [x] 18. CSV / Excel as an input format (cell-level PII masking) — done 2026-08-19, [PR #56](https://github.com/leo-gan/anonymizer/pull/56) / [PR #57](https://github.com/leo-gan/anonymizer/pull/57) / [PR #58](https://github.com/leo-gan/anonymizer/pull/58)
@@ -73,7 +73,7 @@ Known code facts to attach to:
 - `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). `scripts/download_gold_corpus.py` installs TAB / Presidio / Gretel into `data/gold-corpus/` (not in git). Regex-only baseline: `tests/eval/baselines/gold_corpus_regex_only.json`. PR CI: committed gold leftover/recall gate, residual JSON red-team, `pytest-cov` floor, Hypothesis fuzz. Public eval table: `scripts/eval_public_table.py`. LLM path in unit tests is mocked; live LLM eval is opt-in.
 - `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
 - `.docx` takes a Word path (`word.py`): per-paragraph regex on visible text (runs joined), part-wise LLM flatten, per-paragraph apply, native `.docx` write-back. Headers, footers, comments, field codes, and hyperlink targets are walked. `.doc` / `.docm` / `.dot*` are rejected (item 25).
-- PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). No native PDF write, no XMP/`/Info` wipe (item 15).
+- PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). `--output-pdf` writes a sanitized native PDF (PyMuPDF redaction annotations + ``apply_redactions``, ``/Info``/XMP/attachments/layers wiped). `--redact` is irreversible black boxes. Markdown stays the default (item 15).
 - `best-speed` still calls an LLM for names. No GLiNER/spaCy span stage, no per-span confidence (items 20–21).
 - Surface is CLI + SDK. No HTTP service, no Docker image (item 22). Residual/risk reports do not rewrite (item 23).
 
@@ -357,7 +357,7 @@ Known code facts to attach to:
 
 ### 15. In-place PDF redaction (vector rewrite + metadata sanitization)
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #63](https://github.com/leo-gan/anonymizer/pull/63) (`feat/native-pdf-redaction`)  
 **Technique:** different product surface; Adobe Sanitize / Redactable / Azure native-document class.  
 **Why:** The product name implies a safe PDF. Markdown export drops layout, fonts, headers, and multi-column geometry. Overlay-only black boxes leave selectable text in `/Contents`. Hidden XMP, `/Info`, `/Prev` incremental-save history, attachments, layers, and annotations leak identity even when body text is masked. See [`sota-research.md`](sota-research.md).
 
@@ -643,7 +643,11 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
+<<<<<<< HEAD
 Value-first order for **open** items (not a merge gate): **15** (native PDF) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
+=======
+Value-first order for **open** items (not a merge gate): **14** (scans) → **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **25** (DOCX) → **26** (tables) → **27** (release).
+>>>>>>> d7e94fc (chore: mark improvement-plan item 15 done)
 
 ---
 

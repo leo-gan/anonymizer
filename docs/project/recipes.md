@@ -233,6 +233,44 @@ That writes the usual anonymized Markdown and mapping, plus `data/anonymized/sca
 
 ---
 
+## Write a native PDF
+
+The default output for a PDF input is still Markdown. That drops layout, fonts, and headers. `--output-pdf` writes a **sanitized native PDF** as well:
+
+```bash
+pdf-anonymizer run contract.pdf --no-llm --output-pdf
+```
+
+That writes:
+
+- `data/anonymized/contract.anonymized.md` (review / verify / report)
+- `data/anonymized/contract.anonymized.pdf` (shareable page)
+- `data/mappings/contract.mapping.json`
+
+```bash
+pdf-anonymizer deanonymize \
+  data/anonymized/contract.anonymized.pdf \
+  data/mappings/contract.mapping.json
+```
+
+The native write uses PyMuPDF redaction annotations and then `apply_redactions`. That removes the old glyphs from the content stream. It is not a black rectangle drawn on top of selectable text.
+
+`--redact` is a second, **irreversible** mode: the hit becomes a black box and there is no stand-in on the page. Deanonymize cannot put the original words back.
+
+```bash
+pdf-anonymizer run contract.pdf --no-llm --redact
+```
+
+Every native write also wipes `/Info`, XMP, attachments, leftover annotations, and optional-content groups, and saves a full rewrite (no incremental `/Prev` history).
+
+**Notes**
+
+- This is still reversible pseudonymization when you use `--output-pdf` without `--redact`. It is **not** a legal de-identification certificate.
+- Images, form fields, and some drawings can still show a name. Delete those before sharing, or accept the residual.
+- `--output-pdf` on a non-PDF input is an error.
+
+---
+
 ## Anonymize a CSV or Excel roster
 
 A roster, export, or clinic list is a table. The same engine walks **cells** and writes a same-format spreadsheet plus the usual mapping. This is the same reversible pseudonymization as a PDF. It is **not** *k*-anonymity: leftover columns are not crowd-hidden.

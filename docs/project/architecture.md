@@ -61,6 +61,13 @@ graph TD
 *   CSV and Excel skip this loader. See [Table path](#table-path-csv--excel).
 *   Word `.docx` skips this loader. See [Word path](#word-path-docx).
 
+### Native PDF write
+*   Markdown remains the default output for a PDF input.
+*   `--output-pdf` opens the source with PyMuPDF, finds each original with `search_for`, adds a redaction annotation, then `apply_redactions`. That excises the old glyphs from the content stream. It is not an overlay-only black box.
+*   The reversible mode writes the stand-in (`EMAIL_1`) into the redaction. `--redact` fills the box black and does not write a stand-in. Deanonymize cannot restore a redacted page.
+*   Every native write sanitizes `/Info`, XMP, embedded files, leftover annotations, and optional-content groups, and saves with `garbage=4` (no incremental `/Prev` history).
+*   Rasterize-and-rebuild is the scan fallback (item 14), not the digital default. Images, form fields, and some vector drawings can still leak. This is not a legal de-identification certificate.
+
 ### Semantic Chunking
 *   Depending on the `--characters-to-anonymize` parameter (default `100,000` characters), the text is sliced into chunks:
     *   **Markdown/PDF**: Uses `langchain_text_splitters.MarkdownTextSplitter` to avoid cutting headers or code blocks midway.
