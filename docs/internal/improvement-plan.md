@@ -28,7 +28,7 @@
 - [x] 20. Local span NER (GLiNER-class) as `best-speed` — done 2026-09-04, [PR #65](https://github.com/leo-gan/anonymizer/pull/65)
 - [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
 - [x] 22. HTTP API + Docker — done 2026-09-04, [PR #67](https://github.com/leo-gan/anonymizer/pull/67)
-- [ ] 23. Review / apply residual findings
+- [x] 23. Review / apply residual findings — done 2026-09-04, [PR #68](https://github.com/leo-gan/anonymizer/pull/68)
 - [ ] 24. `encrypt` / format-preserving encryption operator
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [ ] 26. Optional table-only formal privacy engine
