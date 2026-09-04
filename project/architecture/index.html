@@ -1699,6 +1699,7 @@
 <li>Instead of traditional OCR or layout-unaware PDF parsing, the project uses <code>pymupdf4llm</code> to convert PDF files into clean, readable <strong>Markdown</strong>. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.</li>
 <li>A PDF with pages and no text layer is a hard error. <code>--ocr</code> runs Tesseract through PyMuPDF and writes word boxes to <code>*.anonymized.layout.json</code> so a later native-PDF redact pass can use the same spans. OCR is slower and less accurate than a real text layer.</li>
 <li>Optional local span NER (<code>[ner]</code> extra, GLiNER on CPU) is the semantic stage for <code>best-speed</code> / <code>best-cost</code> when installed. <code>best-quality</code> may run it first and still calls the LLM for identity clues. No extra keeps the LLM <code>best-speed</code> path.</li>
+<li>Each entity has a recognizer <code>source</code> and a 0–1 <code>score</code>. Regex checksum failures are <code>TYPE_LIKE</code> at a lower score. <code>--min-confidence</code> (default 0) can drop weak hits. Scores are not calibrated probabilities.</li>
 <li>For Markdown and Text files, standard file reads are executed.</li>
 <li>CSV and Excel skip this loader. See <a href="#table-path-csv--excel">Table path</a>.</li>
 <li>Word <code>.docx</code> skips this loader. See <a href="#word-path-docx">Word path</a>.</li>
