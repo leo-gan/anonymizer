@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -776,6 +804,34 @@
     
   
     SDK & API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
   
 
     
@@ -1224,6 +1280,17 @@
     <span class="md-ellipsis">
       
         Debugging, Logs &amp; Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-the-http-service-or-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run the HTTP service (or Docker)
       
     </span>
   </a>
@@ -1743,6 +1810,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#run-the-http-service-or-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run the HTTP service (or Docker)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1919,11 +1997,44 @@
 - Run inside a script that collects exit codes</p>
 <hr />
 <h2 id="drop-low-score-hits">Drop low-score hits<a class="headerlink" href="#drop-low-score-hits" title="Permanent link">&para;</a></h2>
-<p>Each detected span now has a <strong>score</strong> (0–1) and a <strong>source</strong> (<code>regex</code>, <code>ner</code>, <code>llm</code>, or <code>deny-list</code>). A regex hit that passes its checksum (a real IBAN) scores higher than <code>IBAN_LIKE</code>. A deny-list phrase is 1.0. The language model’s JSON is uncalibrated and sits in the middle.</p>
-<p>Default is still accept-all (<code>--min-confidence 0</code>). To hide only the stronger hits:</p>
+<p>A <strong>recognizer</strong> is one detector that looks at the text. This product runs up to four of them: the regex stage, optional local span NER, the language model, and the deny-list. Each hit it keeps is a <strong>span</strong> (a piece of text plus a type) with two extra fields:</p>
+<ul>
+<li><strong><code>source</code></strong> — which recognizer proposed it (<code>regex</code>, <code>ner</code>, <code>llm</code>, or <code>deny-list</code>).</li>
+<li><strong><code>score</code></strong> — a number from 0 to 1 that <em>that</em> recognizer assigned.</li>
+</ul>
+<p>The score is a ranking hint, not a probability. <code>0.85</code> does not mean “85% chance this is PII.” The language model’s JSON is uncalibrated. The table of numbers lives in <a href="../terminology/#recognizer-source-and-score">Terminology</a>.</p>
+<p><strong>Think of it like this.</strong> The regex stage is good at emails and IBANs and weak at names. The language model is the opposite. A deny-list phrase is something you already decided must go. The score lets you say “keep the strong regex hits, drop the shaky look-alikes” without editing prompts.</p>
+<p>Default is still accept-all (<code>--min-confidence 0</code>). Every hit is written. To hide only the stronger hits:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.md<span class="w"> </span>--no-llm<span class="w"> </span>--min-confidence<span class="w"> </span><span class="m">0</span>.8
 </span></code></pre></div>
-<p>That can leave a mistyped IBAN visible. Use it when over-redaction is worse than a leftover <code>_LIKE</code> number. Do not treat the score as a legal or statistical probability.</p>
+<p>On a line such as <code>Pay DE89370400440532013000 or GB00WEST12345698765432</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Text</th>
+<th>Source</th>
+<th>Score</th>
+<th>At <code>--min-confidence 0.8</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DE89370400440532013000</code> (checksum passes)</td>
+<td><code>regex</code></td>
+<td>0.95</td>
+<td>Hidden as <code>IBAN_1</code></td>
+</tr>
+<tr>
+<td><code>GB00WEST12345698765432</code> (checksum fails)</td>
+<td><code>regex</code></td>
+<td>0.55</td>
+<td>Left visible (<code>IBAN_LIKE</code> dropped)</td>
+</tr>
+</tbody>
+</table>
+<p>That can leave a mistyped IBAN on the page. Use the flag when over-redaction is worse than a leftover <code>_LIKE</code> number.</p>
+<p>A deny-list phrase is re-added <em>after</em> the threshold, at score 1.0. <code>--deny-list</code> still hides “Ada” even if you also pass <code>--min-confidence 0.9</code>. The keep-list still wins if the same phrase is on both lists.</p>
+<p>The HTTP <code>POST /anonymize</code> response includes the <code>entities</code> list so you can see <code>source</code> and <code>score</code> for each hit. See <a href="../http-service/">HTTP service</a>.</p>
 <hr />
 <h2 id="use-local-span-ner">Use local span NER<a class="headerlink" href="#use-local-span-ner" title="Permanent link">&para;</a></h2>
 <p>Names such as “Jane Doe” are not a regex job. The default <code>best-speed</code> profile asks a language model. Install the optional extra to do that locally on CPU:</p>
@@ -2456,8 +2567,24 @@ universals that apply everywhere (credit cards, IBANs used across Europe, crypto
 <p>When things go wrong the log is the first place to look (rate-limit errors, provider auth problems, JSON parse failures from the LLM, empty extraction, etc.).</p>
 <p>You can also delete or move <code>data/cache/llm_responses.json</code> to force a cold run with no cached LLM responses.</p>
 <hr />
+<h2 id="run-the-http-service-or-docker">Run the HTTP service (or Docker)<a class="headerlink" href="#run-the-http-service-or-docker" title="Permanent link">&para;</a></h2>
+<p>Pipelines that sit in front of a language model often want <code>POST /anonymize</code> rather than a subprocess. Install the extra and bind to this machine:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>pdf-anonymizer-api<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+</span></code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:8000/anonymize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;content-type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;text&quot;:&quot;Write to ada@example.com&quot;,&quot;use_llm&quot;:false}&#39;</span>
+</span></code></pre></div>
+<p>The response includes <code>entities</code> with <code>source</code> and <code>score</code> so you can see which detector fired. Default <code>use_llm</code> is <code>false</code> on the service (regex-only, no API key). The CLI <code>run</code> command is unchanged.</p>
+<p>Or:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>packages/pdf-anonymizer-api/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>--build
+</span></code></pre></div>
+<p>Compose publishes <code>127.0.0.1:8000</code> only. There is no authentication. Full request table: <a href="../http-service/">HTTP service and Docker</a>.</p>
+<hr />
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
+<li><strong><a href="../http-service/">HTTP service and Docker</a></strong> — <code>POST /anonymize</code>, compose, AppArmor.</li>
 <li><strong><a href="../cli-usage/">CLI Reference</a></strong> — complete flag reference, model aliases, and the profiles table.</li>
 <li><strong><a href="../api-usage/">SDK &amp; API Usage</a></strong> — lower-level function signatures and returns.</li>
 <li><strong><a href="../api-reference/">API Reference (auto)</a></strong> — living signature documentation generated from source docstrings.</li>

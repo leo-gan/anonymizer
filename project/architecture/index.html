@@ -583,6 +583,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -774,6 +802,34 @@
     
   
     SDK & API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
   
 
     
@@ -1656,24 +1712,25 @@
 <hr />
 <h2 id="monorepo-architecture">monorepo Architecture<a class="headerlink" href="#monorepo-architecture" title="Permanent link">&para;</a></h2>
 <p>PDF Anonymizer separates the underlying processing logic (SDK) from the command-line entry points. This decoupled design ensures the core library can be embedded into server APIs or automated data workflows without bringing along CLI dependencies.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                  +--------------------------------+
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                  |     pdf-anonymizer-cli         |
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                  |  (CLI interface using Typer)   |
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                  +---------------+----------------+
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                                  | (uses)
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                  v
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                  +--------------------------------+
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                  |     pdf-anonymizer-core        |
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                  |  (Core SDK &amp; LLM Adapters)    |
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                  +---------------+----------------+
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                                  |
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>         +------------------------+------------------------+
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>         |                        |                        |
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>         v                        v                        v
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>+----------------+       +----------------+       +----------------+
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>|  Text Loader   |       |   LLM Router   |       | Mapping Engine |
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>| &amp; PDF Extractor|       | &amp; API Adapters |       | &amp; Reverser     |
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>+----------------+       +----------------+       +----------------+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                  +--------------------------------+     +---------------------------+
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                  |     pdf-anonymizer-cli         |     |   pdf-anonymizer-api      |
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                  |  (Typer CLI)                   |     |   (FastAPI; core only)    |
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                  +---------------+----------------+     +-------------+-------------+
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                                  |                                    |
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                  +----------------+-------------------+
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                                                   v
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                  +--------------------------------+
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                  |     pdf-anonymizer-core        |
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                  |  (SDK &amp; LLM adapters)          |
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                  +---------------+----------------+
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                                  |
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>         +------------------------+------------------------+
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>         |                        |                        |
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>         v                        v                        v
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>+----------------+       +----------------+       +----------------+
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|  Text Loader   |       |   LLM Router   |       | Mapping Engine |
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>| &amp; PDF Extractor|       | &amp; API Adapters |       | &amp; Reverser     |
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>+----------------+       +----------------+       +----------------+
 </span></code></pre></div>
 <hr />
 <h2 id="the-processing-pipeline">The Processing Pipeline<a class="headerlink" href="#the-processing-pipeline" title="Permanent link">&para;</a></h2>
@@ -1699,7 +1756,8 @@
 <li>Instead of traditional OCR or layout-unaware PDF parsing, the project uses <code>pymupdf4llm</code> to convert PDF files into clean, readable <strong>Markdown</strong>. This retains tables, headings, and lists in a structured text layout that LLMs can parse with higher accuracy.</li>
 <li>A PDF with pages and no text layer is a hard error. <code>--ocr</code> runs Tesseract through PyMuPDF and writes word boxes to <code>*.anonymized.layout.json</code> so a later native-PDF redact pass can use the same spans. OCR is slower and less accurate than a real text layer.</li>
 <li>Optional local span NER (<code>[ner]</code> extra, GLiNER on CPU) is the semantic stage for <code>best-speed</code> / <code>best-cost</code> when installed. <code>best-quality</code> may run it first and still calls the LLM for identity clues. No extra keeps the LLM <code>best-speed</code> path.</li>
-<li>Each entity has a recognizer <code>source</code> and a 0–1 <code>score</code>. Regex checksum failures are <code>TYPE_LIKE</code> at a lower score. <code>--min-confidence</code> (default 0) can drop weak hits. Scores are not calibrated probabilities.</li>
+<li>A <strong>recognizer</strong> is one detector (regex, optional local NER, language model, deny-list). Each entity stores <code>source</code> (which recognizer) and <code>score</code> (that recognizer’s 0–1 hint). Regex checksum failures are <code>TYPE_LIKE</code> at 0.55. <code>--min-confidence</code> (default 0) can drop weak hits. Scores are not calibrated probabilities. See <a href="../terminology/#recognizer-source-and-score">Terminology</a>.</li>
+<li>Optional HTTP service is a <strong>separate package</strong> (<code>pdf-anonymizer-api</code>) that calls core only. Dockerfile and compose live in that package and bind <code>127.0.0.1:8000</code>. No authentication (item 22).</li>
 <li>For Markdown and Text files, standard file reads are executed.</li>
 <li>CSV and Excel skip this loader. See <a href="#table-path-csv--excel">Table path</a>.</li>
 <li>Word <code>.docx</code> skips this loader. See <a href="#word-path-docx">Word path</a>.</li>

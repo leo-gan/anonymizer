@@ -18,7 +18,7 @@
         <link rel="prev" href="../cli-usage/">
       
       
-        <link rel="next" href="../api-reference/">
+        <link rel="next" href="../http-service/">
       
       
         
@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1099,6 +1127,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api-reference/" class="md-nav__link">
         
   
@@ -1589,6 +1645,8 @@
 <li><code>fake_secret</code> (<code>str</code>, optional): Seed for <code>fake</code>. Same person + type + secret → same fake.</li>
 <li><code>seed_mapping</code> (<code>dict[str, str]</code>, optional): Original → written map from a previous file so Ada stays <code>PERSON_1</code>.</li>
 <li><code>keep_list</code> / <code>deny_list</code> (<code>list[str]</code>, optional): Phrases to leave visible, or to force-hide as <code>CUSTOM_n</code>. Keep wins if both lists contain the same phrase.</li>
+<li><code>min_confidence</code> (<code>float</code>, optional): Drop spans whose <a href="../terminology/#recognizer-source-and-score">score</a> is below this value. Default <code>0</code> keeps every hit. Not a calibrated probability.</li>
+<li><code>use_ner</code> (<code>bool</code>, optional): Run local span NER. SDK default <code>False</code> so a checkpoint is never downloaded unless you ask.</li>
 </ul>
 <h3 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1768,6 +1826,7 @@
 <hr />
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
+<li><strong><a href="../http-service/">HTTP service and Docker</a></strong> — <code>POST /anonymize</code> and the official image.</li>
 <li><strong><a href="../recipes/">Recipes &amp; Common Workflows</a></strong> — practical SDK examples (local Ollama, external LLM round-trips, profiles, custom regex, cache control, large files).</li>
 <li><strong><a href="../cli-usage/">CLI Reference</a></strong> — the command-line surface that wraps the same core functions.</li>
 <li><strong><a href="../api-reference/">API Reference (auto)</a></strong> — auto-generated detailed signatures.</li>

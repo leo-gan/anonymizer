@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -912,6 +940,34 @@
     
   
     SDK & API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
   
 
     
@@ -1278,6 +1334,9 @@
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># Word (.docx) input</span>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[docx]&quot;</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># Local HTTP service (separate package; depends on core only)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
 </span></code></pre></div>
 <h3 id="available-extras">Available Extras<a class="headerlink" href="#available-extras" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1290,6 +1349,7 @@
 <li><code>[excel]</code>: Installs <code>openpyxl</code> for <code>.xlsx</code> input. CSV uses the stdlib and needs no extra.</li>
 <li><code>[docx]</code>: Installs <code>python-docx</code> for <code>.docx</code> input. Legacy <code>.doc</code> and macro-enabled <code>.docm</code> are rejected.</li>
 <li><code>[ner]</code>: Installs <code>gliner</code> for local span NER (names and organizations). Pulls PyTorch. Off until you install it; <code>best-speed</code> then skips the cloud language model.</li>
+<li>HTTP service is a <strong>separate package</strong>, <code>pdf-anonymizer-api</code>. It depends on core only, not the CLI. See <a href="../http-service/">HTTP service and Docker</a>.</li>
 </ul>
 <p>Scanned PDFs need the <strong>Tesseract</strong> binary on <code>PATH</code> and the <code>--ocr</code> flag. That is a system package, not a pip extra. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
 <hr />

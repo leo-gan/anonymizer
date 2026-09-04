@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1315,6 +1343,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#http-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#local-span-ner-ner" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1409,6 +1448,34 @@
     
   
     SDK & API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
   
 
     
@@ -2139,6 +2206,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#http-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#local-span-ner-ner" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2388,7 +2466,7 @@
 <td style="text-align: left;"><code>--min-confidence</code></td>
 <td style="text-align: left;"><code>0–1</code></td>
 <td style="text-align: left;"><code>0</code></td>
-<td style="text-align: left;">Drop entities whose recognizer score is below this value. Default 0 keeps every hit. Not a calibrated probability.</td>
+<td style="text-align: left;">Drop spans whose <a href="../terminology/#recognizer-source-and-score">score</a> is below this value. Default 0 keeps every hit. Not a calibrated probability.</td>
 </tr>
 </tbody>
 </table>
@@ -2456,6 +2534,7 @@
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>--countries<span class="w"> </span>US,GB
 </span></code></pre></div>
 <p>See the <a href="../recipes/">Recipes &amp; Common Workflows</a> page for more profile usage patterns.</p>
+<p>The optional HTTP service is a separate package (<code>pdf-anonymizer-api</code>). It is not a CLI command. See <a href="../http-service/">HTTP service and Docker</a>.</p>
 <hr />
 <h2 id="models-providers">Models &amp; Providers<a class="headerlink" href="#models-providers" title="Permanent link">&para;</a></h2>
 <p>You can select a model via the <code>--model-name</code> option. PDF Anonymizer can use pre-configured alias strings or dynamically resolve model paths using the format <code>provider/model-identifier</code>.</p>
@@ -2622,7 +2701,9 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h3 id="scanned-pdfs-ocr">Scanned PDFs (<code>--ocr</code>)<a class="headerlink" href="#scanned-pdfs-ocr" title="Permanent link">&para;</a></h3>
 <p>A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass <code>--ocr</code> to recover words. A sidecar <code>*.anonymized.layout.json</code> stores page boxes for a later native-PDF write. See <a href="../recipes/#ocr-a-scanned-pdf">OCR a scanned PDF</a>.</p>
 <h3 id="per-span-confidence-min-confidence">Per-span confidence (<code>--min-confidence</code>)<a class="headerlink" href="#per-span-confidence-min-confidence" title="Permanent link">&para;</a></h3>
-<p>Every hit now carries a <code>score</code> (0–1) and a <code>source</code> (<code>regex</code>, <code>ner</code>, <code>llm</code>, or <code>deny-list</code>). A verified regex IBAN scores higher than <code>IBAN_LIKE</code>. <code>--min-confidence 0.8</code> drops the weaker ones. Default <code>0</code> keeps today’s accept-all behaviour. These numbers are recognizer hints, not calibrated probabilities. See <a href="../recipes/#drop-low-score-hits">Drop low-score hits</a>.</p>
+<p>A <strong>recognizer</strong> is one detector (regex, local NER, language model, or deny-list). Each hit stores <code>source</code> (which recognizer) and <code>score</code> (that recognizer’s 0–1 hint). <code>--min-confidence 0.8</code> drops weaker hits such as <code>IBAN_LIKE</code>. Default <code>0</code> keeps every hit. These numbers are not calibrated probabilities. Definitions: <a href="../terminology/#recognizer-source-and-score">Terminology</a>. Recipe: <a href="../recipes/#drop-low-score-hits">Drop low-score hits</a>.</p>
+<h3 id="http-service">HTTP service<a class="headerlink" href="#http-service" title="Permanent link">&para;</a></h3>
+<p>The HTTP process is the separate package <code>pdf-anonymizer-api</code>. It is not a CLI command. See <a href="../http-service/">HTTP service and Docker</a>.</p>
 <h3 id="local-span-ner-ner">Local span NER (<code>--ner</code>)<a class="headerlink" href="#local-span-ner-ner" title="Permanent link">&para;</a></h3>
 <p><code>pip install "pdf-anonymizer-core[ner]"</code> (or the CLI extra) installs GLiNER. Then <code>-p best-speed</code> and <code>-p best-cost</code> use that local model for names and organizations and do <strong>not</strong> call the language model. <code>-p best-quality</code> may run NER first and still calls the LLM for identity clues. <code>--no-ner</code> keeps today’s LLM path. <code>--ner</code> without the extra is an error. See <a href="../recipes/#use-local-span-ner">Use local span NER</a>.</p>
 <h3 id="native-pdf-write-output-pdf">Native PDF write (<code>--output-pdf</code>)<a class="headerlink" href="#native-pdf-write-output-pdf" title="Permanent link">&para;</a></h3>
@@ -2638,6 +2719,7 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="../recipes/">Recipes &amp; Common Workflows</a></strong> — practical end-to-end examples (profiles, local models, external LLM workflows, caching, debugging).</li>
+<li><strong><a href="../http-service/">HTTP service and Docker</a></strong> — <code>pdf-anonymizer-api</code>, compose, and <code>source</code> / <code>score</code> on the JSON response.</li>
 <li><strong><a href="../api-usage/">SDK &amp; API Usage</a></strong> — programmatic usage of the same core functions.</li>
 <li><strong><a href="../api-reference/">API Reference (auto)</a></strong> — auto-generated function signatures.</li>
 <li><strong><a href="../architecture/">Architecture Design</a></strong> — how chunking, hybrid detection, mapping, and reversal work internally.</li>

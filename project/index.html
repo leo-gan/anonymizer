@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://leo-gan.github.io/anonymizer/project/">
       
       
-        <link rel="prev" href="../101/how-different/">
+        <link rel="prev" href="../101/fairy-tale/">
       
       
         <link rel="next" href="terminology/">
@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -750,6 +778,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pdf-anonymizer-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pdf-anonymizer-api
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pdf-anonymizer-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -884,6 +923,34 @@
     
   
     SDK & API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
   
 
     
@@ -1133,6 +1200,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pdf-anonymizer-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pdf-anonymizer-api
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pdf-anonymizer-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1191,15 +1269,16 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── docs/                       # MkDocs documentation source files
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── packages/
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   └── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── tests/                      # Global pytest test suite
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── Makefile                    # Developer shortcut commands
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── pyproject.toml              # Workspace and dev dependencies config
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>└── mkdocs.yml                  # MkDocs site configuration
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── tests/                      # Global pytest test suite
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── Makefile                    # Developer shortcut commands
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── pyproject.toml              # Workspace and dev dependencies config
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>└── mkdocs.yml                  # MkDocs site configuration
 </span></code></pre></div>
 <hr />
 <h2 id="the-packages">The Packages<a class="headerlink" href="#the-packages" title="Permanent link">&para;</a></h2>
-<p>The project contains two decoupled Python packages inside <code>packages/</code>:</p>
+<p>The project contains three decoupled Python packages inside <code>packages/</code>:</p>
 <h3 id="pdf-anonymizer-core"><code>pdf-anonymizer-core</code><a class="headerlink" href="#pdf-anonymizer-core" title="Permanent link">&para;</a></h3>
 <p>Contains all the core engines, including:</p>
 <ul>
@@ -1215,6 +1294,8 @@
 <li>Streaming chunk utility to process large text files.</li>
 <li>Mapping and restoration engine for deanonymization.</li>
 </ul>
+<h3 id="pdf-anonymizer-api"><code>pdf-anonymizer-api</code><a class="headerlink" href="#pdf-anonymizer-api" title="Permanent link">&para;</a></h3>
+<p>A FastAPI process that calls <code>pdf-anonymizer-core</code> only. It does not import the CLI. Install with <code>pip install pdf-anonymizer-api</code>.</p>
 <h3 id="pdf-anonymizer-cli"><code>pdf-anonymizer-cli</code><a class="headerlink" href="#pdf-anonymizer-cli" title="Permanent link">&para;</a></h3>
 <p>A CLI tool built on top of <code>pdf-anonymizer-core</code> that:</p>
 <ul>
@@ -1230,6 +1311,7 @@
 <li><strong><a href="installation/">Installation &amp; Setup</a></strong>: Learn how to set up the development environment using <code>uv</code>, manage packages, and define environment variables.</li>
 <li><strong><a href="cli-usage/">CLI Reference</a></strong>: Explore the command-line arguments, options (including <code>--config-profile</code>), custom model strings, and usage examples.</li>
 <li><strong><a href="api-usage/">SDK &amp; API Usage</a></strong>: Learn how to import PDF Anonymizer as a Python library in your own applications.</li>
+<li><strong><a href="http-service/">HTTP service and Docker</a></strong>: <code>POST /anonymize</code> and the official image. No authentication.</li>
 <li><strong><a href="api-reference/">API Reference (auto)</a></strong>: Living signature reference generated from source docstrings.</li>
 <li><strong><a href="recipes/">Recipes &amp; Common Workflows</a></strong>: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.</li>
 <li><strong><a href="gold-corpus/">Gold corpus &amp; eval</a></strong>: Why we measure leftover risk, what is in the gold corpus, and the download / benchmark / CI workflows.</li>

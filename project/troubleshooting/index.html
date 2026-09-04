@@ -585,6 +585,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/fairy-tale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -796,6 +824,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP service & Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api-reference/" class="md-nav__link">
         
   
@@ -972,6 +1028,17 @@
     <span class="md-ellipsis">
       
         Authentication / Missing API Key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http-service-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP service is missing
       
     </span>
   </a>
@@ -1335,6 +1402,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#http-service-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP service is missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ollama-not-running-or-model-not-found" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1650,6 +1728,11 @@
   - <code>ANONYMIZER_MAPPING_KEY</code> locks mapping files as <code>*.mapping.json.enc</code>. <code>ANONYMIZER_FAKE_SECRET</code> seeds <code>--operator TYPE=fake</code>. Neither is required.
   - For the SDK, load the environment variables yourself (e.g. with <code>python-dotenv</code> or <code>os.environ</code>).</p>
 </li>
+</ul>
+<h2 id="http-service-is-missing">HTTP service is missing<a class="headerlink" href="#http-service-is-missing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Symptom</strong>: <code>pdf-anonymizer-api</code> is not installed.</li>
+<li><strong>Fix</strong>: <code>pip install pdf-anonymizer-api</code>. Then <code>pdf-anonymizer-api --host 127.0.0.1 --port 8000</code>. There is no authentication. See <a href="../http-service/">HTTP service and Docker</a>.</li>
 </ul>
 <h2 id="ollama-not-running-or-model-not-found">Ollama Not Running or Model Not Found<a class="headerlink" href="#ollama-not-running-or-model-not-found" title="Permanent link">&para;</a></h2>
 <ul>
