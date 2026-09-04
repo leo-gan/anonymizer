@@ -22,6 +22,7 @@ To use a specific LLM provider, you must install the corresponding extra. This h
 - **Anthropic**: `pip install "pdf-anonymizer-core[anthropic]"`
 - **Excel** (`.xlsx`): `pip install "pdf-anonymizer-core[excel]"`
 - **Word** (`.docx`): `pip install "pdf-anonymizer-core[docx]"`
+- **Local NER**: `pip install "pdf-anonymizer-core[ner]"`
 
 You can also install multiple extras at once:
 

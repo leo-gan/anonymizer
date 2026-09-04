@@ -21,6 +21,7 @@ from pdf_anonymizer_core.core import (
     anonymize_file,
     anonymize_tabular_file,
 )
+from pdf_anonymizer_core.span_ner import resolve_semantic_stages
 from pdf_anonymizer_core.gazetteers import load_phrase_list
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
@@ -274,6 +275,18 @@ def run(
             ),
         ),
     ] = False,
+    ner: Annotated[
+        Optional[bool],
+        typer.Option(
+            "--ner/--no-ner",
+            help=(
+                "Local span NER (GLiNER extra) for names and organizations. "
+                "Default: on for best-speed/best-cost/best-quality when the "
+                "[ner] extra is installed; off for regex-only. "
+                "best-speed and best-cost then skip the language model."
+            ),
+        ),
+    ] = None,
     entity_profile: Annotated[
         Optional[EntityProfile],
         typer.Option(
@@ -315,11 +328,30 @@ def run(
         sys.exit(1)
 
     use_llm = bool(config.use_llm) and not no_llm
-    if not use_llm:
-        logging.info(
-            "Regex-only / offline mode: skipping the language model. "
-            "Names and identity clues will be missed."
+    replace_llm_when_ner = config_profile in (
+        ConfigProfile.BEST_SPEED,
+        ConfigProfile.BEST_COST,
+    )
+    try:
+        use_ner, use_llm = resolve_semantic_stages(
+            use_llm=use_llm,
+            use_ner=ner,
+            replace_llm_when_ner=replace_llm_when_ner,
         )
+    except ValueError as exc:
+        logging.error("%s", exc)
+        sys.exit(1)
+    if not use_llm:
+        if use_ner:
+            logging.info(
+                "Local span NER: skipping the language model. "
+                "Identity clues will be missed."
+            )
+        else:
+            logging.info(
+                "Regex-only / offline mode: skipping the language model. "
+                "Names and identity clues will be missed."
+            )
         if verify_llm:
             logging.warning("--verify-llm is ignored when the language model is off.")
             verify_llm = False
@@ -430,6 +462,7 @@ def run(
                     keep_list=keep_phrases,
                     deny_list=deny_phrases,
                     use_llm=use_llm,
+                    use_ner=use_ner,
                 )
             elif is_tabular_path(str(file_path)):
                 full_anonymized_text, final_mapping, entity_texts = (
@@ -450,6 +483,7 @@ def run(
                         keep_list=keep_phrases,
                         deny_list=deny_phrases,
                         use_llm=use_llm,
+                        use_ner=use_ner,
                     )
                 )
             else:
@@ -470,6 +504,7 @@ def run(
                     keep_list=keep_phrases,
                     deny_list=deny_phrases,
                     use_llm=use_llm,
+                    use_ner=use_ner,
                     ocr=ocr,
                 )
         except ValueError as exc:
