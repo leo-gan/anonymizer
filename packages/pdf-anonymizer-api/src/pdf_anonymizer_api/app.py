@@ -19,6 +19,7 @@ from pdf_anonymizer_core.core import (
 from pdf_anonymizer_core.prompts import detailed, hipaa, simple
 from pdf_anonymizer_core.risk import assess_linkage_risk
 from pdf_anonymizer_core.spans import replace_entities
+from pdf_anonymizer_core.operators import restore_encrypt_tokens
 from pdf_anonymizer_core.utils import (
     mapping_to_placeholder_original,
     restore_placeholders_in_text,
@@ -44,6 +45,7 @@ class AnonymizeBody(BaseModel):
     operators: Optional[Dict[str, str]] = None
     seed_mapping: Optional[Dict[str, str]] = None
     fake_secret: Optional[str] = None
+    encrypt_secret: Optional[str] = None
     model_name: Optional[str] = None
     prompt_name: str = "simple"
     anonymized_entities: Optional[List[str]] = None
@@ -53,6 +55,7 @@ class AnonymizeBody(BaseModel):
 class DeanonymizeBody(BaseModel):
     text: str
     mapping: Dict[str, str]
+    encrypt_secret: Optional[str] = None
 
 
 class TextBody(BaseModel):
@@ -83,6 +86,7 @@ def anonymize_text_request(
     operators: Optional[Dict[str, str]] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    encrypt_secret: Optional[str] = None,
     model_name: Optional[str] = None,
     prompt_name: str = "simple",
     anonymized_entities: Optional[List[str]] = None,
@@ -126,6 +130,7 @@ def anonymize_text_request(
         seed_mapping=seed_mapping,
         operators=operators,
         fake_secret=fake_secret,
+        encrypt_secret=encrypt_secret,
     )
     anonymized = text
     if entities:
@@ -139,13 +144,20 @@ def anonymize_text_request(
     }
 
 
-def deanonymize_text_request(text: str, mapping: Dict[str, str]) -> Dict[str, Any]:
+def deanonymize_text_request(
+    text: str,
+    mapping: Dict[str, str],
+    *,
+    encrypt_secret: Optional[str] = None,
+) -> Dict[str, Any]:
     if len(text) > MAX_TEXT_CHARS:
         raise ValueError(
             f"text is {len(text):,} characters; the HTTP limit is {MAX_TEXT_CHARS:,}."
         )
     placeholder_to_original = mapping_to_placeholder_original(mapping)
     restored, used = restore_placeholders_in_text(text, placeholder_to_original)
+    if encrypt_secret:
+        restored = restore_encrypt_tokens(restored, encrypt_secret)
     return {
         "text": restored,
         "restored_count": len(used),
@@ -162,12 +174,12 @@ def create_app():
             "Local HTTP wrapper around pdf-anonymizer-core. "
             "No authentication. Bind to localhost or a compose network."
         ),
-        version="0.25.0",
+        version="0.26.0",
     )
 
     @application.get("/health")
     def health() -> Dict[str, str]:
-        return {"status": "ok", "version": "0.25.0"}
+        return {"status": "ok", "version": "0.26.0"}
 
     @application.post("/anonymize")
     def anonymize(body: AnonymizeBody) -> Dict[str, Any]:
@@ -182,6 +194,7 @@ def create_app():
                 operators=body.operators,
                 seed_mapping=body.seed_mapping,
                 fake_secret=body.fake_secret,
+                encrypt_secret=body.encrypt_secret,
                 model_name=body.model_name,
                 prompt_name=body.prompt_name,
                 anonymized_entities=body.anonymized_entities,
@@ -193,7 +206,11 @@ def create_app():
     @application.post("/deanonymize")
     def deanonymize(body: DeanonymizeBody) -> Dict[str, Any]:
         try:
-            return deanonymize_text_request(body.text, body.mapping)
+            return deanonymize_text_request(
+                body.text,
+                body.mapping,
+                encrypt_secret=body.encrypt_secret,
+            )
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 

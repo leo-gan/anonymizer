@@ -723,6 +723,7 @@ Sometimes you want a different mark:
 | `hash` | `H_` plus a short fingerprint | Same value always looks the same, but not readable |
 | `shift` | A nearby date | Dates that must stay dates, not just a year |
 | `fake` | `Jane Alvarez`, `555-0103` | Looks real; same person always gets the same fake |
+| `encrypt` | `ENC1_…` (AES-256-GCM token) | Reversible with a secret; original not stored in the mapping |
 
 ```bash
 pdf-anonymizer run invoice.pdf \
@@ -732,9 +733,16 @@ pdf-anonymizer run invoice.pdf \
 
 # Invent stable fake names (same person → same fake)
 pdf-anonymizer run notes.pdf --operator PERSON=fake --operator EMAIL=fake
+
+# Lock emails as tokens (not stored in the mapping file)
+pdf-anonymizer run notes.pdf \
+  --operator EMAIL=encrypt \
+  --encrypt-secret 'a long secret'
 ```
 
 Types you do not list stay as stand-ins. `CREDIT_CARD_LIKE` follows `CREDIT_CARD`.
+
+`encrypt` needs `--encrypt-secret` or `ANONYMIZER_ENCRYPT_SECRET`. The same secret always yields the same token. Deanonymize with that secret. The token is longer than the original (not format-preserving). Those originals are omitted from `*.mapping.json`.
 
 The mapping file still records how to put the original back when the written form is unique. Two dates that both become `2019` cannot both be restored uniquely.
 

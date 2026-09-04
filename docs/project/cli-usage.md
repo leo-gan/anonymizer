@@ -32,7 +32,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--apply-residuals` | flag | off | After the leftover scan, hide every leftover on this run. Implies `--verify`. |
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id, source-file AAD). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 | `--ephemeral-mapping` / `--persist-mapping` | flag | persist | Keep the mapping only in this process. Nothing is written under `data/mappings/`. |
-| `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`. |
+| `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`, `encrypt`. |
 | `--fake-secret` | `TEXT` | built-in | Seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
 | `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
 | `--entity-profile` | `hipaa-safe-harbor` | *none* | Coverage aid for HIPAA Safe Harbor identifier classes. **Not a compliance certificate.** |
@@ -291,6 +291,10 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 
 `run` scans the masked page (unless `--no-verify`) and writes `data/stats/<stem>.residual_pii.json`. `pdf-anonymizer verify` does the same later. `--verify-llm` also asks the language model. The file is not rewritten unless you pass `--apply-residuals` or later run `pdf-anonymizer apply`.
 
+### Encrypt operator
+
+`--operator EMAIL=encrypt --encrypt-secret '…'` writes `ENC1_…` tokens. Deanonymize with the same secret. Those originals are not in the mapping file. See [Change how a type is written](recipes.md#change-how-a-type-is-written).
+
 ### Apply leftovers (`apply`)
 
 `pdf-anonymizer apply REPORT.json --accept-all` hides leftovers from a residual report. `--accept` / `--skip` pick which ones. Default `run` stays report-only. See [Hide leftovers from a residual report](recipes.md#hide-leftovers-from-a-residual-report).
@@ -301,7 +305,7 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 
 ### How a type is written
 
-`--operator TYPE=mask|hash|generalize|shift|fake` changes the mark on the page. Default remains `replace` (`PERSON_1`). Seed `fake` with `--fake-secret` / `ANONYMIZER_FAKE_SECRET`.
+`--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes the mark on the page. Default remains `replace` (`PERSON_1`). Seed `fake` with `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. `encrypt` writes an AES-256-GCM token (`ENC1_…`) and needs `--encrypt-secret` / `ANONYMIZER_ENCRYPT_SECRET`. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).
 
 ### Linkage-risk score
 
