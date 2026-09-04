@@ -1315,7 +1315,7 @@
 
 <h1 id="http-service-and-docker">HTTP service and Docker<a class="headerlink" href="#http-service-and-docker" title="Permanent link">&para;</a></h1>
 <p>The CLI is still the main surface. This page is the optional local HTTP wrapper around the same engine: <code>POST /anonymize</code>, <code>POST /deanonymize</code>, <code>POST /verify</code>, <code>POST /report</code>. There is <strong>no authentication</strong>. Bind to this machine or a compose network.</p>
-<p>Package version <strong>0.24.0</strong>. The HTTP layer is <code>pdf-anonymizer-api</code>. It depends on <code>pdf-anonymizer-core</code> only, not the CLI.</p>
+<p>The HTTP layer is <code>pdf-anonymizer-api</code>. It depends on <code>pdf-anonymizer-core</code> only, not the CLI.</p>
 <hr />
 <h2 id="install-and-run">Install and run<a class="headerlink" href="#install-and-run" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
@@ -1345,7 +1345,7 @@
 <tr>
 <td><code>GET</code></td>
 <td><code>/health</code></td>
-<td><code>{"status": "ok", "version": "0.24.0"}</code></td>
+<td><code>{"status": "ok", "version": "&lt;package version&gt;"}</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>

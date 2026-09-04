@@ -1022,6 +1022,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-apply-command-hide-leftovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The apply Command (hide leftovers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-deanonymize-command-reversal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1215,6 +1226,17 @@
     <span class="md-ellipsis">
       
         Leftover check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apply-leftovers-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apply leftovers (apply)
       
     </span>
   </a>
@@ -1885,6 +1907,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-apply-command-hide-leftovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The apply Command (hide leftovers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-deanonymize-command-reversal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2078,6 +2111,17 @@
     <span class="md-ellipsis">
       
         Leftover check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apply-leftovers-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apply leftovers (apply)
       
     </span>
   </a>
@@ -2376,13 +2420,19 @@
 <td style="text-align: left;"><code>--verify</code> / <code>--no-verify</code></td>
 <td style="text-align: left;">flag</td>
 <td style="text-align: left;">on</td>
-<td style="text-align: left;">After masking, scan the result for leftovers (cheap regex). Writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. Does not change the file.</td>
+<td style="text-align: left;">After masking, scan the result for leftovers (cheap regex). Writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. Does not change the file unless <code>--apply-residuals</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--verify-llm</code></td>
 <td style="text-align: left;">flag</td>
 <td style="text-align: left;">off</td>
 <td style="text-align: left;">Also ask the language model to hunt for leftovers.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--apply-residuals</code></td>
+<td style="text-align: left;">flag</td>
+<td style="text-align: left;">off</td>
+<td style="text-align: left;">After the leftover scan, hide every leftover on this run. Implies <code>--verify</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--mapping-passphrase</code></td>
@@ -2592,10 +2642,25 @@
 <p>The report is <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. Stand-in labels such as <code>PERSON_1</code> are ignored. A leftover email or a mistyped IBAN is listed.</p>
 <p><code>run</code> already does the cheap regex scan unless you pass <code>--no-verify</code>.</p>
 <hr />
+<h2 id="the-apply-command-hide-leftovers">The <code>apply</code> Command (hide leftovers)<a class="headerlink" href="#the-apply-command-hide-leftovers" title="Permanent link">&para;</a></h2>
+<p>The leftover report does not rewrite the page. <code>apply</code> hides the leftovers you accept, using the same span engine as <code>run</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Hide every leftover in the report</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept-all
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Hide only some phrases</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept<span class="w"> </span>accept.json
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Leave some visible</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept-all<span class="w"> </span>--skip<span class="w"> </span>skip.txt
+</span></code></pre></div>
+<p><code>--accept</code> / <code>--skip</code> are a JSON list of strings, a JSON object with an <code>accept</code> or <code>skip</code> key, or one phrase per line. On a TTY, if you pass neither <code>--accept-all</code> nor <code>--accept</code>, the command asks about each leftover.</p>
+<p>The anonymized file is rewritten in place. New stand-ins are added to the mapping. Native PDF output is not supported; apply the Markdown file instead.</p>
+<p><code>run --apply-residuals</code> does the same thing for leftovers found on that run.</p>
+<hr />
 <h2 id="the-deanonymize-command-reversal">The <code>deanonymize</code> Command (Reversal)<a class="headerlink" href="#the-deanonymize-command-reversal" title="Permanent link">&para;</a></h2>
 <p>The <code>deanonymize</code> command reads an anonymized document, loads the JSON mapping file containing placeholders and original PII, restores the original text, and writes the output file.</p>
 <h3 id="syntax_1">Syntax<a class="headerlink" href="#syntax_1" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span>ANONYMIZED_FILE<span class="w"> </span>MAPPING_FILE<span class="w"> </span><span class="o">[</span>--mapping-passphrase<span class="w"> </span>TEXT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--source-sha256<span class="w"> </span>HEX<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span>ANONYMIZED_FILE<span class="w"> </span>MAPPING_FILE<span class="w"> </span><span class="o">[</span>--mapping-passphrase<span class="w"> </span>TEXT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--source-sha256<span class="w"> </span>HEX<span class="o">]</span>
 </span></code></pre></div>
 <h3 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2611,35 +2676,35 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h2 id="operational-examples">Operational Examples<a class="headerlink" href="#operational-examples" title="Permanent link">&para;</a></h2>
 <h3 id="example-1-basic-anonymization">Example 1: Basic Anonymization<a class="headerlink" href="#example-1-basic-anonymization" title="Permanent link">&para;</a></h3>
 <p>Anonymize a meeting transcript using the default Gemini model:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>data/meeting_transcript.pdf
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>data/meeting_transcript.pdf
 </span></code></pre></div>
 *   <strong>Outputs created</strong>:
     *   <code>data/anonymized/meeting_transcript.anonymized.md</code> (the masked document)
     *   <code>data/mappings/meeting_transcript.mapping.json</code> (the mapping file — treat it like a key)</p>
 <h3 id="example-2-local-processing-via-ollama">Example 2: Local Processing via Ollama<a class="headerlink" href="#example-2-local-processing-via-ollama" title="Permanent link">&para;</a></h3>
 <p>To ensure data does not leave your local machine, use a locally running model:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>medical_note.txt<span class="w"> </span>--model-name<span class="w"> </span><span class="s2">&quot;ollama/phi4-mini&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>medical_note.txt<span class="w"> </span>--model-name<span class="w"> </span><span class="s2">&quot;ollama/phi4-mini&quot;</span>
 </span></code></pre></div></p>
 <h3 id="example-3-customized-chunk-size-prompt">Example 3: Customized Chunk Size &amp; Prompt<a class="headerlink" href="#example-3-customized-chunk-size-prompt" title="Permanent link">&para;</a></h3>
 <p>Process a long book draft using smaller chunks and a simple redaction strategy:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>book.md<span class="w"> </span>--characters-to-anonymize<span class="w"> </span><span class="m">50000</span><span class="w"> </span>--prompt-name<span class="w"> </span>simple
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>book.md<span class="w"> </span>--characters-to-anonymize<span class="w"> </span><span class="m">50000</span><span class="w"> </span>--prompt-name<span class="w"> </span>simple
 </span></code></pre></div></p>
 <h3 id="example-4-restoring-the-original-document">Example 4: Restoring the Original Document<a class="headerlink" href="#example-4-restoring-the-original-document" title="Permanent link">&para;</a></h3>
 <p>Revert the anonymization performed in Example 1:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>data/anonymized/meeting_transcript.anonymized.md<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>data/mappings/meeting_transcript.mapping.json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pdf-anonymizer<span class="w"> </span>deanonymize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>data/anonymized/meeting_transcript.anonymized.md<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>data/mappings/meeting_transcript.mapping.json
 </span></code></pre></div>
 *   <strong>Output created</strong>:
     *   <code>data/deanonymized/meeting_transcript.deanonymized.md</code></p>
 <h3 id="example-5-newer-flags-in-one-command">Example 5: Newer flags in one command<a class="headerlink" href="#example-5-newer-flags-in-one-command" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>contract.pdf<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-p<span class="w"> </span>best-quality<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>--countries<span class="w"> </span>US,GB<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">CREDIT_CARD</span><span class="o">=</span>mask<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE</span><span class="o">=</span>generalize<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span>--keep-list<span class="w"> </span>keep.txt<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span>--mapping-passphrase<span class="w"> </span><span class="s1">&#39;a long secret&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>contract.pdf<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>-p<span class="w"> </span>best-quality<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--countries<span class="w"> </span>US,GB<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">CREDIT_CARD</span><span class="o">=</span>mask<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span>--operator<span class="w"> </span><span class="nv">DATE</span><span class="o">=</span>generalize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span>--keep-list<span class="w"> </span>keep.txt<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span>--mapping-passphrase<span class="w"> </span><span class="s1">&#39;a long secret&#39;</span>
 </span></code></pre></div>
 <p>Files in the same <code>run</code> share one growing map, so the same person stays <code>PERSON_1</code>. See <a href="../recipes/">Recipes</a> for keep-lists, HIPAA coverage aid, fake names, and <code>--mapping-in</code>.</p>
 <hr />
@@ -2654,13 +2719,13 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <li><code>data/stats/&lt;stem&gt;.deanonymization_stat.json</code> — written by <code>deanonymize</code></li>
 </ul>
 <p>The stats file contains:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;anonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;mapping_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;deanonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">&quot;unused_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PERSON_7&quot;</span><span class="p">],</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">&quot;not_found_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;anonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;mapping_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;deanonymized_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;unused_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PERSON_7&quot;</span><span class="p">],</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">&quot;not_found_mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>unused_mappings</code>: placeholders present in the map but never found in the anonymized text (usually harmless).</li>
@@ -2679,7 +2744,9 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h3 id="regex-only-offline">Regex-only / offline<a class="headerlink" href="#regex-only-offline" title="Permanent link">&para;</a></h3>
 <p><code>--no-llm</code> or <code>-p regex-only</code> skips the language model. Emails, cards, IBANs, and other structured hits are still hidden (including <code>_LIKE</code> checksum failures). Operators, leftover scan, and linkage-risk still run. No API key is required. <strong>Names and identity clues will be missed.</strong> <code>--verify-llm</code> is ignored so the process stays offline.</p>
 <h3 id="leftover-check">Leftover check<a class="headerlink" href="#leftover-check" title="Permanent link">&para;</a></h3>
-<p><code>run</code> scans the masked page (unless <code>--no-verify</code>) and writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. <code>pdf-anonymizer verify</code> does the same later. <code>--verify-llm</code> also asks the language model. The file is not rewritten.</p>
+<p><code>run</code> scans the masked page (unless <code>--no-verify</code>) and writes <code>data/stats/&lt;stem&gt;.residual_pii.json</code>. <code>pdf-anonymizer verify</code> does the same later. <code>--verify-llm</code> also asks the language model. The file is not rewritten unless you pass <code>--apply-residuals</code> or later run <code>pdf-anonymizer apply</code>.</p>
+<h3 id="apply-leftovers-apply">Apply leftovers (<code>apply</code>)<a class="headerlink" href="#apply-leftovers-apply" title="Permanent link">&para;</a></h3>
+<p><code>pdf-anonymizer apply REPORT.json --accept-all</code> hides leftovers from a residual report. <code>--accept</code> / <code>--skip</code> pick which ones. Default <code>run</code> stays report-only. See <a href="../recipes/#hide-leftovers-from-a-residual-report">Hide leftovers from a residual report</a>.</p>
 <h3 id="lock-the-mapping">Lock the mapping<a class="headerlink" href="#lock-the-mapping" title="Permanent link">&para;</a></h3>
 <p><code>--mapping-passphrase</code> (or <code>ANONYMIZER_MAPPING_KEY</code>) writes <code>*.mapping.json.enc</code> instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode <code>0600</code>. <code>deanonymize</code> needs the same passphrase. <code>--ephemeral-mapping</code> writes no mapping file at all. See <a href="../mapping-security/">Mapping encryption</a>.</p>
 <h3 id="how-a-type-is-written">How a type is written<a class="headerlink" href="#how-a-type-is-written" title="Permanent link">&para;</a></h3>

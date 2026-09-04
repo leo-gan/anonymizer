@@ -1555,7 +1555,11 @@
 </tr>
 <tr>
 <td><strong>Residual scan</strong></td>
-<td>A second cheap regex pass (optional LLM) on already-masked text. Writes <code>*.residual_pii.json</code>. It reports leftovers. It does not rewrite the page.</td>
+<td>A second cheap regex pass (optional LLM) on already-masked text. Writes <code>*.residual_pii.json</code>. It reports leftovers. It does not rewrite the page unless you opt in (<code>apply</code> / <code>--apply-residuals</code>).</td>
+</tr>
+<tr>
+<td><strong>Apply leftovers</strong></td>
+<td>Opt-in rewrite: hide accepted leftover texts with the same span engine. Default stays report-only.</td>
 </tr>
 <tr>
 <td><strong>Red-team</strong></td>

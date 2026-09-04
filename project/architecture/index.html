@@ -1758,6 +1758,7 @@
 <li>Optional local span NER (<code>[ner]</code> extra, GLiNER on CPU) is the semantic stage for <code>best-speed</code> / <code>best-cost</code> when installed. <code>best-quality</code> may run it first and still calls the LLM for identity clues. No extra keeps the LLM <code>best-speed</code> path.</li>
 <li>A <strong>recognizer</strong> is one detector (regex, optional local NER, language model, deny-list). Each entity stores <code>source</code> (which recognizer) and <code>score</code> (that recognizer’s 0–1 hint). Regex checksum failures are <code>TYPE_LIKE</code> at 0.55. <code>--min-confidence</code> (default 0) can drop weak hits. Scores are not calibrated probabilities. See <a href="../terminology/#recognizer-source-and-score">Terminology</a>.</li>
 <li>Optional HTTP service is a <strong>separate package</strong> (<code>pdf-anonymizer-api</code>) that calls core only. Dockerfile and compose live in that package and bind <code>127.0.0.1:8000</code>. No authentication (item 22).</li>
+<li>Residual reports stay report-only unless you opt in: <code>pdf-anonymizer apply</code> or <code>run --apply-residuals</code> rewrites accepted leftovers with the same span engine (item 23).</li>
 <li>For Markdown and Text files, standard file reads are executed.</li>
 <li>CSV and Excel skip this loader. See <a href="#table-path-csv--excel">Table path</a>.</li>
 <li>Word <code>.docx</code> skips this loader. See <a href="#word-path-docx">Word path</a>.</li>
