@@ -7,10 +7,14 @@ so deanonymize can reverse when the written form is unique.
 
 from __future__ import annotations
 
+import base64
 import hashlib
+import hmac
 import re
 from datetime import date, datetime, timedelta
 from typing import Dict, Iterable, Optional
+
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from pdf_anonymizer_core.validators import parent_type
 
@@ -20,6 +24,7 @@ OPERATOR_HASH = "hash"
 OPERATOR_GENERALIZE = "generalize"
 OPERATOR_SHIFT = "shift"
 OPERATOR_FAKE = "fake"
+OPERATOR_ENCRYPT = "encrypt"
 
 OPERATORS = frozenset(
     {
@@ -29,8 +34,16 @@ OPERATORS = frozenset(
         OPERATOR_GENERALIZE,
         OPERATOR_SHIFT,
         OPERATOR_FAKE,
+        OPERATOR_ENCRYPT,
     }
 )
+
+ENCRYPT_PREFIX = "ENC1_"
+ENCRYPT_AAD = b"pdf-anonymizer-encrypt-v1"
+ENCRYPT_SECRET_MESSAGE = (
+    "The encrypt operator needs --encrypt-secret or ANONYMIZER_ENCRYPT_SECRET."
+)
+_ENCRYPT_TOKEN = re.compile(rf"{re.escape(ENCRYPT_PREFIX)}[A-Za-z0-9_-]+")
 
 DEFAULT_FAKE_SECRET = "pdf-anonymizer-fake"
 
@@ -86,6 +99,7 @@ def apply_operator(
     operator: str,
     base_form: Optional[str] = None,
     secret: str = "",
+    encrypt_secret: str = "",
 ) -> str:
     """Return the string to write in place of ``original``."""
     if operator == OPERATOR_REPLACE:
@@ -100,7 +114,81 @@ def apply_operator(
         return shift_date_value(original, base_form or original)
     if operator == OPERATOR_FAKE:
         return fake_value(original, entity_type, base_form or original, secret)
+    if operator == OPERATOR_ENCRYPT:
+        return encrypt_value(original, encrypt_secret)
     return placeholder
+
+
+def _encrypt_key(secret: str) -> bytes:
+    return hashlib.sha256(
+        f"pdf-anonymizer-encrypt-v1:{secret}".encode("utf-8")
+    ).digest()
+
+
+def encrypt_value(original: str, secret: str) -> str:
+    """AES-256-GCM token. Same secret + same text always yields the same token."""
+    if not secret:
+        raise ValueError(ENCRYPT_SECRET_MESSAGE)
+    key = _encrypt_key(secret)
+    nonce = hmac.new(key, original.encode("utf-8"), hashlib.sha256).digest()[:12]
+    cipher = AESGCM(key).encrypt(nonce, original.encode("utf-8"), ENCRYPT_AAD)
+    blob = nonce + cipher
+    token = base64.urlsafe_b64encode(blob).decode("ascii").rstrip("=")
+    return f"{ENCRYPT_PREFIX}{token}"
+
+
+def looks_like_encrypt_token(text: str) -> bool:
+    return bool(text) and bool(_ENCRYPT_TOKEN.fullmatch(text.strip()))
+
+
+def decrypt_value(token: str, secret: str) -> str:
+    """Reverse ``encrypt_value``. Raises ValueError on a bad token or secret."""
+    if not secret:
+        raise ValueError(ENCRYPT_SECRET_MESSAGE)
+    raw = token.strip()
+    if not looks_like_encrypt_token(raw):
+        raise ValueError("Not an encrypt token.")
+    payload = raw[len(ENCRYPT_PREFIX) :]
+    pad = "=" * ((4 - len(payload) % 4) % 4)
+    try:
+        blob = base64.urlsafe_b64decode(payload + pad)
+    except (ValueError, OSError) as exc:
+        raise ValueError("encrypt token is not valid base64.") from exc
+    if len(blob) < 12 + 16:
+        raise ValueError("encrypt token is truncated.")
+    key = _encrypt_key(secret)
+    try:
+        plain = AESGCM(key).decrypt(blob[:12], blob[12:], ENCRYPT_AAD)
+    except Exception as exc:
+        raise ValueError("Could not decrypt token. Check --encrypt-secret.") from exc
+    return plain.decode("utf-8")
+
+
+def find_encrypt_tokens(text: str) -> list[str]:
+    return _ENCRYPT_TOKEN.findall(text or "")
+
+
+def restore_encrypt_tokens(text: str, secret: str) -> str:
+    """Replace every ``ENC1_`` token. Unknown or wrong-key tokens stay as-is."""
+    if not secret or ENCRYPT_PREFIX not in text:
+        return text
+
+    def _replace(match: re.Match[str]) -> str:
+        try:
+            return decrypt_value(match.group(0), secret)
+        except ValueError:
+            return match.group(0)
+
+    return _ENCRYPT_TOKEN.sub(_replace, text)
+
+
+def mapping_without_encrypt_plaintexts(mapping: Dict[str, str]) -> Dict[str, str]:
+    """Drop encrypt tokens so a leaked map does not hold those originals."""
+    return {
+        key: value
+        for key, value in mapping.items()
+        if not looks_like_encrypt_token(key) and not looks_like_encrypt_token(value)
+    }
 
 
 def _fake_seed(secret: str, entity_type: str, base_form: str) -> int:
@@ -188,7 +276,11 @@ def mask_value(original: str, entity_type: str) -> str:
 def _mask_keep_last(original: str, keep: int) -> str:
     chars = list(original)
     digit_positions = [i for i, ch in enumerate(chars) if ch.isdigit()]
-    hide = set(digit_positions[:-keep]) if len(digit_positions) > keep else set(digit_positions)
+    hide = (
+        set(digit_positions[:-keep])
+        if len(digit_positions) > keep
+        else set(digit_positions)
+    )
     for i in hide:
         chars[i] = "*"
     letter_positions = [i for i, ch in enumerate(chars) if ch.isalpha()]
@@ -227,7 +319,9 @@ def generalize_value(original: str, entity_type: str) -> str:
         return _ZIP_IN_TEXT.sub(lambda m: m.group(1)[:3] + "**", original)
 
     if kind == "AGE" or (
-        kind in {"", "ID"} and original.strip().isdigit() and 1 <= int(original.strip()) <= 120
+        kind in {"", "ID"}
+        and original.strip().isdigit()
+        and 1 <= int(original.strip()) <= 120
     ):
         return _age_band(int(original.strip()))
 

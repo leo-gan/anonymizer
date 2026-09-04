@@ -29,7 +29,7 @@
 - [x] 21. Per-span confidence and recognizer provenance — done 2026-09-04, [PR #66](https://github.com/leo-gan/anonymizer/pull/66)
 - [x] 22. HTTP API + Docker — done 2026-09-04, [PR #67](https://github.com/leo-gan/anonymizer/pull/67)
 - [x] 23. Review / apply residual findings — done 2026-09-04, [PR #68](https://github.com/leo-gan/anonymizer/pull/68)
-- [ ] 24. `encrypt` / format-preserving encryption operator
+- [x] 24. `encrypt` / format-preserving encryption operator — done 2026-09-04, [PR #70](https://github.com/leo-gan/anonymizer/pull/70)
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [ ] 26. Optional table-only formal privacy engine
 - [ ] 27. Release hygiene (attestations, no-telemetry statement)
@@ -65,7 +65,7 @@ Known code facts to attach to:
 - `core.py`: replacement is span-based (locate in `full_text`, longest-first, write from the end). Shipped in [PR #51](https://github.com/leo-gan/anonymizer/pull/51).
 - `prompts/detailed.py`: asks for identity clues (`INDIRECT`, or `PERSON` with a known `base_form`) plus birthdates; `simple.py` does not. Shipped in [PR #40](https://github.com/leo-gan/anonymizer/pull/40).
 - Mapping files are plaintext by default. `--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY` writes `*.mapping.json.enc` (AES-256-GCM + Argon2id, source SHA-256 AAD, atomic `0600`). `--ephemeral-mapping` never writes the map.
-- `--operator TYPE=mask|hash|generalize|shift|fake` changes how a type is written. Default remains `replace` (PERSON_1).
+- `--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes how a type is written. Default remains `replace` (PERSON_1). `encrypt` writes an AES-256-GCM token (`ENC1_…`) reversible with `--encrypt-secret`; those originals are not stored in the mapping file (item 24). FPE is not in this item.
 - `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+). Not a compliance certificate.
 - National-ID regexes can be limited with `filter_regex_patterns(["US", "GB"])` or CLI `--countries US,GB`. Universal patterns always stay.
 - `--no-llm` / `-p regex-only` skips the language model. Regex, checksums, operators, verify, and risk still run. Names and identity clues are missed.
@@ -546,8 +546,10 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 24. `encrypt` / format-preserving encryption operator
 
-**Status:** not started  
+**Status:** done (2026-09-04) — [PR #70](https://github.com/leo-gan/anonymizer/pull/70) (`feat/encrypt-operator`)  
 **Technique:** value-level crypto. Presidio encrypt/decrypt; Google AES-SIV / FPE-FFX; Philter FPE; NIST SP 800-38G AES-FF3-1.
+
+**In simple terms:** `replace` writes `PERSON_1` and keeps “Jane Doe” in the mapping file. Anyone who reads that file can undo the page. `encrypt` writes a locked token (`ENC1_…`) instead. The same secret always produces the same token, so Ada stays Ada across files. Deanonymize unlocks the token with `--encrypt-secret`. Those originals are not stored in the mapping. Format-preserving encryption (same number of digits) is not in this item.
 
 **Why:** A leaked `mapping.json` (even `.enc` if the passphrase leaks) reverses every document. FPE keeps format and referential integrity without a central plaintext dictionary.
 

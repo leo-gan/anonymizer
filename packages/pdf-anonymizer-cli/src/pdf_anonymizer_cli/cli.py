@@ -265,6 +265,16 @@ def run(
             ),
         ),
     ] = None,
+    encrypt_secret: Annotated[
+        Optional[str],
+        typer.Option(
+            "--encrypt-secret",
+            help=(
+                "Secret for --operator TYPE=encrypt. Also ANONYMIZER_ENCRYPT_SECRET. "
+                "Same text always yields the same token. Required when encrypt is used."
+            ),
+        ),
+    ] = None,
     ocr: Annotated[
         bool,
         typer.Option(
@@ -362,6 +372,12 @@ def run(
         operator_map = parse_operator_specs(operator)
     except ValueError as exc:
         logging.error("%s", exc)
+        sys.exit(1)
+    encrypt_key = encrypt_secret or os.getenv("ANONYMIZER_ENCRYPT_SECRET")
+    if "encrypt" in operator_map.values() and not encrypt_key:
+        logging.error(
+            "The encrypt operator needs --encrypt-secret or ANONYMIZER_ENCRYPT_SECRET."
+        )
         sys.exit(1)
 
     use_llm = bool(config.use_llm) and not no_llm
@@ -495,6 +511,7 @@ def run(
                     max_retry_delay=config.max_retry_delay,
                     operators=operator_map or None,
                     fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
+                    encrypt_secret=encrypt_key,
                     seed_mapping=seed_mapping,
                     keep_list=keep_phrases,
                     deny_list=deny_phrases,
@@ -517,6 +534,7 @@ def run(
                         max_retry_delay=config.max_retry_delay,
                         operators=operator_map or None,
                         fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
+                        encrypt_secret=encrypt_key,
                         seed_mapping=seed_mapping,
                         keep_list=keep_phrases,
                         deny_list=deny_phrases,
@@ -539,6 +557,7 @@ def run(
                     max_retry_delay=config.max_retry_delay,
                     operators=operator_map or None,
                     fake_secret=fake_secret or os.getenv("ANONYMIZER_FAKE_SECRET"),
+                    encrypt_secret=encrypt_key,
                     seed_mapping=seed_mapping,
                     keep_list=keep_phrases,
                     deny_list=deny_phrases,
@@ -687,6 +706,16 @@ def deanonymize(
             ),
         ),
     ] = None,
+    encrypt_secret: Annotated[
+        Optional[str],
+        typer.Option(
+            "--encrypt-secret",
+            help=(
+                "Secret used by --operator TYPE=encrypt. "
+                "Also ANONYMIZER_ENCRYPT_SECRET."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Deanonymize a file using a mapping file.
@@ -698,6 +727,7 @@ def deanonymize(
             str(mapping_file),
             mapping_passphrase=resolve_mapping_passphrase(mapping_passphrase),
             expected_source_sha256=source_sha256,
+            encrypt_secret=encrypt_secret or os.getenv("ANONYMIZER_ENCRYPT_SECRET"),
         )
     except ValueError as exc:
         logging.error("%s", exc)

@@ -113,7 +113,7 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 
 ### Per-type operators
 *   Default write is still `replace` (`PERSON_1`).
-*   `--operator TYPE=mask|hash|generalize|shift|fake` changes how that type is written. `CREDIT_CARD_LIKE` follows `CREDIT_CARD`.
+*   `--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes how that type is written. `CREDIT_CARD_LIKE` follows `CREDIT_CARD`. `encrypt` is AES-256-GCM (`ENC1_…`), reversible with a secret, and those originals are omitted from the mapping file.
 *   `fake` is seeded (`--fake-secret` / `ANONYMIZER_FAKE_SECRET`) so the same person always gets the same invented name.
 *   Two dates that both become `2019` cannot both be restored uniquely.
 

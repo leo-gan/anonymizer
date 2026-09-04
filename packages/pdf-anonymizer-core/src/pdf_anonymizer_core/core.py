@@ -264,6 +264,7 @@ def build_mapping(
     seed_mapping: Optional[Dict[str, str]],
     operators: Optional[Dict[str, str]],
     fake_secret: Optional[str],
+    encrypt_secret: Optional[str] = None,
 ) -> Dict[str, str]:
     """seed_placeholder_state, PERSON_n / .v_n, apply_operator."""
     if seed_mapping:
@@ -331,6 +332,7 @@ def build_mapping(
                 operator_for_type(entity_type, operators),
                 text_to_base.get(original, original),
                 fake_secret or "",
+                encrypt_secret or "",
             )
         final_mapping = transformed
 
@@ -350,6 +352,7 @@ def anonymize_text_content(
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    encrypt_secret: Optional[str] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
@@ -387,6 +390,7 @@ def anonymize_text_content(
         seed_mapping=seed_mapping,
         operators=operators,
         fake_secret=fake_secret,
+        encrypt_secret=encrypt_secret,
     )
 
     anonymized_text = full_text
@@ -412,6 +416,7 @@ def anonymize_file(
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    encrypt_secret: Optional[str] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
@@ -458,10 +463,12 @@ def anonymize_file(
         base_retry_delay: Base delay in seconds for retry backoff.
         max_retry_delay: Maximum delay cap for retry backoff.
         operators: Optional map of entity type → operator (replace, mask, hash,
-            generalize, shift, fake). Types not listed keep ``replace``.
+            generalize, shift, fake, encrypt). Types not listed keep ``replace``.
             ``CREDIT_CARD_LIKE`` follows ``CREDIT_CARD``.
         fake_secret: Optional seed material for the ``fake`` operator. Same
             person + type + secret always yields the same fake.
+        encrypt_secret: Secret for the ``encrypt`` operator. Same text always
+            yields the same token. Required when any type uses ``encrypt``.
         seed_mapping: Optional original → written map from a previous file so
             the same person keeps PERSON_1 (or the same fake) across documents.
         keep_list: Phrases that must stay visible even if detected.
@@ -507,6 +514,7 @@ def anonymize_file(
             max_retry_delay=max_retry_delay,
             operators=operators,
             fake_secret=fake_secret,
+            encrypt_secret=encrypt_secret,
             seed_mapping=seed_mapping,
             keep_list=keep_list,
             deny_list=deny_list,
@@ -532,6 +540,7 @@ def anonymize_file(
             max_retry_delay=max_retry_delay,
             operators=operators,
             fake_secret=fake_secret,
+            encrypt_secret=encrypt_secret,
             seed_mapping=seed_mapping,
             keep_list=keep_list,
             deny_list=deny_list,
@@ -568,6 +577,7 @@ def anonymize_file(
         max_retry_delay=max_retry_delay,
         operators=operators,
         fake_secret=fake_secret,
+        encrypt_secret=encrypt_secret,
         seed_mapping=seed_mapping,
         keep_list=keep_list,
         deny_list=deny_list,
@@ -690,6 +700,7 @@ def anonymize_tabular_file(
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    encrypt_secret: Optional[str] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
@@ -768,6 +779,7 @@ def anonymize_tabular_file(
         seed_mapping=seed_mapping,
         operators=operators,
         fake_secret=fake_secret,
+        encrypt_secret=encrypt_secret,
     )
     entity_texts = tuple(
         entity["text"] for entity in entities_to_process if entity.get("text")
@@ -799,6 +811,7 @@ def anonymize_docx_file(
     max_retry_delay: float = 10.0,
     operators: Optional[Dict[str, str]] = None,
     fake_secret: Optional[str] = None,
+    encrypt_secret: Optional[str] = None,
     seed_mapping: Optional[Dict[str, str]] = None,
     keep_list: Optional[List[str]] = None,
     deny_list: Optional[List[str]] = None,
@@ -879,6 +892,7 @@ def anonymize_docx_file(
         seed_mapping=seed_mapping,
         operators=operators,
         fake_secret=fake_secret,
+        encrypt_secret=encrypt_secret,
     )
     entity_texts = tuple(
         entity["text"] for entity in entities_to_process if entity.get("text")

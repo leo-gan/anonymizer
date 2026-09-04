@@ -22,6 +22,12 @@ from pdf_anonymizer_core.mapping_crypto import (
     load_mapping_payload,
     sha256_file,
 )
+from pdf_anonymizer_core.operators import (
+    decrypt_value,
+    find_encrypt_tokens,
+    mapping_without_encrypt_plaintexts,
+    restore_encrypt_tokens,
+)
 from pdf_anonymizer_core.secure_io import write_private_json
 from pdf_anonymizer_core.pdf_ocr import take_pdf_layout, write_layout_sidecar
 from pdf_anonymizer_core.pdf_output import (
@@ -295,18 +301,20 @@ def save_results(
     if original_path.is_file():
         source_digest = sha256_file(original_path)
 
+    persist_mapping = mapping_without_encrypt_plaintexts(final_mapping)
     if mapping_passphrase:
         mapping_file = f"{mappings_dir}/{file_stem}.mapping.json.enc"
         payload = encrypt_mapping(
-            final_mapping,
+            persist_mapping,
             mapping_passphrase,
             source_sha256=source_digest or None,
         )
         write_private_json(mapping_file, payload)
     else:
         mapping_file = f"{mappings_dir}/{file_stem}.mapping.json"
-        # Persist mapping as placeholder -> original for correct deanonymization
-        write_private_json(mapping_file, final_mapping)
+        # Persist mapping as placeholder -> original for correct deanonymization.
+        # Encrypt tokens are omitted so a leaked map does not hold those originals.
+        write_private_json(mapping_file, persist_mapping)
 
     return primary_output, mapping_file
 
@@ -341,6 +349,7 @@ def deanonymize_file(
     mapping_passphrase: str | None = None,
     *,
     expected_source_sha256: str | None = None,
+    encrypt_secret: str | None = None,
 ) -> tuple[str, str]:
     """Deanonymize a file using a mapping file.
 
@@ -360,6 +369,8 @@ def deanonymize_file(
         expected_source_sha256: Optional SHA-256 of the original source
             document. When set, an encrypted mapping locked to a different
             file is rejected (AAD mismatch).
+        encrypt_secret: Secret used by the ``encrypt`` operator. Decrypts
+            ``ENC1_`` tokens after placeholder restore.
 
     Returns:
         A tuple (deanonymized_file_path, stats_file_path).
@@ -394,6 +405,8 @@ def deanonymize_file(
             restored, cell_used = restore_placeholders_in_text(
                 cell.search_text, placeholder_to_original
             )
+            if encrypt_secret:
+                restored = restore_encrypt_tokens(restored, encrypt_secret)
             used_placeholders |= cell_used
             if doc.kind == "csv":
                 restored = unneutralize_csv_equals(restored)
@@ -409,6 +422,8 @@ def deanonymize_file(
             restored, block_used = restore_placeholders_in_text(
                 block.search_text, placeholder_to_original
             )
+            if encrypt_secret:
+                restored = restore_encrypt_tokens(restored, encrypt_secret)
             used_placeholders |= block_used
             if restored != block.search_text:
                 write_block_text(block, restored)
@@ -425,12 +440,27 @@ def deanonymize_file(
         deanonymized_text, used_placeholders = restore_placeholders_in_text(
             anonymized_text, placeholder_to_original
         )
+        if encrypt_secret:
+            deanonymized_text = restore_encrypt_tokens(
+                deanonymized_text, encrypt_secret
+            )
+            extra: Dict[str, str] = {}
+            for token in find_encrypt_tokens(anonymized_text):
+                try:
+                    extra[token] = decrypt_value(token, encrypt_secret)
+                except ValueError:
+                    continue
+            placeholder_to_original.update(extra)
     else:
         with open(anonymized_file_path, "r", encoding="utf-8") as f:
             anonymized_text = f.read()
         deanonymized_text, used_placeholders = restore_placeholders_in_text(
             anonymized_text, placeholder_to_original
         )
+        if encrypt_secret:
+            deanonymized_text = restore_encrypt_tokens(
+                deanonymized_text, encrypt_secret
+            )
 
     # Gather stats
     all_placeholders_in_text = set(
