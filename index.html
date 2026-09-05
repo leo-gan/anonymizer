@@ -401,10 +401,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#key-highlights" class="md-nav__link">
+  <a href="#what-it-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Highlights
+        What it does
       
     </span>
   </a>
@@ -1122,10 +1122,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#key-highlights" class="md-nav__link">
+  <a href="#what-it-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Highlights
+        What it does
       
     </span>
   </a>
@@ -1175,8 +1175,7 @@
 
 
 <h1 id="pdf-anonymizer-documentation">🦉🫥 PDF Anonymizer Documentation<a class="headerlink" href="#pdf-anonymizer-documentation" title="Permanent link">&para;</a></h1>
-<p>Welcome to the official documentation portal for the <strong>PDF Anonymizer</strong> project. </p>
-<p>PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK designed to strip Personally Identifiable Information (PII) from large PDF, Markdown, plain text, CSV, Excel, and Word documents using advanced large language models (LLMs). Crucially, the process is fully reversible: you can safely share your anonymized documents and later deanonymize them using local cryptographic maps.</p>
+<p>This tool hides personal details in documents and can put them back. It is a reversible document <a href="project/terminology/">pseudonymizer</a>, not a legal certificate.</p>
 <div class="grid cards">
 <ul>
 <li>
@@ -1194,14 +1193,66 @@
 </ul>
 </div>
 <hr />
-<h2 id="key-highlights">Key Highlights<a class="headerlink" href="#key-highlights" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Context-Aware Accuracy</strong>: A fast RE2 regex stage (with checksums so mistyped IBANs become <code>IBAN_LIKE_1</code>, not leftover digits) plus an LLM that can hide identity clues, not only names.</li>
-<li><strong>Reversible by default</strong>: Typed stand-ins (<code>PERSON_1</code>) plus a JSON mapping file. You can lock the map (<code>*.mapping.json.enc</code>), keep it only in memory, or write a type as a mask, a year, a hash, or a stable fake name instead.</li>
-<li><strong>Checks after masking</strong>: A leftover scan (<code>*.residual_pii.json</code>) and a linkage-risk score (<code>*.risk.json</code>). Reports only — they do not rewrite the page.</li>
-<li><strong>Privacy First &amp; Cost Effective</strong>: Fully compatible with local, offline models using <strong>Ollama</strong> (e.g., Gemma 2, Phi 3/4). Also supports <strong>Google Gemini</strong>, <strong>Anthropic Claude</strong>, <strong>OpenAI GPT</strong>, <strong>Hugging Face</strong>, and <strong>OpenRouter</strong>.</li>
-<li><strong>Built for Scale</strong>: Implements an intelligent stream-based chunking mechanism designed to reliably handle files up to <strong>1GB</strong> without running out of context windows or memory.</li>
-</ul>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reversible pseudonymization</td>
+<td>Personal values become typed placeholders (<code>PERSON_1</code>) plus a mapping file. This is not irreversible anonymization.</td>
+</tr>
+<tr>
+<td>Hybrid named-entity recognition</td>
+<td>RE2 regular expressions find structured identifiers; a language model finds names. Optional local span NER (GLiNER).</td>
+</tr>
+<tr>
+<td>Checksums</td>
+<td>A failed Luhn or IBAN check is still hidden as <code>IBAN_LIKE</code>, so leftover digits do not stay visible.</td>
+</tr>
+<tr>
+<td>Identity clues</td>
+<td>The careful profile also hides phrases that pick out one person without a name (quasi-identifiers, type <code>INDIRECT</code>).</td>
+</tr>
+<tr>
+<td>Leftover measurement</td>
+<td>Residual scan after masking. Gold-corpus leftover rate and recall in CI, split like TAB into direct vs quasi identifiers.</td>
+</tr>
+<tr>
+<td>Anonymization statistics</td>
+<td>After a run, <code>data/stats/</code> records leftovers (<code>*.residual_pii.json</code>) and linkage-risk clumps (<code>*.risk.json</code>). Deanonymize writes unused and missing mapping counts.</td>
+</tr>
+<tr>
+<td>Span-based replacement</td>
+<td>Replacement is by character interval. The longer span wins when two hits overlap.</td>
+</tr>
+<tr>
+<td>File types</td>
+<td>PDF, Markdown, plain text, CSV, Excel, and Word (<code>.docx</code>).</td>
+</tr>
+<tr>
+<td>Country-specific PII</td>
+<td>National-ID regexes for 30+ countries (US, CA, GB, ES, IT, FR, IN, CN, and others). <code>--countries US,GB</code> keeps only those national IDs. Email, IBAN, and cards always stay.</td>
+</tr>
+<tr>
+<td>HIPAA Safe Harbor aid</td>
+<td><code>--entity-profile hipaa-safe-harbor</code> covers the 18 identifier classes (year-only dates, ZIP3, age 90+). It is a coverage aid, not a compliance certificate.</td>
+</tr>
+<tr>
+<td>OCR</td>
+<td><code>--ocr</code> runs Tesseract when a PDF has pages but no text layer.</td>
+</tr>
+<tr>
+<td>Local or remote</td>
+<td>Ollama on this machine, or Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter.</td>
+</tr>
+</tbody>
+</table>
+<p>Operators, locked maps, and HTTP are in <a href="project/">Project Docs</a> and <a href="project/recipes/">Recipes</a>.</p>
 <hr />
 <h2 id="quick-start-in-60-seconds">Quick Start in 60 Seconds<a class="headerlink" href="#quick-start-in-60-seconds" title="Permanent link">&para;</a></h2>
 <p>Ensure you have <a href="https://astral.sh/docs/uv">uv</a> installed, then sync the dependencies:</p>
