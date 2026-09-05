@@ -1,8 +1,6 @@
 # 🦉🫥 PDF Anonymizer Documentation
 
-Welcome to the official documentation portal for the **PDF Anonymizer** project. 
-
-PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK designed to strip Personally Identifiable Information (PII) from large PDF, Markdown, plain text, CSV, Excel, and Word documents using advanced large language models (LLMs). Crucially, the process is fully reversible: you can safely share your anonymized documents and later deanonymize them using local cryptographic maps.
+This tool hides personal details in documents and can put them back. It is a reversible document [pseudonymizer](project/terminology.md), not a legal certificate.
 
 <div class="grid cards" markdown="1">
 
@@ -26,13 +24,24 @@ PDF Anonymizer is a high-performance, developer-friendly utility and Python SDK 
 
 ---
 
-## Key Highlights
+## What it does
 
-*   **Context-Aware Accuracy**: A fast RE2 regex stage (with checksums so mistyped IBANs become `IBAN_LIKE_1`, not leftover digits) plus an LLM that can hide identity clues, not only names.
-*   **Reversible by default**: Typed stand-ins (`PERSON_1`) plus a JSON mapping file. You can lock the map (`*.mapping.json.enc`), keep it only in memory, or write a type as a mask, a year, a hash, or a stable fake name instead.
-*   **Checks after masking**: A leftover scan (`*.residual_pii.json`) and a linkage-risk score (`*.risk.json`). Reports only — they do not rewrite the page.
-*   **Privacy First & Cost Effective**: Fully compatible with local, offline models using **Ollama** (e.g., Gemma 2, Phi 3/4). Also supports **Google Gemini**, **Anthropic Claude**, **OpenAI GPT**, **Hugging Face**, and **OpenRouter**.
-*   **Built for Scale**: Implements an intelligent stream-based chunking mechanism designed to reliably handle files up to **1GB** without running out of context windows or memory.
+| Feature | Meaning |
+|---|---|
+| Reversible pseudonymization | Personal values become typed placeholders (`PERSON_1`) plus a mapping file. This is not irreversible anonymization. |
+| Hybrid named-entity recognition | RE2 regular expressions find structured identifiers; a language model finds names. Optional local span NER (GLiNER). |
+| Checksums | A failed Luhn or IBAN check is still hidden as `IBAN_LIKE`, so leftover digits do not stay visible. |
+| Identity clues | The careful profile also hides phrases that pick out one person without a name (quasi-identifiers, type `INDIRECT`). |
+| Leftover measurement | Residual scan after masking. Gold-corpus leftover rate and recall in CI, split like TAB into direct vs quasi identifiers. |
+| Anonymization statistics | After a run, `data/stats/` records leftovers (`*.residual_pii.json`) and linkage-risk clumps (`*.risk.json`). Deanonymize writes unused and missing mapping counts. |
+| Span-based replacement | Replacement is by character interval. The longer span wins when two hits overlap. |
+| File types | PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`). |
+| Country-specific PII | National-ID regexes for 30+ countries (US, CA, GB, ES, IT, FR, IN, CN, and others). `--countries US,GB` keeps only those national IDs. Email, IBAN, and cards always stay. |
+| HIPAA Safe Harbor aid | `--entity-profile hipaa-safe-harbor` covers the 18 identifier classes (year-only dates, ZIP3, age 90+). It is a coverage aid, not a compliance certificate. |
+| OCR | `--ocr` runs Tesseract when a PDF has pages but no text layer. |
+| Local or remote | Ollama on this machine, or Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter. |
+
+Operators, locked maps, and HTTP are in [Project Docs](project/index.md) and [Recipes](project/recipes.md).
 
 ---
 

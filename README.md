@@ -1,20 +1,26 @@
 # 🦉🫥 PDF Anonymizer
 
-This application anonymizes large PDF, Markdown, Text, CSV, Excel, or Word files using a **hybrid approach**: a fast, safe RE2-powered regex pre-filter (google-re2) followed by LLM-based semantic detection.
+This tool hides personal details in documents and can put them back. It is a reversible document [pseudonymizer](https://leo-gan.github.io/anonymizer/project/terminology/), not a legal certificate.
 
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
 [![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
 
-- **High-Quality Anonymization**: Leverages LLMs to identify and replace Personally Identifiable Information (PII) with high accuracy.
-- **Identity clues, not only names**: A sentence can point to one person without writing their name ("the CEO of Tesla", "the author of the 'Harry Potter' series"). The careful (`detailed`) instructions ask the language model to hide those phrases too. Use `-p best-quality` or `--prompt-name detailed`. The fast default does not. Plain-language explanation: [Identity clues](https://leo-gan.github.io/anonymizer/101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
-- **Fast & Safe Regex Pre-Filter (Hybrid NER)**: First stage uses the RE2 engine (`google-re2`) for linear-time, ReDoS-safe detection of 70+ structured PII patterns (emails, phones, URLs, credit cards, IBANs, crypto wallets, VINs, MACs, dates, currency, plus national IDs/tax IDs/driver licenses/VAT/business/government IDs etc.). Country-partitioned patterns cover 30+ jurisdictions (mandatory: USA, Canada, UK, Spain, Italy, France, India, China + DE, JP, BR, AU, NL, and many more). After a match, cheap checksums (the same kind of “did you type this number wrong?” check a shop uses on a card) decide the label: a real IBAN becomes `IBAN_1`, a mistyped one becomes `IBAN_LIKE_1`. The number is still hidden either way. Limit national IDs with `--countries US,GB`. Regex results are priority-merged with the LLM stage. Full list and per-country details are in the core package docs and recipes.
-- **How a type is written**: Default is a reversible stand-in (`PERSON_1`). `--operator CREDIT_CARD=mask` (or `hash` / `generalize` / `shift` / `fake`) changes that type. `--entity-profile hipaa-safe-harbor` is a coverage aid (year-only dates, ZIP3, age 90+), **not** a certificate.
-- **After masking**: `run` writes `*.residual_pii.json` (leftovers) and `*.risk.json` (identity-clue clumps). `pdf-anonymizer verify` and `pdf-anonymizer report` do the same later. Reports do not rewrite the page.
-- **Same person, same stand-in**: Files in one `run` share a growing map. `--mapping-in` continues a later batch. `--keep-list` / `--deny-list` leave phrases visible or force-hide them. Maps can be locked as `*.mapping.json.enc`, or kept only in memory with `--ephemeral-mapping`.
-- **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
-- **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
-- **Reversible**: Supports deanonymization to recover original data when needed.
-- **Multi-Format**: Works with PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`) files.
+| Feature | Meaning |
+|---|---|
+| Reversible pseudonymization | Personal values become typed placeholders (`PERSON_1`) plus a mapping file. This is not irreversible anonymization. |
+| Hybrid named-entity recognition | RE2 regular expressions find structured identifiers; a language model finds names. Optional local span NER (GLiNER). |
+| Checksums | A failed Luhn or IBAN check is still hidden as `IBAN_LIKE`, so leftover digits do not stay visible. |
+| Identity clues | The careful profile also hides phrases that pick out one person without a name (quasi-identifiers, type `INDIRECT`). |
+| Leftover measurement | Residual scan after masking. Gold-corpus leftover rate and recall in CI, split like TAB into direct vs quasi identifiers. |
+| Anonymization statistics | After a run, `data/stats/` records leftovers (`*.residual_pii.json`) and linkage-risk clumps (`*.risk.json`). Deanonymize writes unused and missing mapping counts. |
+| Span-based replacement | Replacement is by character interval. The longer span wins when two hits overlap. |
+| File types | PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`). |
+| Country-specific PII | National-ID regexes for 30+ countries (US, CA, GB, ES, IT, FR, IN, CN, and others). `--countries US,GB` keeps only those national IDs. Email, IBAN, and cards always stay. |
+| HIPAA Safe Harbor aid | `--entity-profile hipaa-safe-harbor` covers the 18 identifier classes (year-only dates, ZIP3, age 90+). It is a coverage aid, not a compliance certificate. |
+| OCR | `--ocr` runs Tesseract when a PDF has pages but no text layer. |
+| Local or remote | [Ollama](https://ollama.com/) on this machine, or Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter. |
+
+Operators, locked maps, HTTP, and the rest live in the [docs](https://leo-gan.github.io/anonymizer/).
 
 ## 📖 Documentation
 
