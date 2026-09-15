@@ -1035,6 +1035,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#2b-score-id-extract-alone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Score id-extract alone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#3-print-the-public-eval-table" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1288,6 +1299,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#2b-score-id-extract-alone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Score id-extract alone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#3-print-the-public-eval-table" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1505,10 +1527,16 @@
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/run_gold_benchmark.py<span class="w"> </span>--write-baseline
 </span></code></pre></div>
 <p>This runs <code>extract_entities_via_regex</code> and <code>anonymize_text_content(..., use_llm=False)</code>. It writes <code>tests/eval/baselines/gold_corpus_regex_only.json</code>. No API key is required.</p>
-<h3 id="3-print-the-public-eval-table">3. Print the public eval table<a class="headerlink" href="#3-print-the-public-eval-table" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>gold-table
+<h3 id="2b-score-id-extract-alone">2b. Score <code>id-extract</code> alone<a class="headerlink" href="#2b-score-id-extract-alone" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>gold-bench-id-extract
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># or</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_public_table.py
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/run_id_extract_benchmark.py<span class="w"> </span>--write-baseline
+</span></code></pre></div>
+<p>This calls <code>id_extract.extract</code> only. It does not replace text or write a mapping. It writes <code>tests/eval/baselines/gold_corpus_id_extract.json</code>. Use that file to improve the detector without going through core. Default sources are the committed CI set (<code>mini-tab</code>, <code>domain-pack</code>).</p>
+<h3 id="3-print-the-public-eval-table">3. Print the public eval table<a class="headerlink" href="#3-print-the-public-eval-table" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>gold-table
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># or</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_public_table.py
 </span></code></pre></div>
 <p>The table is <code>tests/eval/baselines/public_eval_table.md</code>. NER is a placeholder until item 20. Live <code>detailed</code> scoring is <code>--llm --model-name …</code> and is not part of PR CI.</p>
 <h3 id="4-pr-ci-completeness-gate">4. PR CI completeness gate<a class="headerlink" href="#4-pr-ci-completeness-gate" title="Permanent link">&para;</a></h3>
@@ -1541,23 +1569,23 @@
 </table>
 <p>The large downloaded sets are <strong>not</strong> required in PR CI. If they are present locally, an extra test checks that structured leftover on a sample stays at or under 10%.</p>
 <h3 id="5-tiny-fixture-only">5. Tiny fixture only<a class="headerlink" href="#5-tiny-fixture-only" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py
 </span></code></pre></div>
 <p>This scores <code>tests/eval/fixture.json</code> the same way as item 13. Use it when you only need the scorer, not the public corpus.</p>
 <hr />
 <h2 id="layout">Layout<a class="headerlink" href="#layout" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>scripts/download_gold_corpus.py      # install (gitignored data)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>scripts/run_gold_benchmark.py        # score + leftover
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>scripts/eval_public_table.py         # regex vs NER vs LLM table
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>scripts/eval_tab.py                  # mini fixture only
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>tests/eval/gold.py                   # converters, leftover, gates
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>tests/eval/sources.json              # catalog
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>tests/eval/domain_pack.json          # committed use-case pages
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>tests/eval/fixture.json              # mini-tab
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>tests/eval/baselines/                # committed scores, not the documents
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>tests/eval/test_completeness.py      # CI leftover / recall / residual JSON
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>tests/test_fuzz.py                   # Hypothesis
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>data/gold-corpus/                    # downloaded files (not in git)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>scripts/download_gold_corpus.py      # install (gitignored data)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>scripts/run_gold_benchmark.py        # score + leftover
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>scripts/eval_public_table.py         # regex vs NER vs LLM table
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>scripts/eval_tab.py                  # mini fixture only
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>tests/eval/gold.py                   # converters, leftover, gates
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>tests/eval/sources.json              # catalog
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>tests/eval/domain_pack.json          # committed use-case pages
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>tests/eval/fixture.json              # mini-tab
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>tests/eval/baselines/                # committed scores, not the documents
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>tests/eval/test_completeness.py      # CI leftover / recall / residual JSON
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>tests/test_fuzz.py                   # Hypothesis
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>data/gold-corpus/                    # downloaded files (not in git)
 </span></code></pre></div>
 <hr />
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>

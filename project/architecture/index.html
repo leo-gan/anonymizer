@@ -1721,17 +1721,18 @@
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                                                   v
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                  +--------------------------------+
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                  |     pdf-anonymizer-core        |
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                  |  (SDK &amp; LLM adapters)          |
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                  |  (SDK, merge, mapping, files)  |
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                  +---------------+----------------+
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                                  |
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>         +------------------------+------------------------+
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>         |                        |                        |
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>         v                        v                        v
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>+----------------+       +----------------+       +----------------+
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|  Text Loader   |       |   LLM Router   |       | Mapping Engine |
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>| &amp; PDF Extractor|       | &amp; API Adapters |       | &amp; Reverser     |
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|   id-extract   |       |   LLM Router   |       | Mapping Engine |
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>| RE2 + checksum |       | &amp; API Adapters |       | &amp; Reverser     |
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>+----------------+       +----------------+       +----------------+
 </span></code></pre></div>
+<p><code>id-extract</code> finds structured identifiers and returns character offsets. It does not replace text. Core merges those hits with later recognizers, then maps and replaces. The extractor default is every bundled country (<code>countries="all"</code>).</p>
 <hr />
 <h2 id="the-processing-pipeline">The Processing Pipeline<a class="headerlink" href="#the-processing-pipeline" title="Permanent link">&para;</a></h2>
 <p>When you run <code>pdf-anonymizer run</code>, the system executes the following sequential steps:</p>
@@ -1739,7 +1740,7 @@
     File[Input File: PDF, MD, TXT, CSV, XLSX] --&gt; Ext[Text Extractor]
     Ext --&gt;|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --&gt; Chunk[Text Chunking]
-    Chunk --&gt; Regex[RE2 regex + checksums]
+    Chunk --&gt; Regex[id-extract RE2 + checksums]
     Chunk --&gt; LLM[LLM Entity Identification]
     Regex --&gt; Merge[Merge detections]
     LLM --&gt; Merge

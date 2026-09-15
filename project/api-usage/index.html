@@ -1640,7 +1640,7 @@
 <li><code>prompt_template</code> (<code>str</code>): The prompt template string containing instructions for entity masking.</li>
 <li><code>model_name</code> (<code>str</code>): The target model name (e.g. <code>"gemini-2.5-flash"</code>, <code>"google/gemini-2.5-pro"</code>, <code>"ollama/phi4-mini"</code>).</li>
 <li><code>anonymized_entities</code> (<code>list[str]</code>, optional): Type filter (e.g. <code>["PERSON", "ORGANIZATION"]</code>). Listing <code>IBAN</code> also includes <code>IBAN_LIKE</code>.</li>
-<li><code>regex_patterns</code> (<code>dict</code>, optional): First-stage RE2 map. Defaults to <code>DEFAULT_REGEX_PATTERNS</code>. Use <code>filter_regex_patterns(["US", "GB"])</code> to keep only some national IDs.</li>
+<li><code>regex_patterns</code> (<code>dict</code>, optional): First-stage RE2 map. Defaults to <code>DEFAULT_REGEX_PATTERNS</code> from <code>id-extract</code> (<code>countries="all"</code>). Use <code>filter_regex_patterns(["US", "GB"])</code> to keep only some national IDs. Detection-only callers can import <code>from id_extract import extract</code> instead of going through core.</li>
 <li><code>operators</code> (<code>dict[str, str]</code>, optional): Type → <code>replace</code> / <code>mask</code> / <code>hash</code> / <code>generalize</code> / <code>shift</code> / <code>fake</code>. Unlisted types stay <code>replace</code>.</li>
 <li><code>fake_secret</code> (<code>str</code>, optional): Seed for <code>fake</code>. Same person + type + secret → same fake.</li>
 <li><code>seed_mapping</code> (<code>dict[str, str]</code>, optional): Original → written map from a previous file so Ada stays <code>PERSON_1</code>.</li>

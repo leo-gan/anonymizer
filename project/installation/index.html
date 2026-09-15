@@ -1319,24 +1319,27 @@
 </ol>
 <hr />
 <h2 id="installing-as-a-library-dependency">Installing as a Library Dependency<a class="headerlink" href="#installing-as-a-library-dependency" title="Permanent link">&para;</a></h2>
-<p>If you are using <code>pdf-anonymizer-core</code> or <code>pdf-anonymizer-cli</code> in a separate external project, you can install them via <code>pip</code> or <code>uv</code>.</p>
+<p>If you are using <code>id-extract</code>, <code>pdf-anonymizer-core</code>, or <code>pdf-anonymizer-cli</code> in a separate external project, you can install them via <code>pip</code> or <code>uv</code>.</p>
+<p><code>id-extract</code> is the RE2 detector. It returns placements and does not replace text. <code>pip install id-extract</code> ships every bundled country. Narrow the set at call time with <code>extract(..., countries=["CA", "FR", "GB"])</code> or the CLI <code>--countries</code> flag.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>id-extract
+</span></code></pre></div>
 <p>To keep the installation footprint small, the core package uses <strong>PEP 508 Extras</strong> for specific LLM providers. Install only the providers you plan to use:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Base package only (no provider dependencies; CSV works here)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-core
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Install specific provider support</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[google]&quot;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[ollama]&quot;</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[openai,anthropic]&quot;</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Excel (.xlsx) input</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[excel]&quot;</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># Word (.docx) input</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[docx]&quot;</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># Local HTTP service (separate package; depends on core only)</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Base package only (no provider dependencies; CSV works here)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-core
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Install specific provider support</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[google]&quot;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[ollama]&quot;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[openai,anthropic]&quot;</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Excel (.xlsx) input</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[excel]&quot;</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1"># Word (.docx) input</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[docx]&quot;</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># Local HTTP service (separate package; depends on core only)</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
 </span></code></pre></div>
 <h3 id="available-extras">Available Extras<a class="headerlink" href="#available-extras" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1356,35 +1359,35 @@
 <h2 id="environment-variables-configuration">Environment Variables Configuration<a class="headerlink" href="#environment-variables-configuration" title="Permanent link">&para;</a></h2>
 <p>To run the anonymizer with cloud providers, you must supply API credentials. The CLI automatically loads a <code>.env</code> file from the directory where the command is executed or any parent directory. </p>
 <p>Create a <code>.env</code> file at the root of the repository:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a># Google GenAI (Gemini Models)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>GOOGLE_API_KEY=&quot;AIzaSy...&quot;
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a># OpenAI
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>OPENAI_API_KEY=&quot;sk-proj-...&quot;
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a># Anthropic (Claude Models)
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>ANTHROPIC_API_KEY=&quot;sk-ant-...&quot;
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a># Hugging Face Hub
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>HUGGING_FACE_TOKEN=&quot;hf_...&quot;
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a># OpenRouter
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>OPENROUTER_API_KEY=&quot;sk-or-v1-...&quot;
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a># Ollama Local Host (Optional, defaults to localhost:11434)
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>OLLAMA_HOST=&quot;http://localhost:11434&quot;
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a># Optional: lock mapping files as *.mapping.json.enc (AES-256-GCM + Argon2id)
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>ANONYMIZER_MAPPING_KEY=&quot;a long secret&quot;
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a># Optional: seed for --operator TYPE=fake (same person → same fake)
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># Google GenAI (Gemini Models)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>GOOGLE_API_KEY=&quot;AIzaSy...&quot;
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a># OpenAI
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>OPENAI_API_KEY=&quot;sk-proj-...&quot;
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a># Anthropic (Claude Models)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>ANTHROPIC_API_KEY=&quot;sk-ant-...&quot;
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a># Hugging Face Hub
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>HUGGING_FACE_TOKEN=&quot;hf_...&quot;
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a># OpenRouter
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>OPENROUTER_API_KEY=&quot;sk-or-v1-...&quot;
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a># Ollama Local Host (Optional, defaults to localhost:11434)
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>OLLAMA_HOST=&quot;http://localhost:11434&quot;
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a># Optional: lock mapping files as *.mapping.json.enc (AES-256-GCM + Argon2id)
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>ANONYMIZER_MAPPING_KEY=&quot;a long secret&quot;
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a># Optional: seed for --operator TYPE=fake (same person → same fake)
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
 </span></code></pre></div>
 <p><code>ANONYMIZER_MAPPING_KEY</code> and <code>ANONYMIZER_FAKE_SECRET</code> are optional. Without them, maps stay plaintext JSON and <code>fake</code> uses a built-in constant seed (stable, not private).</p>
 <hr />
 <h2 id="verifying-the-setup">Verifying the Setup<a class="headerlink" href="#verifying-the-setup" title="Permanent link">&para;</a></h2>
 <p>To verify that the installation succeeded and all package internal references are valid, run the automated test suite:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest
 </span></code></pre></div>
 <p>If the tests pass, you are ready to use the CLI tool!</p>
 <hr />

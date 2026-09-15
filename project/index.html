@@ -767,6 +767,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#id-extract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        id-extract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pdf-anonymizer-core" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1189,6 +1200,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#id-extract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        id-extract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pdf-anonymizer-core" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1268,24 +1290,27 @@
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── data/                       # Local data directory for sample files
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── docs/                       # MkDocs documentation source files
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── packages/
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── tests/                      # Global pytest test suite
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── Makefile                    # Developer shortcut commands
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── pyproject.toml              # Workspace and dev dependencies config
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>└── mkdocs.yml                  # MkDocs site configuration
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── id-extract/             # RE2 + checksum detector (placements only)
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── tests/                      # Global pytest test suite
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── Makefile                    # Developer shortcut commands
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── pyproject.toml              # Workspace and dev dependencies config
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>└── mkdocs.yml                  # MkDocs site configuration
 </span></code></pre></div>
 <hr />
 <h2 id="the-packages">The Packages<a class="headerlink" href="#the-packages" title="Permanent link">&para;</a></h2>
-<p>The project contains three decoupled Python packages inside <code>packages/</code>:</p>
+<p>The project contains four decoupled Python packages inside <code>packages/</code>:</p>
+<h3 id="id-extract"><code>id-extract</code><a class="headerlink" href="#id-extract" title="Permanent link">&para;</a></h3>
+<p>Finds structured identifiers with RE2 and checksums. Returns character offsets. It does not replace text. One install ships every country. Pass <code>countries=</code> (or CLI <code>--countries</code>) to use a subset.</p>
 <h3 id="pdf-anonymizer-core"><code>pdf-anonymizer-core</code><a class="headerlink" href="#pdf-anonymizer-core" title="Permanent link">&para;</a></h3>
 <p>Contains all the core engines, including:</p>
 <ul>
 <li>Text extraction from PDF, Markdown, and plain text formats.</li>
 <li>Table loaders for CSV (stdlib) and Excel (<code>.xlsx</code>, <code>[excel]</code> extra): per-cell regex, row-addressed LLM batches, per-cell apply.</li>
 <li>Word loader for <code>.docx</code> (<code>[docx]</code> extra): per-paragraph regex, part-wise flatten, native <code>.docx</code> write-back.</li>
-<li>Hybrid detection: RE2 regex (with checksums / <code>TYPE_LIKE</code>) plus LLM NER.</li>
+<li>Hybrid detection: <code>id-extract</code> (RE2 + checksums / <code>TYPE_LIKE</code>) plus LLM NER.</li>
 <li>LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).</li>
 <li>Prompt templates (<code>simple</code>, <code>detailed</code>, <code>hipaa</code>) and identity-clue detection.</li>
 <li>Per-type operators (<code>replace</code>, <code>mask</code>, <code>hash</code>, <code>generalize</code>, <code>shift</code>, <code>fake</code>).</li>

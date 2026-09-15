@@ -1328,7 +1328,7 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>packages/pdf-anonymizer-api/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>--build
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>curl<span class="w"> </span>http://127.0.0.1:8000/health
 </span></code></pre></div>
-<p>Dockerfile, compose, and the optional AppArmor profile live in <code>packages/pdf-anonymizer-api/</code>. Compose sets the build context to the repository root so the image can copy <code>pdf-anonymizer-core</code> as well. The image installs those two packages only (no CLI).</p>
+<p>Dockerfile, compose, and the optional AppArmor profile live in <code>packages/pdf-anonymizer-api/</code>. Compose sets the build context to the repository root so the image can copy <code>id-extract</code> and <code>pdf-anonymizer-core</code> as well. The image installs those three packages only (no CLI).</p>
 <p><code>POST /anonymize</code> defaults to <code>use_llm: false</code> (regex-only), so the container works without API keys. Pass <code>use_llm: true</code> and a provider key in the environment if you want the language model.</p>
 <p>The AppArmor profile is <code>packages/pdf-anonymizer-api/apparmor/docker-anonymizer</code>. It is not enabled in compose. Load it on the host first, then add <code>security_opt: ["apparmor:docker-anonymizer"]</code>. That is a starting point for untrusted PDFs. It is not a complete sandbox.</p>
 <hr />
