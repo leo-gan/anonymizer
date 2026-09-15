@@ -83,7 +83,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
+          paths: [packages/id-extract/src, packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
           options:
             show_source: true
             show_root_heading: true
@@ -97,7 +97,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
+          paths: [packages/id-extract/src, packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
           options:
             show_source: true
             show_root_heading: true

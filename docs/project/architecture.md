@@ -18,17 +18,19 @@ PDF Anonymizer separates the underlying processing logic (SDK) from the command-
                                                    v
                   +--------------------------------+
                   |     pdf-anonymizer-core        |
-                  |  (SDK & LLM adapters)          |
+                  |  (SDK, merge, mapping, files)  |
                   +---------------+----------------+
                                   |
          +------------------------+------------------------+
          |                        |                        |
          v                        v                        v
 +----------------+       +----------------+       +----------------+
-|  Text Loader   |       |   LLM Router   |       | Mapping Engine |
-| & PDF Extractor|       | & API Adapters |       | & Reverser     |
+|   id-extract   |       |   LLM Router   |       | Mapping Engine |
+| RE2 + checksum |       | & API Adapters |       | & Reverser     |
 +----------------+       +----------------+       +----------------+
 ```
+
+`id-extract` finds structured identifiers and returns character offsets. It does not replace text. Core merges those hits with later recognizers, then maps and replaces. The extractor default is every bundled country (`countries="all"`).
 
 ---
 
@@ -41,7 +43,7 @@ graph TD
     File[Input File: PDF, MD, TXT, CSV, XLSX] --> Ext[Text Extractor]
     Ext -->|Markdown Converter| RawMD[Raw Markdown String]
     RawMD --> Chunk[Text Chunking]
-    Chunk --> Regex[RE2 regex + checksums]
+    Chunk --> Regex[id-extract RE2 + checksums]
     Chunk --> LLM[LLM Entity Identification]
     Regex --> Merge[Merge detections]
     LLM --> Merge

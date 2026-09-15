@@ -16,6 +16,7 @@ anonymizer/
 ├── data/                       # Local data directory for sample files
 ├── docs/                       # MkDocs documentation source files
 ├── packages/
+│   ├── id-extract/             # RE2 + checksum detector (placements only)
 │   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
 │   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
 │   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
@@ -29,7 +30,10 @@ anonymizer/
 
 ## The Packages
 
-The project contains three decoupled Python packages inside `packages/`:
+The project contains four decoupled Python packages inside `packages/`:
+
+### `id-extract`
+Finds structured identifiers with RE2 and checksums. Returns character offsets. It does not replace text. One install ships every country. Pass `countries=` (or CLI `--countries`) to use a subset.
 
 ### `pdf-anonymizer-core`
 Contains all the core engines, including:
@@ -37,7 +41,7 @@ Contains all the core engines, including:
 *   Text extraction from PDF, Markdown, and plain text formats.
 *   Table loaders for CSV (stdlib) and Excel (`.xlsx`, `[excel]` extra): per-cell regex, row-addressed LLM batches, per-cell apply.
 *   Word loader for `.docx` (`[docx]` extra): per-paragraph regex, part-wise flatten, native `.docx` write-back.
-*   Hybrid detection: RE2 regex (with checksums / `TYPE_LIKE`) plus LLM NER.
+*   Hybrid detection: `id-extract` (RE2 + checksums / `TYPE_LIKE`) plus LLM NER.
 *   LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).
 *   Prompt templates (`simple`, `detailed`, `hipaa`) and identity-clue detection.
 *   Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`).

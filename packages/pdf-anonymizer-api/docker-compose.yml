@@ -6,7 +6,7 @@
 # From this directory:
 #   docker compose up --build
 #
-# Context is the repo root so the image can COPY pdf-anonymizer-core.
+# Context is the repo root so the image can COPY id-extract and pdf-anonymizer-core.
 # Docker reads .dockerignore from that context (the repo root file).
 #
 # Optional AppArmor: see apparmor/docker-anonymizer in this package.

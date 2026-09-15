@@ -31,7 +31,13 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
 
 ## Installing as a Library Dependency
 
-If you are using `pdf-anonymizer-core` or `pdf-anonymizer-cli` in a separate external project, you can install them via `pip` or `uv`.
+If you are using `id-extract`, `pdf-anonymizer-core`, or `pdf-anonymizer-cli` in a separate external project, you can install them via `pip` or `uv`.
+
+`id-extract` is the RE2 detector. It returns placements and does not replace text. `pip install id-extract` ships every bundled country. Narrow the set at call time with `extract(..., countries=["CA", "FR", "GB"])` or the CLI `--countries` flag.
+
+```bash
+pip install id-extract
+```
 
 To keep the installation footprint small, the core package uses **PEP 508 Extras** for specific LLM providers. Install only the providers you plan to use:
 

@@ -9,13 +9,14 @@ workspace = { members = ["packages/*"] }
 packages = []
 
 [tool.uv.sources]
+id-extract = { workspace = true }
 pdf-anonymizer-core = { workspace = true }
 pdf-anonymizer-cli = { workspace = true }
 pdf-anonymizer-api = { workspace = true }
 
 [project]
 name = "pdf-anonymizer-workspace"
-version = "0.26.0"
+version = "0.27.0"
 dependencies = []
 
 [project.optional-dependencies]
@@ -30,6 +31,7 @@ dev = [
   "pytest-mock",
   "pytest-cov",
   "hypothesis",
+  "id-extract",
   "pdf-anonymizer-core[huggingface,google,ollama,openrouter,openai,anthropic,excel,docx]",
   "pdf-anonymizer-cli",
   "pdf-anonymizer-api",
@@ -40,6 +42,7 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = [
+  "packages/id-extract/src",
   "packages/pdf-anonymizer-core/src",
   "packages/pdf-anonymizer-cli/src",
   "packages/pdf-anonymizer-api/src",
