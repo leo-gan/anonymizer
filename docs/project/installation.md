@@ -33,7 +33,7 @@ The repository uses **`uv`**, a fast Python package installer and resolver. Ensu
 
 If you are using `id-extract`, `pdf-anonymizer-core`, or `pdf-anonymizer-cli` in a separate external project, you can install them via `pip` or `uv`.
 
-`id-extract` is the RE2 detector. It returns placements and does not replace text. `pip install id-extract` ships every bundled country. Narrow the set at call time with `extract(..., countries=["CA", "FR", "GB"])` or the CLI `--countries` flag.
+`id-extract` is the RE2 detector. It returns placements and does not replace text. `pip install id-extract` ships every bundled country. Narrow the set at call time with `extract(..., countries=["CA", "FR", "GB"])` or the CLI `--countries` flag. Standalone guide: [id-extract](../id-extract/index.md).
 
 ```bash
 pip install id-extract

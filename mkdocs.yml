@@ -121,6 +121,49 @@ nav:
     - Contemporary Techniques: 101/techniques.md
     - How PDF Anonymizer is Different: 101/how-different.md
     - Bonus module: 101/fairy-tale.md
+  - id-extract:
+    - Overview: id-extract/index.md
+    - Install and API: id-extract/api.md
+    - Universal identifiers: id-extract/universal.md
+    - Country catalog: id-extract/countries/index.md
+    - Australia: id-extract/countries/au.md
+    - Argentina: id-extract/countries/ar.md
+    - Austria: id-extract/countries/at.md
+    - Belgium: id-extract/countries/be.md
+    - Brazil: id-extract/countries/br.md
+    - Canada: id-extract/countries/ca.md
+    - China: id-extract/countries/cn.md
+    - Denmark: id-extract/countries/dk.md
+    - Finland: id-extract/countries/fi.md
+    - France: id-extract/countries/fr.md
+    - Germany: id-extract/countries/de.md
+    - Greece: id-extract/countries/gr.md
+    - Hong Kong: id-extract/countries/hk.md
+    - India: id-extract/countries/in.md
+    - Indonesia: id-extract/countries/id.md
+    - Ireland: id-extract/countries/ie.md
+    - Israel: id-extract/countries/il.md
+    - Italy: id-extract/countries/it.md
+    - Japan: id-extract/countries/jp.md
+    - Malaysia: id-extract/countries/my.md
+    - Mexico: id-extract/countries/mx.md
+    - Netherlands: id-extract/countries/nl.md
+    - New Zealand: id-extract/countries/nz.md
+    - Norway: id-extract/countries/no.md
+    - Poland: id-extract/countries/pl.md
+    - Portugal: id-extract/countries/pt.md
+    - Russia: id-extract/countries/ru.md
+    - Singapore: id-extract/countries/sg.md
+    - South Africa: id-extract/countries/za.md
+    - South Korea: id-extract/countries/kr.md
+    - Spain: id-extract/countries/es.md
+    - Sweden: id-extract/countries/se.md
+    - Switzerland: id-extract/countries/ch.md
+    - Taiwan: id-extract/countries/tw.md
+    - Thailand: id-extract/countries/th.md
+    - Türkiye: id-extract/countries/tr.md
+    - United Kingdom: id-extract/countries/gb.md
+    - United States: id-extract/countries/us.md
   - Project Docs:
     - Overview: project/index.md
     - Terminology: project/terminology.md
