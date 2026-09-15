@@ -96,11 +96,39 @@ jobs:
           name: python-packages
           path: dist
 
-      - name: Drop checksum file from the PyPI upload
-        run: rm -f dist/SHA256SUMS
+      - name: Split distributions by project
+        run: |
+          rm -f dist/SHA256SUMS
+          mkdir -p dist-id-extract dist-core dist-cli dist-api
+          mv dist/id_extract-* dist-id-extract/
+          mv dist/pdf_anonymizer_core-* dist-core/
+          mv dist/pdf_anonymizer_cli-* dist-cli/
+          mv dist/pdf_anonymizer_api-* dist-api/
 
-      - name: Publish to PyPI
+      # Existing PyPI projects. A new project name fails OIDC publish
+      # until a pending trusted publisher exists for that exact name.
+      - name: Publish pdf-anonymizer-core
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
-          packages-dir: dist
+          packages-dir: dist-core
+
+      - name: Publish pdf-anonymizer-cli
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+          packages-dir: dist-cli
+
+      - name: Publish pdf-anonymizer-api
+        continue-on-error: true
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+          packages-dir: dist-api
+
+      - name: Publish id-extract
+        continue-on-error: true
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+          packages-dir: dist-id-extract
