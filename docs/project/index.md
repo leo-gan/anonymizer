@@ -33,7 +33,7 @@ anonymizer/
 The project contains four decoupled Python packages inside `packages/`:
 
 ### `id-extract`
-Finds structured identifiers with RE2 and checksums. Returns character offsets. It does not replace text. One install ships every country. Pass `countries=` (or CLI `--countries`) to use a subset.
+Finds structured identifiers with RE2 and checksums. Returns character offsets. It does not replace text. One install ships every country. Pass `countries=` (or CLI `--countries`) to use a subset. Independent guide: [id-extract](../id-extract/index.md), including [one page per country](../id-extract/countries/index.md).
 
 ### `pdf-anonymizer-core`
 Contains all the core engines, including:

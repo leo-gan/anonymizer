@@ -20,6 +20,14 @@ This tool hides personal details in documents and can put them back. It is a rev
 
     [:octicons-arrow-right-24: Explore Project Docs](project/index.md)
 
+-   __id-extract__
+
+    ---
+
+    Standalone detector for structured identifiers (IDs, cards, IBAN). Install it without the anonymizer. One page per country with official sources.
+
+    [:octicons-arrow-right-24: Use id-extract on its own](id-extract/index.md)
+
 </div>
 
 ---
