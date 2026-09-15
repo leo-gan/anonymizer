@@ -1,5 +1,5 @@
 # Build from the repository root. Compose in this directory sets that context
-# so this file can COPY pdf-anonymizer-core as a sibling package.
+# so this file can COPY id-extract and pdf-anonymizer-core as sibling packages.
 #
 #   docker compose -f packages/pdf-anonymizer-api/docker-compose.yml up --build
 #
@@ -14,10 +14,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN useradd --create-home --uid 1000 anonymizer
 
 WORKDIR /src
+COPY packages/id-extract /src/packages/id-extract
 COPY packages/pdf-anonymizer-core /src/packages/pdf-anonymizer-core
 COPY packages/pdf-anonymizer-api /src/packages/pdf-anonymizer-api
 
 RUN pip install --no-cache-dir \
+        "./packages/id-extract" \
         "./packages/pdf-anonymizer-core" \
         "./packages/pdf-anonymizer-api" \
     && rm -rf /root/.cache/pip

@@ -23,6 +23,7 @@ SOURCES_PATH = EVAL_DIR / "sources.json"
 DOMAIN_PACK_PATH = EVAL_DIR / "domain_pack.json"
 MINI_TAB_PATH = EVAL_DIR / "fixture.json"
 BASELINE_PATH = EVAL_DIR / "baselines" / "gold_corpus_regex_only.json"
+ID_EXTRACT_BASELINE_PATH = EVAL_DIR / "baselines" / "gold_corpus_id_extract.json"
 
 STRUCTURED_TYPES = frozenset(
     {

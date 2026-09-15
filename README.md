@@ -39,8 +39,9 @@ The documentation includes:
 
 ## Project Structure
 
-This project is a monorepo containing three packages:
+This project is a monorepo containing four packages:
 
+- **`packages/id-extract`**: RE2 + checksum detector for structured identifiers (IDs, cards, IBAN, email). Returns placements. One install ships every country; pass `countries=` (or CLI `--countries`) to use a subset.
 - **`packages/pdf-anonymizer-core`**: The core library containing the anonymization and deanonymization logic. See the [core README](./packages/pdf-anonymizer-core/README.md) for more details.
 - **`packages/pdf-anonymizer-cli`**: A command-line interface for using the anonymizer. See the [CLI README](./packages/pdf-anonymizer-cli/README.md) for detailed usage instructions.
 - **`packages/pdf-anonymizer-api`**: Optional local HTTP service. Depends on core only, not the CLI.

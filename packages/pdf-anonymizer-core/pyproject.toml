@@ -1,16 +1,16 @@
 [project]
 name = "pdf-anonymizer-core"
-version = "0.26.0"
+version = "0.27.0"
 description = "A core library to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "id-extract>=0.1.0",
     "python-dotenv",
     "pymupdf4llm",
     "langchain-text-splitters",
-    "google-re2",
     "cryptography>=50.0.0",
     "faker>=40.36.0",
 ]
@@ -35,3 +35,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.uv.sources]
+id-extract = { workspace = true }

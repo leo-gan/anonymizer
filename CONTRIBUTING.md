@@ -18,7 +18,7 @@ source .venv/bin/activate   # or `.venv\Scripts\activate` on Windows
 ```
 
 The dev group installs:
-- Both `pdf-anonymizer-core` and `pdf-anonymizer-cli` in editable mode
+- `id-extract`, `pdf-anonymizer-core`, and `pdf-anonymizer-cli` in editable mode
 - All provider extras (google, ollama, openai, anthropic, huggingface, openrouter)
 - Testing, linting, and MkDocs tooling
 
@@ -73,13 +73,13 @@ After editing docs you can preview with `uv run mkdocs serve`.
 
 ## Releasing
 
-Versions live in three `pyproject.toml` files and must stay the same: the workspace root, `packages/pdf-anonymizer-core`, and `packages/pdf-anonymizer-cli`.
+Versions of `pdf-anonymizer-core`, `pdf-anonymizer-cli`, `pdf-anonymizer-api`, and the workspace root stay the same. `packages/id-extract` has its own version (`0.1.0` and up).
 
 1. Land the version bump on `main`.
 2. Create a GitHub Release tagged `vX.Y.Z` on `leo-gan/anonymizer` (use **Generate release notes**; categories come from `.github/release.yml`).
 3. The [Release](../.github/workflows/release.yml) workflow builds both packages, attaches wheels and `SHA256SUMS` to that release, and publishes to PyPI.
 
-PyPI upload uses Trusted Publishing (OIDC), not a stored token. Each of `pdf-anonymizer-core` and `pdf-anonymizer-cli` needs a GitHub trusted publisher: owner `leo-gan`, repository `anonymizer`, workflow `release.yml`, environment `pypi`.
+PyPI upload uses Trusted Publishing (OIDC), not a stored token. Each of `id-extract`, `pdf-anonymizer-core`, and `pdf-anonymizer-cli` needs a GitHub trusted publisher: owner `leo-gan`, repository `anonymizer`, workflow `release.yml`, environment `pypi`.
 
 ## Pull Requests
 

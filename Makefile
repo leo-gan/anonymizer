@@ -1,6 +1,7 @@
-.PHONY: install lint format test test-cov gold-corpus gold-bench gold-table build-core build-cli build-api clean-core clean-cli clean-api publish-core publish-cli publish-api publish-core-test publish-cli-test publish-api-test
+.PHONY: install lint format test test-cov gold-corpus gold-bench gold-bench-id-extract gold-table build-id-extract build-core build-cli build-api clean-id-extract clean-core clean-cli clean-api publish-core publish-cli publish-api publish-core-test publish-cli-test publish-api-test
 
 install:
+	uv pip install -e ./packages/id-extract --system
 	uv pip install -e ./packages/pdf-anonymizer-core --system
 	uv pip install -e ./packages/pdf-anonymizer-cli --system
 	uv pip install -e ./packages/pdf-anonymizer-api --system
@@ -17,7 +18,7 @@ test:
 	uv run pytest
 
 test-cov:
-	uv run pytest --cov=pdf_anonymizer_core --cov=pdf_anonymizer_cli --cov=pdf_anonymizer_api --cov-report=term-missing --cov-report=xml:coverage.xml --cov-fail-under=$(COV_FAIL_UNDER)
+	uv run pytest --cov=id_extract --cov=pdf_anonymizer_core --cov=pdf_anonymizer_cli --cov=pdf_anonymizer_api --cov-report=term-missing --cov-report=xml:coverage.xml --cov-fail-under=$(COV_FAIL_UNDER)
 
 # Floor set after the first measured run on this branch (77%). Do not invent 90%.
 COV_FAIL_UNDER ?= 70
@@ -27,6 +28,9 @@ gold-corpus:
 
 gold-bench:
 	uv run python scripts/run_gold_benchmark.py --write-baseline
+
+gold-bench-id-extract:
+	uv run python scripts/run_id_extract_benchmark.py --write-baseline
 
 gold-table:
 	uv run python scripts/eval_public_table.py --output tests/eval/baselines/public_eval_table.md
@@ -40,9 +44,13 @@ docs-build:
 # -----------------------------
 # Packaging & Publishing
 # -----------------------------
+ID_EXTRACT_PKG_DIR=packages/id-extract
 CORE_PKG_DIR=packages/pdf-anonymizer-core
 CLI_PKG_DIR=packages/pdf-anonymizer-cli
 API_PKG_DIR=packages/pdf-anonymizer-api
+
+clean-id-extract:
+	rm -rf $(ID_EXTRACT_PKG_DIR)/dist $(ID_EXTRACT_PKG_DIR)/build $(ID_EXTRACT_PKG_DIR)/*.egg-info
 
 clean-core:
 	rm -rf $(CORE_PKG_DIR)/dist $(CORE_PKG_DIR)/build $(CORE_PKG_DIR)/*.egg-info
@@ -54,6 +62,9 @@ clean-api:
 	rm -rf $(API_PKG_DIR)/dist $(API_PKG_DIR)/build $(API_PKG_DIR)/*.egg-info
 
 # Build distributions (sdist+wheel)
+build-id-extract: clean-id-extract
+	cd $(ID_EXTRACT_PKG_DIR) && uvx --from build pyproject-build .
+
 build-core: clean-core
 	cd $(CORE_PKG_DIR) && uvx --from build pyproject-build .
 

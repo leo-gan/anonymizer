@@ -9,6 +9,7 @@ resolution-markers = [
 
 [manifest]
 members = [
+    "id-extract",
     "pdf-anonymizer-api",
     "pdf-anonymizer-cli",
     "pdf-anonymizer-core",
@@ -1010,6 +1011,17 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b4/f3/c6bcfb38c4b4cd22494902f5368b5815425f03eeb5159741c7d910a69af5/hypothesis-6.167.1-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:27ca252991fdbe2ff5c611a1cc4d972d4e009eb45292c7802faa2190f995dc50", size = 1165389, upload-time = "2026-08-30T19:50:39.44Z" },
     { url = "https://files.pythonhosted.org/packages/3b/f6/d1d19d115a4c0aa35c87b9e5d570b0a7c9f42f816087849cf29c58664426/hypothesis-6.167.1-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:6c91f6f2f15b8bc6e474b824f931247c39711231e7b1b2f68277726e0ae1c728", size = 679392, upload-time = "2026-08-30T19:51:00.264Z" },
 ]
+
+[[package]]
+name = "id-extract"
+version = "0.1.0"
+source = { editable = "packages/id-extract" }
+dependencies = [
+    { name = "google-re2" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "google-re2" }]
 
 [[package]]
 name = "idna"
@@ -2223,7 +2235,7 @@ wheels = [
 
 [[package]]
 name = "pdf-anonymizer-api"
-version = "0.26.0"
+version = "0.27.0"
 source = { editable = "packages/pdf-anonymizer-api" }
 dependencies = [
     { name = "fastapi" },
@@ -2240,7 +2252,7 @@ requires-dist = [
 
 [[package]]
 name = "pdf-anonymizer-cli"
-version = "0.26.0"
+version = "0.27.0"
 source = { editable = "packages/pdf-anonymizer-cli" }
 dependencies = [
     { name = "pdf-anonymizer-core" },
@@ -2272,12 +2284,12 @@ provides-extras = ["excel", "docx", "ner"]
 
 [[package]]
 name = "pdf-anonymizer-core"
-version = "0.26.0"
+version = "0.27.0"
 source = { editable = "packages/pdf-anonymizer-core" }
 dependencies = [
     { name = "cryptography" },
     { name = "faker" },
-    { name = "google-re2" },
+    { name = "id-extract" },
     { name = "langchain-text-splitters" },
     { name = "pymupdf4llm" },
     { name = "python-dotenv" },
@@ -2319,8 +2331,8 @@ requires-dist = [
     { name = "faker", specifier = ">=40.36.0" },
     { name = "gliner", marker = "extra == 'ner'", specifier = ">=0.2.13" },
     { name = "google-genai", marker = "extra == 'google'" },
-    { name = "google-re2" },
     { name = "huggingface-hub", marker = "extra == 'huggingface'" },
+    { name = "id-extract", editable = "packages/id-extract" },
     { name = "langchain-text-splitters" },
     { name = "ollama", marker = "extra == 'ollama'" },
     { name = "openai", marker = "extra == 'openai'" },
@@ -2334,7 +2346,7 @@ provides-extras = ["google", "ollama", "huggingface", "openrouter", "openai", "a
 
 [[package]]
 name = "pdf-anonymizer-workspace"
-version = "0.26.0"
+version = "0.27.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -2350,6 +2362,7 @@ dev = [
 [package.dev-dependencies]
 dev = [
     { name = "hypothesis" },
+    { name = "id-extract" },
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extra = ["python"] },
@@ -2376,6 +2389,7 @@ provides-extras = ["dev"]
 [package.metadata.requires-dev]
 dev = [
     { name = "hypothesis" },
+    { name = "id-extract", editable = "packages/id-extract" },
     { name = "mkdocs", specifier = ">=1.5.0" },
     { name = "mkdocs-material", specifier = ">=9.5.0" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.26" },

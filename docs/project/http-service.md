@@ -26,7 +26,7 @@ docker compose -f packages/pdf-anonymizer-api/docker-compose.yml up --build
 curl http://127.0.0.1:8000/health
 ```
 
-Dockerfile, compose, and the optional AppArmor profile live in `packages/pdf-anonymizer-api/`. Compose sets the build context to the repository root so the image can copy `pdf-anonymizer-core` as well. The image installs those two packages only (no CLI).
+Dockerfile, compose, and the optional AppArmor profile live in `packages/pdf-anonymizer-api/`. Compose sets the build context to the repository root so the image can copy `id-extract` and `pdf-anonymizer-core` as well. The image installs those three packages only (no CLI).
 
 `POST /anonymize` defaults to `use_llm: false` (regex-only), so the container works without API keys. Pass `use_llm: true` and a provider key in the environment if you want the language model.
 

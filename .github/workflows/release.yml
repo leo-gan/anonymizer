@@ -4,7 +4,7 @@ name: Release
 # wheels + SHA-256 sums, and publish to PyPI.
 #
 # PyPI uses Trusted Publishing (OIDC). No API token is stored in this repo.
-# One-time setup on each PyPI project (pdf-anonymizer-core,
+# One-time setup on each PyPI project (id-extract, pdf-anonymizer-core,
 # pdf-anonymizer-cli, and pdf-anonymizer-api): add a GitHub trusted publisher
 #   owner: leo-gan
 #   repository: anonymizer
@@ -37,12 +37,14 @@ jobs:
           version: "latest"
           enable-cache: true
 
-      - name: Build core, CLI, and API
+      - name: Build id-extract, core, CLI, and API
         run: |
+          make build-id-extract
           make build-core
           make build-cli
           make build-api
           mkdir -p dist
+          cp packages/id-extract/dist/* dist/
           cp packages/pdf-anonymizer-core/dist/* dist/
           cp packages/pdf-anonymizer-cli/dist/* dist/
           cp packages/pdf-anonymizer-api/dist/* dist/

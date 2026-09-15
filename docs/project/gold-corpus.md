@@ -77,6 +77,16 @@ uv run python scripts/run_gold_benchmark.py --write-baseline
 
 This runs `extract_entities_via_regex` and `anonymize_text_content(..., use_llm=False)`. It writes `tests/eval/baselines/gold_corpus_regex_only.json`. No API key is required.
 
+### 2b. Score `id-extract` alone
+
+```bash
+make gold-bench-id-extract
+# or
+uv run python scripts/run_id_extract_benchmark.py --write-baseline
+```
+
+This calls `id_extract.extract` only. It does not replace text or write a mapping. It writes `tests/eval/baselines/gold_corpus_id_extract.json`. Use that file to improve the detector without going through core. Default sources are the committed CI set (`mini-tab`, `domain-pack`).
+
 ### 3. Print the public eval table
 
 ```bash

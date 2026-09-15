@@ -19,7 +19,7 @@ from pdf_anonymizer_core.core import anonymize_file
 *   `prompt_template` (`str`): The prompt template string containing instructions for entity masking.
 *   `model_name` (`str`): The target model name (e.g. `"gemini-2.5-flash"`, `"google/gemini-2.5-pro"`, `"ollama/phi4-mini"`).
 *   `anonymized_entities` (`list[str]`, optional): Type filter (e.g. `["PERSON", "ORGANIZATION"]`). Listing `IBAN` also includes `IBAN_LIKE`.
-*   `regex_patterns` (`dict`, optional): First-stage RE2 map. Defaults to `DEFAULT_REGEX_PATTERNS`. Use `filter_regex_patterns(["US", "GB"])` to keep only some national IDs.
+*   `regex_patterns` (`dict`, optional): First-stage RE2 map. Defaults to `DEFAULT_REGEX_PATTERNS` from `id-extract` (`countries="all"`). Use `filter_regex_patterns(["US", "GB"])` to keep only some national IDs. Detection-only callers can import `from id_extract import extract` instead of going through core.
 *   `operators` (`dict[str, str]`, optional): Type → `replace` / `mask` / `hash` / `generalize` / `shift` / `fake`. Unlisted types stay `replace`.
 *   `fake_secret` (`str`, optional): Seed for `fake`. Same person + type + secret → same fake.
 *   `seed_mapping` (`dict[str, str]`, optional): Original → written map from a previous file so Ada stays `PERSON_1`.
