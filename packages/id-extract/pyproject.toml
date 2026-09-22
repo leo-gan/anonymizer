@@ -1,6 +1,6 @@
 [project]
 name = "id-extract"
-version = "0.1.0"
+version = "0.2.0"
 description = "Extract structured identifiers (IDs, cards, IBAN, email) with RE2 and checksums."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
