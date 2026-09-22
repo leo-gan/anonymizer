@@ -3825,6 +3825,24 @@
 <td style="text-align: left;"><code>0</code></td>
 <td style="text-align: left;">Drop spans whose <a href="../terminology/#recognizer-source-and-score">score</a> is below this value. Default 0 keeps every hit. Not a calibrated probability.</td>
 </tr>
+<tr>
+<td style="text-align: left;"><code>--k</code></td>
+<td style="text-align: left;">integer ≥ 2</td>
+<td style="text-align: left;"><em>none</em></td>
+<td style="text-align: left;">CSV/Excel only. Generalize or suppress quasi-identifier columns until each combination appears at least K times. Writes <code>data/stats/&lt;stem&gt;.table_privacy.json</code>. Does not rewrite PDFs. An aid, not a certificate.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--quasi-columns</code></td>
+<td style="text-align: left;"><code>zip,gender</code></td>
+<td style="text-align: left;">header hints</td>
+<td style="text-align: left;">Quasi-identifier headers for <code>--k</code>. Default matches zip, gender, age, birth date, city, and state.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--sensitive-column</code></td>
+<td style="text-align: left;">header</td>
+<td style="text-align: left;"><em>none</em></td>
+<td style="text-align: left;">With <code>--k</code>, report ℓ-diversity and t-closeness for this column. The column is not generalized.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="configuration-profiles">Configuration Profiles<a class="headerlink" href="#configuration-profiles" title="Permanent link">&para;</a></h3>
