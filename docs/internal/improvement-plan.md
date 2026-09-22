@@ -54,7 +54,7 @@ This product is a **reversible document pseudonymizer**: typed placeholders (`PE
 | Pseudonymization | Typed tokens + `data/mappings/*.json` (optional AES-256-GCM + Argon2id; or in-memory only) |
 | Generalization / suppression | Operators: `mask`, `hash`, `generalize`, `shift` (default still `replace`) |
 | Randomization / differential privacy | Not implemented (poor fit for reversible prose) |
-| *k*-anonymity / ℓ-diversity / *t*-closeness | Not implemented (tabular models; do not rewrite PDFs with them) |
+| *k*-anonymity / ℓ-diversity / *t*-closeness | Optional `--k` on CSV/Excel only. Default cell replace is unchanged. PDFs are not rewritten. |
 | Synthetic data | Value-level `fake` operator (seeded Faker); not whole-document rewrite |
 | Cryptographic methods | Optional AES-256-GCM + Argon2id mapping (`*.mapping.json.enc`), source-file AAD, `0600` writes |
 | Re-ID / attack simulation | Residual regex scan + linkage-risk report + TAB-style eval harness (`tests/eval/`). Downloadable gold-corpus (TAB, Presidio, Gretel) + regex-only baseline. CI leftover/recall gate, residual JSON red-team, coverage floor, Hypothesis fuzz, public eval table (item 19). |
@@ -71,7 +71,7 @@ Known code facts to attach to:
 - `--no-llm` / `-p regex-only` skips the language model. Regex, checksums, operators, verify, and risk still run. Names and identity clues are missed.
 - `--keep-list` / `--deny-list` gazetteers. Keep wins if a phrase is on both lists.
 - `tests/eval/` scores mention-level and entity-level recall, split by direct vs quasi identifiers. `scripts/eval_tab.py` runs the fixture (regex stage if no predictions file). `scripts/download_gold_corpus.py` installs TAB / Presidio / Gretel into `data/gold-corpus/` (not in git). Regex-only baseline: `tests/eval/baselines/gold_corpus_regex_only.json`. PR CI: committed gold leftover/recall gate, residual JSON red-team, `pytest-cov` floor, Hypothesis fuzz. Public eval table: `scripts/eval_public_table.py`. LLM path in unit tests is mocked; live LLM eval is opt-in.
-- `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Still pseudonymization, not *k*-anonymity (item 18).
+- `.csv` / `.xlsx` take a table path (`tables.py`): per-cell regex on text/formula strings, row-addressed LLM batches, per-cell apply. Default is still pseudonymization (item 18). `--k` optionally generalizes quasi-identifier columns and writes a prosecutor-risk report (item 26). It does not rewrite PDFs.
 - `.docx` takes a Word path (`word.py`): per-paragraph regex on visible text (runs joined), part-wise LLM flatten, per-paragraph apply, native `.docx` write-back. Headers, footers, comments, field codes, and hyperlink targets are walked. `.doc` / `.docm` / `.dot*` are rejected (item 25).
 - PDF path is `pymupdf4llm` → Markdown. A PDF with pages and no text layer is a hard error unless `--ocr` (Tesseract on PATH) recovers words. OCR writes `*.anonymized.layout.json` boxes for a later native-PDF redact (item 14). `--output-pdf` writes a sanitized native PDF (PyMuPDF redaction annotations + ``apply_redactions``, ``/Info``/XMP/attachments/layers wiped). `--redact` is irreversible black boxes. Markdown stays the default (item 15).
 - `best-speed` / `best-cost` use local span NER when the `[ner]` extra is installed (GLiNER, CPU). They then skip the language model. `best-quality` may run NER first and still calls the LLM for identity clues. No extra ⇒ today’s LLM `best-speed`.
@@ -586,7 +586,7 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 26. Optional table-only formal privacy engine
 
-**Status:** not started  
+**Status:** done 2026-09-22  
 **Technique:** *k*-anonymity / ℓ-diversity / *t*-closeness / DP as a **table** engine (ARX class). Not a PDF rewriter.
 
 **Why:** Cell-level CSV/XLSX (item 18) is still pseudonymization. Linkage on ZIP+gender+DOB is the actual tabular risk. Google SDP and ARX compute this; we only emit a prose linkage heuristic.

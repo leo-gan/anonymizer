@@ -650,11 +650,19 @@ def write_anonymized_table(
     dest_path: str,
     orig_to_written: Dict[str, str],
     entity_texts: Iterable[str],
-) -> None:
+    *,
+    table_privacy: Optional[dict] = None,
+) -> Optional[dict]:
     doc = load_table(source_path)
     apply_mapping_to_table(doc, orig_to_written, entity_texts)
+    report = None
+    if table_privacy:
+        from pdf_anonymizer_core.table_privacy import apply_table_privacy
+
+        report = apply_table_privacy(doc, **table_privacy)
     dest = Path(dest_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
     save_table(doc, dest_path)
+    return report
 
 

@@ -52,7 +52,7 @@ The OS/network survey is useful only for **adjacent hygiene**: metadata wipe, sa
 |---|---|
 | No offline / local LLM; must send data to the cloud | **False.** Ollama extras, `--no-llm` / `-p regex-only`. Cloud is optional. |
 | Core depends on spaCy | **False.** No spaCy dependency. Semantic stage is LLM, not spaCy NER. |
-| CSV/Excel treated as one continuous text stream | **False.** `tables.py` is per-cell regex + row-addressed LLM batches. Still not *k*-anonymity. |
+| CSV/Excel treated as one continuous text stream | **False.** `tables.py` is per-cell regex + row-addressed LLM batches. Optional `--k` generalizes quasi-identifier columns. Default remains cell-level pseudonymization. |
 | No CI | **Partial.** Lint workflow badge exists; coverage/reproducible-release story is still thin. |
 | No local execution / amnesic mode at all | **Partial.** `--ephemeral-mapping` keeps the map in memory. Outputs still land on disk unless the user deletes them. |
 | Should become Tails/Whonix/Qubes-like | **Out of class.** Do not add Tor routing, amnesic live OS, or VM isolation as product features. |

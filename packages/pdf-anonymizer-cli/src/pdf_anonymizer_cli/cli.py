@@ -354,6 +354,38 @@ def run(
             case_sensitive=False,
         ),
     ] = None,
+    k: Annotated[
+        Optional[int],
+        typer.Option(
+            "--k",
+            help=(
+                "CSV/Excel only. Generalize or suppress quasi-identifier "
+                "columns until each combination appears at least K times. "
+                "Does not rewrite PDFs. An aid, not a privacy certificate."
+            ),
+            min=2,
+        ),
+    ] = None,
+    quasi_columns: Annotated[
+        Optional[str],
+        typer.Option(
+            "--quasi-columns",
+            help=(
+                "Comma-separated quasi-identifier headers for --k. "
+                "Default: headers such as zip, gender, age, and birth date."
+            ),
+        ),
+    ] = None,
+    sensitive_column: Annotated[
+        Optional[str],
+        typer.Option(
+            "--sensitive-column",
+            help=(
+                "Column used only to report ℓ-diversity and t-closeness "
+                "with --k. It is not generalized."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Anonymize one or more files by replacing PII with anonymized placeholders.
@@ -492,6 +524,28 @@ def run(
     if deny_phrases:
         logging.info("  --deny-list: %s phrase(s)", len(deny_phrases))
 
+    table_privacy = None
+    if k is not None:
+        non_tables = [path for path in file_paths if not is_tabular_path(str(path))]
+        if non_tables:
+            logging.error(
+                "--k applies only to CSV and Excel. It does not rewrite %s.",
+                ", ".join(str(path) for path in non_tables),
+            )
+            sys.exit(1)
+        quasi = None
+        if quasi_columns:
+            quasi = [part.strip() for part in quasi_columns.split(",") if part.strip()]
+        table_privacy = {
+            "k": k,
+            "quasi_columns": quasi,
+            "sensitive_column": sensitive_column,
+        }
+        logging.info(
+            "  --k: %s (table aid, not a certificate)",
+            k,
+        )
+
     logging.info(f"Found {len(file_paths)} file(s) to process.")
 
     seed_mapping = None
@@ -553,6 +607,11 @@ def run(
                         use_llm=use_llm,
                         use_ner=use_ner,
                         min_confidence=min_confidence,
+                        k=k,
+                        quasi_columns=(
+                            table_privacy["quasi_columns"] if table_privacy else None
+                        ),
+                        sensitive_column=sensitive_column,
                     )
                 )
             else:
@@ -612,6 +671,7 @@ def run(
                 ),
                 output_pdf=want_pdf,
                 redact=redact,
+                table_privacy=table_privacy,
             )
             logging.info(f"Anonymization for {file_path} complete!")
             logging.info(f"Anonymized text saved into '{anonymized_output_file}'")

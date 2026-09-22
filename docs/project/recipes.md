@@ -360,7 +360,17 @@ pdf-anonymizer verify data/anonymized/people.anonymized.csv
 pdf-anonymizer report data/anonymized/roster.anonymized.xlsx
 ```
 
-No new flags. `--no-llm`, `--operator`, `--keep-list` / `--deny-list`, `--mapping-in`, and the rest work the same way as on a PDF. Files in one `run` still share a growing map (`people.csv notes.md`).
+No new flags are required. `--no-llm`, `--operator`, `--keep-list` / `--deny-list`, `--mapping-in`, and the rest work the same way as on a PDF. Files in one `run` still share a growing map (`people.csv notes.md`).
+
+**Optional k-anonymity (tables only)**
+
+`--k 5` is a separate path. Direct identifiers (email, SSN, phone) still use the usual operators. Columns whose headers are quasi-identifiers (zip, gender, age, birth date, city, state) are generalized or suppressed until every combination of those columns appears at least 5 times. Pass `--quasi-columns zip,gender` to choose the columns. `--sensitive-column diagnosis` is not rewritten; it is used only to report ℓ-diversity and t-closeness.
+
+```bash
+pdf-anonymizer run roster.csv --no-llm --k 5 --quasi-columns zip,gender
+```
+
+That also writes `data/stats/roster.anonymized.table_privacy.json`. The numbers are prosecutor risk: for a row, risk is 1 divided by how many rows share its quasi-identifier combination. This is an aid for a table release. It is not a certificate. Quasi-identifier cells are not reversible. `--k` on a PDF, Word file, or Markdown file is an error and does not change that file.
 
 **Notes**
 
