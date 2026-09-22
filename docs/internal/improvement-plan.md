@@ -31,7 +31,7 @@
 - [x] 23. Review / apply residual findings — done 2026-09-04, [PR #68](https://github.com/leo-gan/anonymizer/pull/68)
 - [x] 24. `encrypt` / format-preserving encryption operator — done 2026-09-04, [PR #70](https://github.com/leo-gan/anonymizer/pull/70)
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
-- [ ] 26. Optional table-only formal privacy engine
+- [x] 26. Optional table-only formal privacy engine — done 2026-09-22, [PR #79](https://github.com/leo-gan/anonymizer/pull/79)
 - [ ] 27. Release hygiene (attestations, no-telemetry statement)
 
 ---
@@ -586,7 +586,7 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 26. Optional table-only formal privacy engine
 
-**Status:** done 2026-09-22  
+**Status:** done 2026-09-22 — [PR #79](https://github.com/leo-gan/anonymizer/pull/79) (`table-privacy-engine`)  
 **Technique:** *k*-anonymity / ℓ-diversity / *t*-closeness / DP as a **table** engine (ARX class). Not a PDF rewriter.
 
 **Why:** Cell-level CSV/XLSX (item 18) is still pseudonymization. Linkage on ZIP+gender+DOB is the actual tabular risk. Google SDP and ARX compute this; we only emit a prose linkage heuristic.
