@@ -134,6 +134,17 @@ def run(
             ),
         ),
     ] = None,
+    opt_in: Annotated[
+        Optional[str],
+        typer.Option(
+            "--opt-in",
+            help=(
+                "State, provincial, and industry id-extract keys, comma-separated "
+                "(e.g. DL_FL_US,NAM_QC_CA), or 'all' for every selective one. "
+                "Default: none."
+            ),
+        ),
+    ] = None,
     verify: Annotated[
         bool,
         typer.Option(
@@ -363,6 +374,7 @@ def run(
             prompt_name=prompt_name,
             chunk_size=characters_to_anonymize,
             countries=country_list,
+            opt_in=opt_in,
         )
     except ValueError as exc:
         logging.error("%s", exc)
@@ -757,6 +769,16 @@ def verify(
             help="ISO-2 country codes for the regex scan, comma-separated (e.g. US,GB).",
         ),
     ] = None,
+    opt_in: Annotated[
+        Optional[str],
+        typer.Option(
+            "--opt-in",
+            help=(
+                "State, provincial, and industry id-extract keys, comma-separated, "
+                "or 'all'. Default: none."
+            ),
+        ),
+    ] = None,
     verify_llm: Annotated[
         bool,
         typer.Option(
@@ -789,6 +811,7 @@ def verify(
             profile=config_profile,
             model_name=model_name,
             countries=country_list,
+            opt_in=opt_in,
         )
     except ValueError as exc:
         logging.error("%s", exc)

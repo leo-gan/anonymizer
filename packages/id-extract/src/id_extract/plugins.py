@@ -145,15 +145,20 @@ def resolve_countries(
 def patterns(
     countries: Optional[Iterable[str] | str] = "all",
     source: Optional[Dict[str, str]] = None,
+    *,
+    opt_in: Optional[Iterable[str] | str | bool] = None,
 ) -> Dict[str, str]:
     """Return universal patterns plus national-ID patterns for ``countries``.
 
     The default ``countries=\"all\"`` is the full bundled map. Universal keys
-    (EMAIL, IBAN, CREDIT_CARD, VIN, ...) always stay.
+    (EMAIL, IBAN, CREDIT_CARD, VIN, ...) always stay. ``opt_in`` adds state,
+    provincial, and industry patterns. It defaults to none.
     """
+    from id_extract.opt_in import opt_in_patterns
+
+    wanted = resolve_countries(countries)
     if source is None:
         universal, by_country = _load_builtin_plugins()
-        wanted = resolve_countries(countries)
         merged = dict(universal)
         if wanted is None:
             for extra in by_country.values():
@@ -161,31 +166,32 @@ def patterns(
         else:
             for code in wanted:
                 merged.update(by_country.get(code, {}))
-        return merged
-
-    wanted = resolve_countries(countries)
-    if wanted is None:
-        return dict(source)
-    filtered: Dict[str, str] = {}
-    for key, pattern in source.items():
-        country = pattern_country(key)
-        if country is None or country in wanted:
-            filtered[key] = pattern
-    return filtered
+    elif wanted is None:
+        merged = dict(source)
+    else:
+        merged = {}
+        for key, pattern in source.items():
+            country = pattern_country(key)
+            if country is None or country in wanted:
+                merged[key] = pattern
+    merged.update(opt_in_patterns(opt_in, wanted))
+    return merged
 
 
 def filter_regex_patterns(
     countries: Optional[Iterable[str]] = None,
     patterns: Optional[Dict[str, str]] = None,
+    *,
+    opt_in: Optional[Iterable[str] | str | bool] = None,
 ) -> Dict[str, str]:
     """Compatibility wrapper used by ``pdf_anonymizer_core.conf``.
 
-    ``None`` or an empty list returns the full map, matching the historical
-    ``filter_regex_patterns`` contract.
+    ``None`` or an empty list returns the full national map, matching the
+    historical ``filter_regex_patterns`` contract. Opt-in patterns stay out
+    unless ``opt_in`` is set.
     """
-    source = patterns
-    if source is None:
-        source = globals()["patterns"](countries="all")
     if not countries:
-        return dict(source)
-    return globals()["patterns"](countries=countries, source=source)
+        wanted: Optional[Iterable[str] | str] = "all"
+    else:
+        wanted = countries
+    return globals()["patterns"](countries=wanted, source=patterns, opt_in=opt_in)

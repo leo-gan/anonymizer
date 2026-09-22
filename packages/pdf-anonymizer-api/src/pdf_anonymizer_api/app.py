@@ -50,6 +50,7 @@ class AnonymizeBody(BaseModel):
     prompt_name: str = "simple"
     anonymized_entities: Optional[List[str]] = None
     countries: Optional[List[str]] = None
+    opt_in: Optional[List[str]] = None
 
 
 class DeanonymizeBody(BaseModel):
@@ -61,6 +62,7 @@ class DeanonymizeBody(BaseModel):
 class TextBody(BaseModel):
     text: str
     countries: Optional[List[str]] = None
+    opt_in: Optional[List[str]] = None
     use_llm: bool = False
     model_name: Optional[str] = None
 
@@ -91,6 +93,7 @@ def anonymize_text_request(
     prompt_name: str = "simple",
     anonymized_entities: Optional[List[str]] = None,
     countries: Optional[List[str]] = None,
+    opt_in: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Run the same engine as the CLI on an in-memory string."""
     if len(text) > MAX_TEXT_CHARS:
@@ -109,7 +112,7 @@ def anonymize_text_request(
         [text],
         prompt_template=template,
         model_name=model_name or "gemini-2.5-flash",
-        regex_patterns=filter_regex_patterns(countries),
+        regex_patterns=filter_regex_patterns(countries, opt_in=opt_in),
         max_retries=3,
         base_retry_delay=1.0,
         max_retry_delay=10.0,
@@ -199,6 +202,7 @@ def create_app():
                 prompt_name=body.prompt_name,
                 anonymized_entities=body.anonymized_entities,
                 countries=body.countries,
+                opt_in=body.opt_in,
             )
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -219,7 +223,9 @@ def create_app():
         try:
             return verify_anonymized_text(
                 body.text,
-                regex_patterns=filter_regex_patterns(body.countries),
+                regex_patterns=filter_regex_patterns(
+                    body.countries, opt_in=body.opt_in
+                ),
                 use_llm=body.use_llm,
                 model_name=body.model_name,
             )

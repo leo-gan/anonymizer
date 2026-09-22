@@ -360,6 +360,66 @@ def validate_pesel_pl(text: str) -> bool:
     return digits[10] == str(check)
 
 
+def validate_rtn_us(text: str) -> bool:
+    """ABA routing number: weights 3, 7, 1 and a zero mod-10 total."""
+    digits = _digits_only(text)
+    if len(digits) != 9:
+        return False
+    prefix = int(digits[:2])
+    if not (prefix <= 12 or 21 <= prefix <= 32 or 61 <= prefix <= 72 or prefix == 80):
+        return False
+    weights = (3, 7, 1, 3, 7, 1, 3, 7, 1)
+    total = sum((ord(digits[i]) - 48) * weights[i] for i in range(9))
+    return total % 10 == 0
+
+
+def validate_cusip(text: str) -> bool:
+    """CUSIP Modulus 10 double-add-double check digit (CGS / ANSI X9.6)."""
+    compact = _alnum_upper(text)
+    if len(compact) != 9 or not compact[8].isdigit():
+        return False
+    total = 0
+    for i, ch in enumerate(compact[:8]):
+        if ch.isdigit():
+            value = ord(ch) - 48
+        elif "A" <= ch <= "Z":
+            value = ord(ch) - ord("A") + 10
+        else:
+            return False
+        if i % 2 == 1:
+            value *= 2
+        total += value // 10 + value % 10
+    check = (10 - (total % 10)) % 10
+    return compact[8] == str(check)
+
+
+def validate_phn_bc(text: str) -> bool:
+    """BC Personal Health Number: leading 9 and the Teleplan MOD-11 digit."""
+    digits = _digits_only(text)
+    if len(digits) != 10 or digits[0] != "9":
+        return False
+    weights = (2, 4, 8, 5, 10, 9, 7, 3)
+    total = sum((ord(digits[i + 1]) - 48) * weights[i] for i in range(8))
+    remainder = total % 11
+    expected = 0 if remainder == 0 else 11 - remainder
+    if expected == 10:
+        return False
+    return digits[9] == str(expected)
+
+
+def validate_clabe_mx(text: str) -> bool:
+    """CLABE control digit: cyclic weights 3, 7, 1 on the first 17 digits."""
+    digits = _digits_only(text)
+    if len(digits) != 18:
+        return False
+    weights = (3, 7, 1)
+    total = 0
+    for i, ch in enumerate(digits[:17]):
+        total += ((ord(ch) - 48) * weights[i % 3]) % 10
+    check = (10 - (total % 10)) % 10
+    return digits[17] == str(check)
+
+
 ValidatorFn = Callable[[str], bool]
 
 # Keys must match entity TYPEs emitted by the regex stage (upper-case).
@@ -376,12 +436,32 @@ CHECKSUM_VALIDATORS: Dict[str, ValidatorFn] = {
     "CPF_BR": validate_cpf_br,
     "CODICE_FISCALE_IT": validate_codice_fiscale_it,
     "PESEL_PL": validate_pesel_pl,
+    "RTN_US": validate_rtn_us,
+    "CUSIP_NNA": validate_cusip,
+    "PHN_BC_CA": validate_phn_bc,
+    "CLABE_MX": validate_clabe_mx,
 }
+
+# These shapes are common digit runs. A failed check is dropped instead of
+# kept as TYPE_LIKE, which is what the other validators do.
+STRICT_CHECKSUMS = frozenset(
+    {
+        "RTN_US",
+        "CUSIP_NNA",
+        "PHN_BC_CA",
+        "CLABE_MX",
+    }
+)
 
 
 def has_checksum(entity_type: str) -> bool:
     """Return True if this type has a registered extra-digit check."""
     return entity_type.upper() in CHECKSUM_VALIDATORS
+
+
+def strict_checksum(entity_type: str) -> bool:
+    """Return True when a failed check should drop the hit."""
+    return entity_type.upper() in STRICT_CHECKSUMS
 
 
 def passes_checksum(entity_type: str, text: str) -> bool:

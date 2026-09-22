@@ -102,4 +102,126 @@ A coarse pattern for U.S. professional or DEA-style licence tokens. It is not a 
 
 - [DEA — registration](https://www.deadiversion.usdoj.gov/drugreg/index.html)
 
+## `ITIN_US` — Individual Taxpayer Identification Number (ITIN)
+
+A tax processing number for a person who needs a U.S. taxpayer identifier and cannot get an SSN. It uses the SSN hyphenation, starts with 9, and the fourth and fifth digits fall in the IRS ranges. A same-span SSN label is dropped.
+
+| | |
+|---|---|
+| **Package type** | `ITIN_US` |
+| **Shape this package looks for** | 9NN-NN-NNNN, middle digits 50–65, 70–88, 90–92, or 94–99 |
+| **Checksum** | none |
+| **Example (synthetic)** | `900-70-0000` |
+
+**Official sources**
+
+- [IRS — Taxpayer identification numbers](https://www.irs.gov/tin/taxpayer-identification-numbers-tin)
+- [IRM 3.21.263 — ITIN ranges](https://www.irs.gov/irm/part3/irm_03-021-263r)
+
+## `ATIN_US` — Adoption Taxpayer Identification Number (ATIN)
+
+A temporary IRS number for a child in a pending domestic adoption. It uses the SSN hyphenation, starts with 9, and the fourth and fifth digits are 93.
+
+| | |
+|---|---|
+| **Package type** | `ATIN_US` |
+| **Shape this package looks for** | 9NN-93-NNNN |
+| **Checksum** | none |
+| **Example (synthetic)** | `900-93-0000` |
+
+**Official sources**
+
+- [IRM 3.13.40 — ATIN format](https://www.irs.gov/irm/part3/irm_03-013-040)
+
+## `PTIN_US` — Preparer Tax Identification Number (PTIN)
+
+The identifier a paid tax return preparer puts on returns they prepare. The IRS describes it as the letter P followed by eight digits.
+
+| | |
+|---|---|
+| **Package type** | `PTIN_US` |
+| **Shape this package looks for** | P + 8 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `P00000000` |
+
+**Official sources**
+
+- [IRM 3.12.2 — PTIN](https://www.irs.gov/irm/part3/irm_03-012-002r)
+
+## `MBI_US` — Medicare Beneficiary Identifier (MBI)
+
+The 11-character identifier CMS prints on Medicare cards. Characters 2, 5, 8, and 9 are letters. Letters S, L, O, I, B, and Z are excluded. Dashes on the card are optional in text.
+
+| | |
+|---|---|
+| **Package type** | `MBI_US` |
+| **Shape this package looks for** | 11 characters, CMS position classes, optional dashes as 4-3-4 |
+| **Checksum** | none |
+| **Example (synthetic)** | `1EG4-TE5-MK73` |
+
+**Official sources**
+
+- [CMS — MBI format](https://www.cms.gov/medicare/new-medicare-card/understanding-the-mbi-with-format.pdf)
+
+## `A_NUMBER_US` — Alien Registration Number
+
+The DHS file number for a non-citizen. USCIS describes it as the letter A followed by 7, 8, or 9 digits. A shorter number is padded with zeros in current systems.
+
+| | |
+|---|---|
+| **Package type** | `A_NUMBER_US` |
+| **Shape this package looks for** | A, optional hyphen, 7–9 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `A000000001` |
+
+**Official sources**
+
+- [USCIS — A-Number](https://www.uscis.gov/glossary-term/50684)
+
+## `USCIS_RECEIPT_US` — USCIS receipt number
+
+The 13-character identifier USCIS assigns to an application or petition: three letters and ten digits.
+
+| | |
+|---|---|
+| **Package type** | `USCIS_RECEIPT_US` |
+| **Shape this package looks for** | 3 letters + 10 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `ABC0000000001` |
+
+**Official sources**
+
+- [USCIS — receipt number field](https://my.uscis.gov/accounts/annual-asylum-fee/questionnaire)
+
+## `DOS_CASE_US` — Department of State immigrant case ID
+
+The case id on an immigrant visa packet. USCIS describes the ordinary form as three letters and 9 or 10 digits, and a Diversity Visa case as four digits, two letters, and five digits. A same-span USCIS receipt wins.
+
+| | |
+|---|---|
+| **Package type** | `DOS_CASE_US` |
+| **Shape this package looks for** | 3 letters + 9 or 10 digits, or 4 digits + 2 letters + 5 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `XYZ0123456789` |
+
+**Official sources**
+
+- [USCIS — A-Number and DOS case ID](https://www.uscis.gov/forms/filing-fees/uscis-immigrant-fee/immigrant-fee-payment-tips-on-finding-your-a-number-and-dos-case-id)
+
+## `DEA_US` — DEA registration number
+
+The controlled-substance registration number: two letters and seven digits. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped.
+
+| | |
+|---|---|
+| **Package type** | `DEA_US` |
+| **Shape this package looks for** | 2 letters + 7 digits, optional hyphen and suffix |
+| **Checksum** | none |
+| **Example (synthetic)** | `AB1234567` |
+
+**Official sources**
+
+- [DEA Practitioner's Manual](https://www.deadiversion.usdoj.gov/GDP/%28DEA-DC-071%29%28EO-DEA226%29_Practitioner%27s_Manual_%28final%29.pdf)
+- [21 CFR 1301.22](https://www.ecfr.gov/current/title-21/chapter-II/part-1301/section-1301.22)
+
 The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.

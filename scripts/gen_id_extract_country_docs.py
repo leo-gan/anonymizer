@@ -25,9 +25,18 @@ COUNTRIES: dict[str, dict] = {
                 "example": "51 824 753 556",
                 "checksum": "none in this package (the ABR uses a weighting check the regex does not run)",
                 "sources": [
-                    ("What an ABN is (ABR)", "https://www.abr.gov.au/business-super-funds-charities/applying-abn"),
-                    ("A New Tax System (Australian Business Number) Act 1999", "https://www.legislation.gov.au/C2004A00467/latest"),
-                    ("ATO — registering for an ABN", "https://www.ato.gov.au/businesses-and-organisations/starting-registering-or-closing-a-business/starting-your-own-business/registration-obligations-for-businesses/registering-for-an-australian-business-number"),
+                    (
+                        "What an ABN is (ABR)",
+                        "https://www.abr.gov.au/business-super-funds-charities/applying-abn",
+                    ),
+                    (
+                        "A New Tax System (Australian Business Number) Act 1999",
+                        "https://www.legislation.gov.au/C2004A00467/latest",
+                    ),
+                    (
+                        "ATO — registering for an ABN",
+                        "https://www.ato.gov.au/businesses-and-organisations/starting-registering-or-closing-a-business/starting-your-own-business/registration-obligations-for-businesses/registering-for-an-australian-business-number",
+                    ),
                 ],
             },
             {
@@ -38,8 +47,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123 456 789",
                 "checksum": "none",
                 "sources": [
-                    ("ATO — What is a tax file number?", "https://www.ato.gov.au/individuals-and-families/tax-file-number/what-is-a-tax-file-number"),
-                    ("Income Tax Assessment Act 1936 s 202B (TFN application)", "https://www.legislation.gov.au/C1936A00027/latest"),
+                    (
+                        "ATO — What is a tax file number?",
+                        "https://www.ato.gov.au/individuals-and-families/tax-file-number/what-is-a-tax-file-number",
+                    ),
+                    (
+                        "Income Tax Assessment Act 1936 s 202B (TFN application)",
+                        "https://www.legislation.gov.au/C1936A00027/latest",
+                    ),
                 ],
             },
             {
@@ -50,8 +65,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12345678",
                 "checksum": "none",
                 "sources": [
-                    ("National Transport Commission — driver licensing", "https://www.ntc.gov.au/transport-reform/ntc-projects/australian-driver-licensing"),
-                    ("Example issuer: NSW Service — driver licences", "https://www.nsw.gov.au/driving-boating-and-transport/driver-and-rider-licences"),
+                    (
+                        "National Transport Commission — driver licensing",
+                        "https://www.ntc.gov.au/transport-reform/ntc-projects/australian-driver-licensing",
+                    ),
+                    (
+                        "Example issuer: NSW Service — driver licences",
+                        "https://www.nsw.gov.au/driving-boating-and-transport/driver-and-rider-licences",
+                    ),
                 ],
             },
         ],
@@ -67,9 +88,18 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123-45-6789",
                 "checksum": "none",
                 "sources": [
-                    ("SSA — request a Social Security number", "https://www.ssa.gov/number-card/request-number-first-time"),
-                    ("SSA POMS RM 10201.030 — structure of the SSN", "https://secure.ssa.gov/poms.nsf/lnx/0110201030"),
-                    ("Social Security Act", "https://www.ssa.gov/OP_Home/ssact/ssact.htm"),
+                    (
+                        "SSA — request a Social Security number",
+                        "https://www.ssa.gov/number-card/request-number-first-time",
+                    ),
+                    (
+                        "SSA POMS RM 10201.030 — structure of the SSN",
+                        "https://secure.ssa.gov/poms.nsf/lnx/0110201030",
+                    ),
+                    (
+                        "Social Security Act",
+                        "https://www.ssa.gov/OP_Home/ssact/ssact.htm",
+                    ),
                 ],
             },
             {
@@ -91,8 +121,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12-3456789",
                 "checksum": "none",
                 "sources": [
-                    ("IRS — Employer identification number", "https://www.irs.gov/businesses/employer-identification-number"),
-                    ("About Form SS-4", "https://www.irs.gov/forms-pubs/about-form-ss-4"),
+                    (
+                        "IRS — Employer identification number",
+                        "https://www.irs.gov/businesses/employer-identification-number",
+                    ),
+                    (
+                        "About Form SS-4",
+                        "https://www.irs.gov/forms-pubs/about-form-ss-4",
+                    ),
                 ],
             },
             {
@@ -103,8 +139,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "1234567893",
                 "checksum": "Luhn over prefix 80840 + the 10 digits (CMS)",
                 "sources": [
-                    ("CMS — National Provider Identifier Standard", "https://www.cms.gov/regulations-and-guidance/administrative-simplification/nationalprovidentstand"),
-                    ("45 CFR Part 162 (HIPAA unique identifiers)", "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-162"),
+                    (
+                        "CMS — National Provider Identifier Standard",
+                        "https://www.cms.gov/regulations-and-guidance/administrative-simplification/nationalprovidentstand",
+                    ),
+                    (
+                        "45 CFR Part 162 (HIPAA unique identifiers)",
+                        "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-162",
+                    ),
                 ],
             },
             {
@@ -115,7 +157,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "D1234567",
                 "checksum": "none",
                 "sources": [
-                    ("AAMVA — driver licensing", "https://www.aamva.org/topics/driver-licensing"),
+                    (
+                        "AAMVA — driver licensing",
+                        "https://www.aamva.org/topics/driver-licensing",
+                    ),
                 ],
             },
             {
@@ -126,7 +171,127 @@ COUNTRIES: dict[str, dict] = {
                 "example": "AB1234567",
                 "checksum": "none",
                 "sources": [
-                    ("DEA — registration", "https://www.deadiversion.usdoj.gov/drugreg/index.html"),
+                    (
+                        "DEA — registration",
+                        "https://www.deadiversion.usdoj.gov/drugreg/index.html",
+                    ),
+                ],
+            },
+            {
+                "key": "ITIN_US",
+                "name": "Individual Taxpayer Identification Number (ITIN)",
+                "definition": "A tax processing number for a person who needs a U.S. taxpayer identifier and cannot get an SSN. It uses the SSN hyphenation, starts with 9, and the fourth and fifth digits fall in the IRS ranges. A same-span SSN label is dropped.",
+                "shape": "9NN-NN-NNNN, middle digits 50–65, 70–88, 90–92, or 94–99",
+                "example": "900-70-0000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "IRS — Taxpayer identification numbers",
+                        "https://www.irs.gov/tin/taxpayer-identification-numbers-tin",
+                    ),
+                    (
+                        "IRM 3.21.263 — ITIN ranges",
+                        "https://www.irs.gov/irm/part3/irm_03-021-263r",
+                    ),
+                ],
+            },
+            {
+                "key": "ATIN_US",
+                "name": "Adoption Taxpayer Identification Number (ATIN)",
+                "definition": "A temporary IRS number for a child in a pending domestic adoption. It uses the SSN hyphenation, starts with 9, and the fourth and fifth digits are 93.",
+                "shape": "9NN-93-NNNN",
+                "example": "900-93-0000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "IRM 3.13.40 — ATIN format",
+                        "https://www.irs.gov/irm/part3/irm_03-013-040",
+                    ),
+                ],
+            },
+            {
+                "key": "PTIN_US",
+                "name": "Preparer Tax Identification Number (PTIN)",
+                "definition": "The identifier a paid tax return preparer puts on returns they prepare. The IRS describes it as the letter P followed by eight digits.",
+                "shape": "P + 8 digits",
+                "example": "P00000000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "IRM 3.12.2 — PTIN",
+                        "https://www.irs.gov/irm/part3/irm_03-012-002r",
+                    ),
+                ],
+            },
+            {
+                "key": "MBI_US",
+                "name": "Medicare Beneficiary Identifier (MBI)",
+                "definition": "The 11-character identifier CMS prints on Medicare cards. Characters 2, 5, 8, and 9 are letters. Letters S, L, O, I, B, and Z are excluded. Dashes on the card are optional in text.",
+                "shape": "11 characters, CMS position classes, optional dashes as 4-3-4",
+                "example": "1EG4-TE5-MK73",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "CMS — MBI format",
+                        "https://www.cms.gov/medicare/new-medicare-card/understanding-the-mbi-with-format.pdf",
+                    ),
+                ],
+            },
+            {
+                "key": "A_NUMBER_US",
+                "name": "Alien Registration Number",
+                "definition": "The DHS file number for a non-citizen. USCIS describes it as the letter A followed by 7, 8, or 9 digits. A shorter number is padded with zeros in current systems.",
+                "shape": "A, optional hyphen, 7–9 digits",
+                "example": "A000000001",
+                "checksum": "none",
+                "sources": [
+                    ("USCIS — A-Number", "https://www.uscis.gov/glossary-term/50684"),
+                ],
+            },
+            {
+                "key": "USCIS_RECEIPT_US",
+                "name": "USCIS receipt number",
+                "definition": "The 13-character identifier USCIS assigns to an application or petition: three letters and ten digits.",
+                "shape": "3 letters + 10 digits",
+                "example": "ABC0000000001",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "USCIS — receipt number field",
+                        "https://my.uscis.gov/accounts/annual-asylum-fee/questionnaire",
+                    ),
+                ],
+            },
+            {
+                "key": "DOS_CASE_US",
+                "name": "Department of State immigrant case ID",
+                "definition": "The case id on an immigrant visa packet. USCIS describes the ordinary form as three letters and 9 or 10 digits, and a Diversity Visa case as four digits, two letters, and five digits. A same-span USCIS receipt wins.",
+                "shape": "3 letters + 9 or 10 digits, or 4 digits + 2 letters + 5 digits",
+                "example": "XYZ0123456789",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "USCIS — A-Number and DOS case ID",
+                        "https://www.uscis.gov/forms/filing-fees/uscis-immigrant-fee/immigrant-fee-payment-tips-on-finding-your-a-number-and-dos-case-id",
+                    ),
+                ],
+            },
+            {
+                "key": "DEA_US",
+                "name": "DEA registration number",
+                "definition": "The controlled-substance registration number: two letters and seven digits. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped.",
+                "shape": "2 letters + 7 digits, optional hyphen and suffix",
+                "example": "AB1234567",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "DEA Practitioner's Manual",
+                        "https://www.deadiversion.usdoj.gov/GDP/%28DEA-DC-071%29%28EO-DEA226%29_Practitioner%27s_Manual_%28final%29.pdf",
+                    ),
+                    (
+                        "21 CFR 1301.22",
+                        "https://www.ecfr.gov/current/title-21/chapter-II/part-1301/section-1301.22",
+                    ),
                 ],
             },
         ],
@@ -142,9 +307,18 @@ COUNTRIES: dict[str, dict] = {
                 "example": "046-454-286",
                 "checksum": "Luhn",
                 "sources": [
-                    ("Service Canada — Social Insurance Number", "https://www.canada.ca/en/employment-social-development/services/sin.html"),
-                    ("CRA — SIN on a tax return", "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/personal-address-information/social-insurance-number.html"),
-                    ("Income Tax Act (Canada)", "https://laws-lois.justice.gc.ca/eng/acts/I-3.3/"),
+                    (
+                        "Service Canada — Social Insurance Number",
+                        "https://www.canada.ca/en/employment-social-development/services/sin.html",
+                    ),
+                    (
+                        "CRA — SIN on a tax return",
+                        "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/personal-address-information/social-insurance-number.html",
+                    ),
+                    (
+                        "Income Tax Act (Canada)",
+                        "https://laws-lois.justice.gc.ca/eng/acts/I-3.3/",
+                    ),
                 ],
             },
             {
@@ -155,7 +329,80 @@ COUNTRIES: dict[str, dict] = {
                 "example": "A1234-12345-12345",
                 "checksum": "none",
                 "sources": [
-                    ("Example issuer: Ontario — driver's licence", "https://www.ontario.ca/page/drivers-licence"),
+                    (
+                        "Example issuer: Ontario — driver's licence",
+                        "https://www.ontario.ca/page/drivers-licence",
+                    ),
+                ],
+            },
+            {
+                "key": "PROGRAM_ACCOUNT_CA",
+                "name": "CRA program account",
+                "definition": "The business number plus a program identifier and a four-digit reference. The letters this package accepts are RT, RP, RC, RM, RZ, RR, and RG.",
+                "shape": "9 digits + program letters + 4 digits",
+                "example": "123456789RT0001",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "CRA — program accounts",
+                        "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/business-registration/business-number-program-account/need-program-accounts.html",
+                    ),
+                ],
+            },
+            {
+                "key": "DIN_CA",
+                "name": "Drug Identification Number (DIN)",
+                "definition": "The eight-digit number Health Canada assigns to a drug before it is marketed. The label prints the prefix DIN. The match includes that prefix.",
+                "shape": "DIN + 8 digits",
+                "example": "DIN 00000000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "Health Canada — DIN",
+                        "https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/fact-sheets/drug-identification-number.html",
+                    ),
+                ],
+            },
+            {
+                "key": "NPN_CA",
+                "name": "Natural Product Number (NPN)",
+                "definition": "The eight-digit licence number on a natural health product. The match includes the prefix NPN.",
+                "shape": "NPN + 8 digits",
+                "example": "NPN 00000000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "Health Canada — product licensing",
+                        "https://www.canada.ca/en/health-canada/services/drugs-health-products/natural-non-prescription/applications-submissions/product-licensing.html",
+                    ),
+                ],
+            },
+            {
+                "key": "DIN_HM_CA",
+                "name": "Homeopathic medicine number (DIN-HM)",
+                "definition": "The eight-digit number on a licensed homeopathic medicine. The match includes the prefix DIN-HM.",
+                "shape": "DIN-HM + 8 digits",
+                "example": "DIN-HM 00000000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "Health Canada — LNHPD terminology",
+                        "https://www.canada.ca/en/health-canada/services/drugs-health-products/reports-publications/natural-health-products/licensed-natural-health-products-database-lnhpd-terminology-guide-september-2008.html",
+                    ),
+                ],
+            },
+            {
+                "key": "UCI_CA",
+                "name": "Unique Client Identifier (UCI)",
+                "definition": "The client id IRCC prints on its documents. This package matches the 10-digit form NN-NNNN-NNNN. The 8-digit form is omitted because that hyphenation is too common.",
+                "shape": "NN-NNNN-NNNN",
+                "example": "00-0000-0000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "IRCC — When will I get my UCI?",
+                        "https://ircc.canada.ca/English/helpcentre/answer.asp?qnum=777&top=4",
+                    ),
                 ],
             },
         ],
@@ -172,8 +419,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "AB123456C",
                 "checksum": "none",
                 "sources": [
-                    ("GOV.UK — Find your National Insurance number", "https://www.gov.uk/find-national-insurance-number"),
-                    ("GOV.UK — National Insurance", "https://www.gov.uk/national-insurance"),
+                    (
+                        "GOV.UK — Find your National Insurance number",
+                        "https://www.gov.uk/find-national-insurance-number",
+                    ),
+                    (
+                        "GOV.UK — National Insurance",
+                        "https://www.gov.uk/national-insurance",
+                    ),
                 ],
             },
             {
@@ -184,8 +437,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "GB123456789",
                 "checksum": "none",
                 "sources": [
-                    ("GOV.UK — VAT registration numbers", "https://www.gov.uk/vat-registration-numbers"),
-                    ("HMRC — Check a UK VAT number", "https://www.gov.uk/check-uk-vat-number"),
+                    (
+                        "GOV.UK — VAT registration numbers",
+                        "https://www.gov.uk/vat-registration-numbers",
+                    ),
+                    (
+                        "HMRC — Check a UK VAT number",
+                        "https://www.gov.uk/check-uk-vat-number",
+                    ),
                 ],
             },
             {
@@ -196,8 +455,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "SC123456",
                 "checksum": "none",
                 "sources": [
-                    ("Companies House — get information about a company", "https://www.gov.uk/get-information-about-a-company"),
-                    ("Companies Act 2006", "https://www.legislation.gov.uk/ukpga/2006/46/contents"),
+                    (
+                        "Companies House — get information about a company",
+                        "https://www.gov.uk/get-information-about-a-company",
+                    ),
+                    (
+                        "Companies Act 2006",
+                        "https://www.legislation.gov.uk/ukpga/2006/46/contents",
+                    ),
                 ],
             },
             {
@@ -208,8 +473,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "MORGA753116SM9IJ",
                 "checksum": "none",
                 "sources": [
-                    ("GOV.UK — driving licence categories", "https://www.gov.uk/driving-licence-categories"),
-                    ("DVLA", "https://www.gov.uk/government/organisations/driver-and-vehicle-licensing-agency"),
+                    (
+                        "GOV.UK — driving licence categories",
+                        "https://www.gov.uk/driving-licence-categories",
+                    ),
+                    (
+                        "DVLA",
+                        "https://www.gov.uk/government/organisations/driver-and-vehicle-licensing-agency",
+                    ),
                 ],
             },
         ],
@@ -225,8 +496,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "255081416802538",
                 "checksum": "none in this package (the official key is mod 97)",
                 "sources": [
-                    ("Ameli — numéro de sécurité sociale", "https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"),
-                    ("INSEE — répertoire national d’identification des personnes physiques", "https://www.insee.fr/fr/metadonnees/definition/c1602"),
+                    (
+                        "Ameli — numéro de sécurité sociale",
+                        "https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale",
+                    ),
+                    (
+                        "INSEE — répertoire national d’identification des personnes physiques",
+                        "https://www.insee.fr/fr/metadonnees/definition/c1602",
+                    ),
                 ],
             },
             {
@@ -237,8 +514,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "FRXX123456789",
                 "checksum": "none",
                 "sources": [
-                    ("Service-Public — numéro de TVA intracommunautaire", "https://www.service-public.fr/professionnels-entreprises/vosdroits/F23570"),
-                    ("Council Directive 2006/112/EC (VAT)", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32006L0112"),
+                    (
+                        "Service-Public — numéro de TVA intracommunautaire",
+                        "https://www.service-public.fr/professionnels-entreprises/vosdroits/F23570",
+                    ),
+                    (
+                        "Council Directive 2006/112/EC (VAT)",
+                        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32006L0112",
+                    ),
                 ],
             },
             {
@@ -249,8 +532,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12AB34567",
                 "checksum": "none",
                 "sources": [
-                    ("Service-Public — passeport", "https://www.service-public.fr/particuliers/vosdroits/N360"),
-                    ("ICAO Doc 9303", "https://www.icao.int/publications/pages/publication.aspx?docnum=9303"),
+                    (
+                        "Service-Public — passeport",
+                        "https://www.service-public.fr/particuliers/vosdroits/N360",
+                    ),
+                    (
+                        "ICAO Doc 9303",
+                        "https://www.icao.int/publications/pages/publication.aspx?docnum=9303",
+                    ),
                 ],
             },
             {
@@ -261,7 +550,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12AB34567890",
                 "checksum": "none",
                 "sources": [
-                    ("Service-Public — permis de conduire", "https://www.service-public.fr/particuliers/vosdroits/N530"),
+                    (
+                        "Service-Public — permis de conduire",
+                        "https://www.service-public.fr/particuliers/vosdroits/N530",
+                    ),
                 ],
             },
         ],
@@ -277,10 +569,16 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12345678Z",
                 "checksum": "remainder modulo 23 → letter table in RD 255/2025 art. 12",
                 "sources": [
-                    ("Ministerio del Interior — DNI", "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/"),
-                    ("Cálculo del dígito de control del NIF/NIE", "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/"),
                     (
-                        "Normativa básica reguladora del DNI (Interior; RD 255/2025, LO 4/2015)",
+                        "Ministerio del Interior — DNI",
+                        "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/",
+                    ),
+                    (
+                        "Cálculo del dígito de control del NIF/NIE",
+                        "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/",
+                    ),
+                    (
+                        "Normativa básica reguladora del DNI (Interior; includes RD 255/2025 and LO 4/2015)",
                         "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/normativa-basica-reguladora/",
                     ),
                 ],
@@ -293,8 +591,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "X1234567L",
                 "checksum": "same letter table as DNI after mapping X=0, Y=1, Z=2",
                 "sources": [
-                    ("Ministerio del Interior — NIF/NIE check digit", "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/"),
-                    ("Ministerio del Interior — extranjería (NIE)", "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/extranjeria/"),
+                    (
+                        "Ministerio del Interior — NIF/NIE check digit",
+                        "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/",
+                    ),
+                    (
+                        "Ministerio del Interior — extranjería (NIE)",
+                        "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/extranjeria/",
+                    ),
                 ],
             },
             {
@@ -305,7 +609,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "A12345674",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Agencia Tributaria — NIF", "https://sede.agenciatributaria.gob.es/Sede/en_gb/todas-gestiones/censos-nif-domicilio-fiscal.html"),
+                    (
+                        "Agencia Tributaria — NIF",
+                        "https://sede.agenciatributaria.gob.es/Sede/en_gb/todas-gestiones/censos-nif-domicilio-fiscal.html",
+                    ),
                 ],
             },
             {
@@ -316,7 +623,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "ESA12345674",
                 "checksum": "none",
                 "sources": [
-                    ("VIES — validate a VAT number", "https://ec.europa.eu/taxation_customs/vies/"),
+                    (
+                        "VIES — validate a VAT number",
+                        "https://ec.europa.eu/taxation_customs/vies/",
+                    ),
                 ],
             },
             {
@@ -327,7 +637,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12345678Z",
                 "checksum": "none",
                 "sources": [
-                    ("DGT — permiso de conducción", "https://www.dgt.es/nuestros-servicios/permisos-de-conducir/"),
+                    (
+                        "DGT — permiso de conducción",
+                        "https://www.dgt.es/nuestros-servicios/permisos-de-conducir/",
+                    ),
                 ],
             },
         ],
@@ -343,8 +656,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "RSSMRA85T10A562S",
                 "checksum": "odd/even character table, last letter",
                 "sources": [
-                    ("Agenzia delle Entrate — codice fiscale", "https://www.agenziaentrate.gov.it/portale/web/guest/schede/istanze/richiesta-ts_cf/informazioni-codice-fiscale"),
-                    ("DPR 605/1973 (anagrafe tributaria)", "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.del.presidente.della.repubblica:1973-09-29;605"),
+                    (
+                        "Agenzia delle Entrate — codice fiscale",
+                        "https://www.agenziaentrate.gov.it/portale/web/guest/schede/istanze/richiesta-ts_cf/informazioni-codice-fiscale",
+                    ),
+                    (
+                        "DPR 605/1973 (anagrafe tributaria)",
+                        "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.del.presidente.della.repubblica:1973-09-29;605",
+                    ),
                 ],
             },
             {
@@ -355,7 +674,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "IT12345678901",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Agenzia delle Entrate — partita IVA", "https://www.agenziaentrate.gov.it/portale/web/guest/schede/istanze/apertura-partita-iva/infogen-apertura-piva"),
+                    (
+                        "Agenzia delle Entrate — partita IVA",
+                        "https://www.agenziaentrate.gov.it/portale/web/guest/schede/istanze/apertura-partita-iva/infogen-apertura-piva",
+                    ),
                 ],
             },
             {
@@ -366,7 +688,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "U1A2345678",
                 "checksum": "none",
                 "sources": [
-                    ("MIT — patente di guida", "https://www.ilportaledellautomobilista.it/"),
+                    (
+                        "MIT — patente di guida",
+                        "https://www.ilportaledellautomobilista.it/",
+                    ),
                 ],
             },
         ],
@@ -383,8 +708,14 @@ COUNTRIES: dict[str, dict] = {
                 "checksum": "Verhoeff",
                 "sources": [
                     ("UIDAI — Aadhaar", "https://uidai.gov.in/en/my-aadhaar"),
-                    ("The Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act, 2016", "https://www.indiacode.nic.in/handle/123456789/2154"),
-                    ("UIDAI legal framework", "https://uidai.gov.in/en/about-uidai/legal-framework.html"),
+                    (
+                        "The Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act, 2016",
+                        "https://www.indiacode.nic.in/handle/123456789/2154",
+                    ),
+                    (
+                        "UIDAI legal framework",
+                        "https://uidai.gov.in/en/about-uidai/legal-framework.html",
+                    ),
                 ],
             },
             {
@@ -395,8 +726,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "ABCDE1234F",
                 "checksum": "none",
                 "sources": [
-                    ("Income Tax Department — PAN", "https://www.incometax.gov.in/iec/foportal/help/individual/return-preparation-help/permanent-account-number-pan"),
-                    ("Income-tax Act, 1961 s. 139A", "https://incometaxindia.gov.in/pages/acts/income-tax-act.aspx"),
+                    (
+                        "Income Tax Department — PAN",
+                        "https://www.incometax.gov.in/iec/foportal/help/individual/return-preparation-help/permanent-account-number-pan",
+                    ),
+                    (
+                        "Income-tax Act, 1961 s. 139A",
+                        "https://incometaxindia.gov.in/pages/acts/income-tax-act.aspx",
+                    ),
                 ],
             },
             {
@@ -408,7 +745,10 @@ COUNTRIES: dict[str, dict] = {
                 "checksum": "none in this package",
                 "sources": [
                     ("GST portal", "https://www.gst.gov.in/"),
-                    ("Central Goods and Services Tax Act, 2017", "https://www.indiacode.nic.in/handle/123456789/2276"),
+                    (
+                        "Central Goods and Services Tax Act, 2017",
+                        "https://www.indiacode.nic.in/handle/123456789/2276",
+                    ),
                 ],
             },
             {
@@ -419,8 +759,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "MH12 20110012345",
                 "checksum": "none",
                 "sources": [
-                    ("Ministry of Road Transport — Parivahan", "https://parivahan.gov.in/parivahan/"),
-                    ("Motor Vehicles Act, 1988", "https://www.indiacode.nic.in/handle/123456789/1798"),
+                    (
+                        "Ministry of Road Transport — Parivahan",
+                        "https://parivahan.gov.in/parivahan/",
+                    ),
+                    (
+                        "Motor Vehicles Act, 1988",
+                        "https://www.indiacode.nic.in/handle/123456789/1798",
+                    ),
                 ],
             },
         ],
@@ -436,8 +782,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "11010519491231002X",
                 "checksum": "ISO 7064 MOD 11-2 weights from GB 11643",
                 "sources": [
-                    ("National Immigration Administration — ID cards", "https://www.nia.gov.cn/"),
-                    ("GB 11643-1999 (citizen identification number)", "https://openstd.samr.gov.cn/"),
+                    (
+                        "National Immigration Administration — ID cards",
+                        "https://www.nia.gov.cn/",
+                    ),
+                    (
+                        "GB 11643-1999 (citizen identification number)",
+                        "https://openstd.samr.gov.cn/",
+                    ),
                 ],
             },
             {
@@ -459,8 +811,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "E12345678",
                 "checksum": "none",
                 "sources": [
-                    ("National Immigration Administration — passports", "https://www.nia.gov.cn/"),
-                    ("ICAO Doc 9303", "https://www.icao.int/publications/pages/publication.aspx?docnum=9303"),
+                    (
+                        "National Immigration Administration — passports",
+                        "https://www.nia.gov.cn/",
+                    ),
+                    (
+                        "ICAO Doc 9303",
+                        "https://www.icao.int/publications/pages/publication.aspx?docnum=9303",
+                    ),
                 ],
             },
         ],
@@ -476,8 +834,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12345678901",
                 "checksum": "none in this package",
                 "sources": [
-                    ("BZSt — Identifikationsnummer", "https://www.bzst.de/DE/Privatpersonen/SteuerlicheIdentifikationsnummer/steuerlicheidentifikationsnummer_node.html"),
-                    ("§ 139a AO", "https://www.gesetze-im-internet.de/ao_1977/__139a.html"),
+                    (
+                        "BZSt — Identifikationsnummer",
+                        "https://www.bzst.de/DE/Privatpersonen/SteuerlicheIdentifikationsnummer/steuerlicheidentifikationsnummer_node.html",
+                    ),
+                    (
+                        "§ 139a AO",
+                        "https://www.gesetze-im-internet.de/ao_1977/__139a.html",
+                    ),
                 ],
             },
             {
@@ -488,7 +852,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "DE123456789",
                 "checksum": "none",
                 "sources": [
-                    ("BZSt — USt-IdNr.", "https://www.bzst.de/DE/Unternehmen/Identifikationsnummern/Umsatzsteuer-Identifikationsnummer/umsatzsteuer-identifikationsnummer_node.html"),
+                    (
+                        "BZSt — USt-IdNr.",
+                        "https://www.bzst.de/DE/Unternehmen/Identifikationsnummern/Umsatzsteuer-Identifikationsnummer/umsatzsteuer-identifikationsnummer_node.html",
+                    ),
                 ],
             },
             {
@@ -510,7 +877,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "B072RRE2I55",
                 "checksum": "none",
                 "sources": [
-                    ("KBA — Fahrerlaubnis", "https://www.kba.de/DE/Themen/ZentraleRegister/FAER/faer_node.html"),
+                    (
+                        "KBA — Fahrerlaubnis",
+                        "https://www.kba.de/DE/Themen/ZentraleRegister/FAER/faer_node.html",
+                    ),
                 ],
             },
         ],
@@ -526,8 +896,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "1234 5678 9012",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Digital Agency — Individual Number", "https://www.digital.go.jp/policies/mynumber"),
-                    ("Act on the Use of Numbers to Identify a Specific Individual in Administrative Procedures", "https://www.japaneselawtranslation.go.jp/en/laws/view/2284"),
+                    (
+                        "Digital Agency — Individual Number",
+                        "https://www.digital.go.jp/policies/mynumber",
+                    ),
+                    (
+                        "Act on the Use of Numbers to Identify a Specific Individual in Administrative Procedures",
+                        "https://www.japaneselawtranslation.go.jp/en/laws/view/2284",
+                    ),
                 ],
             },
             {
@@ -538,7 +914,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "AB12345678",
                 "checksum": "none",
                 "sources": [
-                    ("Immigration Services Agency — residence card", "https://www.moj.go.jp/isa/applications/procedures/nyuukokukanri10_00007.html"),
+                    (
+                        "Immigration Services Agency — residence card",
+                        "https://www.moj.go.jp/isa/applications/procedures/nyuukokukanri10_00007.html",
+                    ),
                 ],
             },
             {
@@ -549,7 +928,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123456789012",
                 "checksum": "none",
                 "sources": [
-                    ("National Police Agency — driver’s licence", "https://www.npa.go.jp/english/index.html"),
+                    (
+                        "National Police Agency — driver’s licence",
+                        "https://www.npa.go.jp/english/index.html",
+                    ),
                 ],
             },
         ],
@@ -565,8 +947,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "900101-1234567",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Ministry of the Interior and Safety — resident registration", "https://www.mois.go.kr/eng/sub/a03/residentRegistration/screen.do"),
-                    ("Resident Registration Act", "https://elaw.klri.re.kr/eng_service/lawView.do?hseq=59940&lang=ENG"),
+                    (
+                        "Ministry of the Interior and Safety — resident registration",
+                        "https://www.mois.go.kr/eng/sub/a03/residentRegistration/screen.do",
+                    ),
+                    (
+                        "Resident Registration Act",
+                        "https://elaw.klri.re.kr/eng_service/lawView.do?hseq=59940&lang=ENG",
+                    ),
                 ],
             },
             {
@@ -577,7 +965,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123-45-67890",
                 "checksum": "none",
                 "sources": [
-                    ("National Tax Service — business registration", "https://www.nts.go.kr/english/"),
+                    (
+                        "National Tax Service — business registration",
+                        "https://www.nts.go.kr/english/",
+                    ),
                 ],
             },
         ],
@@ -593,8 +984,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "490-918-50",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Inland Revenue — IRD numbers", "https://www.ird.govt.nz/managing-my-tax/ird-numbers"),
-                    ("Tax Administration Act 1994", "https://www.legislation.govt.nz/act/public/1994/0166/latest/DLM348343.html"),
+                    (
+                        "Inland Revenue — IRD numbers",
+                        "https://www.ird.govt.nz/managing-my-tax/ird-numbers",
+                    ),
+                    (
+                        "Tax Administration Act 1994",
+                        "https://www.legislation.govt.nz/act/public/1994/0166/latest/DLM348343.html",
+                    ),
                 ],
             },
         ],
@@ -610,7 +1007,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "529.982.247-25",
                 "checksum": "two mod-11 check digits",
                 "sources": [
-                    ("Receita Federal — CPF", "https://www.gov.br/receitafederal/pt-br/assuntos/meu-cpf"),
+                    (
+                        "Receita Federal — CPF",
+                        "https://www.gov.br/receitafederal/pt-br/assuntos/meu-cpf",
+                    ),
                 ],
             },
             {
@@ -621,7 +1021,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "11.222.333/0001-81",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Receita Federal — CNPJ", "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/cnpj"),
+                    (
+                        "Receita Federal — CNPJ",
+                        "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/cnpj",
+                    ),
                 ],
             },
             {
@@ -632,7 +1035,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12.345.678-9",
                 "checksum": "none",
                 "sources": [
-                    ("Gov.br — documentos de identificação", "https://www.gov.br/pt-br/servicos/obter-a-carteira-de-identidade"),
+                    (
+                        "Gov.br — documentos de identificação",
+                        "https://www.gov.br/pt-br/servicos/obter-a-carteira-de-identidade",
+                    ),
                 ],
             },
         ],
@@ -660,7 +1066,52 @@ COUNTRIES: dict[str, dict] = {
                 "example": "XAXX010101000",
                 "checksum": "none",
                 "sources": [
-                    ("SAT — RFC", "https://www.sat.gob.mx/tramites/operacion/28753/obten-tu-rfc-con-la-clave-unica-de-registro-de-poblacion-curp"),
+                    (
+                        "SAT — RFC",
+                        "https://www.sat.gob.mx/tramites/operacion/28753/obten-tu-rfc-con-la-clave-unica-de-registro-de-poblacion-curp",
+                    ),
+                ],
+            },
+            {
+                "key": "CLABE_MX",
+                "name": "CLABE",
+                "definition": "The 18-digit interbank account key: 3 bank digits, 3 plaza digits, 11 account digits, and a control digit. A failed control digit is dropped.",
+                "shape": "18 digits",
+                "example": "000000000000000000",
+                "checksum": "weights 3, 7, 1 on the first 17 digits",
+                "sources": [
+                    (
+                        "ABM — how a CLABE is built",
+                        "https://www.abm.org.mx/preguntas-frecuentes/",
+                    ),
+                ],
+            },
+            {
+                "key": "NSS_MX",
+                "name": "IMSS social-security number (NSS)",
+                "definition": "The 11-digit number IMSS assigns to a person. It is permanent. Any standalone 11-digit run matches, so this pattern is broad.",
+                "shape": "11 digits",
+                "example": "00000000000",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "IMSS procedure 9210-003-200",
+                        "https://www.imss.gob.mx/sites/all/statics/pdf/procedimientos/9210-003-200.pdf",
+                    ),
+                ],
+            },
+            {
+                "key": "PEDIMENTO_MX",
+                "name": "Customs pedimento number",
+                "definition": "The 15-digit customs declaration number from SAT Anexo 22. The printed form separates the year, customs office, and patent with two spaces and leaves the last seven digits together.",
+                "shape": "2 digits, two spaces, 2 digits, two spaces, 4 digits, two spaces, 7 digits",
+                "example": "26  01  0001  6000001",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "SAT Anexo 22 (2026 compilation)",
+                        "https://www.sat.gob.mx/minisitio/NormatividadRMFyRGCE/documentos2026/rgce/compiladas/CompiladoAnexo22_1raRMRGCE2026.pdf",
+                    ),
                 ],
             },
         ],
@@ -676,8 +1127,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "12345678",
                 "checksum": "none",
                 "sources": [
-                    ("RENAPER / Mi Argentina — DNI", "https://www.argentina.gob.ar/interior/renaper/dni"),
-                    ("Ley 17.671 (identificación, registro y clasificación del potencial humano nacional)", "https://www.argentina.gob.ar/normativa/nacional/ley-17671-21708"),
+                    (
+                        "RENAPER / Mi Argentina — DNI",
+                        "https://www.argentina.gob.ar/interior/renaper/dni",
+                    ),
+                    (
+                        "Ley 17.671 (identificación, registro y clasificación del potencial humano nacional)",
+                        "https://www.argentina.gob.ar/normativa/nacional/ley-17671-21708",
+                    ),
                 ],
             },
         ],
@@ -693,8 +1150,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "8001015009087",
                 "checksum": "none in this package (Luhn is used officially)",
                 "sources": [
-                    ("Department of Home Affairs — ID documents", "https://www.dha.gov.za/index.php/civic-services/identity-documents"),
-                    ("Identification Act 68 of 1997", "https://www.gov.za/documents/identification-act"),
+                    (
+                        "Department of Home Affairs — ID documents",
+                        "https://www.dha.gov.za/index.php/civic-services/identity-documents",
+                    ),
+                    (
+                        "Identification Act 68 of 1997",
+                        "https://www.gov.za/documents/identification-act",
+                    ),
                 ],
             },
             {
@@ -705,7 +1168,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "0123456789",
                 "checksum": "none",
                 "sources": [
-                    ("SARS — tax reference number", "https://www.sars.gov.za/individuals/how-to-register-for-tax/"),
+                    (
+                        "SARS — tax reference number",
+                        "https://www.sars.gov.za/individuals/how-to-register-for-tax/",
+                    ),
                 ],
             },
         ],
@@ -722,7 +1188,10 @@ COUNTRIES: dict[str, dict] = {
                 "checksum": "none in this package",
                 "sources": [
                     ("ICA — NRIC", "https://www.ica.gov.sg/documents/nric"),
-                    ("National Registration Act 1965", "https://sso.agc.gov.sg/Act/NRA1965"),
+                    (
+                        "National Registration Act 1965",
+                        "https://sso.agc.gov.sg/Act/NRA1965",
+                    ),
                 ],
             },
         ],
@@ -738,8 +1207,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "A1234563",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Immigration Department — HKID", "https://www.immd.gov.hk/eng/services/hkid.html"),
-                    ("Registration of Persons Ordinance (Cap. 177)", "https://www.elegislation.gov.hk/hk/cap177"),
+                    (
+                        "Immigration Department — HKID",
+                        "https://www.immd.gov.hk/eng/services/hkid.html",
+                    ),
+                    (
+                        "Registration of Persons Ordinance (Cap. 177)",
+                        "https://www.elegislation.gov.hk/hk/cap177",
+                    ),
                 ],
             },
         ],
@@ -755,7 +1230,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "A123456789",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Ministry of the Interior — household registration", "https://www.ris.gov.tw/app/en"),
+                    (
+                        "Ministry of the Interior — household registration",
+                        "https://www.ris.gov.tw/app/en",
+                    ),
                 ],
             },
         ],
@@ -771,8 +1249,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123456782",
                 "checksum": "none in this package (11-proef is official)",
                 "sources": [
-                    ("Rijksoverheid — BSN", "https://www.rijksoverheid.nl/onderwerpen/privacy-en-persoonsgegevens/burgerservicenummer-bsn"),
-                    ("Wet algemene bepalingen burgerservicenummer", "https://wetten.overheid.nl/BWBR0022428"),
+                    (
+                        "Rijksoverheid — BSN",
+                        "https://www.rijksoverheid.nl/onderwerpen/privacy-en-persoonsgegevens/burgerservicenummer-bsn",
+                    ),
+                    (
+                        "Wet algemene bepalingen burgerservicenummer",
+                        "https://wetten.overheid.nl/BWBR0022428",
+                    ),
                 ],
             },
             {
@@ -783,7 +1267,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "NL123456789B01",
                 "checksum": "none",
                 "sources": [
-                    ("Belastingdienst — btw-identificatienummer", "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/administratie_bijhouden/btw-nummers/"),
+                    (
+                        "Belastingdienst — btw-identificatienummer",
+                        "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/administratie_bijhouden/btw-nummers/",
+                    ),
                 ],
             },
         ],
@@ -799,8 +1286,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "85.07.30-123.45",
                 "checksum": "none in this package",
                 "sources": [
-                    ("FPS Interior — National Register", "https://www.ibz.rrn.fgov.be/en/national-register/"),
-                    ("Crossroads Bank for Social Security — NISS", "https://www.ksz-bcss.fgov.be/en"),
+                    (
+                        "FPS Interior — National Register",
+                        "https://www.ibz.rrn.fgov.be/en/national-register/",
+                    ),
+                    (
+                        "Crossroads Bank for Social Security — NISS",
+                        "https://www.ksz-bcss.fgov.be/en",
+                    ),
                 ],
             },
         ],
@@ -816,8 +1309,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "756.1234.5678.97",
                 "checksum": "none in this package",
                 "sources": [
-                    ("AHV/AVS — new insurance number", "https://www.ahv-iv.ch/en/Social-insurances/Old-age-and-survivors-insurance-OASI/Insurance-number"),
-                    ("Federal Act on Old-Age and Survivors’ Insurance (AHVG)", "https://www.fedlex.admin.ch/eli/cc/63/837_843_843/en"),
+                    (
+                        "AHV/AVS — new insurance number",
+                        "https://www.ahv-iv.ch/en/Social-insurances/Old-age-and-survivors-insurance-OASI/Insurance-number",
+                    ),
+                    (
+                        "Federal Act on Old-Age and Survivors’ Insurance (AHVG)",
+                        "https://www.fedlex.admin.ch/eli/cc/63/837_843_843/en",
+                    ),
                 ],
             },
             {
@@ -829,7 +1328,10 @@ COUNTRIES: dict[str, dict] = {
                 "checksum": "none",
                 "sources": [
                     ("UID-Register", "https://www.uid.admin.ch/"),
-                    ("Federal Act on the Business Identification Number", "https://www.fedlex.admin.ch/eli/cc/2010/614/en"),
+                    (
+                        "Federal Act on the Business Identification Number",
+                        "https://www.fedlex.admin.ch/eli/cc/2010/614/en",
+                    ),
                 ],
             },
         ],
@@ -845,8 +1347,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "1237010180",
                 "checksum": "none in this package",
                 "sources": [
-                    ("ÖGK — Sozialversicherungsnummer", "https://www.gesundheitskasse.at/cdscontent/?contentid=10007.821578"),
-                    ("ASVG", "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008147"),
+                    (
+                        "ÖGK — Sozialversicherungsnummer",
+                        "https://www.gesundheitskasse.at/cdscontent/?contentid=10007.821578",
+                    ),
+                    (
+                        "ASVG",
+                        "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008147",
+                    ),
                 ],
             },
         ],
@@ -862,8 +1370,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "811228-9874",
                 "checksum": "none in this package (Luhn is official)",
                 "sources": [
-                    ("Skatteverket — personal identity number", "https://skatteverket.se/servicelankar/otherlanguages/inenglish/individualsandemployees/livinginsweden/personalidentitynumberandcoordinationnumber.4.2cf1b5cd163796a5c8b4295.html"),
-                    ("Folkbokföringslag (1991:481)", "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/folkbokforingslag-1991481_sfs-1991-481/"),
+                    (
+                        "Skatteverket — personal identity number",
+                        "https://skatteverket.se/servicelankar/otherlanguages/inenglish/individualsandemployees/livinginsweden/personalidentitynumberandcoordinationnumber.4.2cf1b5cd163796a5c8b4295.html",
+                    ),
+                    (
+                        "Folkbokföringslag (1991:481)",
+                        "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/folkbokforingslag-1991481_sfs-1991-481/",
+                    ),
                 ],
             },
         ],
@@ -879,8 +1393,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "01018012345",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Skatteetaten — national identity number", "https://www.skatteetaten.no/en/person/national-registry/identitetsnummer/fodselsnummer/"),
-                    ("Folkeregisterloven", "https://lovdata.no/dokument/NL/lov/2016-12-09-88"),
+                    (
+                        "Skatteetaten — national identity number",
+                        "https://www.skatteetaten.no/en/person/national-registry/identitetsnummer/fodselsnummer/",
+                    ),
+                    (
+                        "Folkeregisterloven",
+                        "https://lovdata.no/dokument/NL/lov/2016-12-09-88",
+                    ),
                 ],
             },
         ],
@@ -896,7 +1416,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "010180-1234",
                 "checksum": "none",
                 "sources": [
-                    ("CPR Office — civil registration number", "https://cpr.dk/english/civil-registration-number"),
+                    (
+                        "CPR Office — civil registration number",
+                        "https://cpr.dk/english/civil-registration-number",
+                    ),
                     ("CPR-loven", "https://www.retsinformation.dk/eli/lta/2023/1297"),
                 ],
             },
@@ -913,8 +1436,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "131052-308T",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Digital and Population Data Services Agency — personal identity code", "https://dvv.fi/en/personal-identity-code"),
-                    ("Laki väestötietojärjestelmästä", "https://www.finlex.fi/fi/laki/ajantasa/2009/20090661"),
+                    (
+                        "Digital and Population Data Services Agency — personal identity code",
+                        "https://dvv.fi/en/personal-identity-code",
+                    ),
+                    (
+                        "Laki väestötietojärjestelmästä",
+                        "https://www.finlex.fi/fi/laki/ajantasa/2009/20090661",
+                    ),
                 ],
             },
         ],
@@ -930,8 +1459,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "44051401359",
                 "checksum": "weighted digits, last is the check",
                 "sources": [
-                    ("gov.pl — PESEL", "https://www.gov.pl/web/gov/czym-jest-numer-pesel"),
-                    ("Ustawa o ewidencji ludności", "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20100002171"),
+                    (
+                        "gov.pl — PESEL",
+                        "https://www.gov.pl/web/gov/czym-jest-numer-pesel",
+                    ),
+                    (
+                        "Ustawa o ewidencji ludności",
+                        "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20100002171",
+                    ),
                 ],
             },
         ],
@@ -947,8 +1482,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "1234567T",
                 "checksum": "none",
                 "sources": [
-                    ("Gov.ie — PPS Number", "https://www.gov.ie/en/service/12e6de-get-a-personal-public-service-pps-number/"),
-                    ("Social Welfare Consolidation Act 2005", "https://www.irishstatutebook.ie/eli/2005/act/26/enacted/en/html"),
+                    (
+                        "Gov.ie — PPS Number",
+                        "https://www.gov.ie/en/service/12e6de-get-a-personal-public-service-pps-number/",
+                    ),
+                    (
+                        "Social Welfare Consolidation Act 2005",
+                        "https://www.irishstatutebook.ie/eli/2005/act/26/enacted/en/html",
+                    ),
                 ],
             },
         ],
@@ -964,7 +1505,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123456789",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Autoridade Tributária — NIF", "https://www.portaldasfinancas.gov.pt/at/html/index.html"),
+                    (
+                        "Autoridade Tributária — NIF",
+                        "https://www.portaldasfinancas.gov.pt/at/html/index.html",
+                    ),
                 ],
             },
         ],
@@ -996,7 +1540,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "123456782",
                 "checksum": "none in this package (Luhn is official)",
                 "sources": [
-                    ("Population and Immigration Authority — identity card", "https://www.gov.il/en/departments/population_and_immigration_authority"),
+                    (
+                        "Population and Immigration Authority — identity card",
+                        "https://www.gov.il/en/departments/population_and_immigration_authority",
+                    ),
                 ],
             },
         ],
@@ -1013,7 +1560,10 @@ COUNTRIES: dict[str, dict] = {
                 "checksum": "none in this package",
                 "sources": [
                     ("NVI — identity card", "https://www.nvi.gov.tr/"),
-                    ("Population Services Law No. 5490", "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=5490&MevzuatTur=1&MevzuatTertip=5"),
+                    (
+                        "Population Services Law No. 5490",
+                        "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=5490&MevzuatTur=1&MevzuatTertip=5",
+                    ),
                 ],
             },
         ],
@@ -1029,8 +1579,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "45 16 123456",
                 "checksum": "none",
                 "sources": [
-                    ("МВД — паспорт гражданина РФ", "https://мвд.рф/mvd/structure1/Glavnie_upravlenija/guvm"),
-                    ("Federal Law No. 114-FZ (exit/entry) and Government passport statute", "http://pravo.gov.ru/"),
+                    (
+                        "МВД — паспорт гражданина РФ",
+                        "https://мвд.рф/mvd/structure1/Glavnie_upravlenija/guvm",
+                    ),
+                    (
+                        "Federal Law No. 114-FZ (exit/entry) and Government passport statute",
+                        "http://pravo.gov.ru/",
+                    ),
                 ],
             },
         ],
@@ -1046,7 +1602,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "1234567890121",
                 "checksum": "none in this package",
                 "sources": [
-                    ("Department of Provincial Administration — ID card", "https://www.dopa.go.th/"),
+                    (
+                        "Department of Provincial Administration — ID card",
+                        "https://www.dopa.go.th/",
+                    ),
                 ],
             },
         ],
@@ -1062,7 +1621,10 @@ COUNTRIES: dict[str, dict] = {
                 "example": "900101-14-5678",
                 "checksum": "none",
                 "sources": [
-                    ("JPN — MyKad", "https://www.jpn.gov.my/en/core-business/identity-card"),
+                    (
+                        "JPN — MyKad",
+                        "https://www.jpn.gov.my/en/core-business/identity-card",
+                    ),
                     ("National Registration Act 1959", "https://lom.agc.gov.my/"),
                 ],
             },
@@ -1079,8 +1641,14 @@ COUNTRIES: dict[str, dict] = {
                 "example": "3174010101900001",
                 "checksum": "none",
                 "sources": [
-                    ("Dukcapil / Kemendagri — NIK", "https://www.dukcapil.kemendagri.go.id/"),
-                    ("Undang-Undang Nomor 24 Tahun 2013 tentang Administrasi Kependudukan", "https://peraturan.bpk.go.id/Details/38852"),
+                    (
+                        "Dukcapil / Kemendagri — NIK",
+                        "https://www.dukcapil.kemendagri.go.id/",
+                    ),
+                    (
+                        "Undang-Undang Nomor 24 Tahun 2013 tentang Administrasi Kependudukan",
+                        "https://peraturan.bpk.go.id/Details/38852",
+                    ),
                 ],
             },
         ],
