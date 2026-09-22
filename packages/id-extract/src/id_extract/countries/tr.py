@@ -3,5 +3,6 @@
 CODE = "TR"
 
 PATTERNS = {
-    "NATIONAL_ID_TR": "\\b\\d{11}\\b",
+    # The first digit is never 0. A failed NVI check is dropped.
+    "NATIONAL_ID_TR": r"\b[1-9]\d{10}\b",
 }

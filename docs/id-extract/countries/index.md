@@ -8,16 +8,16 @@ Universal identifiers (email, cards, IBAN, …) are documented on [Universal ide
 
 | Country | Code | Types |
 |---|---|---|
-| [Australia](au.md) | `AU` | `ABN_AU`, `TFN_AU`, `DRIVERS_LICENSE_AU` |
+| [Australia](au.md) | `AU` | `ABN_AU`, `TFN_AU`, `DRIVERS_LICENSE_AU`, `ACN_AU`, `MEDICARE_AU` |
 | [United States](us.md) | `US` | `SSN_US`, `SSN`, `EIN_US`, `MEDICAL_NPI_US`, `DRIVERS_LICENSE_US`, `MEDICAL_LICENSE_US`, `ITIN_US`, `ATIN_US`, `PTIN_US`, `MBI_US`, `A_NUMBER_US`, `USCIS_RECEIPT_US`, `DOS_CASE_US`, `DEA_US` |
 | [Canada](ca.md) | `CA` | `SIN_CA`, `DRIVERS_LICENSE_CA`, `PROGRAM_ACCOUNT_CA`, `DIN_CA`, `NPN_CA`, `DIN_HM_CA`, `UCI_CA` |
-| [United Kingdom](gb.md) | `GB` | `NINO_GB`, `VAT_GB`, `COMPANIES_HOUSE_GB`, `DRIVERS_LICENSE_GB` |
+| [United Kingdom](gb.md) | `GB` | `NINO_GB`, `VAT_GB`, `COMPANIES_HOUSE_GB`, `PASSPORT_GB`, `NHS_GB`, `DRIVERS_LICENSE_GB` |
 | [France](fr.md) | `FR` | `INSEE_FR`, `VAT_FR`, `PASSPORT_FR`, `DRIVERS_LICENSE_FR` |
 | [Spain](es.md) | `ES` | `DNI_ES`, `NIE_ES`, `CIF_ES`, `VAT_ES`, `DRIVERS_LICENSE_ES` |
 | [Italy](it.md) | `IT` | `CODICE_FISCALE_IT`, `VAT_IT`, `DRIVERS_LICENSE_IT` |
 | [India](in.md) | `IN` | `AADHAAR_IN`, `PAN_IN`, `GSTIN_IN`, `DRIVERS_LICENSE_IN` |
 | [China](cn.md) | `CN` | `RESIDENT_ID_CN`, `UNIFIED_SOCIAL_CREDIT_CODE_CN`, `PASSPORT_CN` |
-| [Germany](de.md) | `DE` | `STEUER_ID_DE`, `VAT_DE`, `PERSONALAUSWEIS_DE`, `DRIVERS_LICENSE_DE` |
+| [Germany](de.md) | `DE` | `STEUER_ID_DE`, `VAT_DE`, `PERSONALAUSWEIS_DE`, `HANDELSREGISTER_DE`, `DRIVERS_LICENSE_DE` |
 | [Japan](jp.md) | `JP` | `MY_NUMBER_JP`, `RESIDENT_CARD_JP`, `DRIVERS_LICENSE_JP` |
 | [South Korea](kr.md) | `KR` | `RESIDENT_REGISTRATION_KR`, `BUSINESS_REG_KR` |
 | [New Zealand](nz.md) | `NZ` | `IRD_NZ` |
@@ -25,7 +25,7 @@ Universal identifiers (email, cards, IBAN, …) are documented on [Universal ide
 | [Mexico](mx.md) | `MX` | `CURP_MX`, `RFC_MX`, `CLABE_MX`, `NSS_MX`, `PEDIMENTO_MX` |
 | [Argentina](ar.md) | `AR` | `DNI_AR` |
 | [South Africa](za.md) | `ZA` | `ID_ZA`, `TAX_ZA` |
-| [Singapore](sg.md) | `SG` | `NRIC_SG` |
+| [Singapore](sg.md) | `SG` | `NRIC_SG`, `UEN_SG` |
 | [Hong Kong](hk.md) | `HK` | `HKID_HK` |
 | [Taiwan](tw.md) | `TW` | `NATIONAL_ID_TW` |
 | [Netherlands](nl.md) | `NL` | `BSN_NL`, `VAT_NL` |

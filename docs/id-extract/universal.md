@@ -39,6 +39,8 @@ A failed card, IBAN, or VIN check becomes `CREDIT_CARD_LIKE`, `IBAN_LIKE`, or `V
 | `DATE_ISO` | Calendar date, optional time | `YYYY-MM-DD` and optional ISO time | `2026-09-15T12:00:00Z` | [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) |
 | `US_PASSPORT` | United States passport number | Letter + 8 digits, or 9 digits | `A12345678` | [U.S. Department of State — Passports](https://travel.state.gov/content/travel/en/passports.html), [ICAO Doc 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303) |
 | `CA_PASSPORT` | Canadian passport number | Two letters + 6 digits | `AB123456` | [IRCC — Canadian passports](https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports.html), ICAO 9303 |
-| `GB_PASSPORT` | United Kingdom passport number | 9 digits | `123456789` | [GOV.UK — Passports](https://www.gov.uk/browse/abroad/passports), ICAO 9303 |
+| `GB_PASSPORT` | United Kingdom passport number issued as nine digits | 9 digits | `123456789` | [GOV.UK — Passports](https://www.gov.uk/browse/abroad/passports), ICAO 9303 |
+
+Passports issued from 2015 use two letters and seven digits. That shape is `PASSPORT_GB` on the [United Kingdom](countries/gb.md) page, not this universal key.
 
 Those three passport keys stay in the universal map so a `--countries GB` filter does not drop `US_PASSPORT`. That is a limitation of the current key names, not a claim that U.S. passports are issued in every country.

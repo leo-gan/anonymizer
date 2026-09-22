@@ -34,7 +34,7 @@ def test_itin_and_atin_replace_the_ssn_label() -> None:
 def test_other_us_federal_shapes() -> None:
     text = (
         "PTIN P00000000 MBI 1EG4-TE5-MK73 A-Number A000000001 "
-        "receipt ABC0000000001 case XYZ0123456789 DEA AB1234567"
+        "receipt ABC0000000001 case XYZ0123456789 DEA AB1234563"
     )
     found = _types(text, countries=["US"])
     assert {
@@ -46,6 +46,53 @@ def test_other_us_federal_shapes() -> None:
     } <= found
     assert "MEDICAL_LICENSE_US" not in found
     assert "DOS_CASE_US" in _types("case XYZ012345678", countries=["US"])
+
+
+def test_unissued_ssn_groups_do_not_match() -> None:
+    assert "SSN_US" not in _types("000-12-1234")
+    assert "SSN_US" not in _types("666-12-1234")
+    assert "SSN_US" not in _types("123-00-1234")
+    assert "SSN_US" not in _types("123-45-0000")
+    assert "SSN_US" in _types("667-12-1234")
+
+
+def test_sin_rejects_a_leading_zero_or_eight() -> None:
+    assert "SIN_CA" not in _types("046-454-286", countries=["CA"])
+    assert "SIN_CA" not in _types("812-345-678", countries=["CA"])
+
+
+def test_new_official_shapes_keep_only_a_passing_check() -> None:
+    assert "ACN_AU" in _types("ACN 530 000 009", countries=["AU"])
+    assert "ACN_AU" not in _types("ACN 530 000 000", countries=["AU"])
+    assert "MEDICARE_AU" in _types("Medicare 2428 77813 1", countries=["AU"])
+    assert "MEDICARE_AU" not in _types("Medicare 2428778141", countries=["AU"])
+    assert "NHS_GB" in _types("NHS 943 476 5919", countries=["GB"])
+    assert "NHS_GB" not in _types("NHS 9434765918", countries=["GB"])
+    assert "UEN_SG" in _types("UEN 201912345R", countries=["SG"])
+    assert "UEN_SG" not in _types("UEN 201912345A", countries=["SG"])
+    assert "PASSPORT_GB" in _types("passport AB1234567", countries=["GB"])
+    assert "PASSPORT_GB" not in _types("company SC1234567", countries=["GB"])
+    assert "COMPANIES_HOUSE_GB" in _types("company SC1234567", countries=["GB"])
+    germany = _types("card C00000004 legacy T22000129 HRB 12345", countries=["DE"])
+    assert {"PERSONALAUSWEIS_DE", "HANDELSREGISTER_DE"} <= germany
+    assert "PERSONALAUSWEIS_DE" not in _types("card C00000005", countries=["DE"])
+    assert "PERSONALAUSWEIS_DE_LIKE" in _types("card C00000005", countries=["DE"])
+    assert passes_checksum("DEA_US", "AB1234563")
+    assert not passes_checksum("DEA_US", "AB1234567")
+
+
+def test_remaining_presidio_checks() -> None:
+    assert "NRIC_SG" in _types("FIN F1234567A and M1234567B", countries=["SG"])
+    assert "HETU_FI" in _types("hetu 131052-308T", countries=["FI"])
+    assert "HETU_FI_LIKE" in _types("hetu 131052-308A", countries=["FI"])
+    assert "HETU_FI" not in _types("hetu 131052-308A", countries=["FI"])
+    assert "NATIONAL_ID_TH" in _types("Thai 1101700200001", countries=["TH"])
+    assert "NATIONAL_ID_TH" not in _types("Thai 1101700200000", countries=["TH"])
+    assert "NATIONAL_ID_TR" in _types("TCKN 10000000146", countries=["TR"])
+    assert "NATIONAL_ID_TR" not in _types("TCKN 10000000147", countries=["TR"])
+    assert "STEUER_ID_DE" in _types("IdNr 26954371827", countries=["DE"])
+    assert "STEUER_ID_DE" not in _types("IdNr 26954371820", countries=["DE"])
+    assert "STEUER_ID_DE" not in _types("IdNr 01234567890", countries=["DE"])
 
 
 def test_canada_and_mexico_federal_shapes() -> None:

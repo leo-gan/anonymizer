@@ -3,5 +3,8 @@
 CODE = "FI"
 
 PATTERNS = {
-    "HETU_FI": "\\b\\d{6}[+\\-A]\\d{3}[0-9A-Z]\\b",
+    # Century mark and the 31-character check alphabet from DVV.
+    "HETU_FI": (
+        r"\b\d{6}[-+ABCDEFYXWVU]\d{3}[0-9ABCDEFHJKLMNPRSTUVWXY]\b"
+    ),
 }

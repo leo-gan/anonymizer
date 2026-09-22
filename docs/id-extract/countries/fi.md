@@ -10,13 +10,13 @@ National-ID patterns loaded when you pass `countries=["FI"]` (or `"all"`). Unive
 
 ## `HETU_FI` — Henkilötunnus
 
-The Finnish personal identity code. Date of birth, a century sign (+, -, or A), an individual number, and a check character.
+The Finnish personal identity code. Six digits of the date of birth, a century mark, a three-digit individual number, and a check character. The century mark is + for the 1800s, - Y X W V U for the 1900s, and A B C D E F for the 2000s. A failed check is kept as HETU_FI_LIKE.
 
 | | |
 |---|---|
 | **Package type** | `HETU_FI` |
-| **Shape this package looks for** | DDMMYY + +|-|A + 3 digits + alphanumeric |
-| **Checksum** | none in this package |
+| **Shape this package looks for** | DDMMYY + century mark + 3 digits + check character |
+| **Checksum** | The nine-digit number modulo 31 indexes 0123456789ABCDEFHJKLMNPRSTUVWXY. The date must be a real day in the century given by the mark. A failure is kept as HETU_FI_LIKE. |
 | **Example (synthetic)** | `131052-308T` |
 
 **Official sources**
