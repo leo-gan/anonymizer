@@ -2559,7 +2559,7 @@
 <p><code>id-extract</code> matches the <strong>shape</strong> of these numbers. A hit is not proof that the value was issued, is still valid, or that the cited statute applies to your document. Checksums, where present, only test the extra digit.</p>
 </div>
 <h2 id="sin_ca-social-insurance-number-sin"><code>SIN_CA</code> — Social Insurance Number (SIN)<a class="headerlink" href="#sin_ca-social-insurance-number-sin" title="Permanent link">&para;</a></h2>
-<p>A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. Temporary SINs begin with 9.</p>
+<p>A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. A personal SIN does not begin with 0 or 8. Temporary SINs begin with 9.</p>
 <table>
 <thead>
 <tr>
@@ -2574,7 +2574,7 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>NNN-NNN-NNN</td>
+<td>NNN-NNN-NNN, first digit 1–7 or 9</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
@@ -2582,7 +2582,7 @@
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
-<td><code>046-454-286</code></td>
+<td><code>123-456-782</code></td>
 </tr>
 </tbody>
 </table>

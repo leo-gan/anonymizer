@@ -2713,7 +2713,7 @@
 <p><code>id-extract</code> matches the <strong>shape</strong> of these numbers. A hit is not proof that the value was issued, is still valid, or that the cited statute applies to your document. Checksums, where present, only test the extra digit.</p>
 </div>
 <h2 id="ssn_us-social-security-number-ssn"><code>SSN_US</code> — Social Security number (SSN)<a class="headerlink" href="#ssn_us-social-security-number-ssn" title="Permanent link">&para;</a></h2>
-<p>A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier.</p>
+<p>A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier. Area numbers 000 and 666, group 00, and serial 0000 are not issued.</p>
 <table>
 <thead>
 <tr>
@@ -2728,11 +2728,11 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>AAA-GG-SSSS</td>
+<td>AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none</td>
+<td>none; those unissued groups are excluded from the expression</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
@@ -2747,7 +2747,7 @@
 <li><a href="https://www.ssa.gov/OP_Home/ssact/ssact.htm">Social Security Act</a></li>
 </ul>
 <h2 id="ssn-ssn-legacy-key"><code>SSN</code> — SSN (legacy key)<a class="headerlink" href="#ssn-ssn-legacy-key" title="Permanent link">&para;</a></h2>
-<p>Same pattern as SSN_US. Kept so older callers that ask for type SSN still match.</p>
+<p>Same pattern as SSN_US, including the excluded area, group, and serial. Kept so older callers that ask for type SSN still match.</p>
 <table>
 <thead>
 <tr>
@@ -2762,11 +2762,11 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>AAA-GG-SSSS</td>
+<td>AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none</td>
+<td>none; those unissued groups are excluded from the expression</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
@@ -2812,7 +2812,7 @@
 <li><a href="https://www.irs.gov/forms-pubs/about-form-ss-4">About Form SS-4</a></li>
 </ul>
 <h2 id="medical_npi_us-national-provider-identifier-npi"><code>MEDICAL_NPI_US</code> — National Provider Identifier (NPI)<a class="headerlink" href="#medical_npi_us-national-provider-identifier-npi" title="Permanent link">&para;</a></h2>
-<p>A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The number is intelligence-free.</p>
+<p>A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The first digit is 1 or 2.</p>
 <table>
 <thead>
 <tr>
@@ -2827,7 +2827,7 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>10 digits</td>
+<td>10 digits, first digit 1 or 2</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
@@ -3134,7 +3134,7 @@
 <li><a href="https://www.uscis.gov/forms/filing-fees/uscis-immigrant-fee/immigrant-fee-payment-tips-on-finding-your-a-number-and-dos-case-id">USCIS — A-Number and DOS case ID</a></li>
 </ul>
 <h2 id="dea_us-dea-registration-number"><code>DEA_US</code> — DEA registration number<a class="headerlink" href="#dea_us-dea-registration-number" title="Permanent link">&para;</a></h2>
-<p>The controlled-substance registration number: two letters and seven digits. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped.</p>
+<p>The controlled-substance registration number: two letters and seven digits. The seventh digit is a check digit. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped when the check passes.</p>
 <table>
 <thead>
 <tr>
@@ -3153,11 +3153,11 @@
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none</td>
+<td>DEA check digit. A failure is kept as DEA_US_LIKE.</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
-<td><code>AB1234567</code></td>
+<td><code>AB1234563</code></td>
 </tr>
 </tbody>
 </table>

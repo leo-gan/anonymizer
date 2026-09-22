@@ -2869,9 +2869,9 @@
 <td><code>DEA_US</code></td>
 <td>DEA registration number</td>
 <td>Federal</td>
-<td>2 letters and 7 digits. Under <a href="https://www.ecfr.gov/current/title-21/chapter-II/part-1301/section-1301.22">21 CFR 1301.22(c)</a> a hospital may add a hyphen and an internal suffix.</td>
+<td>2 letters and 7 digits. The seventh digit is a check digit. Under <a href="https://www.ecfr.gov/current/title-21/chapter-II/part-1301/section-1301.22">21 CFR 1301.22(c)</a> a hospital may add a hyphen and an internal suffix.</td>
 <td>Strong</td>
-<td><code>AB1234567</code></td>
+<td><code>AB1234563</code></td>
 <td><a href="https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-071)(EO-DEA226)_Practitioner's_Manual_(final).pdf">DEA Practitioner's Manual</a></td>
 </tr>
 <tr>
@@ -2938,7 +2938,7 @@
 <td><a href="https://www.ecfr.gov/current/title-33/part-181/subpart-C">33 CFR 181.25</a></td>
 </tr>
 <tr>
-<td><code>DL_US_FL</code></td>
+<td><code>DL_FL_US</code></td>
 <td>Florida driver licence or ID number</td>
 <td>State</td>
 <td>1 letter and 12 digits. The portal shows <code>LNNN-NNN-NN-NNN-N</code>. Since 31 July 2024 the assignment is randomized and still uses this shape.</td>
@@ -2947,7 +2947,7 @@
 <td><a href="https://www.flhsmv.gov/pdf/courts/utc/utccombinedmanual.pdf">FLHSMV UTC manual</a>, <a href="https://www.flhsmv.gov/2024/07/19/flhsmv-implements-legislation-requiring-driver-licenses-and-identification-card-numbers-to-change/">FLHSMV 2024 notice</a>, <a href="https://services.flhsmv.gov/dlcheck/">status-check example</a></td>
 </tr>
 <tr>
-<td><code>PAYROLL_US_CA</code></td>
+<td><code>EDD_PAYROLL_US</code></td>
 <td>California EDD employer payroll-tax account</td>
 <td>State</td>
 <td>8 digits, printed <code>NNN-NNNN-N</code></td>
@@ -3021,7 +3021,7 @@
 </tbody>
 </table>
 <h3 id="overlaps-with-the-current-us-plugin">Overlaps with the current US plugin<a class="headerlink" href="#overlaps-with-the-current-us-plugin" title="Permanent link">&para;</a></h3>
-<p><code>ITIN_US</code> and <code>ATIN_US</code> use the same hyphens as <code>SSN_US</code>. Test those two patterns first, or every ITIN is labeled a Social Security number. <code>DEA_US</code> sits inside <code>MEDICAL_LICENSE_US</code>. <code>DL_US_FL</code> sits inside <code>DRIVERS_LICENSE_US</code>. A hyphenated NDC can also be ten digits and sit inside <code>MEDICAL_NPI_US</code>, which is any ten digits. The tighter pattern should win the overlap.</p>
+<p><code>ITIN_US</code> and <code>ATIN_US</code> use the same hyphens as <code>SSN_US</code>. Test those two patterns first, or every ITIN is labeled a Social Security number. <code>DEA_US</code> sits inside <code>MEDICAL_LICENSE_US</code>. <code>DL_FL_US</code> sits inside <code>DRIVERS_LICENSE_US</code>. A hyphenated NDC can also be ten digits and sit inside <code>MEDICAL_NPI_US</code> when the first digit is 1 or 2. The tighter pattern should win the overlap.</p>
 <p>The DEA manual shows the nine-character body. This catalog does not cite a DEA regulation that publishes the pharmacy check-digit procedure, so Fit stays <strong>Strong</strong> on the shape rather than <strong>Check</strong>.</p>
 <p>The ABA policy names the ninth routing digit as the check digit. Read the weight formula in that policy before coding it. This page does not copy the weights.</p>
 <h2 id="canada">Canada<a class="headerlink" href="#canada" title="Permanent link">&para;</a></h2>
@@ -3049,7 +3049,7 @@
 <td><a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/business-registration/business-number-program-account/need-program-accounts.html">CRA program accounts</a></td>
 </tr>
 <tr>
-<td><code>NAM_CA_QC</code></td>
+<td><code>NAM_QC_CA</code></td>
 <td>Quebec health-insurance number (NAM)</td>
 <td>Province</td>
 <td>4 letters and 8 digits</td>
@@ -3067,7 +3067,7 @@
 <td><a href="https://www.revenuquebec.ca/fr/services-en-ligne/outils/interface-de-programmation-dapplications-api-servant-a-verifier-la-validite-dun-numero-dinscription-au-fichier-de-la-tvq/">Revenu Québec TVQ API</a>, <a href="https://www.revenuquebec.ca/fr/entreprises/taxes/tpstvh-et-tvq/situations-particulieres-liees-a-la-tpstvh-et-a-la-tvq/fournisseurs-hors-quebec/inscription-au-fichier-de-la-tvq-pour-les-fournisseurs-hors-quebec/">non-resident <code>NR</code> accounts</a></td>
 </tr>
 <tr>
-<td><code>DL_CA_ON</code></td>
+<td><code>DL_ON_CA</code></td>
 <td>Ontario driver-licence number</td>
 <td>Province</td>
 <td>1 letter and 14 digits. The last two digits are <code>01</code>–<code>31</code>.</td>
@@ -3180,7 +3180,7 @@
 </tbody>
 </table>
 <p>The expression should use this list, or a later CRA list, rather than any two letters. CRA's own sample is <code>123456789 RT 0001</code>.</p>
-<p><code>DL_CA_ON</code> sits inside the current <code>DRIVERS_LICENSE_CA</code> pattern. The Ontario pattern should win that overlap. <code>NAM_CA_QC</code> does not match <code>SIN_CA</code>, because the SIN pattern requires hyphens.</p>
+<p><code>DL_ON_CA</code> sits inside the current <code>DRIVERS_LICENSE_CA</code> pattern. The Ontario pattern should win that overlap. <code>NAM_QC_CA</code> does not match <code>SIN_CA</code>, because the SIN pattern requires hyphens.</p>
 <p><code>CUSIP_US_CA</code> in the United States table is also the Canadian securities identifier. CUSIP Global Services is the national numbering agency for both countries.</p>
 <h3 id="other-provincial-and-federal-health-numbers">Other provincial and federal health numbers<a class="headerlink" href="#other-provincial-and-federal-health-numbers" title="Permanent link">&para;</a></h3>
 <p>The Ontario Ministry of Health publishes this chart for client numbers on monitored-drug claims. Quebec and British Columbia are already in the table above with a tighter source. The remaining rows are fixed lengths. A bare run of 8, 9, 10, or 12 digits is not selective, so Fit is <strong>Keyword</strong> unless the row says otherwise.</p>

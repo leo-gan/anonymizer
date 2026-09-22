@@ -2427,7 +2427,7 @@
 <p><code>id-extract</code> matches the <strong>shape</strong> of these numbers. A hit is not proof that the value was issued, is still valid, or that the cited statute applies to your document. Checksums, where present, only test the extra digit.</p>
 </div>
 <h2 id="national_id_tr-tc-kimlik-no"><code>NATIONAL_ID_TR</code> — T.C. Kimlik No<a class="headerlink" href="#national_id_tr-tc-kimlik-no" title="Permanent link">&para;</a></h2>
-<p>The 11-digit Republic of Türkiye identity number.</p>
+<p>The 11-digit Republic of Türkiye identity number. The first digit is never 0. The tenth and eleventh digits are check digits. A failed check is dropped, because eleven digits are a common shape.</p>
 <table>
 <thead>
 <tr>
@@ -2442,11 +2442,11 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>11 digits</td>
+<td>11 digits, first digit 1–9</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none in this package</td>
+<td>NVI check on digits 10 and 11. A failure is dropped.</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>

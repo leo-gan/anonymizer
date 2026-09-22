@@ -936,6 +936,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#acn_au-australian-company-number-acn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACN_AU — Australian Company Number (ACN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#medicare_au-medicare-card-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MEDICARE_AU — Medicare card number
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2444,6 +2466,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#acn_au-australian-company-number-acn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACN_AU — Australian Company Number (ACN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#medicare_au-medicare-card-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MEDICARE_AU — Medicare card number
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2569,6 +2613,71 @@
 <ul>
 <li><a href="https://www.ntc.gov.au/transport-reform/ntc-projects/australian-driver-licensing">National Transport Commission — driver licensing</a></li>
 <li><a href="https://www.nsw.gov.au/driving-boating-and-transport/driver-and-rider-licences">Example issuer: NSW Service — driver licences</a></li>
+</ul>
+<h2 id="acn_au-australian-company-number-acn"><code>ACN_AU</code> — Australian Company Number (ACN)<a class="headerlink" href="#acn_au-australian-company-number-acn" title="Permanent link">&para;</a></h2>
+<p>The nine-digit number ASIC issues to a company. The last digit is a check digit. A failed check is dropped, because nine digits are a common shape.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>ACN_AU</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>9 digits, or NNN NNN NNN</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>ASIC modified modulus 10. A failure is dropped.</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>530 000 009</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.asic.gov.au/for-business-and-companies/companies/register-a-company/australian-company-number-acn/">ASIC — Australian Company Number</a></li>
+<li><a href="https://download.asic.gov.au/media/q5cf1uel/datastream-messages-specification-4-aug-2025.pdf">ASIC Datastream specification, Appendix B (ACN check digit)</a></li>
+</ul>
+<h2 id="medicare_au-medicare-card-number"><code>MEDICARE_AU</code> — Medicare card number<a class="headerlink" href="#medicare_au-medicare-card-number" title="Permanent link">&para;</a></h2>
+<p>The number on an Australian Medicare card. The first digit is 2, 3, 4, 5, or 6. The ninth digit is a check digit. The tenth digit is the person's position on the card. A failed check is dropped, because ten digits are also an NPI.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>MEDICARE_AU</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>10 digits starting with 2–6, or NNNN NNNNN N</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>Weights 1, 3, 7, 9, 1, 3, 7, 9 on the first eight digits. The ninth digit equals that sum modulo 10. A failure is dropped.</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>2428 77813 1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.servicesaustralia.gov.au/medicare-card">Services Australia — Medicare card</a></li>
 </ul>
 <p>The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.</p>
 

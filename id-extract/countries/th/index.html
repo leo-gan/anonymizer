@@ -2427,7 +2427,7 @@
 <p><code>id-extract</code> matches the <strong>shape</strong> of these numbers. A hit is not proof that the value was issued, is still valid, or that the cited statute applies to your document. Checksums, where present, only test the extra digit.</p>
 </div>
 <h2 id="national_id_th-thai-national-id-number"><code>NATIONAL_ID_TH</code> — Thai national ID number<a class="headerlink" href="#national_id_th-thai-national-id-number" title="Permanent link">&para;</a></h2>
-<p>A 13-digit number on the Thai national identity card.</p>
+<p>A 13-digit number on the Thai national identity card. The first digit is never 0. The thirteenth digit is a check digit. A failed check is dropped, because thirteen digits are a common shape.</p>
 <table>
 <thead>
 <tr>
@@ -2442,15 +2442,15 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>13 digits</td>
+<td>13 digits, first digit 1–9</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none in this package</td>
+<td>Weights 13 through 2 on the first 12 digits. Check digit = (11 − sum mod 11) mod 10. A failure is dropped.</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
-<td><code>1234567890121</code></td>
+<td><code>1101700200001</code></td>
 </tr>
 </tbody>
 </table>

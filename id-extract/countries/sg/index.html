@@ -1670,6 +1670,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#uen_sg-unique-entity-number-uen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UEN_SG — Unique Entity Number (UEN)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2400,6 +2411,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#uen_sg-unique-entity-number-uen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UEN_SG — Unique Entity Number (UEN)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2427,7 +2449,7 @@
 <p><code>id-extract</code> matches the <strong>shape</strong> of these numbers. A hit is not proof that the value was issued, is still valid, or that the cited statute applies to your document. Checksums, where present, only test the extra digit.</p>
 </div>
 <h2 id="nric_sg-nric-fin"><code>NRIC_SG</code> — NRIC / FIN<a class="headerlink" href="#nric_sg-nric-fin" title="Permanent link">&para;</a></h2>
-<p>The National Registration Identity Card number for citizens and PRs (prefix S, T) or the Foreign Identification Number (prefix F, G, M). This pattern covers S, G, and T.</p>
+<p>The National Registration Identity Card number for citizens and permanent residents (prefix S or T) or the Foreign Identification Number (prefix F, G, or M). M is the FIN prefix issued from 2022.</p>
 <table>
 <thead>
 <tr>
@@ -2442,11 +2464,11 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>S/G/T + 7 digits + letter</td>
+<td>S, T, F, G, or M + 7 digits + letter</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none in this package</td>
+<td>none in this package. ICA does not publish the check-letter algorithm.</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
@@ -2458,6 +2480,38 @@
 <ul>
 <li><a href="https://www.ica.gov.sg/documents/nric">ICA — NRIC</a></li>
 <li><a href="https://sso.agc.gov.sg/Act/NRA1965">National Registration Act 1965</a></li>
+</ul>
+<h2 id="uen_sg-unique-entity-number-uen"><code>UEN_SG</code> — Unique Entity Number (UEN)<a class="headerlink" href="#uen_sg-unique-entity-number-uen" title="Permanent link">&para;</a></h2>
+<p>The standard number for an entity registered in Singapore. Businesses registered before the current company form use eight digits and a letter. Local companies use nine digits and a letter, and the first four digits are the year of registration. Other entities use a T, S, or R, a two-digit year, a two-letter entity type, four digits, and a check letter. A failed check is dropped.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>UEN_SG</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>8 digits + letter, 9 digits + letter, or TSR + entity type + 4 digits + letter</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>UEN check letter for each of the three forms. A local-company number whose year is in the future is rejected. A failure is dropped.</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>201912345R</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.uen.gov.sg/">UEN</a></li>
 </ul>
 <p>The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.</p>
 

@@ -1945,6 +1945,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#passport_gb-british-passport-number-from-2015" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PASSPORT_GB — British passport number (from 2015)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nhs_gb-nhs-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NHS_GB — NHS number
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#drivers_license_gb-photocard-driving-licence-number" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2456,6 +2478,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#passport_gb-british-passport-number-from-2015" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PASSPORT_GB — British passport number (from 2015)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nhs_gb-nhs-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NHS_GB — NHS number
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#drivers_license_gb-photocard-driving-licence-number" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2591,6 +2635,71 @@
 <ul>
 <li><a href="https://www.gov.uk/get-information-about-a-company">Companies House — get information about a company</a></li>
 <li><a href="https://www.legislation.gov.uk/ukpga/2006/46/contents">Companies Act 2006</a></li>
+</ul>
+<h2 id="passport_gb-british-passport-number-from-2015"><code>PASSPORT_GB</code> — British passport number (from 2015)<a class="headerlink" href="#passport_gb-british-passport-number-from-2015" title="Permanent link">&para;</a></h2>
+<p>The nine-character number printed on a British passport issued from 2015: two letters and seven digits. The letter pairs SC, NI, OC, and SO are omitted because those prefixes are Companies House numbers. The older nine-digit book number remains the universal pattern GB_PASSPORT.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>PASSPORT_GB</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>Two letters + 7 digits, excluding SC, NI, OC, and SO</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>AB1234567</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.gov.uk/government/organisations/hm-passport-office">HM Passport Office</a></li>
+</ul>
+<h2 id="nhs_gb-nhs-number"><code>NHS_GB</code> — NHS number<a class="headerlink" href="#nhs_gb-nhs-number" title="Permanent link">&para;</a></h2>
+<p>The 10-digit number used to identify a patient in the NHS in England and Wales. It is printed in groups of 3, 3, and 4. The tenth digit is a check digit. A failed check is dropped, because ten digits are also an NPI.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>NHS_GB</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>10 digits, optional spaces or hyphens as 3-3-4</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>Modulus 11. Weights 10 through 2 on the first nine digits. Check digit = 11 − (sum mod 11). A result of 11 is stored as 0. A result of 10 is not issued. A failure is dropped.</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>943 476 5919</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://digital.nhs.uk/services/nhs-number">NHS England — NHS number</a></li>
+<li><a href="https://digital.nhs.uk/data-and-information/information-standards/information-standards-and-data-collections-including-extractions/publications-and-notifications/standards-and-collections/isb-0149-nhs-number">ISB 0149 NHS Number</a></li>
 </ul>
 <h2 id="drivers_license_gb-photocard-driving-licence-number"><code>DRIVERS_LICENSE_GB</code> — Photocard driving licence number<a class="headerlink" href="#drivers_license_gb-photocard-driving-licence-number" title="Permanent link">&para;</a></h2>
 <p>The 16-character driver number printed on a Great Britain photocard licence.</p>
