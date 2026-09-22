@@ -13,7 +13,7 @@ for hit in extract("ABN 51 824 753 556 and ada@example.com"):
     print(hit["type"], hit["text"], hit["start"], hit["end"])
 ```
 
-The default is every bundled country. Narrow the set with `countries=["AU", "GB"]`. `UK` is accepted as `GB`.
+The default is every bundled country. Narrow the set with `countries=["AU", "GB"]`. `UK` is accepted as `GB`. State, provincial, and industry patterns stay off until you pass `opt_in="all"` or a list of keys.
 
 Full guide, including one page per country with official sources:
 

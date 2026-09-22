@@ -9,8 +9,8 @@ Universal identifiers (email, cards, IBAN, …) are documented on [Universal ide
 | Country | Code | Types |
 |---|---|---|
 | [Australia](au.md) | `AU` | `ABN_AU`, `TFN_AU`, `DRIVERS_LICENSE_AU` |
-| [United States](us.md) | `US` | `SSN_US`, `SSN`, `EIN_US`, `MEDICAL_NPI_US`, `DRIVERS_LICENSE_US`, `MEDICAL_LICENSE_US` |
-| [Canada](ca.md) | `CA` | `SIN_CA`, `DRIVERS_LICENSE_CA` |
+| [United States](us.md) | `US` | `SSN_US`, `SSN`, `EIN_US`, `MEDICAL_NPI_US`, `DRIVERS_LICENSE_US`, `MEDICAL_LICENSE_US`, `ITIN_US`, `ATIN_US`, `PTIN_US`, `MBI_US`, `A_NUMBER_US`, `USCIS_RECEIPT_US`, `DOS_CASE_US`, `DEA_US` |
+| [Canada](ca.md) | `CA` | `SIN_CA`, `DRIVERS_LICENSE_CA`, `PROGRAM_ACCOUNT_CA`, `DIN_CA`, `NPN_CA`, `DIN_HM_CA`, `UCI_CA` |
 | [United Kingdom](gb.md) | `GB` | `NINO_GB`, `VAT_GB`, `COMPANIES_HOUSE_GB`, `DRIVERS_LICENSE_GB` |
 | [France](fr.md) | `FR` | `INSEE_FR`, `VAT_FR`, `PASSPORT_FR`, `DRIVERS_LICENSE_FR` |
 | [Spain](es.md) | `ES` | `DNI_ES`, `NIE_ES`, `CIF_ES`, `VAT_ES`, `DRIVERS_LICENSE_ES` |
@@ -22,7 +22,7 @@ Universal identifiers (email, cards, IBAN, …) are documented on [Universal ide
 | [South Korea](kr.md) | `KR` | `RESIDENT_REGISTRATION_KR`, `BUSINESS_REG_KR` |
 | [New Zealand](nz.md) | `NZ` | `IRD_NZ` |
 | [Brazil](br.md) | `BR` | `CPF_BR`, `CNPJ_BR`, `RG_BR` |
-| [Mexico](mx.md) | `MX` | `CURP_MX`, `RFC_MX` |
+| [Mexico](mx.md) | `MX` | `CURP_MX`, `RFC_MX`, `CLABE_MX`, `NSS_MX`, `PEDIMENTO_MX` |
 | [Argentina](ar.md) | `AR` | `DNI_AR` |
 | [South Africa](za.md) | `ZA` | `ID_ZA`, `TAX_ZA` |
 | [Singapore](sg.md) | `SG` | `NRIC_SG` |

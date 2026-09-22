@@ -87,6 +87,15 @@ class TestTypedValidators:
 
 
 class TestPassesChecksumDispatch:
+    def test_rtn_cusip_phn_and_clabe(self) -> None:
+        assert passes_checksum("RTN_US", "010000003")
+        assert not passes_checksum("RTN_US", "010000000")
+        assert passes_checksum("CUSIP_NNA", "037833100")
+        assert passes_checksum("PHN_BC_CA", "9012372173")
+        assert not passes_checksum("PHN_BC_CA", "9000000001")
+        assert passes_checksum("CLABE_MX", "000000000000000000")
+        assert not passes_checksum("CLABE_MX", "000000000000000001")
+
     def test_unknown_type_is_accepted(self) -> None:
         assert passes_checksum("EMAIL", "not-a-real-check")
         assert passes_checksum("PHONE", "999")

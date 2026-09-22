@@ -7,7 +7,9 @@ from pdf_anonymizer_core.regex_ner import extract_entities_via_regex
 def _extract_types(text: str, only: list[str] | None = None) -> list[str]:
     pats = DEFAULT_REGEX_PATTERNS
     if only:
-        pats = {k: DEFAULT_REGEX_PATTERNS[k] for k in only if k in DEFAULT_REGEX_PATTERNS}
+        pats = {
+            k: DEFAULT_REGEX_PATTERNS[k] for k in only if k in DEFAULT_REGEX_PATTERNS
+        }
     ents = extract_entities_via_regex(text, pats)
     return [e["type"] for e in ents]
 
@@ -100,7 +102,9 @@ class TestUniversalPatterns(unittest.TestCase):
         text = "Vehicle 1HGCM82633A004352 and junk I0OQ1234567890123 (I/O/Q forbidden)"
         vins = _extract_texts(text, "VIN")
         self.assertIn("1HGCM82633A004352", vins)
-        self.assertNotIn("I0OQ1234567890123", [v for v in vins])  # pattern excludes I O Q
+        self.assertNotIn(
+            "I0OQ1234567890123", [v for v in vins]
+        )  # pattern excludes I O Q
 
     def test_currency_and_date_iso(self):
         text = "Paid $1,234.56 on 2025-06-20T14:30:00Z or 2024-12-31"
@@ -194,11 +198,44 @@ class TestAdditionalCountries30Plus(unittest.TestCase):
     def test_many_country_keys_exist(self):
         # Guard that we actually ship patterns for >= 30 countries worth of keys
         country_suffixes = {
-            "US", "CA", "GB", "FR", "ES", "IT", "IN", "CN",
-            "DE", "JP", "KR", "AU", "NZ", "BR", "MX", "AR",
-            "ZA", "SG", "HK", "TW", "NL", "BE", "CH", "AT",
-            "SE", "NO", "DK", "FI", "PL", "IE", "PT", "GR",
-            "IL", "TR", "RU", "TH", "MY", "ID",
+            "US",
+            "CA",
+            "GB",
+            "FR",
+            "ES",
+            "IT",
+            "IN",
+            "CN",
+            "DE",
+            "JP",
+            "KR",
+            "AU",
+            "NZ",
+            "BR",
+            "MX",
+            "AR",
+            "ZA",
+            "SG",
+            "HK",
+            "TW",
+            "NL",
+            "BE",
+            "CH",
+            "AT",
+            "SE",
+            "NO",
+            "DK",
+            "FI",
+            "PL",
+            "IE",
+            "PT",
+            "GR",
+            "IL",
+            "TR",
+            "RU",
+            "TH",
+            "MY",
+            "ID",
         }
         present = set()
         for key in DEFAULT_REGEX_PATTERNS:
@@ -207,7 +244,9 @@ class TestAdditionalCountries30Plus(unittest.TestCase):
                     present.add(suf)
                     break
         # Also count universal that cover many (IBAN alone covers dozens)
-        self.assertGreaterEqual(len(present) + 3, 30, "Need patterns touching at least ~30 countries")
+        self.assertGreaterEqual(
+            len(present) + 3, 30, "Need patterns touching at least ~30 countries"
+        )
 
 
 class TestChecksumFilter(unittest.TestCase):
@@ -268,7 +307,7 @@ class TestFullDefaultIntegration(unittest.TestCase):
         doc = """
         From: alice.smith@acme.co.uk
         Paid invoice USD 4,567.89 via IBAN DE89370400440532013000 on 2025-03-14T09:00:00Z
-        US customer SSN 987-65-4321 , CC 4242-4242-4242-4242
+        US customer SSN 123-45-6789 , CC 4242-4242-4242-4242
         Crypto donation 0xAbC1230000000000000000000000000000000000
         French client INSEE 1851075240027 VAT FRXX123456789
         Indian Aadhaar 2345 6789 0124 PAN AAAPA1234A

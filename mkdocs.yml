@@ -126,6 +126,7 @@ nav:
     - Install and API: id-extract/api.md
     - Universal identifiers: id-extract/universal.md
     - Country catalog: id-extract/countries/index.md
+    - Opt-in identifiers (US, CA, MX): id-extract/opt-in-us-ca-mx.md
     - Australia: id-extract/countries/au.md
     - Argentina: id-extract/countries/ar.md
     - Austria: id-extract/countries/at.md

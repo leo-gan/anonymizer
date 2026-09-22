@@ -193,6 +193,7 @@ def get_config_for_profile(
     chunk_size: Optional[int] = None,
     chunk_overlap: Optional[int] = None,
     countries: Optional[Iterable[str]] = None,
+    opt_in: Optional[Iterable[str] | str | bool] = None,
 ) -> AppConfig:
     """Return an AppConfig populated from one of the built-in profiles.
 
@@ -212,6 +213,8 @@ def get_config_for_profile(
         chunk_overlap: Optional override for chunk overlap.
         countries: Optional ISO-2 codes that limit national-ID regexes
             (universal patterns always stay).
+        opt_in: Optional id-extract opt-in keys, or ``"all"`` for every
+            selective state, provincial, and industry pattern. Default: none.
 
     Returns:
         A fully populated AppConfig instance ready to drive anonymize_file
@@ -235,7 +238,7 @@ def get_config_for_profile(
         max_retries=profile_defaults["max_retries"],
         base_retry_delay=profile_defaults["base_retry_delay"],
         max_retry_delay=profile_defaults["max_retry_delay"],
-        regex_patterns=filter_regex_patterns(countries),
+        regex_patterns=filter_regex_patterns(countries, opt_in=opt_in),
         use_llm=profile_defaults.get("use_llm", True),
         enable_cache=profile_defaults.get("enable_cache", True),
     )

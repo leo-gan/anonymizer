@@ -50,6 +50,7 @@ You do not need `pdf-anonymizer-core` to use this package. The anonymizer depend
 - [Install and API](api.md)
 - [Universal identifiers](universal.md) (email, cards, IBAN, VIN, …)
 - [Country catalog](countries/index.md) — one page per ISO-2 plugin
+- [Opt-in identifiers for the United States, Canada, and Mexico](opt-in-us-ca-mx.md) — state, provincial, and industry numbers. Pass `opt_in=` to load them.
 
 Each country page names the identifier, the type key the package emits, the shape it looks for, a synthetic example, whether a checksum runs, and links to the issuing agency or the statute that defines it.
 

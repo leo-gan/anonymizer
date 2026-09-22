@@ -40,4 +40,79 @@ Licences are issued by each province or territory. Formats vary. The second alte
 
 - [Example issuer: Ontario — driver's licence](https://www.ontario.ca/page/drivers-licence)
 
+## `PROGRAM_ACCOUNT_CA` — CRA program account
+
+The business number plus a program identifier and a four-digit reference. The letters this package accepts are RT, RP, RC, RM, RZ, RR, and RG.
+
+| | |
+|---|---|
+| **Package type** | `PROGRAM_ACCOUNT_CA` |
+| **Shape this package looks for** | 9 digits + program letters + 4 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `123456789RT0001` |
+
+**Official sources**
+
+- [CRA — program accounts](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/business-registration/business-number-program-account/need-program-accounts.html)
+
+## `DIN_CA` — Drug Identification Number (DIN)
+
+The eight-digit number Health Canada assigns to a drug before it is marketed. The label prints the prefix DIN. The match includes that prefix.
+
+| | |
+|---|---|
+| **Package type** | `DIN_CA` |
+| **Shape this package looks for** | DIN + 8 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `DIN 00000000` |
+
+**Official sources**
+
+- [Health Canada — DIN](https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/fact-sheets/drug-identification-number.html)
+
+## `NPN_CA` — Natural Product Number (NPN)
+
+The eight-digit licence number on a natural health product. The match includes the prefix NPN.
+
+| | |
+|---|---|
+| **Package type** | `NPN_CA` |
+| **Shape this package looks for** | NPN + 8 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `NPN 00000000` |
+
+**Official sources**
+
+- [Health Canada — product licensing](https://www.canada.ca/en/health-canada/services/drugs-health-products/natural-non-prescription/applications-submissions/product-licensing.html)
+
+## `DIN_HM_CA` — Homeopathic medicine number (DIN-HM)
+
+The eight-digit number on a licensed homeopathic medicine. The match includes the prefix DIN-HM.
+
+| | |
+|---|---|
+| **Package type** | `DIN_HM_CA` |
+| **Shape this package looks for** | DIN-HM + 8 digits |
+| **Checksum** | none |
+| **Example (synthetic)** | `DIN-HM 00000000` |
+
+**Official sources**
+
+- [Health Canada — LNHPD terminology](https://www.canada.ca/en/health-canada/services/drugs-health-products/reports-publications/natural-health-products/licensed-natural-health-products-database-lnhpd-terminology-guide-september-2008.html)
+
+## `UCI_CA` — Unique Client Identifier (UCI)
+
+The client id IRCC prints on its documents. This package matches the 10-digit form NN-NNNN-NNNN. The 8-digit form is omitted because that hyphenation is too common.
+
+| | |
+|---|---|
+| **Package type** | `UCI_CA` |
+| **Shape this package looks for** | NN-NNNN-NNNN |
+| **Checksum** | none |
+| **Example (synthetic)** | `00-0000-0000` |
+
+**Official sources**
+
+- [IRCC — When will I get my UCI?](https://ircc.canada.ca/English/helpcentre/answer.asp?qnum=777&top=4)
+
 The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.
