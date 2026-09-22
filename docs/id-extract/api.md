@@ -58,11 +58,11 @@ Universal keys (email, cards, IBAN, …) are always included when you load a cou
 
 ## Checksums
 
-After a match, a registered extra-digit check may run. For most types a failure does not drop the hit. The type is renamed with the `_LIKE` suffix. Four types drop a failed check instead, because the shape alone is a common digit run.
+After a match, a registered extra-digit check may run. For most types a failure does not drop the hit. The type is renamed with the `_LIKE` suffix. The types named in the next paragraph drop a failed check, because the shape alone is a common digit or character run.
 
-Types with a check today: `CREDIT_CARD`, `IBAN`, `VIN`, `MEDICAL_NPI_US`, `SIN_CA`, `DNI_ES`, `NIE_ES`, `RESIDENT_ID_CN`, `AADHAAR_IN`, `CPF_BR`, `CODICE_FISCALE_IT`, `PESEL_PL`, `RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`.
+Types with a check today: `CREDIT_CARD`, `IBAN`, `VIN`, `MEDICAL_NPI_US`, `SIN_CA`, `DNI_ES`, `NIE_ES`, `RESIDENT_ID_CN`, `AADHAAR_IN`, `CPF_BR`, `CODICE_FISCALE_IT`, `PESEL_PL`, `RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`, `DEA_US`, `PERSONALAUSWEIS_DE`, `ACN_AU`, `MEDICARE_AU`, `NHS_GB`, `UEN_SG`, `HETU_FI`, `NATIONAL_ID_TH`, `NATIONAL_ID_TR`, `STEUER_ID_DE`.
 
-`RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, and `CLABE_MX` drop a failed check. The other checked types keep the hit and add `_LIKE`.
+`RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`, `ACN_AU`, `MEDICARE_AU`, `NHS_GB`, `UEN_SG`, `NATIONAL_ID_TH`, `NATIONAL_ID_TR`, and `STEUER_ID_DE` drop a failed check. The other checked types keep the hit and add `_LIKE`.
 
 ## Filter used by the anonymizer
 

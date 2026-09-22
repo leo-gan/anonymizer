@@ -57,4 +57,35 @@ A licence to drive is issued by each state or territory, not by the Commonwealth
 - [National Transport Commission — driver licensing](https://www.ntc.gov.au/transport-reform/ntc-projects/australian-driver-licensing)
 - [Example issuer: NSW Service — driver licences](https://www.nsw.gov.au/driving-boating-and-transport/driver-and-rider-licences)
 
+## `ACN_AU` — Australian Company Number (ACN)
+
+The nine-digit number ASIC issues to a company. The last digit is a check digit. A failed check is dropped, because nine digits are a common shape.
+
+| | |
+|---|---|
+| **Package type** | `ACN_AU` |
+| **Shape this package looks for** | 9 digits, or NNN NNN NNN |
+| **Checksum** | ASIC modified modulus 10. A failure is dropped. |
+| **Example (synthetic)** | `530 000 009` |
+
+**Official sources**
+
+- [ASIC — Australian Company Number](https://www.asic.gov.au/for-business-and-companies/companies/register-a-company/australian-company-number-acn/)
+- [ASIC Datastream specification, Appendix B (ACN check digit)](https://download.asic.gov.au/media/q5cf1uel/datastream-messages-specification-4-aug-2025.pdf)
+
+## `MEDICARE_AU` — Medicare card number
+
+The number on an Australian Medicare card. The first digit is 2, 3, 4, 5, or 6. The ninth digit is a check digit. The tenth digit is the person's position on the card. A failed check is dropped, because ten digits are also an NPI.
+
+| | |
+|---|---|
+| **Package type** | `MEDICARE_AU` |
+| **Shape this package looks for** | 10 digits starting with 2–6, or NNNN NNNNN N |
+| **Checksum** | Weights 1, 3, 7, 9, 1, 3, 7, 9 on the first eight digits. The ninth digit equals that sum modulo 10. A failure is dropped. |
+| **Example (synthetic)** | `2428 77813 1` |
+
+**Official sources**
+
+- [Services Australia — Medicare card](https://www.servicesaustralia.gov.au/medicare-card)
+
 The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.

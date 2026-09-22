@@ -10,14 +10,14 @@ National-ID patterns loaded when you pass `countries=["CA"]` (or `"all"`). Unive
 
 ## `SIN_CA` — Social Insurance Number (SIN)
 
-A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. Temporary SINs begin with 9.
+A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. A personal SIN does not begin with 0 or 8. Temporary SINs begin with 9.
 
 | | |
 |---|---|
 | **Package type** | `SIN_CA` |
-| **Shape this package looks for** | NNN-NNN-NNN |
+| **Shape this package looks for** | NNN-NNN-NNN, first digit 1–7 or 9 |
 | **Checksum** | Luhn |
-| **Example (synthetic)** | `046-454-286` |
+| **Example (synthetic)** | `123-456-782` |
 
 **Official sources**
 

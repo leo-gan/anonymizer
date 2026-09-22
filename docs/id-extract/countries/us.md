@@ -10,13 +10,13 @@ National-ID patterns loaded when you pass `countries=["US"]` (or `"all"`). Unive
 
 ## `SSN_US` — Social Security number (SSN)
 
-A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier.
+A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier. Area numbers 000 and 666, group 00, and serial 0000 are not issued.
 
 | | |
 |---|---|
 | **Package type** | `SSN_US` |
-| **Shape this package looks for** | AAA-GG-SSSS |
-| **Checksum** | none |
+| **Shape this package looks for** | AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000 |
+| **Checksum** | none; those unissued groups are excluded from the expression |
 | **Example (synthetic)** | `123-45-6789` |
 
 **Official sources**
@@ -27,13 +27,13 @@ A nine-digit number assigned by the Social Security Administration to record ear
 
 ## `SSN` — SSN (legacy key)
 
-Same pattern as SSN_US. Kept so older callers that ask for type SSN still match.
+Same pattern as SSN_US, including the excluded area, group, and serial. Kept so older callers that ask for type SSN still match.
 
 | | |
 |---|---|
 | **Package type** | `SSN` |
-| **Shape this package looks for** | AAA-GG-SSSS |
-| **Checksum** | none |
+| **Shape this package looks for** | AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000 |
+| **Checksum** | none; those unissued groups are excluded from the expression |
 | **Example (synthetic)** | `123-45-6789` |
 
 **Official sources**
@@ -58,12 +58,12 @@ A nine-digit federal tax identifier the IRS assigns to businesses, estates, trus
 
 ## `MEDICAL_NPI_US` — National Provider Identifier (NPI)
 
-A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The number is intelligence-free.
+A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The first digit is 1 or 2.
 
 | | |
 |---|---|
 | **Package type** | `MEDICAL_NPI_US` |
-| **Shape this package looks for** | 10 digits |
+| **Shape this package looks for** | 10 digits, first digit 1 or 2 |
 | **Checksum** | Luhn over prefix 80840 + the 10 digits (CMS) |
 | **Example (synthetic)** | `1234567893` |
 
@@ -210,14 +210,14 @@ The case id on an immigrant visa packet. USCIS describes the ordinary form as th
 
 ## `DEA_US` — DEA registration number
 
-The controlled-substance registration number: two letters and seven digits. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped.
+The controlled-substance registration number: two letters and seven digits. The seventh digit is a check digit. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped when the check passes.
 
 | | |
 |---|---|
 | **Package type** | `DEA_US` |
 | **Shape this package looks for** | 2 letters + 7 digits, optional hyphen and suffix |
-| **Checksum** | none |
-| **Example (synthetic)** | `AB1234567` |
+| **Checksum** | DEA check digit. A failure is kept as DEA_US_LIKE. |
+| **Example (synthetic)** | `AB1234563` |
 
 **Official sources**
 

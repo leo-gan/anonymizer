@@ -10,13 +10,13 @@ National-ID patterns loaded when you pass `countries=["TR"]` (or `"all"`). Unive
 
 ## `NATIONAL_ID_TR` — T.C. Kimlik No
 
-The 11-digit Republic of Türkiye identity number.
+The 11-digit Republic of Türkiye identity number. The first digit is never 0. The tenth and eleventh digits are check digits. A failed check is dropped, because eleven digits are a common shape.
 
 | | |
 |---|---|
 | **Package type** | `NATIONAL_ID_TR` |
-| **Shape this package looks for** | 11 digits |
-| **Checksum** | none in this package |
+| **Shape this package looks for** | 11 digits, first digit 1–9 |
+| **Checksum** | NVI check on digits 10 and 11. A failure is dropped. |
 | **Example (synthetic)** | `10000000146` |
 
 **Official sources**

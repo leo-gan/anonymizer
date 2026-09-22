@@ -4,6 +4,8 @@
 **Audience:** maintainers only  
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build.
 
+Identifier-level comparison with Microsoft Presidio (what to add, what to tighten, what not to copy): [presidio-id-extract.md](presidio-id-extract.md).
+
 Sources merged here:
 
 1. Session research (product docs + deep-research workflow, 2026-09-03).

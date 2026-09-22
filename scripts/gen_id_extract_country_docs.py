@@ -75,6 +75,38 @@ COUNTRIES: dict[str, dict] = {
                     ),
                 ],
             },
+            {
+                "key": "ACN_AU",
+                "name": "Australian Company Number (ACN)",
+                "definition": "The nine-digit number ASIC issues to a company. The last digit is a check digit. A failed check is dropped, because nine digits are a common shape.",
+                "shape": "9 digits, or NNN NNN NNN",
+                "example": "530 000 009",
+                "checksum": "ASIC modified modulus 10. A failure is dropped.",
+                "sources": [
+                    (
+                        "ASIC — Australian Company Number",
+                        "https://www.asic.gov.au/for-business-and-companies/companies/register-a-company/australian-company-number-acn/",
+                    ),
+                    (
+                        "ASIC Datastream specification, Appendix B (ACN check digit)",
+                        "https://download.asic.gov.au/media/q5cf1uel/datastream-messages-specification-4-aug-2025.pdf",
+                    ),
+                ],
+            },
+            {
+                "key": "MEDICARE_AU",
+                "name": "Medicare card number",
+                "definition": "The number on an Australian Medicare card. The first digit is 2, 3, 4, 5, or 6. The ninth digit is a check digit. The tenth digit is the person's position on the card. A failed check is dropped, because ten digits are also an NPI.",
+                "shape": "10 digits starting with 2–6, or NNNN NNNNN N",
+                "example": "2428 77813 1",
+                "checksum": "Weights 1, 3, 7, 9, 1, 3, 7, 9 on the first eight digits. The ninth digit equals that sum modulo 10. A failure is dropped.",
+                "sources": [
+                    (
+                        "Services Australia — Medicare card",
+                        "https://www.servicesaustralia.gov.au/medicare-card",
+                    ),
+                ],
+            },
         ],
     },
     "US": {
@@ -83,10 +115,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "SSN_US",
                 "name": "Social Security number (SSN)",
-                "definition": "A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier.",
-                "shape": "AAA-GG-SSSS",
+                "definition": "A nine-digit number assigned by the Social Security Administration to record earnings and administer benefits. It is also used as a taxpayer identifier. Area numbers 000 and 666, group 00, and serial 0000 are not issued.",
+                "shape": "AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000",
                 "example": "123-45-6789",
-                "checksum": "none",
+                "checksum": "none; those unissued groups are excluded from the expression",
                 "sources": [
                     (
                         "SSA — request a Social Security number",
@@ -105,10 +137,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "SSN",
                 "name": "SSN (legacy key)",
-                "definition": "Same pattern as SSN_US. Kept so older callers that ask for type SSN still match.",
-                "shape": "AAA-GG-SSSS",
+                "definition": "Same pattern as SSN_US, including the excluded area, group, and serial. Kept so older callers that ask for type SSN still match.",
+                "shape": "AAA-GG-SSSS, excluding area 000 and 666, group 00, and serial 0000",
                 "example": "123-45-6789",
-                "checksum": "none",
+                "checksum": "none; those unissued groups are excluded from the expression",
                 "sources": [
                     ("SSA — Social Security numbers", "https://www.ssa.gov/ssnumber/"),
                 ],
@@ -134,8 +166,8 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "MEDICAL_NPI_US",
                 "name": "National Provider Identifier (NPI)",
-                "definition": "A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The number is intelligence-free.",
-                "shape": "10 digits",
+                "definition": "A 10-digit identifier for covered health-care providers under HIPAA Administrative Simplification. CMS assigns it through NPPES. The first digit is 1 or 2.",
+                "shape": "10 digits, first digit 1 or 2",
                 "example": "1234567893",
                 "checksum": "Luhn over prefix 80840 + the 10 digits (CMS)",
                 "sources": [
@@ -279,10 +311,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "DEA_US",
                 "name": "DEA registration number",
-                "definition": "The controlled-substance registration number: two letters and seven digits. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped.",
+                "definition": "The controlled-substance registration number: two letters and seven digits. The seventh digit is a check digit. A hospital may append a hyphen and an internal suffix under 21 CFR 1301.22(c). A same-span medical-licence label is dropped when the check passes.",
                 "shape": "2 letters + 7 digits, optional hyphen and suffix",
-                "example": "AB1234567",
-                "checksum": "none",
+                "example": "AB1234563",
+                "checksum": "DEA check digit. A failure is kept as DEA_US_LIKE.",
                 "sources": [
                     (
                         "DEA Practitioner's Manual",
@@ -302,9 +334,9 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "SIN_CA",
                 "name": "Social Insurance Number (SIN)",
-                "definition": "A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. Temporary SINs begin with 9.",
-                "shape": "NNN-NNN-NNN",
-                "example": "046-454-286",
+                "definition": "A unique 9-digit number issued by Service Canada. It identifies a person for income tax under Income Tax Act s. 237 and for certain federal programs. A personal SIN does not begin with 0 or 8. Temporary SINs begin with 9.",
+                "shape": "NNN-NNN-NNN, first digit 1–7 or 9",
+                "example": "123-456-782",
                 "checksum": "Luhn",
                 "sources": [
                     (
@@ -462,6 +494,38 @@ COUNTRIES: dict[str, dict] = {
                     (
                         "Companies Act 2006",
                         "https://www.legislation.gov.uk/ukpga/2006/46/contents",
+                    ),
+                ],
+            },
+            {
+                "key": "PASSPORT_GB",
+                "name": "British passport number (from 2015)",
+                "definition": "The nine-character number printed on a British passport issued from 2015: two letters and seven digits. The letter pairs SC, NI, OC, and SO are omitted because those prefixes are Companies House numbers. The older nine-digit book number remains the universal pattern GB_PASSPORT.",
+                "shape": "Two letters + 7 digits, excluding SC, NI, OC, and SO",
+                "example": "AB1234567",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "HM Passport Office",
+                        "https://www.gov.uk/government/organisations/hm-passport-office",
+                    ),
+                ],
+            },
+            {
+                "key": "NHS_GB",
+                "name": "NHS number",
+                "definition": "The 10-digit number used to identify a patient in the NHS in England and Wales. It is printed in groups of 3, 3, and 4. The tenth digit is a check digit. A failed check is dropped, because ten digits are also an NPI.",
+                "shape": "10 digits, optional spaces or hyphens as 3-3-4",
+                "example": "943 476 5919",
+                "checksum": "Modulus 11. Weights 10 through 2 on the first nine digits. Check digit = 11 − (sum mod 11). A result of 11 is stored as 0. A result of 10 is not issued. A failure is dropped.",
+                "sources": [
+                    (
+                        "NHS England — NHS number",
+                        "https://digital.nhs.uk/services/nhs-number",
+                    ),
+                    (
+                        "ISB 0149 NHS Number",
+                        "https://digital.nhs.uk/data-and-information/information-standards/information-standards-and-data-collections-including-extractions/publications-and-notifications/standards-and-collections/isb-0149-nhs-number",
                     ),
                 ],
             },
@@ -829,10 +893,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "STEUER_ID_DE",
                 "name": "Steuerliche Identifikationsnummer",
-                "definition": "The 11-digit personal tax ID assigned by the Federal Central Tax Office (BZSt). It stays with the person for life.",
-                "shape": "11 digits",
-                "example": "12345678901",
-                "checksum": "none in this package",
+                "definition": "The 11-digit personal tax ID assigned by the Federal Central Tax Office (BZSt). It stays with the person for life. The first digit is never 0. The eleventh digit is the ISO 7064 mod 11,10 check. A failed check is dropped, because eleven digits are a common shape.",
+                "shape": "11 digits, first digit 1–9",
+                "example": "26954371827",
+                "checksum": "ISO 7064 mod 11,10. A failure is dropped.",
                 "sources": [
                     (
                         "BZSt — Identifikationsnummer",
@@ -860,13 +924,31 @@ COUNTRIES: dict[str, dict] = {
             },
             {
                 "key": "PERSONALAUSWEIS_DE",
-                "name": "Personalausweis / passport number (structural)",
-                "definition": "A coarse 9–10 character token for German ID-card or passport numbers.",
-                "shape": "9–10 letters or digits",
-                "example": "T22000129",
-                "checksum": "none",
+                "name": "Personalausweis number",
+                "definition": "The document number on a German identity card. Cards issued since November 2010 use nine characters from the ICAO set (the letters A, B, D, E, I, O, Q, S, and U are omitted) and an ICAO check digit. Older cards are the letter T plus eight digits and have no check digit.",
+                "shape": "ICAO 8 characters + check digit, or T + 8 digits",
+                "example": "C00000004",
+                "checksum": "ICAO Doc 9303 weights 7, 3, 1 on the neuer Personalausweis. The legacy T form is accepted without a check. A failed nPA check is kept as PERSONALAUSWEIS_DE_LIKE.",
                 "sources": [
                     ("BMI — Personalausweis", "https://www.personalausweisportal.de/"),
+                    (
+                        "Personalausweisgesetz",
+                        "https://www.gesetze-im-internet.de/pauswg/",
+                    ),
+                ],
+            },
+            {
+                "key": "HANDELSREGISTER_DE",
+                "name": "Handelsregisternummer",
+                "definition": "The commercial-register number. HRA is used for sole traders and partnerships. HRB is used for corporations. The prefix is followed by one to six digits.",
+                "shape": "HRA or HRB, optional space, 1–6 digits",
+                "example": "HRB 12345",
+                "checksum": "none",
+                "sources": [
+                    (
+                        "§ 14 HGB",
+                        "https://www.gesetze-im-internet.de/hgb/__14.html",
+                    ),
                 ],
             },
             {
@@ -1182,15 +1264,29 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "NRIC_SG",
                 "name": "NRIC / FIN",
-                "definition": "The National Registration Identity Card number for citizens and PRs (prefix S, T) or the Foreign Identification Number (prefix F, G, M). This pattern covers S, G, and T.",
-                "shape": "S/G/T + 7 digits + letter",
+                "definition": "The National Registration Identity Card number for citizens and permanent residents (prefix S or T) or the Foreign Identification Number (prefix F, G, or M). M is the FIN prefix issued from 2022.",
+                "shape": "S, T, F, G, or M + 7 digits + letter",
                 "example": "S1234567D",
-                "checksum": "none in this package",
+                "checksum": "none in this package. ICA does not publish the check-letter algorithm.",
                 "sources": [
                     ("ICA — NRIC", "https://www.ica.gov.sg/documents/nric"),
                     (
                         "National Registration Act 1965",
                         "https://sso.agc.gov.sg/Act/NRA1965",
+                    ),
+                ],
+            },
+            {
+                "key": "UEN_SG",
+                "name": "Unique Entity Number (UEN)",
+                "definition": "The standard number for an entity registered in Singapore. Businesses registered before the current company form use eight digits and a letter. Local companies use nine digits and a letter, and the first four digits are the year of registration. Other entities use a T, S, or R, a two-digit year, a two-letter entity type, four digits, and a check letter. A failed check is dropped.",
+                "shape": "8 digits + letter, 9 digits + letter, or TSR + entity type + 4 digits + letter",
+                "example": "201912345R",
+                "checksum": "UEN check letter for each of the three forms. A local-company number whose year is in the future is rejected. A failure is dropped.",
+                "sources": [
+                    (
+                        "UEN",
+                        "https://www.uen.gov.sg/",
                     ),
                 ],
             },
@@ -1431,10 +1527,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "HETU_FI",
                 "name": "Henkilötunnus",
-                "definition": "The Finnish personal identity code. Date of birth, a century sign (+, -, or A), an individual number, and a check character.",
-                "shape": "DDMMYY + +|-|A + 3 digits + alphanumeric",
+                "definition": "The Finnish personal identity code. Six digits of the date of birth, a century mark, a three-digit individual number, and a check character. The century mark is + for the 1800s, - Y X W V U for the 1900s, and A B C D E F for the 2000s. A failed check is kept as HETU_FI_LIKE.",
+                "shape": "DDMMYY + century mark + 3 digits + check character",
                 "example": "131052-308T",
-                "checksum": "none in this package",
+                "checksum": "The nine-digit number modulo 31 indexes 0123456789ABCDEFHJKLMNPRSTUVWXY. The date must be a real day in the century given by the mark. A failure is kept as HETU_FI_LIKE.",
                 "sources": [
                     (
                         "Digital and Population Data Services Agency — personal identity code",
@@ -1554,10 +1650,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "NATIONAL_ID_TR",
                 "name": "T.C. Kimlik No",
-                "definition": "The 11-digit Republic of Türkiye identity number.",
-                "shape": "11 digits",
+                "definition": "The 11-digit Republic of Türkiye identity number. The first digit is never 0. The tenth and eleventh digits are check digits. A failed check is dropped, because eleven digits are a common shape.",
+                "shape": "11 digits, first digit 1–9",
                 "example": "10000000146",
-                "checksum": "none in this package",
+                "checksum": "NVI check on digits 10 and 11. A failure is dropped.",
                 "sources": [
                     ("NVI — identity card", "https://www.nvi.gov.tr/"),
                     (
@@ -1597,10 +1693,10 @@ COUNTRIES: dict[str, dict] = {
             {
                 "key": "NATIONAL_ID_TH",
                 "name": "Thai national ID number",
-                "definition": "A 13-digit number on the Thai national identity card.",
-                "shape": "13 digits",
-                "example": "1234567890121",
-                "checksum": "none in this package",
+                "definition": "A 13-digit number on the Thai national identity card. The first digit is never 0. The thirteenth digit is a check digit. A failed check is dropped, because thirteen digits are a common shape.",
+                "shape": "13 digits, first digit 1–9",
+                "example": "1101700200001",
+                "checksum": "Weights 13 through 2 on the first 12 digits. Check digit = (11 − sum mod 11) mod 10. A failure is dropped.",
                 "sources": [
                     (
                         "Department of Provincial Administration — ID card",

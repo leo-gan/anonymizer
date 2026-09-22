@@ -57,6 +57,37 @@ The registrar’s number for a company. England and Wales companies are usually 
 - [Companies House — get information about a company](https://www.gov.uk/get-information-about-a-company)
 - [Companies Act 2006](https://www.legislation.gov.uk/ukpga/2006/46/contents)
 
+## `PASSPORT_GB` — British passport number (from 2015)
+
+The nine-character number printed on a British passport issued from 2015: two letters and seven digits. The letter pairs SC, NI, OC, and SO are omitted because those prefixes are Companies House numbers. The older nine-digit book number remains the universal pattern GB_PASSPORT.
+
+| | |
+|---|---|
+| **Package type** | `PASSPORT_GB` |
+| **Shape this package looks for** | Two letters + 7 digits, excluding SC, NI, OC, and SO |
+| **Checksum** | none |
+| **Example (synthetic)** | `AB1234567` |
+
+**Official sources**
+
+- [HM Passport Office](https://www.gov.uk/government/organisations/hm-passport-office)
+
+## `NHS_GB` — NHS number
+
+The 10-digit number used to identify a patient in the NHS in England and Wales. It is printed in groups of 3, 3, and 4. The tenth digit is a check digit. A failed check is dropped, because ten digits are also an NPI.
+
+| | |
+|---|---|
+| **Package type** | `NHS_GB` |
+| **Shape this package looks for** | 10 digits, optional spaces or hyphens as 3-3-4 |
+| **Checksum** | Modulus 11. Weights 10 through 2 on the first nine digits. Check digit = 11 − (sum mod 11). A result of 11 is stored as 0. A result of 10 is not issued. A failure is dropped. |
+| **Example (synthetic)** | `943 476 5919` |
+
+**Official sources**
+
+- [NHS England — NHS number](https://digital.nhs.uk/services/nhs-number)
+- [ISB 0149 NHS Number](https://digital.nhs.uk/data-and-information/information-standards/information-standards-and-data-collections-including-extractions/publications-and-notifications/standards-and-collections/isb-0149-nhs-number)
+
 ## `DRIVERS_LICENSE_GB` — Photocard driving licence number
 
 The 16-character driver number printed on a Great Britain photocard licence.

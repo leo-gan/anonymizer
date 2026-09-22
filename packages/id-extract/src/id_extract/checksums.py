@@ -5,7 +5,9 @@ After a match, this module checks the extra digit when one exists.
 
 - Check passes: keep the real type (``IBAN``).
 - Check fails: keep the text, but relabel as ``IBAN_LIKE`` so a mistyped
-  number is still hidden. Never drop the hit.
+  number is still hidden.
+- A type in ``STRICT_CHECKSUMS`` drops a failed check instead. Those shapes
+  are common digit runs.
 - No registered check: accept the type unchanged.
 
 Only attach a check when it is cheap and unambiguous. Do not invent rules for
@@ -14,6 +16,7 @@ identifiers that have none (most SSNs, many passports, most VAT numbers).
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Callable, Dict
 
 # Official IBAN character lengths by country code (ISO 13616).
@@ -407,6 +410,250 @@ def validate_phn_bc(text: str) -> bool:
     return digits[9] == str(expected)
 
 
+def validate_dea_us(text: str) -> bool:
+    """DEA check digit on the seven digits after the two-letter prefix.
+
+    Add the 1st, 3rd, and 5th of those digits to twice the 2nd, 4th, and 6th.
+    The units digit of that sum is the 7th digit. A hyphenated hospital suffix
+    is ignored.
+    """
+    body = text.upper().split("-", 1)[0].strip()
+    if len(body) != 9 or not body[:2].isalpha() or not body[2:].isdigit():
+        return False
+    digits = body[2:]
+    total = (
+        int(digits[0])
+        + int(digits[2])
+        + int(digits[4])
+        + 2 * (int(digits[1]) + int(digits[3]) + int(digits[5]))
+    )
+    return int(digits[6]) == total % 10
+
+
+def validate_personalausweis_de(text: str) -> bool:
+    """ICAO Doc 9303 check on a neuer Personalausweis number.
+
+    A legacy ``T`` plus eight digits has no check digit and is accepted.
+    """
+    value = _alnum_upper(text)
+    if len(value) != 9:
+        return False
+    if value[0] == "T" and value[1:].isdigit():
+        return True
+    weights = (7, 3, 1)
+    total = 0
+    for index, char in enumerate(value[:-1]):
+        if char.isdigit():
+            number = int(char)
+        elif "A" <= char <= "Z":
+            number = ord(char) - ord("A") + 10
+        else:
+            return False
+        total += number * weights[index % 3]
+    return value[-1].isdigit() and total % 10 == int(value[-1])
+
+
+def validate_acn_au(text: str) -> bool:
+    """ASIC modified modulus 10 on the nine digits of an ACN."""
+    digits = _digits_only(text)
+    if len(digits) != 9:
+        return False
+    weights = (8, 7, 6, 5, 4, 3, 2, 1)
+    total = sum(int(digits[index]) * weights[index] for index in range(8))
+    check = (10 - (total % 10)) % 10
+    return digits[8] == str(check)
+
+
+def validate_medicare_au(text: str) -> bool:
+    """Medicare modulus 10 on the first eight digits. The 9th digit is the check.
+
+    The 10th digit is the person reference on the card and is not part of the check.
+    """
+    digits = _digits_only(text)
+    if len(digits) != 10 or digits[0] not in "23456":
+        return False
+    weights = (1, 3, 7, 9, 1, 3, 7, 9)
+    total = sum(int(digits[index]) * weights[index] for index in range(8))
+    return int(digits[8]) == total % 10
+
+
+def validate_nhs_gb(text: str) -> bool:
+    """NHS number modulus 11. Weights 10..2 on the first nine digits.
+
+    Check digit = 11 - (sum mod 11). A result of 11 is stored as 0.
+    A result of 10 is not issued.
+    """
+    digits = _digits_only(text)
+    if len(digits) != 10:
+        return False
+    weights = (10, 9, 8, 7, 6, 5, 4, 3, 2)
+    total = sum(int(digits[index]) * weights[index] for index in range(9))
+    check = 11 - (total % 11)
+    if check == 10:
+        return False
+    if check == 11:
+        check = 0
+    return int(digits[9]) == check
+
+
+_UEN_A_WEIGHT = (10, 4, 9, 3, 8, 2, 7, 1)
+_UEN_A_ALPHABET = "XMKECAWLJDB"
+_UEN_B_WEIGHT = (10, 8, 6, 4, 9, 7, 5, 3, 1)
+_UEN_B_ALPHABET = "ZKCMDNERGWH"
+_UEN_C_WEIGHT = (4, 3, 5, 3, 10, 2, 2, 5, 7)
+_UEN_C_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWX0123456789"
+_UEN_C_ENTITY = frozenset(
+    {
+        "LP",
+        "LL",
+        "FC",
+        "PF",
+        "RF",
+        "MQ",
+        "MM",
+        "NB",
+        "CC",
+        "CS",
+        "MB",
+        "FM",
+        "GS",
+        "DP",
+        "CP",
+        "NR",
+        "CM",
+        "CD",
+        "MD",
+        "HS",
+        "VH",
+        "CH",
+        "MH",
+        "CL",
+        "XL",
+        "CX",
+        "HC",
+        "RP",
+        "TU",
+        "TC",
+        "FB",
+        "FN",
+        "PA",
+        "PB",
+        "SS",
+        "MC",
+        "SM",
+        "GA",
+        "GB",
+    }
+)
+
+
+def validate_uen_sg(text: str) -> bool:
+    """Singapore UEN check for the business, local-company, and other-entity forms."""
+    value = _alnum_upper(text)
+    if len(value) == 9 and value[:8].isdigit():
+        check = _UEN_A_ALPHABET[
+            sum(int(char) * weight for char, weight in zip(value[:8], _UEN_A_WEIGHT)) % 11
+        ]
+        return value[8] == check
+    if len(value) == 10 and value[:9].isdigit():
+        if int(value[:4]) > date.today().year:
+            return False
+        check = _UEN_B_ALPHABET[
+            sum(int(char) * weight for char, weight in zip(value[:9], _UEN_B_WEIGHT)) % 11
+        ]
+        return value[9] == check
+    if (
+        len(value) == 10
+        and value[0] in "TSR"
+        and value[1:3].isdigit()
+        and value[3:5].isalpha()
+        and value[5:9].isdigit()
+    ):
+        if value[3:5] not in _UEN_C_ENTITY:
+            return False
+        total = sum(
+            _UEN_C_ALPHABET.index(char) * weight
+            for char, weight in zip(value[:9], _UEN_C_WEIGHT)
+        )
+        return value[9] == _UEN_C_ALPHABET[(total - 5) % 11]
+    return False
+
+
+_HETU_CENTURY = {
+    "+": 1800,
+    "-": 1900,
+    "Y": 1900,
+    "X": 1900,
+    "W": 1900,
+    "V": 1900,
+    "U": 1900,
+    "A": 2000,
+    "B": 2000,
+    "C": 2000,
+    "D": 2000,
+    "E": 2000,
+    "F": 2000,
+}
+_HETU_CHECK = "0123456789ABCDEFHJKLMNPRSTUVWXY"
+
+
+def validate_hetu_fi(text: str) -> bool:
+    """DVV control character. The century mark selects the year, then the date must exist."""
+    value = text.strip().upper()
+    if len(value) != 11:
+        return False
+    century = _HETU_CENTURY.get(value[6])
+    if century is None or value[-1] not in _HETU_CHECK:
+        return False
+    try:
+        date(century + int(value[4:6]), int(value[2:4]), int(value[0:2]))
+    except ValueError:
+        return False
+    number = int(value[0:6] + value[7:10])
+    return _HETU_CHECK[number % 31] == value[-1]
+
+
+def validate_national_id_th(text: str) -> bool:
+    """Thai national-ID check: weights 13..2 on the first 12 digits, then (11 - sum mod 11) mod 10."""
+    digits = _digits_only(text)
+    if len(digits) != 13 or digits[0] == "0":
+        return False
+    total = sum(int(digits[index]) * (13 - index) for index in range(12))
+    check = (11 - (total % 11)) % 10
+    return int(digits[12]) == check
+
+
+def validate_national_id_tr(text: str) -> bool:
+    """NVI check. Digit 10 is from the odd and even places. Digit 11 is the sum of the first ten."""
+    digits = _digits_only(text)
+    if len(digits) != 11 or digits[0] == "0":
+        return False
+    nums = [int(char) for char in digits]
+    odd = sum(nums[index] for index in range(0, 9, 2))
+    even = sum(nums[index] for index in range(1, 8, 2))
+    if nums[9] != (odd * 7 - even) % 10:
+        return False
+    return nums[10] == sum(nums[:10]) % 10
+
+
+def validate_steuer_id_de(text: str) -> bool:
+    """ISO 7064 mod 11,10 on a German tax id. The first digit is never 0."""
+    digits = _digits_only(text)
+    if len(digits) != 11 or digits[0] == "0":
+        return False
+    nums = [int(char) for char in digits]
+    product = 10
+    for index in range(10):
+        total = (nums[index] + product) % 10
+        if total == 0:
+            total = 10
+        product = (total * 2) % 11
+    check = 11 - product
+    if check == 10:
+        check = 0
+    return check == nums[10]
+
+
 def validate_clabe_mx(text: str) -> bool:
     """CLABE control digit: cyclic weights 3, 7, 1 on the first 17 digits."""
     digits = _digits_only(text)
@@ -440,6 +687,16 @@ CHECKSUM_VALIDATORS: Dict[str, ValidatorFn] = {
     "CUSIP_NNA": validate_cusip,
     "PHN_BC_CA": validate_phn_bc,
     "CLABE_MX": validate_clabe_mx,
+    "DEA_US": validate_dea_us,
+    "PERSONALAUSWEIS_DE": validate_personalausweis_de,
+    "ACN_AU": validate_acn_au,
+    "MEDICARE_AU": validate_medicare_au,
+    "NHS_GB": validate_nhs_gb,
+    "UEN_SG": validate_uen_sg,
+    "HETU_FI": validate_hetu_fi,
+    "NATIONAL_ID_TH": validate_national_id_th,
+    "NATIONAL_ID_TR": validate_national_id_tr,
+    "STEUER_ID_DE": validate_steuer_id_de,
 }
 
 # These shapes are common digit runs. A failed check is dropped instead of
@@ -450,6 +707,13 @@ STRICT_CHECKSUMS = frozenset(
         "CUSIP_NNA",
         "PHN_BC_CA",
         "CLABE_MX",
+        "ACN_AU",
+        "MEDICARE_AU",
+        "NHS_GB",
+        "UEN_SG",
+        "NATIONAL_ID_TH",
+        "NATIONAL_ID_TR",
+        "STEUER_ID_DE",
     }
 )
 
