@@ -816,6 +816,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../opt-in-us-ca-mx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opt-in identifiers (US, CA, MX)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../au/" class="md-nav__link">
         
   
@@ -1031,6 +1059,61 @@
     <span class="md-ellipsis">
       
         DRIVERS_LICENSE_CA — Driver licence (province or territory)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#program_account_ca-cra-program-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PROGRAM_ACCOUNT_CA — CRA program account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#din_ca-drug-identification-number-din" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DIN_CA — Drug Identification Number (DIN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#npn_ca-natural-product-number-npn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NPN_CA — Natural Product Number (NPN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#din_hm_ca-homeopathic-medicine-number-din-hm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DIN_HM_CA — Homeopathic medicine number (DIN-HM)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uci_ca-unique-client-identifier-uci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UCI_CA — Unique Client Identifier (UCI)
       
     </span>
   </a>
@@ -2394,6 +2477,61 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#program_account_ca-cra-program-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PROGRAM_ACCOUNT_CA — CRA program account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#din_ca-drug-identification-number-din" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DIN_CA — Drug Identification Number (DIN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#npn_ca-natural-product-number-npn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NPN_CA — Natural Product Number (NPN)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#din_hm_ca-homeopathic-medicine-number-din-hm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DIN_HM_CA — Homeopathic medicine number (DIN-HM)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uci_ca-unique-client-identifier-uci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UCI_CA — Unique Client Identifier (UCI)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2485,6 +2623,166 @@
 <p><strong>Official sources</strong></p>
 <ul>
 <li><a href="https://www.ontario.ca/page/drivers-licence">Example issuer: Ontario — driver's licence</a></li>
+</ul>
+<h2 id="program_account_ca-cra-program-account"><code>PROGRAM_ACCOUNT_CA</code> — CRA program account<a class="headerlink" href="#program_account_ca-cra-program-account" title="Permanent link">&para;</a></h2>
+<p>The business number plus a program identifier and a four-digit reference. The letters this package accepts are RT, RP, RC, RM, RZ, RR, and RG.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>PROGRAM_ACCOUNT_CA</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>9 digits + program letters + 4 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>123456789RT0001</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/business-registration/business-number-program-account/need-program-accounts.html">CRA — program accounts</a></li>
+</ul>
+<h2 id="din_ca-drug-identification-number-din"><code>DIN_CA</code> — Drug Identification Number (DIN)<a class="headerlink" href="#din_ca-drug-identification-number-din" title="Permanent link">&para;</a></h2>
+<p>The eight-digit number Health Canada assigns to a drug before it is marketed. The label prints the prefix DIN. The match includes that prefix.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>DIN_CA</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>DIN + 8 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>DIN 00000000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/fact-sheets/drug-identification-number.html">Health Canada — DIN</a></li>
+</ul>
+<h2 id="npn_ca-natural-product-number-npn"><code>NPN_CA</code> — Natural Product Number (NPN)<a class="headerlink" href="#npn_ca-natural-product-number-npn" title="Permanent link">&para;</a></h2>
+<p>The eight-digit licence number on a natural health product. The match includes the prefix NPN.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>NPN_CA</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>NPN + 8 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>NPN 00000000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.canada.ca/en/health-canada/services/drugs-health-products/natural-non-prescription/applications-submissions/product-licensing.html">Health Canada — product licensing</a></li>
+</ul>
+<h2 id="din_hm_ca-homeopathic-medicine-number-din-hm"><code>DIN_HM_CA</code> — Homeopathic medicine number (DIN-HM)<a class="headerlink" href="#din_hm_ca-homeopathic-medicine-number-din-hm" title="Permanent link">&para;</a></h2>
+<p>The eight-digit number on a licensed homeopathic medicine. The match includes the prefix DIN-HM.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>DIN_HM_CA</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>DIN-HM + 8 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>DIN-HM 00000000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.canada.ca/en/health-canada/services/drugs-health-products/reports-publications/natural-health-products/licensed-natural-health-products-database-lnhpd-terminology-guide-september-2008.html">Health Canada — LNHPD terminology</a></li>
+</ul>
+<h2 id="uci_ca-unique-client-identifier-uci"><code>UCI_CA</code> — Unique Client Identifier (UCI)<a class="headerlink" href="#uci_ca-unique-client-identifier-uci" title="Permanent link">&para;</a></h2>
+<p>The client id IRCC prints on its documents. This package matches the 10-digit form NN-NNNN-NNNN. The 8-digit form is omitted because that hyphenation is too common.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>UCI_CA</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>NN-NNNN-NNNN</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>00-0000-0000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://ircc.canada.ca/English/helpcentre/answer.asp?qnum=777&amp;top=4">IRCC — When will I get my UCI?</a></li>
 </ul>
 <p>The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.</p>
 

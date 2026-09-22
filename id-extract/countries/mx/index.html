@@ -816,6 +816,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../opt-in-us-ca-mx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opt-in identifiers (US, CA, MX)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../au/" class="md-nav__link">
         
   
@@ -1451,6 +1479,39 @@
     <span class="md-ellipsis">
       
         RFC_MX — RFC (Registro Federal de Contribuyentes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clabe_mx-clabe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLABE_MX — CLABE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nss_mx-imss-social-security-number-nss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NSS_MX — IMSS social-security number (NSS)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pedimento_mx-customs-pedimento-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEDIMENTO_MX — Customs pedimento number
       
     </span>
   </a>
@@ -2394,6 +2455,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#clabe_mx-clabe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLABE_MX — CLABE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nss_mx-imss-social-security-number-nss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NSS_MX — IMSS social-security number (NSS)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pedimento_mx-customs-pedimento-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEDIMENTO_MX — Customs pedimento number
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2484,6 +2578,102 @@
 <p><strong>Official sources</strong></p>
 <ul>
 <li><a href="https://www.sat.gob.mx/tramites/operacion/28753/obten-tu-rfc-con-la-clave-unica-de-registro-de-poblacion-curp">SAT — RFC</a></li>
+</ul>
+<h2 id="clabe_mx-clabe"><code>CLABE_MX</code> — CLABE<a class="headerlink" href="#clabe_mx-clabe" title="Permanent link">&para;</a></h2>
+<p>The 18-digit interbank account key: 3 bank digits, 3 plaza digits, 11 account digits, and a control digit. A failed control digit is dropped.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>CLABE_MX</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>18 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>weights 3, 7, 1 on the first 17 digits</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>000000000000000000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.abm.org.mx/preguntas-frecuentes/">ABM — how a CLABE is built</a></li>
+</ul>
+<h2 id="nss_mx-imss-social-security-number-nss"><code>NSS_MX</code> — IMSS social-security number (NSS)<a class="headerlink" href="#nss_mx-imss-social-security-number-nss" title="Permanent link">&para;</a></h2>
+<p>The 11-digit number IMSS assigns to a person. It is permanent. Any standalone 11-digit run matches, so this pattern is broad.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>NSS_MX</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>11 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>00000000000</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.imss.gob.mx/sites/all/statics/pdf/procedimientos/9210-003-200.pdf">IMSS procedure 9210-003-200</a></li>
+</ul>
+<h2 id="pedimento_mx-customs-pedimento-number"><code>PEDIMENTO_MX</code> — Customs pedimento number<a class="headerlink" href="#pedimento_mx-customs-pedimento-number" title="Permanent link">&para;</a></h2>
+<p>The 15-digit customs declaration number from SAT Anexo 22. The printed form separates the year, customs office, and patent with two spaces and leaves the last seven digits together.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Package type</strong></td>
+<td><code>PEDIMENTO_MX</code></td>
+</tr>
+<tr>
+<td><strong>Shape this package looks for</strong></td>
+<td>2 digits, two spaces, 2 digits, two spaces, 4 digits, two spaces, 7 digits</td>
+</tr>
+<tr>
+<td><strong>Checksum</strong></td>
+<td>none</td>
+</tr>
+<tr>
+<td><strong>Example (synthetic)</strong></td>
+<td><code>26  01  0001  6000001</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official sources</strong></p>
+<ul>
+<li><a href="https://www.sat.gob.mx/minisitio/NormatividadRMFyRGCE/documentos2026/rgce/compiladas/CompiladoAnexo22_1raRMRGCE2026.pdf">SAT Anexo 22 (2026 compilation)</a></li>
 </ul>
 <p>The example values are synthetic or well-known public test numbers. Do not treat them as issued identifiers.</p>
 
