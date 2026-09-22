@@ -6,6 +6,7 @@ and post-deanonymization auditing statistics.
 """
 
 import json
+import logging
 import os
 import re
 from pathlib import Path
@@ -196,6 +197,7 @@ def save_results(
     orig_to_written: Optional[Dict[str, str]] = None,
     output_pdf: bool = False,
     redact: bool = False,
+    table_privacy: Optional[dict] = None,
 ) -> tuple[str, str]:
     """
     Save the anonymized text and the mapping to files.
@@ -262,7 +264,22 @@ def save_results(
         if is_word_path(file_path):
             write_anonymized_docx(file_path, anonymized_output_file, apply_map, texts)
         else:
-            write_anonymized_table(file_path, anonymized_output_file, apply_map, texts)
+            privacy_report = write_anonymized_table(
+                file_path,
+                anonymized_output_file,
+                apply_map,
+                texts,
+                table_privacy=table_privacy,
+            )
+            if privacy_report is not None:
+                from pdf_anonymizer_core.table_privacy import (
+                    write_table_privacy_report,
+                )
+
+                report_path = write_table_privacy_report(
+                    privacy_report, anonymized_output_file
+                )
+                logging.info("Table privacy report: %s", report_path)
     else:
         with open(anonymized_output_file, "w", encoding="utf-8") as f:
             f.write(full_anonymized_text)

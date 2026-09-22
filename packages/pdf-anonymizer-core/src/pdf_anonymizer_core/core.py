@@ -707,6 +707,9 @@ def anonymize_tabular_file(
     use_llm: bool = True,
     use_ner: bool = False,
     min_confidence: float = 0.0,
+    k: Optional[int] = None,
+    quasi_columns: Optional[List[str]] = None,
+    sensitive_column: Optional[str] = None,
 ) -> Tuple[str, Dict[str, str], Tuple[str, ...]]:
     """Anonymize a CSV/Excel file cell by cell.
 
@@ -785,6 +788,15 @@ def anonymize_tabular_file(
         entity["text"] for entity in entities_to_process if entity.get("text")
     )
     apply_mapping_to_table(doc, final_mapping, entity_texts)
+    if k is not None:
+        from pdf_anonymizer_core.table_privacy import apply_table_privacy
+
+        apply_table_privacy(
+            doc,
+            k=k,
+            quasi_columns=quasi_columns,
+            sensitive_column=sensitive_column,
+        )
     review = flatten_table_for_review(doc, anonymized=True)
     return review, final_mapping, entity_texts
 

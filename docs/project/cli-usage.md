@@ -44,6 +44,9 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--redact` / `--no-redact` | flag | off | Irreversible native PDF (black boxes, no stand-in). Implies `--output-pdf`. |
 | `--ner` / `--no-ner` | flag | auto | Local span NER (GLiNER extra) for names and organizations. Auto-on when the extra is installed (except regex-only). `best-speed` / `best-cost` then skip the language model. |
 | `--min-confidence` | `0–1` | `0` | Drop spans whose [score](terminology.md#recognizer-source-and-score) is below this value. Default 0 keeps every hit. Not a calibrated probability. |
+| `--k` | integer ≥ 2 | *none* | CSV/Excel only. Generalize or suppress quasi-identifier columns until each combination appears at least K times. Writes `data/stats/<stem>.table_privacy.json`. Does not rewrite PDFs. An aid, not a certificate. |
+| `--quasi-columns` | `zip,gender` | header hints | Quasi-identifier headers for `--k`. Default matches zip, gender, age, birth date, city, and state. |
+| `--sensitive-column` | header | *none* | With `--k`, report ℓ-diversity and t-closeness for this column. The column is not generalized. |
 
 ### Configuration Profiles
 
