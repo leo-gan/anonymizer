@@ -1014,7 +1014,7 @@ wheels = [
 
 [[package]]
 name = "id-extract"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "packages/id-extract" }
 dependencies = [
     { name = "google-re2" },
@@ -2235,7 +2235,7 @@ wheels = [
 
 [[package]]
 name = "pdf-anonymizer-api"
-version = "0.28.0"
+version = "0.29.0"
 source = { editable = "packages/pdf-anonymizer-api" }
 dependencies = [
     { name = "fastapi" },
@@ -2252,7 +2252,7 @@ requires-dist = [
 
 [[package]]
 name = "pdf-anonymizer-cli"
-version = "0.28.0"
+version = "0.29.0"
 source = { editable = "packages/pdf-anonymizer-cli" }
 dependencies = [
     { name = "pdf-anonymizer-core" },
@@ -2284,7 +2284,7 @@ provides-extras = ["excel", "docx", "ner"]
 
 [[package]]
 name = "pdf-anonymizer-core"
-version = "0.28.0"
+version = "0.29.0"
 source = { editable = "packages/pdf-anonymizer-core" }
 dependencies = [
     { name = "cryptography" },
@@ -2346,7 +2346,7 @@ provides-extras = ["google", "ollama", "huggingface", "openrouter", "openai", "a
 
 [[package]]
 name = "pdf-anonymizer-workspace"
-version = "0.28.0"
+version = "0.29.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
