@@ -4,6 +4,8 @@
 **Audience:** maintainers only  
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
+The next backlog is [`real-life-plan.md`](real-life-plan.md). Item 27 below is carried there as the security-review item. Do not reopen items 1–26.
+
 ## Progress
 
 - [x] 1. Prompt: implied / contextual PII — done 2026-08-14, [PR #40](https://github.com/leo-gan/anonymizer/pull/40)
