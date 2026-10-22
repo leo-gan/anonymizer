@@ -23,7 +23,21 @@ SOURCES_PATH = EVAL_DIR / "sources.json"
 DOMAIN_PACK_PATH = EVAL_DIR / "domain_pack.json"
 MINI_TAB_PATH = EVAL_DIR / "fixture.json"
 BASELINE_PATH = EVAL_DIR / "baselines" / "gold_corpus_regex_only.json"
+NER_BASELINE_PATH = EVAL_DIR / "baselines" / "gold_corpus_ner.json"
+LOCAL_DETAILED_BASELINE_PATH = (
+    EVAL_DIR / "baselines" / "gold_corpus_local_detailed.json"
+)
+CLOSED_DETAILED_BASELINE_PATH = (
+    EVAL_DIR / "baselines" / "gold_corpus_closed_detailed.json"
+)
 ID_EXTRACT_BASELINE_PATH = EVAL_DIR / "baselines" / "gold_corpus_id_extract.json"
+
+PROFILE_BASELINES = {
+    "regex-only": BASELINE_PATH,
+    "ner": NER_BASELINE_PATH,
+    "local-detailed": LOCAL_DETAILED_BASELINE_PATH,
+    "closed-detailed": CLOSED_DETAILED_BASELINE_PATH,
+}
 
 STRUCTURED_TYPES = frozenset(
     {
@@ -449,6 +463,73 @@ def load_gold_corpus(
     if max_docs is not None:
         documents = documents[: max(0, max_docs)]
     return documents
+
+
+def expand_predictions_to_spans(
+    text: str, entities: Sequence[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Give each predicted string the character spans where it occurs.
+
+    Gold mentions are stored with offsets. A language-model hit is only the
+    string. Scoring matches offsets, so a string with no offsets cannot hit
+    a span. Every exact occurrence becomes one prediction. A string that is
+    not in the document stays, without offsets, and counts as a miss.
+    """
+    found: List[Dict[str, Any]] = []
+    seen_strings = set()
+    for entity in entities:
+        needle = str(entity.get("text") or "")
+        if not needle or needle in seen_strings:
+            continue
+        seen_strings.add(needle)
+        start = 0
+        hits = 0
+        while True:
+            index = text.find(needle, start)
+            if index < 0:
+                break
+            hits += 1
+            item = dict(entity)
+            item["start"] = index
+            item["end"] = index + len(needle)
+            found.append(item)
+            start = index + len(needle)
+        if hits == 0:
+            found.append(dict(entity))
+    return found
+
+
+def align_predictions(
+    text: str, entities: Sequence[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Keep spans the detector already has, and locate the rest in ``text``.
+
+    The same span from regex and from the language model is kept once.
+    Mention precision counts every prediction, so a duplicate span would
+    look like an extra false positive.
+    """
+    found: List[Dict[str, Any]] = []
+    seen = set()
+    loose: List[Dict[str, Any]] = []
+    for entity in entities:
+        start, end = entity.get("start"), entity.get("end")
+        if isinstance(start, int) and isinstance(end, int):
+            key = (start, end, str(entity.get("text") or ""))
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append(entity)
+        else:
+            loose.append(entity)
+    for entity in expand_predictions_to_spans(text, loose):
+        start, end = entity.get("start"), entity.get("end")
+        if isinstance(start, int) and isinstance(end, int):
+            key = (start, end, str(entity.get("text") or ""))
+            if key in seen:
+                continue
+            seen.add(key)
+        found.append(entity)
+    return found
 
 
 def evaluate_documents(

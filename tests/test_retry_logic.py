@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 
-from pdf_anonymizer_core.call_llm import identify_entities_with_llm
+from pdf_anonymizer_core.call_llm import extract_json_object, identify_entities_with_llm
 from pdf_anonymizer_core.prompts import simple
 
 
@@ -124,6 +124,10 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
 
         self.assertEqual(entities, [])
         self.assertEqual(mock_provider.call.call_count, 3)
+
+    def test_extract_json_object_drops_thinking_and_prose(self):
+        raw = '<think>hidden</think>\nHere is the list:\n```json\n{"entities": []}\n```'
+        self.assertEqual(extract_json_object(raw), '{"entities": []}')
 
 
 if __name__ == "__main__":

@@ -26,15 +26,9 @@ This is not a legal privacy proof and not a HIPAA or GDPR certificate.
 
 Scores follow the TAB split (mention vs entity, direct vs quasi). Definitions: [leftover](terminology.md#leftover), [gold-corpus](terminology.md#gold-corpus), [how we measure](terminology.md#how-we-measure).
 
-**Honesty.** The committed regex-only baseline is one run of this package’s regex stage. It is not a cross-tool ranking. Names and most legal quasi-identifiers stay in the clear until a language model or a later NER stage exists. Do not copy these numbers onto the README as marketing.
+**Honesty.** Each row is one run of this package, not a cross-tool ranking. The regex-only row misses names. The local row is RE2 plus the detailed prompt on `ollama/gemma4:12b-it-qat` (quantization-aware 4-bit, thinking off, context 8192). The closed row is the same prompt on a billed API model and is empty until that run is approved. Do not copy these numbers onto the README as marketing.
 
-Regex-only on the full downloaded set (6,761 documents), stored in `tests/eval/baselines/gold_corpus_regex_only.json`:
-
-| Profile | Mention F1 | Leftover | Structured leftover |
-|---|---:|---:|---:|
-| regex-only | 0.262 | 0.576 | 0.039 |
-| ner | — | — | not shipped (item 20) |
-| detailed LLM | — | — | opt-in; not required in PR CI |
+The numbers live in `tests/eval/baselines/`. `make gold-table` prints mention F1, entity F1, direct F1, quasi F1, leftover, and structured leftover. A profile with no baseline file is a blank row. Pull-request CI scores regex-only on the committed fixtures and does not download a model.
 
 ---
 
@@ -95,7 +89,7 @@ make gold-table
 uv run python scripts/eval_public_table.py
 ```
 
-The table is `tests/eval/baselines/public_eval_table.md`. NER is a placeholder until item 20. Live `detailed` scoring is `--llm --model-name …` and is not part of PR CI.
+The table is `tests/eval/baselines/public_eval_table.md`. A language-model row appears after `scripts/run_gold_benchmark.py --profile local-detailed` or `--profile closed-detailed` writes its baseline. Those runs are not part of PR CI.
 
 ### 4. PR CI completeness gate
 

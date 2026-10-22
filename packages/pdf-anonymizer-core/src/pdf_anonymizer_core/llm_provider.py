@@ -18,6 +18,8 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
+from contextvars import ContextVar
+from dataclasses import dataclass
 from threading import Lock
 from typing import Any, Dict, Optional
 
@@ -75,6 +77,83 @@ class LocalLLMCache:
 
 _cache_instance: Optional[LocalLLMCache] = None
 _cache_enabled: bool = True
+
+
+@dataclass
+class LlmRunStats:
+    """Counters for one benchmark or batch. Token fields are provider counts when the response has them."""
+
+    calls: int = 0
+    parse_failures: int = 0
+    prompt_tokens: int = 0
+    output_tokens: int = 0
+
+
+_llm_stats: ContextVar[Optional[LlmRunStats]] = ContextVar(
+    "anonymizer_llm_stats", default=None
+)
+
+
+def bind_llm_stats(stats: Optional[LlmRunStats]):
+    """Count calls while ``stats`` is bound. Returns the reset token."""
+    return _llm_stats.set(stats)
+
+
+def reset_llm_stats(token) -> None:
+    _llm_stats.reset(token)
+
+
+def current_llm_stats() -> Optional[LlmRunStats]:
+    return _llm_stats.get()
+
+
+def _note_usage(prompt_tokens: int, output_tokens: int) -> None:
+    stats = _llm_stats.get()
+    if stats is None:
+        return
+    stats.prompt_tokens += int(prompt_tokens or 0)
+    stats.output_tokens += int(output_tokens or 0)
+
+
+def _ollama_chat_kwargs() -> Dict[str, Any]:
+    """Optional Ollama settings for a scored local run.
+
+    ``ANONYMIZER_OLLAMA_NUM_CTX`` is the context window. ``ANONYMIZER_OLLAMA_THINK``
+    is ``true`` or ``false``. ``ANONYMIZER_OLLAMA_TEMPERATURE`` is a float.
+    Unset variables leave Ollama's own defaults in place.
+    """
+    kwargs: Dict[str, Any] = {}
+    options: Dict[str, Any] = {}
+    num_ctx = os.getenv("ANONYMIZER_OLLAMA_NUM_CTX")
+    if num_ctx:
+        options["num_ctx"] = int(num_ctx)
+    temperature = os.getenv("ANONYMIZER_OLLAMA_TEMPERATURE")
+    if temperature:
+        options["temperature"] = float(temperature)
+    if options:
+        kwargs["options"] = options
+    think = os.getenv("ANONYMIZER_OLLAMA_THINK")
+    if think:
+        kwargs["think"] = think.strip().lower() in {"1", "true", "yes"}
+    return kwargs
+
+
+def _ollama_content_and_usage(response: Any) -> tuple[str, int, int]:
+    if isinstance(response, dict):
+        message = response.get("message") or {}
+        content = message.get("content") or ""
+        return (
+            content,
+            int(response.get("prompt_eval_count") or 0),
+            int(response.get("eval_count") or 0),
+        )
+    message = getattr(response, "message", None)
+    content = getattr(message, "content", None) or ""
+    return (
+        str(content),
+        int(getattr(response, "prompt_eval_count", 0) or 0),
+        int(getattr(response, "eval_count", 0) or 0),
+    )
 
 
 def configure_cache(
@@ -176,17 +255,23 @@ class OllamaProvider(LLMProvider):
     def _call_raw(
         self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
     ) -> str:
-        response: Dict[str, Any] = self.ollama.chat(
-            model=model_name,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if (
-            isinstance(response, dict)
-            and "message" in response
-            and "content" in response["message"]
-        ):
-            return response["message"]["content"]
-        return ""
+        kwargs = _ollama_chat_kwargs()
+        try:
+            response: Any = self.ollama.chat(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                **kwargs,
+            )
+        except TypeError:
+            kwargs.pop("think", None)
+            response = self.ollama.chat(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                **kwargs,
+            )
+        content, prompt_tokens, output_tokens = _ollama_content_and_usage(response)
+        _note_usage(prompt_tokens, output_tokens)
+        return content
 
 
 class HuggingFaceProvider(LLMProvider):

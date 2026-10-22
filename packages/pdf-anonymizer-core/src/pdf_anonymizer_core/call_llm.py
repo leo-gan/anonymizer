@@ -14,7 +14,24 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from pdf_anonymizer_core.conf import get_provider_and_model_name
-from pdf_anonymizer_core.llm_provider import get_provider
+from pdf_anonymizer_core.llm_provider import current_llm_stats, get_provider
+
+
+def extract_json_object(raw: str) -> str:
+    """Return the JSON object inside a model reply.
+
+    Models often wrap the object in a fence, a thinking block, or a sentence.
+    The parser keeps the outermost braces and leaves a bare JSON string unchanged.
+    """
+    text = (raw or "").strip()
+    if "</think>" in text:
+        text = text.split("</think>", 1)[1].strip()
+    text = text.replace("```json", "").replace("```", "").strip()
+    start = text.find("{")
+    end = text.rfind("}")
+    if start >= 0 and end > start:
+        return text[start : end + 1]
+    return text
 
 
 # Pydantic models for structured output parsing
@@ -125,11 +142,12 @@ def identify_entities_with_llm(
             )
             provider_name, actual_model_name = get_provider_and_model_name(model_name)
             provider = get_provider(provider_name)
+            stats = current_llm_stats()
+            if stats is not None:
+                stats.calls += 1
             raw_text = provider.call(prompt, actual_model_name)
 
-            cleaned_response = (
-                raw_text.strip().replace("```json", "").replace("```", "").strip()
-            )
+            cleaned_response = extract_json_object(raw_text)
 
             # Validate and parse response using Pydantic
             result = IdentificationResult.model_validate_json(cleaned_response)
@@ -146,6 +164,10 @@ def identify_entities_with_llm(
 
         except Exception as e:
             is_retryable, category = classify_error(e)
+            if category == "PARSING_ERROR":
+                stats = current_llm_stats()
+                if stats is not None:
+                    stats.parse_failures += 1
             logging.error(
                 f"Attempt {attempt + 1} failed with error category '{category}': {e}"
             )

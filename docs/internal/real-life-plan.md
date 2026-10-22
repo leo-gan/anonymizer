@@ -67,10 +67,10 @@ Score four rows. Do not score `gemini-2.5-pro`, which is still the `best-quality
 |---|---|---|
 | `regex-only` | none | Floor. Offline. Already the CI gate. |
 | `ner` | `urchade/gliner_small-v2.1` | Fast local detector. No language model. |
-| `local-detailed` | `ollama/qwen3.6:27b` | Careful local path. Detailed prompt. This is the real-life row. |
+| `local-detailed` | `ollama/gemma4:12b-it-qat` | Careful local path. RE2 plus the detailed prompt. Approved 2026-10-22. |
 | `closed-detailed` | `google/gemini-3.8-flash` | Full corpus, paid Gemini API. Detailed prompt. |
 
-`qwen3.6:27b` is the local model because the careful prompt must come back as JSON, and a 27B Qwen holds that shape more reliably than `phi4-mini` (the README example, about 4B, 16k context). The Q4 weights need about 24 GB. If the scoring machine has less, use `ollama/gemma4:12b` and write that id in the baseline. Do not publish `phi4-mini` as the local row. An optional fifth file may record it later so the README example has a number.
+`gemma4:12b-it-qat` is the local model. It is an 11.9B quantization-aware 4-bit build, about 7.2 GB. The scoring machine is an RTX A2000 with 8 GB, so a 27B Q4 file does not stay on the GPU. The run sets `num_ctx` 8192, thinking off, and temperature 0. Ollama on this machine must be new enough to load Gemma 4 (0.30 or later). The row is RE2 plus the detailed prompt. It does not include GLiNER. `phi4-mini` stays the README example and is not this row.
 
 `gemini-3.8-flash` is the closed model for the full 6,761 documents. It is the current Flash id, introductory API price $0.75 / $3.75 per million input / output tokens through 31 December 2026, then $1.50 / $7.50. Gemini 3.5 Flash-Lite is cheaper ($0.30 / $2.50) and is the wrong model for identity clues. Gemini 4 Argon and Gemini 3.1 Pro are stronger and several times the output cost. Google AI Plus does not include them. They stay off the full run.
 
@@ -83,7 +83,7 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - Teach `scripts/run_gold_benchmark.py` a `--profile regex-only|ner|local-detailed|closed-detailed` switch. `regex-only` stays the default and stays offline.
 - `ner` calls `extract_entities_via_ner` on each gold document, then the same `evaluate_documents` and `leftover_report` path. Skip with a clear message when the `[ner]` extra or the checkpoint is absent. Do not download a model inside pull-request CI.
 - Write `tests/eval/baselines/gold_corpus_ner.json` only from an explicit `--write-baseline` on a machine that has the model. Record package version, model id, document count, and the corpus manifest hashes that `gold_corpus_regex_only.json` already records.
-- `local-detailed` calls the detailed prompt through `ollama/qwen3.6:27b` (or the fallback id above). It writes `tests/eval/baselines/gold_corpus_local_detailed.json`. Pull-request CI must not pull the weights.
+- `local-detailed` runs RE2 plus the detailed prompt through `ollama/gemma4:12b-it-qat`, with `num_ctx` 8192, thinking off, and temperature 0. It writes `tests/eval/baselines/gold_corpus_local_detailed.json`. Pull-request CI must not pull the weights.
 - `closed-detailed` calls the detailed prompt through `google/gemini-3.8-flash` on a billed `GOOGLE_API_KEY`. It writes `tests/eval/baselines/gold_corpus_closed_detailed.json`. Pull-request CI must not call it. Pass `--model-name` so a later sample run can target `grok` without a second script.
 - Change `scripts/eval_public_table.py` so a row is filled when its baseline file exists, and the placeholder text no longer says item 20 is unshipped. Mention precision, recall, F1, leftover, and structured leftover stay the columns. Add entity F1 beside mention F1. The scorer already computes it.
 - Re-run regex-only on the current tree and replace the 0.17.0 baseline in the same pull request, so the rows are comparable.
@@ -96,7 +96,7 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - Do not lower the existing CI gate (structured mention recall 1.0 and structured leftover 0 on mini-tab plus the domain pack).
 - Do not fail CI when the large downloaded corpus is absent.
 
-**Done when:** `make gold-table` prints a NER row from a committed file, or an explicit "not measured on this machine" line. The checked-in table has a real NER row, a `local-detailed` row for `ollama/qwen3.6:27b` (or the recorded fallback), and a `closed-detailed` row for `google/gemini-3.8-flash`, each with its model id. A missing opt-in run stays a line that says it was not run. The regex row's `package_version` matches `pdf-anonymizer-core`.
+**Done when:** `make gold-table` prints a NER row from a committed file, or an explicit "not measured on this machine" line. The checked-in table has a real NER row, a `local-detailed` row for `ollama/gemma4:12b-it-qat`, and a `closed-detailed` row for the approved closed model, each with its model id. A missing opt-in run stays a line that says it was not run. The regex row's `package_version` matches `pdf-anonymizer-core`.
 
 **Touches:** `scripts/run_gold_benchmark.py`, `scripts/eval_public_table.py`, `tests/eval/baselines/`, `docs/project/gold-corpus.md`, a unit test that the table renderer fills a row from a tiny fixture.
 
