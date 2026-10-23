@@ -193,7 +193,10 @@ def _load_checkpoint(path: Optional[Path]) -> Dict[str, List[Dict[str, Any]]]:
             line = line.strip()
             if not line:
                 continue
-            row = json.loads(line)
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
             found[str(row["key"])] = list(row.get("predictions") or [])
     return found
 
@@ -285,6 +288,8 @@ def run_benchmark(
         runtime = {"stages": ["ner"]}
 
     saved = _load_checkpoint(checkpoint)
+    if saved:
+        print(f"resuming {len(saved)} checkpointed documents", flush=True)
     predictions: List[List[Dict[str, Any]]] = []
     started = time.monotonic()
     try:
@@ -300,7 +305,13 @@ def run_benchmark(
             else:
                 if not resolved_model:
                     raise SystemExit(f"--profile {profile} requires --model-name")
+                before_failures = stats.transport_failures if stats is not None else 0
                 predicted = _predict_detailed(text, resolved_model)
+                if stats is not None and stats.transport_failures > before_failures:
+                    raise SystemExit(
+                        f"Language model unreachable at {key}. "
+                        "This document was not checkpointed."
+                    )
                 _append_checkpoint(checkpoint, key, predicted)
             predictions.append(predicted)
             if profile == "regex-only":
@@ -363,6 +374,7 @@ def run_benchmark(
         report["llm_stats"] = {
             "calls": stats.calls,
             "parse_failures": stats.parse_failures,
+            "transport_failures": stats.transport_failures,
             "prompt_tokens": stats.prompt_tokens,
             "output_tokens": stats.output_tokens,
         }

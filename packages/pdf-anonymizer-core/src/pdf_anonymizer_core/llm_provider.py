@@ -85,6 +85,7 @@ class LlmRunStats:
 
     calls: int = 0
     parse_failures: int = 0
+    transport_failures: int = 0
     prompt_tokens: int = 0
     output_tokens: int = 0
 
