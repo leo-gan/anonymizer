@@ -18,7 +18,7 @@
         <link rel="prev" href="../recipes/">
       
       
-        <link rel="next" href="../mapping-security/">
+        <link rel="next" href="../eval-results/">
       
       
         
@@ -2406,6 +2406,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../eval-results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../mapping-security/" class="md-nav__link">
         
   
@@ -2714,38 +2742,7 @@
 <hr />
 <h2 id="what-we-measure">What we measure<a class="headerlink" href="#what-we-measure" title="Permanent link">&para;</a></h2>
 <p>Scores follow the TAB split (mention vs entity, direct vs quasi). Definitions: <a href="../terminology/#leftover">leftover</a>, <a href="../terminology/#gold-corpus">gold-corpus</a>, <a href="../terminology/#how-we-measure">how we measure</a>.</p>
-<p><strong>Honesty.</strong> The committed regex-only baseline is one run of this package’s regex stage. It is not a cross-tool ranking. Names and most legal quasi-identifiers stay in the clear until a language model or a later NER stage exists. Do not copy these numbers onto the README as marketing.</p>
-<p>Regex-only on the full downloaded set (6,761 documents), stored in <code>tests/eval/baselines/gold_corpus_regex_only.json</code>:</p>
-<table>
-<thead>
-<tr>
-<th>Profile</th>
-<th style="text-align: right;">Mention F1</th>
-<th style="text-align: right;">Leftover</th>
-<th style="text-align: right;">Structured leftover</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>regex-only</td>
-<td style="text-align: right;">0.262</td>
-<td style="text-align: right;">0.576</td>
-<td style="text-align: right;">0.039</td>
-</tr>
-<tr>
-<td>ner</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">not shipped (item 20)</td>
-</tr>
-<tr>
-<td>detailed LLM</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">opt-in; not required in PR CI</td>
-</tr>
-</tbody>
-</table>
+<p>The charts, the source split, and the Gemma-versus-Argon sample are on <strong><a href="../eval-results/">Evaluation results</a></strong>. Pull-request CI scores regex-only on the committed fixtures and does not call an API.</p>
 <hr />
 <h2 id="what-is-in-the-corpus">What is in the corpus<a class="headerlink" href="#what-is-in-the-corpus" title="Permanent link">&para;</a></h2>
 <p>The catalog is <code>tests/eval/sources.json</code>.</p>
@@ -2823,7 +2820,7 @@
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># or</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_public_table.py
 </span></code></pre></div>
-<p>The table is <code>tests/eval/baselines/public_eval_table.md</code>. NER is a placeholder until item 20. Live <code>detailed</code> scoring is <code>--llm --model-name …</code> and is not part of PR CI.</p>
+<p>The table is <code>tests/eval/baselines/public_eval_table.md</code>. A language-model row appears after <code>scripts/run_gold_benchmark.py --profile local-detailed</code> or <code>--profile closed-detailed</code> writes its baseline. Those runs are not part of PR CI.</p>
 <h3 id="4-pr-ci-completeness-gate">4. PR CI completeness gate<a class="headerlink" href="#4-pr-ci-completeness-gate" title="Permanent link">&para;</a></h3>
 <p><code>.github/workflows/ci.yml</code> runs <code>make test-cov</code>. That job includes:</p>
 <table>
@@ -2875,6 +2872,7 @@
 <hr />
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
+<li><a href="../eval-results/">Evaluation results</a> — charts for the regex, Gemma 4, and Argon sample runs</li>
 <li><a href="../terminology/">Terminology</a> — leftover, mention, quasi-identifier, TAB</li>
 <li><a href="../recipes/#gold-corpus-benchmark">Recipes</a> — the same commands in the recipe list</li>
 <li><a href="../../101/why-anonymization/">Why Anonymize?</a> — sectors the domain pack covers</li>
