@@ -55,7 +55,7 @@ Items 1, 2, and 3 can merge in any order. Item 4 waits on the token from item 3.
 
 ### 1. Publish NER and careful-LLM scores
 
-**Status:** local row measured 2026-10-24 (`ollama/gemma4:12b-it-qat`, 6,761 documents, mention F1 0.564, leftover 0.241). Closed row is `gemini-4-argon` on a stratified sample only, approved 2026-10-24. The first call was rejected: the key's project is on the free tier, and Argon's free quota is 0.
+**Status:** local row measured 2026-10-24 (`ollama/gemma4:12b-it-qat`, 6,761 documents, mention F1 0.564, leftover 0.241). Closed sample measured 2026-10-24 (`gemini-4-argon`, 82 documents, seed 20261024, mention F1 0.416, leftover 0.438). On those same 82 documents Gemma mention F1 is 0.365 and leftover is 0.505.
 
 **Why:** The regex-only F1 of 0.26 is the number a reader can cite, and it measures the mode that misses names. A hospital or a law firm will ask for the other rows. The real-life careful path is a local Ollama model. One closed model is the ceiling on the same documents.
 

@@ -26,14 +26,23 @@ This is not a legal privacy proof and not a HIPAA or GDPR certificate.
 
 Scores follow the TAB split (mention vs entity, direct vs quasi). Definitions: [leftover](terminology.md#leftover), [gold-corpus](terminology.md#gold-corpus), [how we measure](terminology.md#how-we-measure).
 
-**Honesty.** Each row is one run of this package, not a cross-tool ranking. The local row is RE2 plus the detailed prompt on `ollama/gemma4:12b-it-qat` (quantization-aware 4-bit, thinking off, context 8192, temperature 0), scored on 24 October 2026. The closed row stays empty until that run is approved. Do not copy these numbers onto the README as marketing.
+**Honesty.** Each row is one run of this package, not a cross-tool ranking. The local row is RE2 plus the detailed prompt on `ollama/gemma4:12b-it-qat` (quantization-aware 4-bit, thinking off, context 8192, temperature 0), scored on 24 October 2026. The closed row is a sample, not the full corpus. Do not copy these numbers onto the README as marketing.
 
 | Profile | Docs | Mention F1 | Direct F1 | Quasi F1 | Leftover | Structured leftover |
 |---|---:|---:|---:|---:|---:|---:|
 | regex-only | 6761 | 0.262 | 0.293 | 0.235 | 0.576 | 0.039 |
 | local-detailed | 6761 | 0.564 | 0.560 | 0.325 | 0.241 | 0.001 |
 
-Court text is the weak slice. TAB mention F1 is 0.327 and leftover is 0.564. Gretel mention F1 is 0.703 and leftover is 0.053. The numbers live in `tests/eval/baselines/`. Pull-request CI scores regex-only on the committed fixtures and does not download a model.
+Court text is the weak slice of the full local run. TAB mention F1 is 0.327 and leftover is 0.564. Gretel mention F1 is 0.703 and leftover is 0.053.
+
+`gemini-4-argon` was scored on 82 documents only: all 7 mini-tab and domain-pack pages, plus 25 each from Gretel, Presidio, and TAB, seed `20261024`. Thinking was off. The same 82 documents, scored from the saved Gemma predictions:
+
+| Model on those 82 documents | Mention F1 | Direct F1 | Quasi F1 | Leftover | Structured leftover |
+|---|---:|---:|---:|---:|---:|
+| `gemma4:12b-it-qat` | 0.365 | 0.505 | 0.181 | 0.505 | 0.000 |
+| `gemini-4-argon` | 0.416 | 0.330 | 0.268 | 0.438 | 0.000 |
+
+Argon hides more gold mentions, especially on TAB (leftover 0.497 against Gemma's 0.575). Its direct precision is 0.210, so many of the spans it marks are not direct identifiers. Do not read the 82-document row as a full-corpus score. The numbers live in `tests/eval/baselines/`. Pull-request CI scores regex-only on the committed fixtures and does not call an API.
 
 ---
 
