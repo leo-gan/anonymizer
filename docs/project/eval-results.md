@@ -33,7 +33,7 @@ xychart-beta
 | TAB court cases | 254 | 0.936 | 0.564 | 0.014 | 0.327 |
 | Domain pack | 6 | 0.361 | 0.000 | 0.571 | 0.815 |
 
-Court cases are the weak slice. Regex leaves 94% of those mentions visible because the labels are names, places, and dates, not emails. Gemma still leaves 56%.
+Court cases are the weak slice of this table. The next section says what that 56% actually is.
 
 ---
 
@@ -61,6 +61,35 @@ xychart-beta
 | Research | 96 | 0.634 | 0.015 |
 
 Healthcare leftover is 3.1%. Mention F1 there is 0.67, so some labeled spans are still missed or marked as the wrong kind, but most of the labeled text is no longer in the output.
+
+---
+
+## Why the legal number is not a name leak
+
+The legal domain is 323 documents: 254 TAB court cases, 68 Gretel pages whose source label is `legal-documents`, and 1 domain-pack page. Offsets were checked against the document text. None of the 14,308 legal mentions disagree with their recorded span.
+
+| Slice | Documents | Gold mentions | Leftover |
+|---|---:|---:|---:|
+| Gretel `legal-documents` | 68 | 286 | 0.042 |
+| Domain-pack legal page | 1 | 6 | 0.000 |
+| TAB court cases | 254 | 14,016 | 0.564 |
+
+The domain rate of 0.553 is the court cases. Gretel’s legal pages behave like the other synthetic sets.
+
+TAB marks a mention as direct or quasi separately from its type. On the 254 cases, direct leftover is 99 of 845 mentions (0.117). Quasi leftover is 7,803 of 13,171 (0.592). Dates are the mass:
+
+| TAB type | Kind | Hidden | Still visible |
+|---|---|---:|---:|
+| Date | quasi | 69 | 5,331 |
+| Demographic phrase | quasi | 549 | 1,873 |
+| Person | quasi | 1,620 | 208 |
+| Person | direct | 435 | 84 |
+| Organization | quasi | 1,837 | 239 |
+| Code or id | direct | 299 | 2 |
+
+A date such as `29 November 1996` is still in the masked judgment. So are quasi phrases the annotators marked and the model did not emit: `Swedish`, `widows`, `two`, `son`. Of the 7,902 leftover mentions, 7,770 were never covered by a replacement at their own span. The other 132 were covered, and the string still occurs somewhere else in the case. Names and id codes in the same cases are mostly gone.
+
+One regex does distort the court-case output without causing that leftover. The Canadian licence pattern includes `\b[A-Z0-9]{5,15}\b`. On these judgments it fires 1,459 times. `PROCEDURE` and `FACTS`, the section headings, become `DRIVERS_LICENSE_CA` on all 254 cases. Dates contain spaces, so this pattern does not hide them and does not create the 56% rate. It does add false predictions and rewrites headings.
 
 ---
 
