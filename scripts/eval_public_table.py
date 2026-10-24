@@ -121,6 +121,13 @@ def _note_for(profile: str, report: Dict[str, Any]) -> str:
         return "span NER only"
     if profile == "local-detailed":
         return "RE2 + detailed prompt, think off, num_ctx 8192"
+    sample = report.get("sample") or {}
+    if sample:
+        return (
+            f"sample of {sample.get('documents')} docs, "
+            f"{sample.get('per_source')} per large source, seed {sample.get('seed')}; "
+            "not the full corpus"
+        )
     return "RE2 + detailed prompt, paid API"
 
 

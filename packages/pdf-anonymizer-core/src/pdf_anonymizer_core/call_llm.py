@@ -179,7 +179,10 @@ def identify_entities_with_llm(
                     logging.error(
                         f"Fatal error category '{category}'. Stopping retries."
                     )
-                if category == "CONNECTION_ERROR" or "connect" in str(e).lower():
+                if (
+                    category in {"CONNECTION_ERROR", "RATE_LIMIT_ERROR"}
+                    or "connect" in str(e).lower()
+                ):
                     failed = current_llm_stats()
                     if failed is not None:
                         failed.transport_failures += 1

@@ -88,6 +88,7 @@ class LlmRunStats:
     transport_failures: int = 0
     prompt_tokens: int = 0
     output_tokens: int = 0
+    thoughts_tokens: int = 0
 
 
 _llm_stats: ContextVar[Optional[LlmRunStats]] = ContextVar(
@@ -114,6 +115,38 @@ def _note_usage(prompt_tokens: int, output_tokens: int) -> None:
         return
     stats.prompt_tokens += int(prompt_tokens or 0)
     stats.output_tokens += int(output_tokens or 0)
+
+
+def _gemini_config(max_output_tokens: Optional[int]):
+    """Optional Gemini settings. Unset variables leave the API defaults."""
+    temperature = os.getenv("ANONYMIZER_GEMINI_TEMPERATURE")
+    budget = os.getenv("ANONYMIZER_GEMINI_THINKING_BUDGET")
+    if not temperature and budget is None and not max_output_tokens:
+        return None
+    from google.genai import types
+
+    kwargs: Dict[str, Any] = {}
+    if temperature:
+        kwargs["temperature"] = float(temperature)
+    if budget is not None and budget != "":
+        kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=int(budget))
+    if max_output_tokens:
+        kwargs["max_output_tokens"] = max_output_tokens
+    return types.GenerateContentConfig(**kwargs)
+
+
+def _note_gemini_usage(response: Any) -> None:
+    meta = getattr(response, "usage_metadata", None)
+    if meta is None:
+        return
+    _note_usage(
+        int(getattr(meta, "prompt_token_count", 0) or 0),
+        int(getattr(meta, "candidates_token_count", 0) or 0),
+    )
+    stats = _llm_stats.get()
+    if stats is None:
+        return
+    stats.thoughts_tokens += int(getattr(meta, "thoughts_token_count", 0) or 0)
 
 
 def _ollama_chat_kwargs() -> Dict[str, Any]:
@@ -237,7 +270,12 @@ class GoogleProvider(LLMProvider):
         self, prompt: str, model_name: str, max_output_tokens: Optional[int] = None
     ) -> str:
         client = self.genai.Client()
-        response = client.models.generate_content(model=model_name, contents=prompt)
+        call_kwargs: Dict[str, Any] = {"model": model_name, "contents": prompt}
+        config = _gemini_config(max_output_tokens)
+        if config is not None:
+            call_kwargs["config"] = config
+        response = client.models.generate_content(**call_kwargs)
+        _note_gemini_usage(response)
         return response.text if hasattr(response, "text") else ""
 
 

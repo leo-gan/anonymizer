@@ -55,7 +55,7 @@ Items 1, 2, and 3 can merge in any order. Item 4 waits on the token from item 3.
 
 ### 1. Publish NER and careful-LLM scores
 
-**Status:** local row measured 2026-10-24 (`ollama/gemma4:12b-it-qat`, 6,761 documents, mention F1 0.564, leftover 0.241). Closed row is waiting for approval.
+**Status:** local row measured 2026-10-24 (`ollama/gemma4:12b-it-qat`, 6,761 documents, mention F1 0.564, leftover 0.241). Closed row is `gemini-4-argon` on a stratified sample only, approved 2026-10-24. The first call was rejected: the key's project is on the free tier, and Argon's free quota is 0.
 
 **Why:** The regex-only F1 of 0.26 is the number a reader can cite, and it measures the mode that misses names. A hospital or a law firm will ask for the other rows. The real-life careful path is a local Ollama model. One closed model is the ceiling on the same documents.
 
@@ -68,11 +68,11 @@ Score four rows. Do not score `gemini-2.5-pro`, which is still the `best-quality
 | `regex-only` | none | Floor. Offline. Already the CI gate. |
 | `ner` | `urchade/gliner_small-v2.1` | Fast local detector. No language model. |
 | `local-detailed` | `ollama/gemma4:12b-it-qat` | Careful local path. RE2 plus the detailed prompt. Approved 2026-10-22. |
-| `closed-detailed` | `google/gemini-3.8-flash` | Full corpus, paid Gemini API. Detailed prompt. |
+| `closed-detailed` | `google/gemini-4-argon` | Stratified sample only, not the full corpus. Detailed prompt. Thinking off. |
 
 `gemma4:12b-it-qat` is the local model. It is an 11.9B quantization-aware 4-bit build, about 7.2 GB. The scoring machine is an RTX A2000 with 8 GB, so a 27B Q4 file does not stay on the GPU. The run sets `num_ctx` 8192, thinking off, and temperature 0. Ollama on this machine must be new enough to load Gemma 4 (0.30 or later). The row is RE2 plus the detailed prompt. It does not include GLiNER. `phi4-mini` stays the README example and is not this row.
 
-`gemini-3.8-flash` is the closed model for the full 6,761 documents. It is the current Flash id, introductory API price $0.75 / $3.75 per million input / output tokens through 31 December 2026, then $1.50 / $7.50. Gemini 3.5 Flash-Lite is cheaper ($0.30 / $2.50) and is the wrong model for identity clues. Gemini 4 Argon and Gemini 3.1 Pro are stronger and several times the output cost. Google AI Plus does not include them. They stay off the full run.
+`gemini-4-argon` is the closed model, and only on a sample: every mini-tab and domain-pack document, plus 25 documents from each of Gretel, Presidio, and TAB, seed `20261024`. Do not run it on all 6,761 documents. Thinking stays off (`thinking_budget` 0) and temperature is 0. The call needs a billed Gemini API key. Argon has no free-tier quota.
 
 A good Grok subscription (SuperGrok at $30, or the newer X Premium / Super / Ultra plans) does not include API tokens. The xAI API is a separate bill: grok-4.3 is about $1.25 / $2.50 per million, grok-4.7 is about $2 / $6, and 4.7's context is 500k rather than 1M. This repo has no xAI provider (`ModelProvider` is Google, Ollama, Hugging Face, OpenRouter, OpenAI, Anthropic). Do not block item 1 on a new provider. Optional later, on a fixed sample (TAB test, the domain pack, and 200 Gretel docs): `grok-4.3` with reasoning off, via OpenRouter or a small xAI adapter. Use grok-4.7 only on that sample if the 4.3 row is already in hand. Heavy / multi-agent mode is the wrong tool for a span list.
 
@@ -84,7 +84,7 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - `ner` calls `extract_entities_via_ner` on each gold document, then the same `evaluate_documents` and `leftover_report` path. Skip with a clear message when the `[ner]` extra or the checkpoint is absent. Do not download a model inside pull-request CI.
 - Write `tests/eval/baselines/gold_corpus_ner.json` only from an explicit `--write-baseline` on a machine that has the model. Record package version, model id, document count, and the corpus manifest hashes that `gold_corpus_regex_only.json` already records.
 - `local-detailed` runs RE2 plus the detailed prompt through `ollama/gemma4:12b-it-qat`, with `num_ctx` 8192, thinking off, and temperature 0. It writes `tests/eval/baselines/gold_corpus_local_detailed.json`. Pull-request CI must not pull the weights.
-- `closed-detailed` calls the detailed prompt through `google/gemini-3.8-flash` on a billed `GOOGLE_API_KEY`. It writes `tests/eval/baselines/gold_corpus_closed_detailed.json`. Pull-request CI must not call it. Pass `--model-name` so a later sample run can target `grok` without a second script.
+- `closed-detailed` calls the detailed prompt through `google/gemini-4-argon` on a billed `GOOGLE_API_KEY`, with `--sample-per-source 25`. It writes `tests/eval/baselines/gold_corpus_closed_detailed.json` and labels the row as a sample. Pull-request CI must not call it. A rate-limit or connection failure does not checkpoint the document.
 - Change `scripts/eval_public_table.py` so a row is filled when its baseline file exists, and the placeholder text no longer says item 20 is unshipped. Mention precision, recall, F1, leftover, and structured leftover stay the columns. Add entity F1 beside mention F1. The scorer already computes it.
 - Re-run regex-only on the current tree and replace the 0.17.0 baseline in the same pull request, so the rows are comparable.
 - Update `docs/project/gold-corpus.md` so it matches the script. Name the model id next to each row. Keep the sentence that this is not a legal privacy proof.

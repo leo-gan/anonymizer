@@ -17,6 +17,7 @@ import argparse
 import json
 import logging
 import os
+import random
 import sys
 import time
 from collections import defaultdict
@@ -68,7 +69,8 @@ from tests.eval.gold import (  # noqa: E402
 )
 
 LOCAL_MODEL = "ollama/gemma4:12b-it-qat"
-CLOSED_MODEL = "google/gemini-3.8-flash"
+CLOSED_MODEL = "google/gemini-4-argon"
+_ALWAYS_SAMPLE_SOURCES = frozenset({"mini-tab", "domain-pack"})
 LOCAL_NUM_CTX = "8192"
 PROFILES = ("regex-only", "ner", "local-detailed", "closed-detailed")
 
@@ -184,6 +186,41 @@ def _doc_key(document: Dict[str, Any]) -> str:
     return f"{document.get('source')}::{document.get('name')}"
 
 
+def _sample_documents(
+    documents: Sequence[Dict[str, Any]], per_source: int, seed: int
+) -> List[Dict[str, Any]]:
+    """Take every tiny committed source, and ``per_source`` rows from each other source.
+
+    The draw is seeded so a later resume hits the same documents.
+    """
+    grouped: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for document in documents:
+        grouped[str(document.get("source") or "unknown")].append(document)
+    rng = random.Random(seed)
+    chosen: List[Dict[str, Any]] = []
+    for source in sorted(grouped):
+        rows = grouped[source]
+        if source in _ALWAYS_SAMPLE_SOURCES or len(rows) <= per_source:
+            chosen.extend(rows)
+            continue
+        chosen.extend(rng.sample(rows, per_source))
+    return chosen
+
+
+def _configure_closed_runtime() -> Dict[str, Any]:
+    os.environ["ANONYMIZER_GEMINI_TEMPERATURE"] = "0"
+    os.environ["ANONYMIZER_GEMINI_THINKING_BUDGET"] = "0"
+    configure_cache(False)
+    return {
+        "temperature": 0,
+        "thinking_budget": 0,
+        "chunk_size": PROFILE_CONFIGS[ConfigProfile.BEST_QUALITY]["chunk_size"],
+        "chunk_overlap": PROFILE_CONFIGS[ConfigProfile.BEST_QUALITY]["chunk_overlap"],
+        "max_retries": 2,
+        "stages": ["regex", "llm"],
+    }
+
+
 def _load_checkpoint(path: Optional[Path]) -> Dict[str, List[Dict[str, Any]]]:
     found: Dict[str, List[Dict[str, Any]]] = {}
     if path is None or not path.is_file():
@@ -254,6 +291,8 @@ def run_benchmark(
     profile: str = "regex-only",
     model_name: Optional[str] = None,
     checkpoint: Optional[Path] = None,
+    sample_per_source: Optional[int] = None,
+    sample_seed: int = 0,
 ) -> Dict[str, Any]:
     if profile not in PROFILES:
         raise SystemExit(f"Unknown profile {profile!r}. Use one of: {', '.join(PROFILES)}")
@@ -261,6 +300,22 @@ def run_benchmark(
     if not documents:
         raise SystemExit(
             "No gold documents found. Run: uv run python scripts/download_gold_corpus.py"
+        )
+    sample_info: Optional[Dict[str, Any]] = None
+    if sample_per_source is not None:
+        if sample_per_source < 1:
+            raise SystemExit("--sample-per-source must be at least 1")
+        documents = _sample_documents(documents, sample_per_source, sample_seed)
+        sample_info = {
+            "per_source": sample_per_source,
+            "seed": sample_seed,
+            "always_included": sorted(_ALWAYS_SAMPLE_SOURCES),
+            "documents": len(documents),
+            "keys": [_doc_key(document) for document in documents],
+        }
+        print(
+            f"sample {len(documents)} documents, {sample_per_source} per large source, seed {sample_seed}",
+            flush=True,
         )
 
     runtime: Dict[str, Any] = {}
@@ -274,15 +329,9 @@ def run_benchmark(
         stats_token = bind_llm_stats(stats)
     elif profile == "closed-detailed":
         resolved_model = model_name or CLOSED_MODEL
-        configure_cache(False)
+        runtime = _configure_closed_runtime()
         stats = LlmRunStats()
         stats_token = bind_llm_stats(stats)
-        runtime = {
-            "chunk_size": PROFILE_CONFIGS[ConfigProfile.BEST_QUALITY]["chunk_size"],
-            "chunk_overlap": PROFILE_CONFIGS[ConfigProfile.BEST_QUALITY]["chunk_overlap"],
-            "max_retries": 2,
-            "stages": ["regex", "llm"],
-        }
     elif profile == "ner":
         resolved_model = DEFAULT_NER_MODEL
         runtime = {"stages": ["ner"]}
@@ -309,8 +358,8 @@ def run_benchmark(
                 predicted = _predict_detailed(text, resolved_model)
                 if stats is not None and stats.transport_failures > before_failures:
                     raise SystemExit(
-                        f"Language model unreachable at {key}. "
-                        "This document was not checkpointed."
+                        f"Language model call failed at {key} "
+                        "(connection or quota). This document was not checkpointed."
                     )
                 _append_checkpoint(checkpoint, key, predicted)
             predictions.append(predicted)
@@ -366,6 +415,7 @@ def run_benchmark(
         "max_docs": max_docs,
         "corpus_manifest": manifest,
         "runtime": runtime,
+        "sample": sample_info,
         "overall": overall,
         "by_source": by_source,
         "by_domain": by_domain,
@@ -377,6 +427,7 @@ def run_benchmark(
             "transport_failures": stats.transport_failures,
             "prompt_tokens": stats.prompt_tokens,
             "output_tokens": stats.output_tokens,
+            "thoughts_tokens": stats.thoughts_tokens,
         }
     return report
 
@@ -417,6 +468,22 @@ def main() -> None:
     )
     parser.add_argument("--max-docs", type=int, default=None)
     parser.add_argument(
+        "--sample-per-source",
+        type=int,
+        default=None,
+        help=(
+            "Score this many documents from each large source. "
+            "mini-tab and domain-pack are always included whole. "
+            "Use this for a closed-model comparison. Do not use it for the full corpus."
+        ),
+    )
+    parser.add_argument(
+        "--sample-seed",
+        type=int,
+        default=20261024,
+        help="Seed for --sample-per-source.",
+    )
+    parser.add_argument(
         "--profile",
         default="regex-only",
         choices=list(PROFILES),
@@ -449,6 +516,10 @@ def main() -> None:
         if args.sources
         else None
     )
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env")
+    load_dotenv(ROOT / "packages" / "pdf-anonymizer-cli" / ".env")
     logging.basicConfig(level=logging.WARNING)
     checkpoint = Path(args.checkpoint) if args.checkpoint else None
     if args.profile == "local-detailed" and checkpoint is None:
@@ -460,6 +531,8 @@ def main() -> None:
         profile=args.profile,
         model_name=args.model_name,
         checkpoint=checkpoint,
+        sample_per_source=args.sample_per_source,
+        sample_seed=args.sample_seed,
     )
     _print_table(report)
 
