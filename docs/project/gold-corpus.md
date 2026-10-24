@@ -26,9 +26,14 @@ This is not a legal privacy proof and not a HIPAA or GDPR certificate.
 
 Scores follow the TAB split (mention vs entity, direct vs quasi). Definitions: [leftover](terminology.md#leftover), [gold-corpus](terminology.md#gold-corpus), [how we measure](terminology.md#how-we-measure).
 
-**Honesty.** Each row is one run of this package, not a cross-tool ranking. The regex-only row misses names. The local row is RE2 plus the detailed prompt on `ollama/gemma4:12b-it-qat` (quantization-aware 4-bit, thinking off, context 8192). The closed row is the same prompt on a billed API model and is empty until that run is approved. Do not copy these numbers onto the README as marketing.
+**Honesty.** Each row is one run of this package, not a cross-tool ranking. The local row is RE2 plus the detailed prompt on `ollama/gemma4:12b-it-qat` (quantization-aware 4-bit, thinking off, context 8192, temperature 0), scored on 24 October 2026. The closed row stays empty until that run is approved. Do not copy these numbers onto the README as marketing.
 
-The numbers live in `tests/eval/baselines/`. `make gold-table` prints mention F1, entity F1, direct F1, quasi F1, leftover, and structured leftover. A profile with no baseline file is a blank row. Pull-request CI scores regex-only on the committed fixtures and does not download a model.
+| Profile | Docs | Mention F1 | Direct F1 | Quasi F1 | Leftover | Structured leftover |
+|---|---:|---:|---:|---:|---:|---:|
+| regex-only | 6761 | 0.262 | 0.293 | 0.235 | 0.576 | 0.039 |
+| local-detailed | 6761 | 0.564 | 0.560 | 0.325 | 0.241 | 0.001 |
+
+Court text is the weak slice. TAB mention F1 is 0.327 and leftover is 0.564. Gretel mention F1 is 0.703 and leftover is 0.053. The numbers live in `tests/eval/baselines/`. Pull-request CI scores regex-only on the committed fixtures and does not download a model.
 
 ---
 
