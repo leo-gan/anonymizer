@@ -22,6 +22,12 @@ This tool hides personal details in documents and can put them back. It is a rev
 
 Operators, locked maps, HTTP, and the rest live in the [docs](https://leo-gan.github.io/anonymizer/).
 
+## Measured quality
+
+On 6,761 public documents, regex-only leaves 58% of labeled mentions visible (mention F1 0.26). RE2 plus a local Gemma 4 12B model leaves 24% (mention F1 0.56). Emails, cards, and IBANs are almost all hidden. English court cases are the weak slice: 56% of those mentions stay visible.
+
+On the same 82-document sample, Gemini 4 Argon leaves 44% and Gemma leaves 51%. Argon also marks more text that is not a direct identifier. Charts and the source split are on [Evaluation results](https://leo-gan.github.io/anonymizer/project/eval-results/).
+
 ## 📖 Documentation
 
 A comprehensive documentation site is available at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.

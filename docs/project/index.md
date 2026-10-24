@@ -74,6 +74,7 @@ To dive deeper into the technical details, navigate through the following guides
 - **[API Reference (auto)](api-reference.md)**: Living signature reference generated from source docstrings.
 - **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.
 - **[Gold corpus & eval](gold-corpus.md)**: Why we measure leftover risk, what is in the gold corpus, and the download / benchmark / CI workflows.
+- **[Evaluation results](eval-results.md)**: Charts and tables for the regex, local Gemma 4, and Gemini 4 Argon sample runs.
 - **[Mapping encryption](mapping-security.md)**: Argon2id + AES-256-GCM envelopes, AAD, `0600` writes, ephemeral maps, and the tests that lock those in.
 - **[Troubleshooting](troubleshooting.md)**: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.
 - **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.
