@@ -26,15 +26,7 @@ This is not a legal privacy proof and not a HIPAA or GDPR certificate.
 
 Scores follow the TAB split (mention vs entity, direct vs quasi). Definitions: [leftover](terminology.md#leftover), [gold-corpus](terminology.md#gold-corpus), [how we measure](terminology.md#how-we-measure).
 
-**Honesty.** The committed regex-only baseline is one run of this package’s regex stage. It is not a cross-tool ranking. Names and most legal quasi-identifiers stay in the clear until a language model or a later NER stage exists. Do not copy these numbers onto the README as marketing.
-
-Regex-only on the full downloaded set (6,761 documents), stored in `tests/eval/baselines/gold_corpus_regex_only.json`:
-
-| Profile | Mention F1 | Leftover | Structured leftover |
-|---|---:|---:|---:|
-| regex-only | 0.262 | 0.576 | 0.039 |
-| ner | — | — | not shipped (item 20) |
-| detailed LLM | — | — | opt-in; not required in PR CI |
+The charts, the source split, and the Gemma-versus-Argon sample are on **[Evaluation results](eval-results.md)**. Pull-request CI scores regex-only on the committed fixtures and does not call an API.
 
 ---
 
@@ -95,7 +87,7 @@ make gold-table
 uv run python scripts/eval_public_table.py
 ```
 
-The table is `tests/eval/baselines/public_eval_table.md`. NER is a placeholder until item 20. Live `detailed` scoring is `--llm --model-name …` and is not part of PR CI.
+The table is `tests/eval/baselines/public_eval_table.md`. A language-model row appears after `scripts/run_gold_benchmark.py --profile local-detailed` or `--profile closed-detailed` writes its baseline. Those runs are not part of PR CI.
 
 ### 4. PR CI completeness gate
 
@@ -141,6 +133,7 @@ data/gold-corpus/                    # downloaded files (not in git)
 
 ## See also
 
+- [Evaluation results](eval-results.md) — charts for the regex, Gemma 4, and Argon sample runs
 - [Terminology](terminology.md) — leftover, mention, quasi-identifier, TAB
 - [Recipes](recipes.md#gold-corpus-benchmark) — the same commands in the recipe list
 - [Why Anonymize?](../101/why-anonymization.md) — sectors the domain pack covers

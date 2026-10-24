@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Print the public eval table (regex-only vs NER vs detailed LLM).
+"""Print the public eval table (regex-only, NER, local detailed, closed detailed).
 
-NER is item 20 and is not shipped. Live LLM is opt-in so PR CI stays
-offline. Default reads the committed regex-only baseline.
+Live model rows are opt-in so PR CI stays offline. Default reads whatever
+baseline files are already committed.
 
 Usage:
     uv run python scripts/eval_public_table.py
     uv run python scripts/eval_public_table.py --ci-fixtures
-    uv run python scripts/eval_public_table.py --llm --model-name ollama/phi4-mini
 """
 
 from __future__ import annotations
@@ -23,26 +22,45 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
     sys.path.insert(0, str(ROOT / "packages" / "pdf-anonymizer-core" / "src"))
 
-from tests.eval.gold import BASELINE_PATH, CI_GOLD_SOURCES  # noqa: E402
+from tests.eval.gold import (  # noqa: E402
+    CI_GOLD_SOURCES,
+    PROFILE_BASELINES,
+)
 
 TABLE_PATH = ROOT / "tests" / "eval" / "baselines" / "public_eval_table.md"
 
 
+def _scores(report: Dict[str, Any]) -> Dict[str, Any]:
+    return ((report.get("overall") or {}).get("scores") or {})
+
+
 def _mention_block(report: Dict[str, Any]) -> Dict[str, Any]:
-    return ((report.get("overall") or {}).get("scores") or {}).get("all") or {}
+    return _scores(report).get("all") or {}
+
+
+def _kind_f1(report: Dict[str, Any], kind: str) -> Optional[float]:
+    block = (_scores(report).get(kind) or {}).get("mention") or {}
+    value = block.get("f1")
+    return None if value is None else float(value)
 
 
 def _row_from_report(
     profile: str, report: Dict[str, Any], note: str = ""
 ) -> Dict[str, Any]:
     mention = (_mention_block(report).get("mention")) or {}
+    entity = (_mention_block(report).get("entity")) or {}
     leftover = (report.get("overall") or {}).get("leftover") or {}
+    model = report.get("model") or ""
     return {
         "profile": profile,
+        "model": model,
         "documents": report.get("documents"),
         "precision": mention.get("precision"),
         "recall": mention.get("recall"),
         "f1": mention.get("f1"),
+        "entity_f1": entity.get("f1"),
+        "direct_f1": _kind_f1(report, "direct"),
+        "quasi_f1": _kind_f1(report, "quasi"),
         "leftover_rate": leftover.get("leftover_rate"),
         "structured_leftover_rate": leftover.get("structured_leftover_rate"),
         "note": note,
@@ -52,10 +70,14 @@ def _row_from_report(
 def _placeholder(profile: str, note: str) -> Dict[str, Any]:
     return {
         "profile": profile,
+        "model": "",
         "documents": None,
         "precision": None,
         "recall": None,
         "f1": None,
+        "entity_f1": None,
+        "direct_f1": None,
+        "quasi_f1": None,
         "leftover_rate": None,
         "structured_leftover_rate": None,
         "note": note,
@@ -66,11 +88,11 @@ def render_table(rows: List[Dict[str, Any]]) -> str:
     lines = [
         "# Public eval table",
         "",
-        "Regex-only is measured. NER waits on item 20. `detailed` LLM is nightly / opt-in.",
-        "This is not a legal privacy proof.",
+        "Regex-only is the offline gate. NER, local detailed, and closed detailed",
+        "appear when their baseline files exist. This is not a legal privacy proof.",
         "",
-        "| Profile | Docs | Mention P | Mention R | Mention F1 | Leftover | Structured leftover | Note |",
-        "|---|---:|---:|---:|---:|---:|---:|---|",
+        "| Profile | Model | Docs | Mention P | Mention R | Mention F1 | Entity F1 | Direct F1 | Quasi F1 | Leftover | Structured leftover | Note |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in rows:
 
@@ -80,22 +102,49 @@ def render_table(rows: List[Dict[str, Any]]) -> str:
             return f"{value:.3f}"
 
         docs = "—" if row["documents"] is None else str(row["documents"])
+        model = row.get("model") or "—"
         lines.append(
-            f"| {row['profile']} | {docs} | {fmt(row['precision'])} | "
-            f"{fmt(row['recall'])} | {fmt(row['f1'])} | {fmt(row['leftover_rate'])} | "
-            f"{fmt(row['structured_leftover_rate'])} | {row['note']} |"
+            f"| {row['profile']} | {model} | {docs} | {fmt(row['precision'])} | "
+            f"{fmt(row['recall'])} | {fmt(row['f1'])} | {fmt(row['entity_f1'])} | "
+            f"{fmt(row['direct_f1'])} | {fmt(row['quasi_f1'])} | "
+            f"{fmt(row['leftover_rate'])} | {fmt(row['structured_leftover_rate'])} | "
+            f"{row['note']} |"
         )
     lines.append("")
     return "\n".join(lines)
 
 
-def rows_from_baseline(path: Path = BASELINE_PATH) -> List[Dict[str, Any]]:
-    report = json.loads(path.read_text(encoding="utf-8"))
-    return [
-        _row_from_report("regex-only", report, "committed baseline"),
-        _placeholder("ner", "not shipped (item 20)"),
-        _placeholder("detailed-llm", "opt-in / nightly; no API key in PR CI"),
-    ]
+def _note_for(profile: str, report: Dict[str, Any]) -> str:
+    if profile == "regex-only":
+        return "committed baseline"
+    if profile == "ner":
+        return "span NER only"
+    if profile == "local-detailed":
+        return "RE2 + detailed prompt, think off, num_ctx 8192"
+    sample = report.get("sample") or {}
+    if sample:
+        return (
+            f"sample of {sample.get('documents')} docs, "
+            f"{sample.get('per_source')} per large source, seed {sample.get('seed')}; "
+            "not the full corpus"
+        )
+    return "RE2 + detailed prompt, paid API"
+
+
+def rows_from_baseline() -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    missing = {
+        "ner": "not measured on this machine",
+        "local-detailed": "not measured on this machine",
+        "closed-detailed": "not run; closed model not approved yet",
+    }
+    for profile, path in PROFILE_BASELINES.items():
+        if path.is_file():
+            report = json.loads(path.read_text(encoding="utf-8"))
+            rows.append(_row_from_report(profile, report, _note_for(profile, report)))
+        else:
+            rows.append(_placeholder(profile, missing.get(profile, "not measured")))
+    return rows
 
 
 def main() -> None:
@@ -111,12 +160,6 @@ def main() -> None:
         action="store_true",
         help="Recompute regex-only on the committed mini-tab + domain pack",
     )
-    parser.add_argument(
-        "--llm",
-        action="store_true",
-        help="Also run the live detailed LLM profile (needs a model)",
-    )
-    parser.add_argument("--model-name", default=None)
     parser.add_argument(
         "--output",
         default=str(TABLE_PATH),
@@ -139,22 +182,12 @@ def main() -> None:
         report = module.run_benchmark(DEFAULT_DEST, list(CI_GOLD_SOURCES), None)
         rows = [
             _row_from_report("regex-only", report, "CI fixtures"),
-            _placeholder("ner", "not shipped (item 20)"),
-            _placeholder("detailed-llm", "opt-in / nightly; no API key in PR CI"),
+            _placeholder("ner", "not measured on this machine"),
+            _placeholder("local-detailed", "not measured on this machine"),
+            _placeholder("closed-detailed", "not run; closed model not approved yet"),
         ]
     else:
         rows = rows_from_baseline()
-
-    if args.llm:
-        if not args.model_name:
-            raise SystemExit("--llm requires --model-name")
-        rows = [row for row in rows if row["profile"] != "detailed-llm"]
-        rows.append(
-            _placeholder(
-                "detailed-llm",
-                f"requested ({args.model_name}); wire when a nightly job exists",
-            )
-        )
 
     text = render_table(rows)
     out = Path(args.output)

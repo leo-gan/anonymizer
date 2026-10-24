@@ -1,0 +1,1111 @@
+{
+  "created": "2026-10-24T20:42:59Z",
+  "profile": "closed-detailed",
+  "model": "google/gemini-4-argon",
+  "package_version": "0.31.0",
+  "documents": 82,
+  "sources": [
+    "domain-pack",
+    "gretel",
+    "mini-tab",
+    "presidio",
+    "tab"
+  ],
+  "domains": [
+    "enterprise",
+    "finance",
+    "general",
+    "government",
+    "healthcare",
+    "legal",
+    "research"
+  ],
+  "max_docs": null,
+  "corpus_manifest": {
+    "dest": "/home/leo/PycharmProjects/GLD/anonymizer/data/gold-corpus",
+    "counts": {
+      "tab": 254,
+      "presidio": 1500,
+      "gretel": 5000
+    },
+    "files": {
+      "normalized/gretel.jsonl": {
+        "bytes": 4639806,
+        "sha256": "daad09208758fa2171e39b533c271d44457d25ad51765d97f1d21b57c6c594c0"
+      },
+      "normalized/presidio.jsonl": {
+        "bytes": 611668,
+        "sha256": "5f4c56bb4bbbfbae5f54edd08998cee4244bce29166ed4e7724d6143dc693e41"
+      },
+      "normalized/tab.jsonl": {
+        "bytes": 3108607,
+        "sha256": "e5a1bc38ad4a46f3d3a17e3e22c4cc78d419050e9b02c195a07f9c391f55e830"
+      },
+      "raw/gretel/test.jsonl": {
+        "bytes": 4414141,
+        "sha256": "fde4fa9b499464d376ebd28c4a5e269cbdf690754430826a5fe36d3cedbd79cf"
+      },
+      "raw/gretel/test.parquet": {
+        "bytes": 2029143,
+        "sha256": "c89a6bffa838edb0f2fc6686bf35da4930944519ac97308b0b6e32298594b5b1"
+      },
+      "raw/presidio/synth_dataset_v2.json": {
+        "bytes": 1023794,
+        "sha256": "ec08a771ba8135314cafb60752b2295212222ba3a4cd75d73811839c699e0012"
+      },
+      "raw/tab/echr_dev.json": {
+        "bytes": 12643092,
+        "sha256": "8c3c7306f46b8d54debeb38ae11d8b0b8bcf4bdccbc3b6f13c12ad7be16893ec"
+      },
+      "raw/tab/echr_test.json": {
+        "bytes": 13103290,
+        "sha256": "cd0f0f15f84a8739654c7cf30c6be8ce27b051ef73974d39d792a0cb8c846379"
+      }
+    },
+    "sources": [
+      "tab",
+      "presidio",
+      "gretel"
+    ],
+    "full_tab": false
+  },
+  "runtime": {
+    "temperature": 0,
+    "thinking_budget": 0,
+    "chunk_size": 15000,
+    "chunk_overlap": 2000,
+    "max_retries": 2,
+    "stages": [
+      "regex",
+      "llm"
+    ]
+  },
+  "sample": {
+    "per_source": 25,
+    "seed": 20261024,
+    "always_included": [
+      "domain-pack",
+      "mini-tab"
+    ],
+    "documents": 82,
+    "keys": [
+      "domain-pack::healthcare-discharge",
+      "domain-pack::legal-retainer",
+      "domain-pack::government-benefits",
+      "domain-pack::research-survey",
+      "domain-pack::finance-statement",
+      "domain-pack::enterprise-ticket",
+      "gretel::gretel-6e4221f9d3694c808733b7854dabfdc5",
+      "gretel::gretel-1698cd5319b84814a4784252ac131d4c",
+      "gretel::gretel-ee26c239cd5343d79f125af4d38ea33e",
+      "gretel::gretel-c4801650319a4ff8aa53c1f7f9d01f22",
+      "gretel::gretel-93f108dc1c074c79bd94a2fa1ada5474",
+      "gretel::gretel-5fa80cdb612c4923acc136cd027883cc",
+      "gretel::gretel-734c4beb591b4dec81b786b410d4c6af",
+      "gretel::gretel-e4f17b50cfb049c7b1afe25e953908d0",
+      "gretel::gretel-aa992339c2284d8dbf90a0ac28a1124b",
+      "gretel::gretel-98b5b95799a04360ab9806d945277a58",
+      "gretel::gretel-de071ab226214eb49c2557b1c0f83f51",
+      "gretel::gretel-c1498f87584f497aa2ca88217d091123",
+      "gretel::gretel-17ba9bab7e60496eae7398be05bec131",
+      "gretel::gretel-8055d4e14afb4bd99d1c39f3eea1f393",
+      "gretel::gretel-649fb72c53cb4326a108e042bc281e76",
+      "gretel::gretel-b65ff61a61684d569f2b3ea31a13f83d",
+      "gretel::gretel-13b3e5e9886e492da0a1b171ca458b40",
+      "gretel::gretel-2ec48e228bfc4352b647b49e13f75654",
+      "gretel::gretel-ac3fc28a3a0e4783bf3e0bd89d38d070",
+      "gretel::gretel-604de239909540be88d63a77c2f6d20f",
+      "gretel::gretel-faa556f0c40c4be18d9f269b99ef4bd8",
+      "gretel::gretel-2354e7e926134490be1040fdda11aedd",
+      "gretel::gretel-4d2c16e5b9214937ba3b20a0dcbf2cad",
+      "gretel::gretel-bdca526790594f4cb5d3bbebda3c75d7",
+      "gretel::gretel-ddc618b483154ce5946a28ffd1d1b3d5",
+      "mini-tab::mini-tab",
+      "presidio::presidio-0686",
+      "presidio::presidio-0584",
+      "presidio::presidio-0156",
+      "presidio::presidio-0088",
+      "presidio::presidio-0858",
+      "presidio::presidio-0123",
+      "presidio::presidio-0288",
+      "presidio::presidio-0635",
+      "presidio::presidio-1487",
+      "presidio::presidio-1029",
+      "presidio::presidio-0332",
+      "presidio::presidio-0272",
+      "presidio::presidio-0552",
+      "presidio::presidio-0178",
+      "presidio::presidio-0753",
+      "presidio::presidio-0491",
+      "presidio::presidio-1385",
+      "presidio::presidio-1185",
+      "presidio::presidio-0068",
+      "presidio::presidio-1136",
+      "presidio::presidio-0637",
+      "presidio::presidio-0649",
+      "presidio::presidio-0937",
+      "presidio::presidio-0115",
+      "presidio::presidio-0074",
+      "tab::tab-001-57867",
+      "tab::tab-001-93654",
+      "tab::tab-001-89128",
+      "tab::tab-001-83927",
+      "tab::tab-001-79501",
+      "tab::tab-001-58744",
+      "tab::tab-001-90163",
+      "tab::tab-001-61228",
+      "tab::tab-001-72664",
+      "tab::tab-001-89991",
+      "tab::tab-001-91059",
+      "tab::tab-001-61816",
+      "tab::tab-001-79392",
+      "tab::tab-001-82750",
+      "tab::tab-001-76766",
+      "tab::tab-001-60516",
+      "tab::tab-001-71938",
+      "tab::tab-001-99929",
+      "tab::tab-001-58409",
+      "tab::tab-001-159913",
+      "tab::tab-001-170347",
+      "tab::tab-001-57508",
+      "tab::tab-001-61807",
+      "tab::tab-001-67200",
+      "tab::tab-001-91290"
+    ]
+  },
+  "overall": {
+    "name": "gold-corpus",
+    "scores": {
+      "all": {
+        "mention": {
+          "precision": 0.3557840616966581,
+          "recall": 0.502177068214804,
+          "f1": 0.416491122479687,
+          "true_positives": 692,
+          "predicted": 1945,
+          "gold": 1378
+        },
+        "entity": {
+          "precision": 0.18236173393124067,
+          "recall": 0.10508182601205857,
+          "f1": 0.13333333333333333,
+          "true_positives": 122,
+          "predicted": 669,
+          "gold": 1161
+        }
+      },
+      "direct": {
+        "mention": {
+          "precision": 0.21005917159763313,
+          "recall": 0.7717391304347826,
+          "f1": 0.33023255813953484,
+          "true_positives": 142,
+          "predicted": 676,
+          "gold": 184
+        },
+        "entity": {
+          "precision": 0.2546816479400749,
+          "recall": 0.4171779141104294,
+          "f1": 0.31627906976744186,
+          "true_positives": 68,
+          "predicted": 267,
+          "gold": 163
+        }
+      },
+      "quasi": {
+        "mention": {
+          "precision": 0.2761126248864669,
+          "recall": 0.26049700085689803,
+          "f1": 0.2680776014109348,
+          "true_positives": 304,
+          "predicted": 1101,
+          "gold": 1167
+        },
+        "entity": {
+          "precision": 0.13114754098360656,
+          "recall": 0.0411946446961895,
+          "f1": 0.06269592476489028,
+          "true_positives": 40,
+          "predicted": 305,
+          "gold": 971
+        }
+      }
+    },
+    "documents": 82,
+    "gold_mentions": 1378,
+    "predicted_mentions": 1945,
+    "leftover": {
+      "leftover": 603,
+      "gold": 1378,
+      "leftover_rate": 0.4375907111756168,
+      "structured_leftover": 0,
+      "structured_gold": 48,
+      "structured_leftover_rate": 0.0,
+      "residual_regex": 0
+    }
+  },
+  "by_source": {
+    "domain-pack": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.8333333333333334,
+            "recall": 0.9722222222222222,
+            "f1": 0.8974358974358975,
+            "true_positives": 35,
+            "predicted": 42,
+            "gold": 36
+          },
+          "entity": {
+            "precision": 0.8717948717948718,
+            "recall": 0.9444444444444444,
+            "f1": 0.9066666666666667,
+            "true_positives": 34,
+            "predicted": 39,
+            "gold": 36
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.88,
+            "recall": 0.88,
+            "f1": 0.88,
+            "true_positives": 22,
+            "predicted": 25,
+            "gold": 25
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 0.92,
+            "f1": 0.9583333333333334,
+            "true_positives": 23,
+            "predicted": 23,
+            "gold": 25
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.8461538461538461,
+            "recall": 1.0,
+            "f1": 0.9166666666666666,
+            "true_positives": 11,
+            "predicted": 13,
+            "gold": 11
+          },
+          "entity": {
+            "precision": 0.9166666666666666,
+            "recall": 1.0,
+            "f1": 0.9565217391304348,
+            "true_positives": 11,
+            "predicted": 12,
+            "gold": 11
+          }
+        }
+      },
+      "documents": 6,
+      "gold_mentions": 36,
+      "predicted_mentions": 42,
+      "leftover": {
+        "leftover": 0,
+        "gold": 36,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 19,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "gretel": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.7007874015748031,
+            "recall": 0.8090909090909091,
+            "f1": 0.751054852320675,
+            "true_positives": 89,
+            "predicted": 127,
+            "gold": 110
+          },
+          "entity": {
+            "precision": 0.5210084033613446,
+            "recall": 0.5636363636363636,
+            "f1": 0.5414847161572053,
+            "true_positives": 62,
+            "predicted": 119,
+            "gold": 110
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.5833333333333334,
+            "recall": 0.45901639344262296,
+            "f1": 0.5137614678899083,
+            "true_positives": 28,
+            "predicted": 48,
+            "gold": 61
+          },
+          "entity": {
+            "precision": 0.6,
+            "recall": 0.4426229508196721,
+            "f1": 0.5094339622641509,
+            "true_positives": 27,
+            "predicted": 45,
+            "gold": 61
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.7,
+            "recall": 0.7241379310344828,
+            "f1": 0.711864406779661,
+            "true_positives": 21,
+            "predicted": 30,
+            "gold": 29
+          },
+          "entity": {
+            "precision": 0.84,
+            "recall": 0.7241379310344828,
+            "f1": 0.7777777777777777,
+            "true_positives": 21,
+            "predicted": 25,
+            "gold": 29
+          }
+        }
+      },
+      "documents": 25,
+      "gold_mentions": 110,
+      "predicted_mentions": 127,
+      "leftover": {
+        "leftover": 8,
+        "gold": 110,
+        "leftover_rate": 0.07272727272727272,
+        "structured_leftover": 0,
+        "structured_gold": 22,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "mini-tab": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 5,
+            "predicted": 5,
+            "gold": 5
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 5,
+            "predicted": 5,
+            "gold": 5
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 3,
+            "predicted": 3,
+            "gold": 3
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 3,
+            "predicted": 3,
+            "gold": 3
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          }
+        }
+      },
+      "documents": 1,
+      "gold_mentions": 5,
+      "predicted_mentions": 5,
+      "leftover": {
+        "leftover": 0,
+        "gold": 5,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 3,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "presidio": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.6046511627906976,
+            "recall": 0.8125,
+            "f1": 0.6933333333333334,
+            "true_positives": 26,
+            "predicted": 43,
+            "gold": 32
+          },
+          "entity": {
+            "precision": 0.5833333333333334,
+            "recall": 0.65625,
+            "f1": 0.6176470588235293,
+            "true_positives": 21,
+            "predicted": 36,
+            "gold": 32
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.8,
+            "recall": 0.75,
+            "f1": 0.7741935483870969,
+            "true_positives": 12,
+            "predicted": 15,
+            "gold": 16
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 0.9375,
+            "f1": 0.967741935483871,
+            "true_positives": 15,
+            "predicted": 15,
+            "gold": 16
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.2916666666666667,
+            "recall": 0.7777777777777778,
+            "f1": 0.42424242424242425,
+            "true_positives": 7,
+            "predicted": 24,
+            "gold": 9
+          },
+          "entity": {
+            "precision": 0.35294117647058826,
+            "recall": 0.6666666666666666,
+            "f1": 0.46153846153846156,
+            "true_positives": 6,
+            "predicted": 17,
+            "gold": 9
+          }
+        }
+      },
+      "documents": 25,
+      "gold_mentions": 32,
+      "predicted_mentions": 43,
+      "leftover": {
+        "leftover": 1,
+        "gold": 32,
+        "leftover_rate": 0.03125,
+        "structured_leftover": 0,
+        "structured_gold": 4,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "tab": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.3107638888888889,
+            "recall": 0.44937238493723847,
+            "f1": 0.36743072186110165,
+            "true_positives": 537,
+            "predicted": 1728,
+            "gold": 1195
+          },
+          "entity": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "true_positives": 0,
+            "predicted": 472,
+            "gold": 978
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.13162393162393163,
+            "recall": 0.9746835443037974,
+            "f1": 0.2319277108433735,
+            "true_positives": 77,
+            "predicted": 585,
+            "gold": 79
+          },
+          "entity": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "true_positives": 0,
+            "predicted": 181,
+            "gold": 58
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.2548449612403101,
+            "recall": 0.235663082437276,
+            "f1": 0.24487895716945998,
+            "true_positives": 263,
+            "predicted": 1032,
+            "gold": 1116
+          },
+          "entity": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "true_positives": 0,
+            "predicted": 251,
+            "gold": 920
+          }
+        }
+      },
+      "documents": 25,
+      "gold_mentions": 1195,
+      "predicted_mentions": 1728,
+      "leftover": {
+        "leftover": 594,
+        "gold": 1195,
+        "leftover_rate": 0.497071129707113,
+        "structured_leftover": 0,
+        "structured_gold": 0,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    }
+  },
+  "by_domain": {
+    "enterprise": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.7142857142857143,
+            "recall": 0.9090909090909091,
+            "f1": 0.8,
+            "true_positives": 10,
+            "predicted": 14,
+            "gold": 11
+          },
+          "entity": {
+            "precision": 0.6428571428571429,
+            "recall": 0.8181818181818182,
+            "f1": 0.7200000000000001,
+            "true_positives": 9,
+            "predicted": 14,
+            "gold": 11
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.8333333333333334,
+            "recall": 0.7142857142857143,
+            "f1": 0.7692307692307692,
+            "true_positives": 5,
+            "predicted": 6,
+            "gold": 7
+          },
+          "entity": {
+            "precision": 0.8333333333333334,
+            "recall": 0.7142857142857143,
+            "f1": 0.7692307692307692,
+            "true_positives": 5,
+            "predicted": 6,
+            "gold": 7
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          }
+        }
+      },
+      "documents": 2,
+      "gold_mentions": 11,
+      "predicted_mentions": 14,
+      "leftover": {
+        "leftover": 0,
+        "gold": 11,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 5,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "finance": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 5,
+            "predicted": 5,
+            "gold": 5
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 5,
+            "predicted": 5,
+            "gold": 5
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 4,
+            "predicted": 4,
+            "gold": 4
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 4,
+            "predicted": 4,
+            "gold": 4
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 1,
+            "predicted": 1,
+            "gold": 1
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 1,
+            "predicted": 1,
+            "gold": 1
+          }
+        }
+      },
+      "documents": 1,
+      "gold_mentions": 5,
+      "predicted_mentions": 5,
+      "leftover": {
+        "leftover": 0,
+        "gold": 5,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 4,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "general": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.7014925373134329,
+            "recall": 0.8468468468468469,
+            "f1": 0.7673469387755102,
+            "true_positives": 94,
+            "predicted": 134,
+            "gold": 111
+          },
+          "entity": {
+            "precision": 0.5691056910569106,
+            "recall": 0.6306306306306306,
+            "f1": 0.5982905982905983,
+            "true_positives": 70,
+            "predicted": 123,
+            "gold": 111
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.66,
+            "recall": 0.6,
+            "f1": 0.6285714285714286,
+            "true_positives": 33,
+            "predicted": 50,
+            "gold": 55
+          },
+          "entity": {
+            "precision": 0.75,
+            "recall": 0.6545454545454545,
+            "f1": 0.6990291262135923,
+            "true_positives": 36,
+            "predicted": 48,
+            "gold": 55
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.5111111111111111,
+            "recall": 0.71875,
+            "f1": 0.5974025974025974,
+            "true_positives": 23,
+            "predicted": 45,
+            "gold": 32
+          },
+          "entity": {
+            "precision": 0.6111111111111112,
+            "recall": 0.6875,
+            "f1": 0.6470588235294118,
+            "true_positives": 22,
+            "predicted": 36,
+            "gold": 32
+          }
+        }
+      },
+      "documents": 43,
+      "gold_mentions": 111,
+      "predicted_mentions": 134,
+      "leftover": {
+        "leftover": 8,
+        "gold": 111,
+        "leftover_rate": 0.07207207207207207,
+        "structured_leftover": 0,
+        "structured_gold": 24,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "government": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.5625,
+            "recall": 0.8181818181818182,
+            "f1": 0.6666666666666666,
+            "true_positives": 9,
+            "predicted": 16,
+            "gold": 11
+          },
+          "entity": {
+            "precision": 0.6923076923076923,
+            "recall": 0.8181818181818182,
+            "f1": 0.7500000000000001,
+            "true_positives": 9,
+            "predicted": 13,
+            "gold": 11
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.7142857142857143,
+            "recall": 0.7142857142857143,
+            "f1": 0.7142857142857143,
+            "true_positives": 5,
+            "predicted": 7,
+            "gold": 7
+          },
+          "entity": {
+            "precision": 0.7142857142857143,
+            "recall": 0.7142857142857143,
+            "f1": 0.7142857142857143,
+            "true_positives": 5,
+            "predicted": 7,
+            "gold": 7
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "true_positives": 4,
+            "predicted": 8,
+            "gold": 4
+          },
+          "entity": {
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.888888888888889,
+            "true_positives": 4,
+            "predicted": 5,
+            "gold": 4
+          }
+        }
+      },
+      "documents": 3,
+      "gold_mentions": 11,
+      "predicted_mentions": 16,
+      "leftover": {
+        "leftover": 0,
+        "gold": 11,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 4,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "healthcare": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.7575757575757576,
+            "recall": 0.7575757575757576,
+            "f1": 0.7575757575757576,
+            "true_positives": 25,
+            "predicted": 33,
+            "gold": 33
+          },
+          "entity": {
+            "precision": 0.5625,
+            "recall": 0.5454545454545454,
+            "f1": 0.5538461538461538,
+            "true_positives": 18,
+            "predicted": 32,
+            "gold": 33
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.75,
+            "recall": 0.48,
+            "f1": 0.5853658536585366,
+            "true_positives": 12,
+            "predicted": 16,
+            "gold": 25
+          },
+          "entity": {
+            "precision": 0.8,
+            "recall": 0.48,
+            "f1": 0.6,
+            "true_positives": 12,
+            "predicted": 15,
+            "gold": 25
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.8571428571428571,
+            "recall": 0.8571428571428571,
+            "f1": 0.8571428571428571,
+            "true_positives": 6,
+            "predicted": 7,
+            "gold": 7
+          },
+          "entity": {
+            "precision": 0.8571428571428571,
+            "recall": 0.8571428571428571,
+            "f1": 0.8571428571428571,
+            "true_positives": 6,
+            "predicted": 7,
+            "gold": 7
+          }
+        }
+      },
+      "documents": 6,
+      "gold_mentions": 33,
+      "predicted_mentions": 33,
+      "leftover": {
+        "leftover": 1,
+        "gold": 33,
+        "leftover_rate": 0.030303030303030304,
+        "structured_leftover": 0,
+        "structured_gold": 6,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "legal": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.3127880184331797,
+            "recall": 0.4521232306411324,
+            "f1": 0.36976506639427986,
+            "true_positives": 543,
+            "predicted": 1736,
+            "gold": 1201
+          },
+          "entity": {
+            "precision": 0.012552301255230125,
+            "recall": 0.006097560975609756,
+            "f1": 0.008207934336525308,
+            "true_positives": 6,
+            "predicted": 478,
+            "gold": 984
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.13582342954159593,
+            "recall": 0.975609756097561,
+            "f1": 0.23845007451564829,
+            "true_positives": 80,
+            "predicted": 589,
+            "gold": 82
+          },
+          "entity": {
+            "precision": 0.016304347826086956,
+            "recall": 0.04918032786885246,
+            "f1": 0.024489795918367346,
+            "true_positives": 3,
+            "predicted": 184,
+            "gold": 61
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 0.25675675675675674,
+            "recall": 0.23771224307417338,
+            "f1": 0.2468677494199536,
+            "true_positives": 266,
+            "predicted": 1036,
+            "gold": 1119
+          },
+          "entity": {
+            "precision": 0.011811023622047244,
+            "recall": 0.0032502708559046588,
+            "f1": 0.005097706032285472,
+            "true_positives": 3,
+            "predicted": 254,
+            "gold": 923
+          }
+        }
+      },
+      "documents": 26,
+      "gold_mentions": 1201,
+      "predicted_mentions": 1736,
+      "leftover": {
+        "leftover": 594,
+        "gold": 1201,
+        "leftover_rate": 0.4945878434637802,
+        "structured_leftover": 0,
+        "structured_gold": 2,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    },
+    "research": {
+      "name": "gold-corpus",
+      "scores": {
+        "all": {
+          "mention": {
+            "precision": 0.8571428571428571,
+            "recall": 1.0,
+            "f1": 0.923076923076923,
+            "true_positives": 6,
+            "predicted": 7,
+            "gold": 6
+          },
+          "entity": {
+            "precision": 0.8333333333333334,
+            "recall": 0.8333333333333334,
+            "f1": 0.8333333333333334,
+            "true_positives": 5,
+            "predicted": 6,
+            "gold": 6
+          }
+        },
+        "direct": {
+          "mention": {
+            "precision": 0.75,
+            "recall": 0.75,
+            "f1": 0.75,
+            "true_positives": 3,
+            "predicted": 4,
+            "gold": 4
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1": 0.8571428571428571,
+            "true_positives": 3,
+            "predicted": 3,
+            "gold": 4
+          }
+        },
+        "quasi": {
+          "mention": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          },
+          "entity": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 2
+          }
+        }
+      },
+      "documents": 1,
+      "gold_mentions": 6,
+      "predicted_mentions": 7,
+      "leftover": {
+        "leftover": 0,
+        "gold": 6,
+        "leftover_rate": 0.0,
+        "structured_leftover": 0,
+        "structured_gold": 3,
+        "structured_leftover_rate": 0.0,
+        "residual_regex": 0
+      }
+    }
+  },
+  "llm_stats": {
+    "calls": 82,
+    "parse_failures": 0,
+    "transport_failures": 0,
+    "prompt_tokens": 141633,
+    "output_tokens": 45628,
+    "thoughts_tokens": 0
+  }
+}

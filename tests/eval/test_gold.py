@@ -196,7 +196,17 @@ def test_regex_stage_scores_mini_tab_email() -> None:
 def test_public_eval_table_has_regex_row() -> None:
     table = (BASELINE_PATH.parent / "public_eval_table.md").read_text(encoding="utf-8")
     assert "| regex-only |" in table
-    assert "not shipped (item 20)" in table
+    assert "not measured on this machine" in table or "| ner |" in table
+
+
+def test_expand_predictions_finds_repeated_spans() -> None:
+    from tests.eval.gold import expand_predictions_to_spans
+
+    text = "Ada met Ada."
+    found = expand_predictions_to_spans(
+        text, [{"text": "Ada", "type": "PERSON", "base_form": "Ada"}]
+    )
+    assert [(item["start"], item["end"]) for item in found] == [(0, 3), (8, 11)]
 
 
 def test_committed_regex_baseline_covers_use_cases() -> None:
