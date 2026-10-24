@@ -55,7 +55,7 @@ Items 1, 2, and 3 can merge in any order. Item 4 waits on the token from item 3.
 
 ### 1. Publish NER and careful-LLM scores
 
-**Status:** not started
+**Status:** local row measured 2026-10-24 (`ollama/gemma4:12b-it-qat`, 6,761 documents, mention F1 0.564, leftover 0.241). Closed row is waiting for approval.
 
 **Why:** The regex-only F1 of 0.26 is the number a reader can cite, and it measures the mode that misses names. A hospital or a law firm will ask for the other rows. The real-life careful path is a local Ollama model. One closed model is the ceiling on the same documents.
 
