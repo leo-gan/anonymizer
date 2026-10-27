@@ -477,18 +477,21 @@ def save_csv(doc: TableDocument, path: str) -> None:
     lookup = _cells_by_address(sheet)
     encoding = "utf-8-sig" if doc.had_bom else "utf-8"
     dialect = dict(doc.dialect) if doc.dialect else _dialect_kwargs(csv.excel)
-    with open(path, "w", encoding=encoding, newline="") as handle:
-        writer = csv.writer(handle, **dialect)
-        for row in range(1, sheet.max_row + 1):
-            width = _row_width(sheet, row)
-            if width == 0:
-                writer.writerow([])
-                continue
-            values = [
-                _csv_write_value(lookup.get((row, col)))
-                for col in range(1, width + 1)
-            ]
-            writer.writerow(values)
+    buffer = io.StringIO(newline="")
+    writer = csv.writer(buffer, **dialect)
+    for row in range(1, sheet.max_row + 1):
+        width = _row_width(sheet, row)
+        if width == 0:
+            writer.writerow([])
+            continue
+        values = [
+            _csv_write_value(lookup.get((row, col)))
+            for col in range(1, width + 1)
+        ]
+        writer.writerow(values)
+    from pdf_anonymizer_core.secure_io import write_private_bytes
+
+    write_private_bytes(path, bytearray(buffer.getvalue().encode(encoding)))
 
 
 def save_xlsx(doc: TableDocument, path: str) -> None:
@@ -531,6 +534,9 @@ def save_xlsx(doc: TableDocument, path: str) -> None:
                             dropped += 1
                             excel_cell.value = None
         styled.save(path)
+        from pdf_anonymizer_core.secure_io import restrict_private
+
+        restrict_private(path)
     finally:
         styled.close()
 

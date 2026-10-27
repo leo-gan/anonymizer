@@ -168,6 +168,9 @@ def write_anonymized_pdf(
             incremental=False,
             encryption=pymupdf.PDF_ENCRYPT_NONE,
         )
+        from pdf_anonymizer_core.secure_io import restrict_private
+
+        restrict_private(dest)
     except Exception as exc:
         raise ValueError(f"Cannot write native PDF {dest_path}") from exc
     finally:

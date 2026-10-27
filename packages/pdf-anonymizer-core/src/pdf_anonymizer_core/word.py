@@ -358,6 +358,9 @@ def save_docx(doc: WordDocument, path: str) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     try:
         doc._document.save(path)
+        from pdf_anonymizer_core.secure_io import restrict_private
+
+        restrict_private(path)
     except Exception as exc:
         raise ValueError(f"Cannot write Word document {path}") from exc
 

@@ -26,6 +26,7 @@ from pdf_anonymizer_core.span_ner import resolve_semantic_stages
 from pdf_anonymizer_core.gazetteers import load_phrase_list
 from pdf_anonymizer_core.call_llm import LLMIdentificationError
 from pdf_anonymizer_core.llm_provider import configure_cache
+from pdf_anonymizer_core.purge import purge_local_artifacts
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.operators import parse_operator_specs
 from pdf_anonymizer_core.prompts import detailed, hipaa, simple
@@ -52,11 +53,32 @@ from pdf_anonymizer_core.apply_residuals import (
 from pdf_anonymizer_core.verify import verify_anonymized_text, write_residual_report
 from typing_extensions import Annotated
 
-# Setup logging using log file configured in conf.py
+def _private_log_handler(path: str) -> logging.Handler:
+    """Append to the log with mode 0600.
+
+    The log names files and models. It must not be readable by every account
+    on the machine.
+    """
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, mode=0o700, exist_ok=True)
+    descriptor = os.open(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600)
+    try:
+        os.fchmod(descriptor, 0o600)
+    except OSError:
+        pass
+    stream = os.fdopen(descriptor, "a", encoding="utf-8")
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
+    return handler
+
+
+# The log is created at import so a crash before the first command is still recorded.
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler(DEFAULT_LOG_FILE), logging.StreamHandler()],
+    handlers=[_private_log_handler(DEFAULT_LOG_FILE), logging.StreamHandler()],
 )
 
 app = typer.Typer()
@@ -183,6 +205,17 @@ def run(
                 "Checksums, country filter, operators, leftover scan, and "
                 "risk still run. Names and identity clues will be missed. "
                 "Same as -p regex-only. Default: use the model."
+            ),
+        ),
+    ] = False,
+    cache: Annotated[
+        bool,
+        typer.Option(
+            "--cache/--no-cache",
+            help=(
+                "Store language-model replies on disk. Off by default. "
+                "A reply contains the chunk and the extracted values. "
+                "The file is mode 0600 and entries expire after 24 hours."
             ),
         ),
     ] = False,
@@ -454,14 +487,13 @@ def run(
             logging.warning("--verify-llm is ignored when the language model is off.")
             verify_llm = False
 
-    if use_llm:
-        # Configure LLM caching with values from configuration
-        configure_cache(
-            enabled=config.enable_cache,
-            cache_dir=config.cache_dir,
-            cache_file=config.cache_file,
-        )
+    configure_cache(
+        enabled=bool(cache) and use_llm,
+        cache_dir=config.cache_dir,
+        cache_file=config.cache_file,
+    )
 
+    if use_llm:
         provider_name, _ = get_provider_and_model_name(config.model_name)
         if provider_name == "google":
             if "gemini" in config.model_name and not os.getenv("GOOGLE_API_KEY"):
@@ -1086,6 +1118,28 @@ def apply(
     )
     for text in result["applied"]:
         logging.info("  hid %s", text)
+
+
+@app.command()
+def purge(
+    root: Annotated[
+        Path,
+        typer.Option(
+            "--root",
+            help="Directory that contains data/ and app.log.",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = Path("."),
+) -> None:
+    """Delete the local cache, mapping files, stats, and app.log.
+
+    Anonymized and deanonymized documents are left in place.
+    """
+    removed = purge_local_artifacts(root)
+    logging.info("Removed %s local artifact(s).", len(removed))
 
 
 if __name__ == "__main__":

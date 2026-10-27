@@ -78,11 +78,9 @@ def write_layout_sidecar(dest_path: str, source: str, words: Iterable[PdfWord]) 
     dest = Path(dest_path)
     # letter.anonymized.md → letter.anonymized.layout.json
     layout_path = dest.with_suffix(".layout.json")
-    layout_path.parent.mkdir(parents=True, exist_ok=True)
-    layout_path.write_text(
-        json.dumps(layout_to_json(source, words), indent=2),
-        encoding="utf-8",
-    )
+    from pdf_anonymizer_core.secure_io import write_private_json
+
+    write_private_json(layout_path, layout_to_json(source, words))
     return str(layout_path)
 
 

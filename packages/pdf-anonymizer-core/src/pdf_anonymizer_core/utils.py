@@ -29,7 +29,7 @@ from pdf_anonymizer_core.operators import (
     mapping_without_encrypt_plaintexts,
     restore_encrypt_tokens,
 )
-from pdf_anonymizer_core.secure_io import write_private_json
+from pdf_anonymizer_core.secure_io import write_private_json, write_private_text
 from pdf_anonymizer_core.pdf_ocr import take_pdf_layout, write_layout_sidecar
 from pdf_anonymizer_core.pdf_output import (
     OUTPUT_PDF_NOT_PDF_MESSAGE,
@@ -281,8 +281,7 @@ def save_results(
                 )
                 logging.info("Table privacy report: %s", report_path)
     else:
-        with open(anonymized_output_file, "w", encoding="utf-8") as f:
-            f.write(full_anonymized_text)
+        write_private_text(anonymized_output_file, full_anonymized_text)
 
     layout_source, layout_words = take_pdf_layout()
     if layout_words and layout_source:
@@ -509,8 +508,7 @@ def deanonymize_file(
             anonymized_file_path, deanonymized_file, placeholder_to_original
         )
     else:
-        with open(deanonymized_file, "w", encoding="utf-8") as f:
-            f.write(deanonymized_text)
+        write_private_text(deanonymized_file, deanonymized_text)
 
     stats_file = f"{stats_dir}/{file_stem}.deanonymization_stat.json"
     stats = {
@@ -520,8 +518,7 @@ def deanonymize_file(
         "unused_mappings": unused_mappings,
         "not_found_mappings": not_found_mappings,
     }
-    with open(stats_file, "w", encoding="utf-8") as f:
-        json.dump(stats, f, indent=4)
+    write_private_json(stats_file, stats)
 
     # Drop in-process references to recovered PII. Python strings cannot be
     # reliably overwritten; clearing the dicts is the explicit protocol.

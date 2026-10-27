@@ -125,4 +125,4 @@ class TestRegexOnlyProfile:
         ):
             cfg = get_config_for_profile(profile)
             assert cfg.use_llm is True
-            assert cfg.enable_cache is True
+            assert cfg.enable_cache is False
