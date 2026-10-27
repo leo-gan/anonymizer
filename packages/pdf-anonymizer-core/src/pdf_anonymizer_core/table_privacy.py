@@ -354,7 +354,6 @@ def _apply_sheet(
 
 def write_table_privacy_report(report: dict, anonymized_file_path: str) -> str:
     """Write ``data/stats/<stem>.table_privacy.json``."""
-    import json
     import os
     from pathlib import Path
 
@@ -363,9 +362,9 @@ def write_table_privacy_report(report: dict, anonymized_file_path: str) -> str:
     os.makedirs(DEFAULT_STATS_DIR, exist_ok=True)
     stem = Path(anonymized_file_path).stem
     path = f"{DEFAULT_STATS_DIR}/{stem}.table_privacy.json"
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(report, handle, indent=2, sort_keys=True)
-        handle.write("\n")
+    from pdf_anonymizer_core.secure_io import write_private_json
+
+    write_private_json(path, report)
     return path
 
 

@@ -89,6 +89,23 @@ def write_private_bytes(path: PathLike, data: bytes | bytearray | memoryview) ->
         raise
 
 
+def write_private_text(path: PathLike, text: str) -> None:
+    """Write UTF-8 text atomically with mode ``0600``."""
+    raw = bytearray(text.encode("utf-8"))
+    try:
+        write_private_bytes(path, raw)
+    finally:
+        wipe_mutable(raw)
+
+
+def restrict_private(path: PathLike) -> None:
+    """Best-effort ``0600`` after a library wrote the file itself."""
+    try:
+        os.chmod(path, PRIVATE_FILE_MODE)
+    except OSError:
+        pass
+
+
 def write_private_json(path: PathLike, payload: Any) -> None:
     """Serialize ``payload`` as UTF-8 JSON and write it with ``write_private_bytes``.
 

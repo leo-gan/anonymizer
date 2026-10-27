@@ -17,6 +17,7 @@ import hashlib
 import json
 import logging
 import os
+import time
 from abc import ABC, abstractmethod
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -28,6 +29,11 @@ from pdf_anonymizer_core.conf import (
     DEFAULT_CACHE_FILE,
     DEFAULT_CHARACTERS_TO_ANONYMIZE,
 )
+from pdf_anonymizer_core.secure_io import write_private_json
+
+# Replies are a copy of the document chunk and the extracted values.
+# One day is long enough to retry a run and short enough to limit the copy.
+CACHE_TTL_SECONDS = 24 * 60 * 60
 
 
 # Thread-safe Local LLM Response Cache
@@ -48,35 +54,55 @@ class LocalLLMCache:
             if os.path.exists(self.cache_file):
                 try:
                     with open(self.cache_file, "r", encoding="utf-8") as f:
-                        self._cache = json.load(f)
+                        loaded = json.load(f)
+                    self._cache = {
+                        key: value
+                        for key, value in loaded.items()
+                        if self._fresh_response(value) is not None
+                    }
                 except Exception as e:
-                    logging.warning(f"Failed to load LLM cache file: {e}")
+                    logging.warning("Failed to load LLM cache file: %s", type(e).__name__)
                     self._cache = {}
+
+    @staticmethod
+    def _fresh_response(item: Any) -> Optional[str]:
+        if not isinstance(item, dict):
+            return None
+        stored = item.get("stored")
+        response = item.get("response")
+        if not isinstance(stored, (int, float)) or not isinstance(response, str):
+            return None
+        if time.time() - float(stored) > CACHE_TTL_SECONDS:
+            return None
+        return response
 
     def save(self):
         try:
-            os.makedirs(self.cache_dir, exist_ok=True)
             with self.lock:
-                with open(self.cache_file, "w", encoding="utf-8") as f:
-                    json.dump(self._cache, f, indent=4)
+                payload = dict(self._cache)
+            write_private_json(self.cache_file, payload)
         except Exception as e:
-            logging.warning(f"Failed to save LLM cache file: {e}")
+            logging.warning("Failed to save LLM cache file: %s", type(e).__name__)
 
     def get(self, model_name: str, prompt: str) -> Optional[str]:
         prompt_hash = hashlib.md5(prompt.encode("utf-8")).hexdigest()
         key = f"{model_name}:{prompt_hash}"
         with self.lock:
-            return self._cache.get(key)
+            item = self._cache.get(key)
+            fresh = self._fresh_response(item)
+            if fresh is None and key in self._cache:
+                del self._cache[key]
+            return fresh
 
     def set(self, model_name: str, prompt: str, response: str):
         prompt_hash = hashlib.md5(prompt.encode("utf-8")).hexdigest()
         key = f"{model_name}:{prompt_hash}"
         with self.lock:
-            self._cache[key] = response
+            self._cache[key] = {"response": response, "stored": time.time()}
 
 
 _cache_instance: Optional[LocalLLMCache] = None
-_cache_enabled: bool = True
+_cache_enabled: bool = False
 
 
 @dataclass

@@ -172,7 +172,7 @@ class AppConfig(BaseModel):
     max_retries: int
     base_retry_delay: float
     max_retry_delay: float
-    enable_cache: bool = True
+    enable_cache: bool = False
     cache_dir: str = DEFAULT_CACHE_DIR
     cache_file: str = DEFAULT_CACHE_FILE
     anonymized_dir: str = DEFAULT_ANONYMIZED_DIR
@@ -240,7 +240,7 @@ def get_config_for_profile(
         max_retry_delay=profile_defaults["max_retry_delay"],
         regex_patterns=filter_regex_patterns(countries, opt_in=opt_in),
         use_llm=profile_defaults.get("use_llm", True),
-        enable_cache=profile_defaults.get("enable_cache", True),
+        enable_cache=profile_defaults.get("enable_cache", False),
     )
 
 

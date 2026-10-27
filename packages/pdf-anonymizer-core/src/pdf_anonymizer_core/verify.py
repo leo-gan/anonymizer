@@ -7,7 +7,6 @@ IBAN_LIKE_2) are ignored. The scan reports; it does not rewrite the file.
 
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -148,6 +147,7 @@ def write_residual_report(report: Dict[str, Any], anonymized_file_path: str) -> 
     path = residual_report_path(anonymized_file_path)
     report = dict(report)
     report["anonymized_file"] = anonymized_file_path
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(report, handle, indent=4)
+    from pdf_anonymizer_core.secure_io import write_private_json
+
+    write_private_json(path, report)
     return path

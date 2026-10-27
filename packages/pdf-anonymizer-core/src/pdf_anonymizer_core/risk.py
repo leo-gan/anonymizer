@@ -7,7 +7,6 @@ not change the file.
 
 from __future__ import annotations
 
-import json
 import os
 import re
 from pathlib import Path
@@ -205,6 +204,7 @@ def write_risk_report(report: Dict[str, Any], anonymized_file_path: str) -> str:
     path = risk_report_path(anonymized_file_path)
     payload = dict(report)
     payload["anonymized_file"] = anonymized_file_path
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=4)
+    from pdf_anonymizer_core.secure_io import write_private_json
+
+    write_private_json(path, payload)
     return path

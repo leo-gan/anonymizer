@@ -177,10 +177,12 @@ def apply_residual_hits(
                 anonymized_path, anonymized_path, orig_to_written, texts
             )
         else:
+            from pdf_anonymizer_core.secure_io import write_private_text
+
             current = path.read_text(encoding="utf-8")
-            path.write_text(
+            write_private_text(
+                path,
                 replace_entities(current, texts, orig_to_written),
-                encoding="utf-8",
             )
 
     if write_mapping:

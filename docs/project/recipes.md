@@ -660,28 +660,20 @@ The mapping file format is `placeholder → original` (the direction used at dea
 
 ## LLM Response Caching
 
-By default the core caches successful LLM responses (keyed by model + prompt hash) to `data/cache/llm_responses.json`.
+The cache is off unless you pass `--cache`. A stored reply contains the chunk sent to the model and the values the model returned, so the file is a second copy of that personal data. When caching is on, the file is `data/cache/llm_responses.json`, mode `0600`, and an entry expires after 24 hours.
 
-Benefits:
-- Re-running the same document (or very similar chunks) is dramatically faster and cheaper.
-- Helps during development and iterative prompt tuning.
+```bash
+pdf-anonymizer run contract.pdf --cache
+pdf-anonymizer purge
+```
 
-**Disable or relocate the cache (SDK)**
+`purge` deletes `data/cache/`, `data/mappings/`, `data/stats/`, and `app.log` under the working directory. It does not delete anonymized or deanonymized documents.
 
 ```python
 from pdf_anonymizer_core.llm_provider import configure_cache
-from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
 
-cfg = get_config_for_profile(ConfigProfile.BEST_SPEED)
-
-configure_cache(
-    enabled=False,                    # or True
-    cache_dir=cfg.cache_dir,
-    cache_file=cfg.cache_file,
-)
+configure_cache(enabled=True)
 ```
-
-The CLI always enables caching according to the profile's `AppConfig`. Delete or move the cache directory for a cold run.
 
 ---
 
