@@ -117,6 +117,11 @@ Common problems and how to resolve them.
 - **Symptom**: `--output-pdf only applies to PDF inputs.`
 - **Fix**: That flag rewrites a PDF package. Use it on a `.pdf`.
 
+## The run stops and names the language model
+
+- **Symptom**: `Language model ... stopped (AUTHENTICATION_ERROR)` or `GENERIC_ERROR`, and no anonymized file appears.
+- **Fix**: The command stops on purpose. A failed model call used to continue with names still visible. Check the API key, then run the file again. `--no-llm` keeps the regex path and does not call the model.
+
 ## Large Files / Memory or Context Issues
 
 - **Symptom**: Out of memory, context length errors, or very slow runs.

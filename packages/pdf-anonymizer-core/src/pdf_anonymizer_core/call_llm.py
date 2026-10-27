@@ -17,6 +17,14 @@ from pdf_anonymizer_core.conf import get_provider_and_model_name
 from pdf_anonymizer_core.llm_provider import current_llm_stats, get_provider
 
 
+class LLMIdentificationError(RuntimeError):
+    """The language model did not return entities for one chunk.
+
+    The message names the model and the error category. It does not include
+    the chunk, so a log of this exception is not a second copy of the document.
+    """
+
+
 def extract_json_object(raw: str) -> str:
     """Return the JSON object inside a model reply.
 
@@ -130,8 +138,11 @@ def identify_entities_with_llm(
 
     Returns:
         List of entity dicts (each with "text", "type", "base_form",
-        "score" 0.70, and "source" "llm"). Returns [] on unrecoverable
-        failure after retries.
+        "score" 0.70, and "source" "llm").
+
+    Raises:
+        LLMIdentificationError: Auth failed, or retries are exhausted.
+            The caller must not write a file that looks fully anonymized.
     """
     prompt = prompt_template.format(text=text)
 
@@ -169,16 +180,13 @@ def identify_entities_with_llm(
                 if stats is not None:
                     stats.parse_failures += 1
             logging.error(
-                f"Attempt {attempt + 1} failed with error category '{category}': {e}"
+                "Attempt %s failed with error category %s (%s).",
+                attempt + 1,
+                category,
+                type(e).__name__,
             )
 
             if not is_retryable or attempt + 1 == max_retries:
-                if attempt + 1 == max_retries:
-                    logging.error("Max retries reached. Returning empty list.")
-                else:
-                    logging.error(
-                        f"Fatal error category '{category}'. Stopping retries."
-                    )
                 if (
                     category in {"CONNECTION_ERROR", "RATE_LIMIT_ERROR"}
                     or "connect" in str(e).lower()
@@ -186,7 +194,10 @@ def identify_entities_with_llm(
                     failed = current_llm_stats()
                     if failed is not None:
                         failed.transport_failures += 1
-                return []
+                raise LLMIdentificationError(
+                    f"Language model {model_name} stopped ({category}) "
+                    f"after {attempt + 1} attempt(s). No anonymized file was written."
+                ) from None
 
             # Exponential backoff with jitter
             backoff = min(base_retry_delay * (2**attempt), max_retry_delay)
@@ -196,4 +207,7 @@ def identify_entities_with_llm(
             logging.info(f"Retrying in {sleep_time:.2f} seconds...")
             time.sleep(sleep_time)
 
-    return []
+    raise LLMIdentificationError(
+        f"Language model {model_name} stopped (GENERIC_ERROR) after 0 attempts. "
+        "No anonymized file was written."
+    )

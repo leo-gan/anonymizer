@@ -2,7 +2,11 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 
-from pdf_anonymizer_core.call_llm import extract_json_object, identify_entities_with_llm
+from pdf_anonymizer_core.call_llm import (
+    LLMIdentificationError,
+    extract_json_object,
+    identify_entities_with_llm,
+)
 from pdf_anonymizer_core.prompts import simple
 
 
@@ -118,11 +122,10 @@ class TestIdentifyEntitiesWithLlm(unittest.TestCase):
         mock_get_provider.return_value = mock_provider
 
         text = "This is a test text."
-        entities = identify_entities_with_llm(
-            text, self.prompt_template, self.model_name
-        )
+        with self.assertRaises(LLMIdentificationError) as caught:
+            identify_entities_with_llm(text, self.prompt_template, self.model_name)
 
-        self.assertEqual(entities, [])
+        self.assertNotIn(text, str(caught.exception))
         self.assertEqual(mock_provider.call.call_count, 3)
 
     def test_extract_json_object_drops_thinking_and_prose(self):

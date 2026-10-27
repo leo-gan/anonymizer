@@ -703,7 +703,7 @@ PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
 - Use Markdown-aware splitting (automatic for `.pdf` and `.md`). Plain `.txt` falls back to recursive character splitting.
 - Watch the log output: each chunk is logged (`Identifying entities in part X/Y...`).
 - The `chunk_overlap` (profile-driven) helps the model see context across chunk boundaries for coreference.
-- If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors.
+- If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors. When the retries are exhausted, or the provider rejects the key, the command stops and does not write that file.
 
 ---
 
@@ -737,7 +737,7 @@ Sometimes you want a different mark:
 |---|---|---|
 | `replace` | `PERSON_1` (default) | Reversible stand-ins |
 | `mask` | `****-****-****-1111` | Cards, SSNs, phones (keep a little shape) |
-| `generalize` | `2019`, `021**`, `40-49` | Dates, ZIP codes, ages |
+| `generalize` | `2019`, `021**`, `40-49` | Dates, ZIP codes, ages. A shape it cannot coarsen is masked, not left as written. |
 | `hash` | `H_` plus a short fingerprint | Same value always looks the same, but not readable |
 | `shift` | A nearby date | Dates that must stay dates, not just a year |
 | `fake` | `Jane Alvarez`, `555-0103` | Looks real; same person always gets the same fake |
