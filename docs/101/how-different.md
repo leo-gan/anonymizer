@@ -106,11 +106,11 @@ Sending sensitive documents to public cloud APIs to redact them is a security co
 
 ---
 
-## Engineered for Scale (Up to 1GB)
+## Large files
 
-Large documents (like a 500-page clinical trial registry or a 1GB database export in text format) exceed the maximum input size (context window) of typical LLMs, or they cause standard scripts to crash due to memory depletion.
+A long document can be larger than one model context window. The tool reads the file into memory, splits the text into chunks, and runs the detectors on each chunk. That split does not stream the file, and it does not keep memory flat as the file grows.
 
-*   **Smart Stream-Chunking**: PDF Anonymizer uses an advanced chunking system. It streams the document, breaks it down into manageable semantic slices, processes each chunk through the LLM, and stitches the results and entity mappings back together dynamically. This allows you to process large files consistently without running out of memory.
+CSV, Excel, and Word are refused above 50 MiB. A measured regex-only run of a 100 MB synthetic text file is recorded on the recipes page. There is no tested 1 GB path.
 
 ---
 
@@ -124,7 +124,7 @@ Large documents (like a 500-page clinical trial registry or a 1GB database expor
 | **How a type is written** | Usually one mask | Usually one mask | :white_check_mark: `replace` / `mask` / `hash` / `generalize` / `shift` / `fake` |
 | **Leftover / linkage check** | Rare | Rare | :white_check_mark: Report files only (no auto-rewrite) |
 | **Local Offline Run** | :white_check_mark: Yes | :x: No (Cloud only) | :white_check_mark: Yes (Via local Ollama models) |
-| **Large File Support** | :wavy_dash: High memory usage | :x: Limited by file size limits | :white_check_mark: Yes (Streaming chunks up to 1GB) |
+| **Large File Support** | :wavy_dash: High memory usage | :x: Limited by file size limits | :wavy_dash: Text is chunked in memory. Tables and Word stop at 50 MiB. No tested 1 GB path. |
 | **Monorepo Architecture** | :wavy_dash: Often monolithic | :x: Closed source | :white_check_mark: Yes (Separated Core SDK and CLI) |
 
 ---

@@ -129,8 +129,9 @@ Common problems and how to resolve them.
   - Use `-p best-cost` (larger chunks).
   - Manually increase `--characters-to-anonymize` (e.g. 120000 or higher) when using a model with a large context window.
   - The tool uses Markdown-aware splitting for PDFs and `.md` files to preserve structure.
-  - CSV and Excel are **in-memory**. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.
-  - Word `.docx` is **in-memory**. It is refused above 50 MiB or 100,000 non-empty paragraphs. That is not the 1 GB text-chunking path.
+  - CSV and Excel are in memory. They are refused above 50 MiB or 500,000 non-empty cells.
+  - Word `.docx` is in memory. It is refused above 50 MiB or 100,000 non-empty paragraphs.
+  - Text and PDF are also read into memory before chunking. There is no tested 1 GB path. See [Processing Very Large Documents](recipes.md#processing-very-large-documents).
 
 ## Excel extra missing
 

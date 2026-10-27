@@ -6,7 +6,7 @@ A command-line interface for anonymizing PDF, Markdown, and plain text files usi
 - **Identity clues**: With `-p best-quality` or `--prompt-name detailed`, the tool also hides phrases that point to one person without writing their name (for example "the CEO of Tesla"). The default `best-speed` profile does not.
 - **Checksum labels**: After the fast number search, a real IBAN becomes `IBAN_1` and a mistyped one becomes `IBAN_LIKE_1`. Both are hidden. Same idea for cards, VINs, and a few national IDs.
 - **Operators, reports, and lists**: `--operator TYPE=mask|hash|generalize|shift|fake|encrypt`, leftover scan (`verify`), linkage-risk score (`report`), `--keep-list` / `--deny-list`, `--mapping-in`, optional locked maps, HIPAA coverage aid. See the [CLI History](https://leo-gan.github.io/anonymizer/project/cli-usage/#history).
-- **Large File Support**: Consistently anonymizes large files (tested up to 1GB).
+- **File size**: Text and PDF are read into memory and then split into chunks. CSV, Excel, and Word are refused above 50 MiB. A measured 100 MB text run is in the [recipes](https://leo-gan.github.io/anonymizer/project/recipes/#processing-very-large-documents). There is no tested 1 GB path.
 - **Multi-Provider & Cost-Effective**: Free to use with local [Ollama](https://ollama.com/) models. It also supports major providers like [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.com/), [Hugging Face](https://huggingface.co/), and [OpenRouter](https://openrouter.ai/).
 - **Reversible**: Supports deanonymization to recover original data when needed.
 - **Multi-Format**: Works with PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`) files.

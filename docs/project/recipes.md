@@ -383,7 +383,7 @@ That also writes `data/stats/roster.anonymized.table_privacy.json`. The numbers 
 **Notes**
 
 - **Formulas are never written back.** Excel: cached values only. A leftover `=A1` would restore a replaced name. CSV: only a cell whose raw value starts with `=` is treated as formula-like and written with a leading `'`. Deanonymize strips that `'` when the remainder still starts with `=`. E.164 phones such as `+1-555-0100` are **not** formulas and are left untouched.
-- **Size / RAM.** Hard limits: 50 MiB on disk, 500,000 non-empty cells. Spreadsheets load in memory. Peak for a large `.xlsx` is two live workbooks plus the cell table (hundreds of MiB possible at the cap). This is **not** the 1 GB text-chunking path.
+- **Size / RAM.** Hard limits: 50 MiB on disk, 500,000 non-empty cells. Spreadsheets load in memory. Peak for a large `.xlsx` is two live workbooks plus the cell table (hundreds of MiB possible at the cap). This is not the text-chunking path, and that path is not a tested 1 GB stream.
 - **Regex skips number and date cells.** Regex runs on text and formula-cached strings only. An undashed numeric ID stored as an Excel number is **missed** on `--no-llm`. Store the dashed form as text, use a deny-list, or keep the language model on. There is no “9-digit integer ⇒ SSN” rule.
 - **Stored value, not display format.** A numeric `123456789` with format `000-00-0000` is still seen as `123456789`.
 - **Leftover risk.** Charts, comments, headers/footers, data-validation lists, defined names, and hyperlinks are not rewritten. A chart series or a header can still show a name. Delete those before sharing, or accept the residual.
@@ -453,7 +453,7 @@ No new flags. `--no-llm`, `--operator`, `--keep-list` / `--deny-list`, `--mappin
 
 - **Runs are joined before detection.** Word often splits `jane@acme.com` across three runs. The loader concatenates visible `w:t` text in a paragraph so the email is one string. After replacement, the new text is written into the first run and later runs are cleared. Bold or color on those later runs is lost.
 - **Headers, footers, comments, and field codes are walked.** External hyperlink targets (`mailto:…`) are rewritten too.
-- **Size / RAM.** Hard limits: 50 MiB on disk, 100,000 non-empty paragraphs, fields, and hyperlink targets. The package loads in memory. This is **not** the 1 GB text-chunking path.
+- **Size / RAM.** Hard limits: 50 MiB on disk, 100,000 non-empty paragraphs, fields, and hyperlink targets. The package loads in memory. This is not the text-chunking path, and that path is not a tested 1 GB stream.
 - **Leftover risk.** Images, picture alt text, core properties (author / last modified by), charts, and embedded objects are not rewritten. Delete those before sharing, or accept the residual.
 - Tracked-change deletions (`w:del`) are skipped so rejected text is not treated as live PII.
 - `.doc`, `.docm`, `.dot`, `.dotm`, and `.dotx` are rejected. Re-save as `.docx`. Macro-enabled files are not supported (macros can re-derive PII).
@@ -679,9 +679,11 @@ configure_cache(enabled=True)
 
 ## Processing Very Large Documents
 
-PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.
+The text path reads the whole file, then splits it into chunks for the detectors. It does not stream the bytes, and memory grows with the file. CSV, Excel, and `.docx` are a different path: they load the package in memory and are refused above 50 MiB. Spreadsheets also stop at 500,000 non-empty cells. Word also stops at 100,000 non-empty paragraphs. See [Anonymize a CSV or Excel roster](#anonymize-a-csv-or-excel-roster) and [Anonymize a Word document](#anonymize-a-word-document).
 
-**Spreadsheets and Word files are in-memory.** CSV, Excel, and `.docx` do **not** use this 1 GB streaming path. Spreadsheets are capped at 50 MiB / 500,000 non-empty cells. Word is capped at 50 MiB / 100,000 non-empty paragraphs. See [Anonymize a CSV or Excel roster](#anonymize-a-csv-or-excel-roster) and [Anonymize a Word document](#anonymize-a-word-document).
+A regex-only run of a synthetic 100 MB text file (one email, then filler) is the measured point. The harness is `scripts/bench_large_text.py`. Pull-request CI runs that harness on 20 KB so the script still executes. It does not re-time the 100 MB file, because the duration depends on the machine.
+
+On 27 October 2026 the harness was started on a 100 MB file on Linux 6.8.0-138-generic (x86_64). After 25 minutes and 8 seconds the process was still using one full core, and its peak resident set was 1,947,280 KiB (about 1.86 GiB). The run was stopped there. The file was one email followed by filler, and the profile was regex-only. That measurement is a lower bound on the time. It is not evidence that a 1 GB file succeeds.
 
 **Practical tips**
 
