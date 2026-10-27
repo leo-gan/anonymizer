@@ -4,7 +4,7 @@
 **Audience:** maintainers only  
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
-The next backlog is [`real-life-plan.md`](real-life-plan.md). Item 27 is release hygiene in this file. The local-service review (token, audit log, `/health` version) stays in `real-life-plan.md` as item 3. Do not reopen items 1–26.
+Items 1–27 are done. The next backlog is [`real-life-plan.md`](real-life-plan.md). The local-service review (token, audit log, `/health` version) stays there as item 3. Do not reopen items 1–27.
 
 ## Progress
 
@@ -34,7 +34,7 @@ The next backlog is [`real-life-plan.md`](real-life-plan.md). Item 27 is release
 - [x] 24. `encrypt` / format-preserving encryption operator — done 2026-09-04, [PR #70](https://github.com/leo-gan/anonymizer/pull/70)
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [x] 26. Optional table-only formal privacy engine — done 2026-09-22, [PR #79](https://github.com/leo-gan/anonymizer/pull/79)
-- [ ] 27. Release hygiene (attestations, no-telemetry statement) — written on `release-hygiene` (2026-10-27); checkbox stays open until the pull request exists
+- [x] 27. Release hygiene (attestations, no-telemetry statement) — done 2026-10-27, [PR #87](https://github.com/leo-gan/anonymizer/pull/87)
 
 ---
 
@@ -608,7 +608,7 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 27. Release hygiene (attestations, no-telemetry statement)
 
-**Status:** written on `release-hygiene` (2026-10-27). The checklist stays open until the pull request link exists.  
+**Status:** done 2026-10-27 — [PR #87](https://github.com/leo-gan/anonymizer/pull/87) (`release-hygiene`)  
 **Technique:** trust in the supply chain. Filtered from the OS/network survey — not Tor, not a live USB.
 
 **Why:** Open-source privacy tools are judged on whether a wheel can be checked and whether the program sends usage data. The code already had no telemetry. v0.31.0 already attaches `SHA256SUMS` to the GitHub Release, and PyPI already stores a publish attestation from trusted publishing. What was missing was the written guarantee and a GitHub build attestation for the release files.
@@ -652,7 +652,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-Value-first order for **open** items (not a merge gate): **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
+Items 1–27 are done. The next backlog is [`real-life-plan.md`](real-life-plan.md).
 
 ---
 

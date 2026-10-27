@@ -4,7 +4,7 @@
 **Audience:** maintainers only
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
-This plan continues [`improvement-plan.md`](improvement-plan.md). Items 1–26 there have shipped (v0.31.0). Item 27 (release hygiene) is its own change: the written network statement, the `SHA256SUMS` file already on the GitHub Release, and a GitHub build attestation. Item 3 keeps the local-service review. This plan does not reopen OCR, native PDF, GLiNER, the HTTP service, or table *k*-anonymity as if they were missing. `docs/temp/` describes that older gap list and is not the backlog.
+This plan continues [`improvement-plan.md`](improvement-plan.md). Items 1–27 there have shipped. Item 27 (release hygiene) landed in [PR #87](https://github.com/leo-gan/anonymizer/pull/87): the written network statement, the `SHA256SUMS` file already on the GitHub Release, and a GitHub build attestation. Item 3 keeps the local-service review. This plan does not reopen OCR, native PDF, GLiNER, the HTTP service, or table *k*-anonymity as if they were missing. `docs/temp/` describes that older gap list and is not the backlog.
 
 The product is a reversible document pseudonymizer. Personal values become typed stand-ins (`PERSON_1`) plus a mapping file. While the map exists, the file is still personal data. HIPAA and GDPR wording stays "aid", not a certificate.
 
@@ -149,7 +149,7 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - Append one JSON line per deanonymize, from the CLI and from HTTP, to `data/stats/audit.log` (mode `0600`). Fields: time, command (`cli` or `http`), restored count, whether a mapping file path was used. Do not write original values, placeholder values, or document text.
 - Copy the network wording from the root README into `docs/project/http-service.md`. The CLI default profile is `best-speed` (`gemini-2.5-flash`). Without the `ner` extra that run calls Google. With the extra it uses local span NER. Do not write that a cloud model is opt-in for the command line. The HTTP service default remains regex-only. When the audit file exists, say that it stays on disk.
 - Read the API version from installed package metadata. Delete the hardcoded `0.26.0`.
-- Do not rebuild checksums or attestations here. v0.31.0 already publishes `SHA256SUMS`, and PyPI already stores a publish attestation. Item 27 adds the GitHub build attestation.
+- Do not rebuild checksums or attestations here. v0.31.0 already publishes `SHA256SUMS`, and PyPI already stores a publish attestation. Item 27 added the GitHub build attestation in [PR #87](https://github.com/leo-gan/anonymizer/pull/87).
 
 **Do not**
 
