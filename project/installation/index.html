@@ -2696,7 +2696,7 @@
 </span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a># Optional: seed for --operator TYPE=fake (same person → same fake)
 </span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
 </span></code></pre></div>
-<p><code>ANONYMIZER_MAPPING_KEY</code> and <code>ANONYMIZER_FAKE_SECRET</code> are optional. Without them, maps stay plaintext JSON and <code>fake</code> uses a built-in constant seed (stable, not private).</p>
+<p><code>ANONYMIZER_MAPPING_KEY</code> is optional. Without it, maps stay plaintext JSON. <code>ANONYMIZER_FAKE_SECRET</code> is required when an operator is <code>fake</code>. There is no built-in seed.</p>
 <hr />
 <h2 id="verifying-the-setup">Verifying the Setup<a class="headerlink" href="#verifying-the-setup" title="Permanent link">&para;</a></h2>
 <p>To verify that the installation succeeded and all package internal references are valid, run the automated test suite:</p>

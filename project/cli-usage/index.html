@@ -3790,8 +3790,8 @@
 <tr>
 <td style="text-align: left;"><code>--fake-secret</code></td>
 <td style="text-align: left;"><code>TEXT</code></td>
-<td style="text-align: left;">built-in</td>
-<td style="text-align: left;">Seed for <code>fake</code>. Also <code>ANONYMIZER_FAKE_SECRET</code>.</td>
+<td style="text-align: left;">none</td>
+<td style="text-align: left;">Required seed for <code>fake</code>. Also <code>ANONYMIZER_FAKE_SECRET</code>.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>--risk</code> / <code>--no-risk</code></td>
@@ -4105,7 +4105,7 @@ If <code>ANONYMIZED_FILE</code> is <code>data/anonymized/document.anonymized.md<
 <h3 id="lock-the-mapping">Lock the mapping<a class="headerlink" href="#lock-the-mapping" title="Permanent link">&para;</a></h3>
 <p><code>--mapping-passphrase</code> (or <code>ANONYMIZER_MAPPING_KEY</code>) writes <code>*.mapping.json.enc</code> instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode <code>0600</code>. <code>deanonymize</code> needs the same passphrase. <code>--ephemeral-mapping</code> writes no mapping file at all. See <a href="../mapping-security/">Mapping encryption</a>.</p>
 <h3 id="how-a-type-is-written">How a type is written<a class="headerlink" href="#how-a-type-is-written" title="Permanent link">&para;</a></h3>
-<p><code>--operator TYPE=mask|hash|generalize|shift|fake|encrypt</code> changes the mark on the page. Default remains <code>replace</code> (<code>PERSON_1</code>). Seed <code>fake</code> with <code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>. <code>encrypt</code> writes an AES-256-GCM token (<code>ENC1_…</code>) and needs <code>--encrypt-secret</code> / <code>ANONYMIZER_ENCRYPT_SECRET</code>. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).</p>
+<p><code>--operator TYPE=mask|hash|generalize|shift|fake|encrypt</code> changes the mark on the page. Default remains <code>replace</code> (<code>PERSON_1</code>). <code>fake</code> needs <code>--fake-secret</code> / <code>ANONYMIZER_FAKE_SECRET</code>. There is no built-in seed. <code>hash</code> is an unsalted SHA-256 prefix: the same input always matches, and a short value can be reversed by trying the candidates. The command warns once when that value is short. <code>encrypt</code> writes an AES-256-GCM token (<code>ENC1_…</code>) and needs <code>--encrypt-secret</code> / <code>ANONYMIZER_ENCRYPT_SECRET</code>. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).</p>
 <h3 id="linkage-risk-score">Linkage-risk score<a class="headerlink" href="#linkage-risk-score" title="Permanent link">&para;</a></h3>
 <p><code>run</code> writes <code>data/stats/&lt;stem&gt;.risk.json</code> unless <code>--no-risk</code>. <code>pdf-anonymizer report</code> scores an already-masked file. Report only; the page is not changed.</p>
 <h3 id="hipaa-safe-harbor-coverage-aid">HIPAA Safe Harbor coverage aid<a class="headerlink" href="#hipaa-safe-harbor-coverage-aid" title="Permanent link">&para;</a></h3>

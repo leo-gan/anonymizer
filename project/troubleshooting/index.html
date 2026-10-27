@@ -3060,7 +3060,7 @@
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>ANONYMIZER_MAPPING_KEY=&quot;a long secret&quot;
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>ANONYMIZER_FAKE_SECRET=&quot;another long secret&quot;
 </span></code></pre></div>
-  - <code>ANONYMIZER_MAPPING_KEY</code> locks mapping files as <code>*.mapping.json.enc</code>. <code>ANONYMIZER_FAKE_SECRET</code> seeds <code>--operator TYPE=fake</code>. Neither is required.
+  - <code>ANONYMIZER_MAPPING_KEY</code> locks mapping files as <code>*.mapping.json.enc</code>. It is optional. <code>ANONYMIZER_FAKE_SECRET</code> is required when <code>--operator</code> uses <code>fake</code>.
   - For the SDK, load the environment variables yourself (e.g. with <code>python-dotenv</code> or <code>os.environ</code>).</p>
 </li>
 </ul>
