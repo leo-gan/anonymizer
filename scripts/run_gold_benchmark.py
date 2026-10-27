@@ -32,6 +32,7 @@ if str(ROOT) not in sys.path:
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter  # noqa: E402
 
+from pdf_anonymizer_core.call_llm import LLMIdentificationError  # noqa: E402
 from pdf_anonymizer_core.conf import (  # noqa: E402
     DEFAULT_REGEX_PATTERNS,
     PROFILE_CONFIGS,
@@ -355,7 +356,10 @@ def run_benchmark(
                 if not resolved_model:
                     raise SystemExit(f"--profile {profile} requires --model-name")
                 before_failures = stats.transport_failures if stats is not None else 0
-                predicted = _predict_detailed(text, resolved_model)
+                try:
+                    predicted = _predict_detailed(text, resolved_model)
+                except LLMIdentificationError as exc:
+                    raise SystemExit(str(exc)) from None
                 if stats is not None and stats.transport_failures > before_failures:
                     raise SystemExit(
                         f"Language model call failed at {key} "

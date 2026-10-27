@@ -24,6 +24,7 @@ from pdf_anonymizer_core.core import (
 )
 from pdf_anonymizer_core.span_ner import resolve_semantic_stages
 from pdf_anonymizer_core.gazetteers import load_phrase_list
+from pdf_anonymizer_core.call_llm import LLMIdentificationError
 from pdf_anonymizer_core.llm_provider import configure_cache
 from pdf_anonymizer_core.mapping_crypto import resolve_mapping_passphrase
 from pdf_anonymizer_core.operators import parse_operator_specs
@@ -637,7 +638,7 @@ def run(
                     ocr=ocr,
                     min_confidence=min_confidence,
                 )
-        except ValueError as exc:
+        except (ValueError, LLMIdentificationError) as exc:
             logging.error("%s", exc)
             sys.exit(1)
 

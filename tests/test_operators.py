@@ -59,6 +59,13 @@ class TestMaskHashGeneralizeShift:
         assert generalize_value("91", "AGE") == "90+"
         assert "021**" in generalize_value("123 Main St, Boston MA 02139", "ADDRESS")
 
+    def test_generalize_unknown_shape_is_masked(self) -> None:
+        masked = generalize_value("Ada Lovelace", "PERSON")
+        assert "Ada" not in masked
+        assert "Lovelace" not in masked
+        street = generalize_value("123 Main Street", "ADDRESS")
+        assert "Main" not in street
+
     def test_shift_is_stable_per_base_form(self) -> None:
         a = shift_date_value("2019-06-20", "Ada Lovelace")
         b = shift_date_value("2019-06-20", "Ada Lovelace")

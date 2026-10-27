@@ -303,7 +303,11 @@ def _mask_email(original: str) -> str:
 
 
 def generalize_value(original: str, entity_type: str) -> str:
-    """Coarser value: year, ZIP3, or age band. Falls back to the original shape."""
+    """Coarser value: year, ZIP3, or age band.
+
+    A shape this function does not know how to coarsen is masked. The original
+    is not returned, because a silent pass-through would leave that value visible.
+    """
     kind = parent_type(entity_type)
     parsed = _parse_date(original)
     if parsed is not None and (
@@ -316,7 +320,10 @@ def generalize_value(original: str, entity_type: str) -> str:
         return zip_match.group(1)[:3] + "**"
 
     if kind == "ADDRESS":
-        return _ZIP_IN_TEXT.sub(lambda m: m.group(1)[:3] + "**", original)
+        coarsened = _ZIP_IN_TEXT.sub(lambda m: m.group(1)[:3] + "**", original)
+        if coarsened != original:
+            return coarsened
+        return mask_value(original, entity_type)
 
     if kind == "AGE" or (
         kind in {"", "ID"}
@@ -329,10 +336,9 @@ def generalize_value(original: str, entity_type: str) -> str:
         # year-only already
         return original.strip()
 
-    # Unknown shape: keep year if it looks like a date, else leave a coarse token
     if parsed is not None:
         return str(parsed.year)
-    return original
+    return mask_value(original, entity_type)
 
 
 def _age_band(age: int) -> str:

@@ -559,7 +559,7 @@ def anonymize_file(
         logging.warning("No text could be extracted from the file.")
         return None, None
 
-    logging.info(f"Extracted text pages: {text_pages[0][:50]} ...")
+    logging.info("Extracted text pages: %s", len(text_pages))
     extracted_text_size = len(full_text)
 
     logging.info(f"  - File size: {file_size / 1024:.2f} KB")
