@@ -44,6 +44,9 @@ def test_cli_stops_when_the_model_rejects_the_key(tmp_path, monkeypatch, caplog)
         def call(self, *args, **kwargs):
             raise RuntimeError("401 unauthorized")
 
+    # CI has no key, so the command would stop before the provider call.
+    # A present key reaches the adapter, which then rejects it.
+    monkeypatch.setenv("GOOGLE_API_KEY", "not-a-real-key")
     monkeypatch.setattr(
         "pdf_anonymizer_core.call_llm.get_provider",
         lambda _name: Rejected(),
