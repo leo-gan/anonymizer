@@ -3487,7 +3487,7 @@
 <p><strong>Notes</strong></p>
 <ul>
 <li><strong>Formulas are never written back.</strong> Excel: cached values only. A leftover <code>=A1</code> would restore a replaced name. CSV: only a cell whose raw value starts with <code>=</code> is treated as formula-like and written with a leading <code>'</code>. Deanonymize strips that <code>'</code> when the remainder still starts with <code>=</code>. E.164 phones such as <code>+1-555-0100</code> are <strong>not</strong> formulas and are left untouched.</li>
-<li><strong>Size / RAM.</strong> Hard limits: 50 MiB on disk, 500,000 non-empty cells. Spreadsheets load in memory. Peak for a large <code>.xlsx</code> is two live workbooks plus the cell table (hundreds of MiB possible at the cap). This is <strong>not</strong> the 1 GB text-chunking path.</li>
+<li><strong>Size / RAM.</strong> Hard limits: 50 MiB on disk, 500,000 non-empty cells. Spreadsheets load in memory. Peak for a large <code>.xlsx</code> is two live workbooks plus the cell table (hundreds of MiB possible at the cap). This is not the text-chunking path, and that path is not a tested 1 GB stream.</li>
 <li><strong>Regex skips number and date cells.</strong> Regex runs on text and formula-cached strings only. An undashed numeric ID stored as an Excel number is <strong>missed</strong> on <code>--no-llm</code>. Store the dashed form as text, use a deny-list, or keep the language model on. There is no “9-digit integer ⇒ SSN” rule.</li>
 <li><strong>Stored value, not display format.</strong> A numeric <code>123456789</code> with format <code>000-00-0000</code> is still seen as <code>123456789</code>.</li>
 <li><strong>Leftover risk.</strong> Charts, comments, headers/footers, data-validation lists, defined names, and hyperlinks are not rewritten. A chart series or a header can still show a name. Delete those before sharing, or accept the residual.</li>
@@ -3541,7 +3541,7 @@
 <ul>
 <li><strong>Runs are joined before detection.</strong> Word often splits <code>jane@acme.com</code> across three runs. The loader concatenates visible <code>w:t</code> text in a paragraph so the email is one string. After replacement, the new text is written into the first run and later runs are cleared. Bold or color on those later runs is lost.</li>
 <li><strong>Headers, footers, comments, and field codes are walked.</strong> External hyperlink targets (<code>mailto:…</code>) are rewritten too.</li>
-<li><strong>Size / RAM.</strong> Hard limits: 50 MiB on disk, 100,000 non-empty paragraphs, fields, and hyperlink targets. The package loads in memory. This is <strong>not</strong> the 1 GB text-chunking path.</li>
+<li><strong>Size / RAM.</strong> Hard limits: 50 MiB on disk, 100,000 non-empty paragraphs, fields, and hyperlink targets. The package loads in memory. This is not the text-chunking path, and that path is not a tested 1 GB stream.</li>
 <li><strong>Leftover risk.</strong> Images, picture alt text, core properties (author / last modified by), charts, and embedded objects are not rewritten. Delete those before sharing, or accept the residual.</li>
 <li>Tracked-change deletions (<code>w:del</code>) are skipped so rejected text is not treated as live PII.</li>
 <li><code>.doc</code>, <code>.docm</code>, <code>.dot</code>, <code>.dotm</code>, and <code>.dotx</code> are rejected. Re-save as <code>.docx</code>. Macro-enabled files are not supported (macros can re-derive PII).</li>
@@ -3716,8 +3716,9 @@
 </span></code></pre></div>
 <hr />
 <h2 id="processing-very-large-documents">Processing Very Large Documents<a class="headerlink" href="#processing-very-large-documents" title="Permanent link">&para;</a></h2>
-<p>PDF Anonymizer is designed for files up to ~1 GB thanks to streaming chunking.</p>
-<p><strong>Spreadsheets and Word files are in-memory.</strong> CSV, Excel, and <code>.docx</code> do <strong>not</strong> use this 1 GB streaming path. Spreadsheets are capped at 50 MiB / 500,000 non-empty cells. Word is capped at 50 MiB / 100,000 non-empty paragraphs. See <a href="#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a> and <a href="#anonymize-a-word-document">Anonymize a Word document</a>.</p>
+<p>The text path reads the whole file, then splits it into chunks for the detectors. It does not stream the bytes, and memory grows with the file. CSV, Excel, and <code>.docx</code> are a different path: they load the package in memory and are refused above 50 MiB. Spreadsheets also stop at 500,000 non-empty cells. Word also stops at 100,000 non-empty paragraphs. See <a href="#anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster</a> and <a href="#anonymize-a-word-document">Anonymize a Word document</a>.</p>
+<p>A regex-only run of a synthetic 100 MB text file (one email, then filler) is the measured point. The harness is <code>scripts/bench_large_text.py</code>. Pull-request CI runs that harness on 20 KB so the script still executes. It does not re-time the 100 MB file, because the duration depends on the machine.</p>
+<p>On 27 October 2026 the harness was started on a 100 MB file on Linux 6.8.0-138-generic (x86_64). After 25 minutes and 8 seconds the process was still using one full core, and its peak resident set was 1,947,280 KiB (about 1.86 GiB). The run was stopped there. The file was one email followed by filler, and the profile was regex-only. That measurement is a lower bound on the time. It is not evidence that a 1 GB file succeeds.</p>
 <p><strong>Practical tips</strong></p>
 <ul>
 <li>Start with the <code>best-cost</code> profile (larger chunks, fewer LLM calls).</li>

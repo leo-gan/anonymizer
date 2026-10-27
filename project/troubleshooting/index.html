@@ -3171,8 +3171,9 @@
 <li>Use <code>-p best-cost</code> (larger chunks).</li>
 <li>Manually increase <code>--characters-to-anonymize</code> (e.g. 120000 or higher) when using a model with a large context window.</li>
 <li>The tool uses Markdown-aware splitting for PDFs and <code>.md</code> files to preserve structure.</li>
-<li>CSV and Excel are <strong>in-memory</strong>. They are refused above 50 MiB or 500,000 non-empty cells. That is not the 1 GB text-chunking path.</li>
-<li>Word <code>.docx</code> is <strong>in-memory</strong>. It is refused above 50 MiB or 100,000 non-empty paragraphs. That is not the 1 GB text-chunking path.</li>
+<li>CSV and Excel are in memory. They are refused above 50 MiB or 500,000 non-empty cells.</li>
+<li>Word <code>.docx</code> is in memory. It is refused above 50 MiB or 100,000 non-empty paragraphs.</li>
+<li>Text and PDF are also read into memory before chunking. There is no tested 1 GB path. See <a href="../recipes/#processing-very-large-documents">Processing Very Large Documents</a>.</li>
 </ul>
 <h2 id="excel-extra-missing">Excel extra missing<a class="headerlink" href="#excel-extra-missing" title="Permanent link">&para;</a></h2>
 <ul>

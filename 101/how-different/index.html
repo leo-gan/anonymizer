@@ -730,10 +730,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#engineered-for-scale-up-to-1gb" class="md-nav__link">
+  <a href="#large-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Engineered for Scale (Up to 1GB)
+        Large files
       
     </span>
   </a>
@@ -2595,10 +2595,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#engineered-for-scale-up-to-1gb" class="md-nav__link">
+  <a href="#large-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Engineered for Scale (Up to 1GB)
+        Large files
       
     </span>
   </a>
@@ -2717,11 +2717,9 @@
 <li><strong>Multi-Provider Agility</strong>: If you have access to secure enterprise cloud endpoints, you can easily toggle between providers like <strong>Google Gemini</strong>, <strong>Anthropic Claude</strong>, <strong>OpenAI</strong>, <strong>Hugging Face</strong>, and <strong>OpenRouter</strong> by simply changing a command option and setting your API keys in a <code>.env</code> file.</li>
 </ul>
 <hr />
-<h2 id="engineered-for-scale-up-to-1gb">Engineered for Scale (Up to 1GB)<a class="headerlink" href="#engineered-for-scale-up-to-1gb" title="Permanent link">&para;</a></h2>
-<p>Large documents (like a 500-page clinical trial registry or a 1GB database export in text format) exceed the maximum input size (context window) of typical LLMs, or they cause standard scripts to crash due to memory depletion.</p>
-<ul>
-<li><strong>Smart Stream-Chunking</strong>: PDF Anonymizer uses an advanced chunking system. It streams the document, breaks it down into manageable semantic slices, processes each chunk through the LLM, and stitches the results and entity mappings back together dynamically. This allows you to process large files consistently without running out of memory.</li>
-</ul>
+<h2 id="large-files">Large files<a class="headerlink" href="#large-files" title="Permanent link">&para;</a></h2>
+<p>A long document can be larger than one model context window. The tool reads the file into memory, splits the text into chunks, and runs the detectors on each chunk. That split does not stream the file, and it does not keep memory flat as the file grows.</p>
+<p>CSV, Excel, and Word are refused above 50 MiB. A measured regex-only run of a 100 MB synthetic text file is recorded on the recipes page. There is no tested 1 GB path.</p>
 <hr />
 <h2 id="quick-comparison-summary">Quick Comparison Summary<a class="headerlink" href="#quick-comparison-summary" title="Permanent link">&para;</a></h2>
 <table>
@@ -2774,7 +2772,7 @@
 <td style="text-align: left;"><strong>Large File Support</strong></td>
 <td style="text-align: left;"><img alt="〰" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/3030.svg" title=":wavy_dash:" /> High memory usage</td>
 <td style="text-align: left;"><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /> Limited by file size limits</td>
-<td style="text-align: left;"><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /> Yes (Streaming chunks up to 1GB)</td>
+<td style="text-align: left;"><img alt="〰" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/3030.svg" title=":wavy_dash:" /> Text is chunked in memory. Tables and Word stop at 50 MiB. No tested 1 GB path.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Monorepo Architecture</strong></td>
