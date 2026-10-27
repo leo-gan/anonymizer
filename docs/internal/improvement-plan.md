@@ -4,7 +4,7 @@
 **Audience:** maintainers only  
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
-The next backlog is [`real-life-plan.md`](real-life-plan.md). Item 27 below is carried there as the security-review item. Do not reopen items 1–26.
+Items 1–27 are done. The next backlog is [`real-life-plan.md`](real-life-plan.md). The local-service review (token, audit log, `/health` version) stays there as item 3. Do not reopen items 1–27.
 
 ## Progress
 
@@ -34,7 +34,7 @@ The next backlog is [`real-life-plan.md`](real-life-plan.md). Item 27 below is c
 - [x] 24. `encrypt` / format-preserving encryption operator — done 2026-09-04, [PR #70](https://github.com/leo-gan/anonymizer/pull/70)
 - [x] 25. Native DOCX input/output — done 2026-09-04, [PR #61](https://github.com/leo-gan/anonymizer/pull/61)
 - [x] 26. Optional table-only formal privacy engine — done 2026-09-22, [PR #79](https://github.com/leo-gan/anonymizer/pull/79)
-- [ ] 27. Release hygiene (attestations, no-telemetry statement)
+- [x] 27. Release hygiene (attestations, no-telemetry statement) — done 2026-10-27, [PR #87](https://github.com/leo-gan/anonymizer/pull/87)
 
 ---
 
@@ -608,18 +608,18 @@ This item adds an opt-in second step: you mark which leftovers to accept, and th
 
 ### 27. Release hygiene (attestations, no-telemetry statement)
 
-**Status:** not started  
+**Status:** done 2026-10-27 — [PR #87](https://github.com/leo-gan/anonymizer/pull/87) (`release-hygiene`)  
 **Technique:** trust in the supply chain. Filtered from the OS/network survey — not Tor, not a live USB.
 
-**Why:** Open-source privacy tools are judged on “can I reproduce this wheel” and “does it phone home.” Code already has no telemetry; that is not written as a guarantee. CI does not publish checksums.
+**Why:** Open-source privacy tools are judged on whether a wheel can be checked and whether the program sends usage data. The code already had no telemetry. v0.31.0 already attaches `SHA256SUMS` to the GitHub Release, and PyPI already stores a publish attestation from trusted publishing. What was missing was the written guarantee and a GitHub build attestation for the release files.
 
 **Do**
 
-- CI: publish wheel SHA-256 (and attestations if cheap).
-- README / recipes: explicit no-telemetry, no-log-shipping statement; cloud LLM is opt-in and leaves the machine.
-- Do not add analytics “just to check.”
+- Keep `SHA256SUMS` on the release. `actions/attest` signs a build attestation for the wheels and sdists. Leave the existing PyPI publish attestations in place.
+- README and recipes state that the program does not send usage data and does not upload logs. They also state that the default profile is `best-speed` (`gemini-2.5-flash`): without the `ner` extra that run sends chunks to Google when `GOOGLE_API_KEY` is set, and with the extra it uses local span NER instead. The pages do not call the cloud model opt-in.
+- Do not add analytics.
 
-**Touches:** `.github/workflows/`, README, recipes.  
+**Touches:** `.github/workflows/release.yml`, `README.md`, `docs/project/recipes.md`.  
 **Prerequisite:** none.
 
 ---
@@ -652,7 +652,7 @@ Every numbered item can merge with **no prerequisite PR**. Soft couplings only:
 - (24) `encrypt`/`fpe` is an operator on (6), hardened by (17).
 - (26) is table-only; it must not rewrite PDFs.
 
-Value-first order for **open** items (not a merge gate): **20** + **21** (local NER) → **22** (API) → **23** (apply) → **24** (FPE) → **26** (tables) → **27** (release).
+Items 1–27 are done. The next backlog is [`real-life-plan.md`](real-life-plan.md).
 
 ---
 
