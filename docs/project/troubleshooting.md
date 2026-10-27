@@ -19,7 +19,7 @@ Common problems and how to resolve them.
     ANONYMIZER_MAPPING_KEY="a long secret"
     ANONYMIZER_FAKE_SECRET="another long secret"
     ```
-  - `ANONYMIZER_MAPPING_KEY` locks mapping files as `*.mapping.json.enc`. `ANONYMIZER_FAKE_SECRET` seeds `--operator TYPE=fake`. Neither is required.
+  - `ANONYMIZER_MAPPING_KEY` locks mapping files as `*.mapping.json.enc`. It is optional. `ANONYMIZER_FAKE_SECRET` is required when `--operator` uses `fake`.
   - For the SDK, load the environment variables yourself (e.g. with `python-dotenv` or `os.environ`).
 
 ## HTTP service is missing

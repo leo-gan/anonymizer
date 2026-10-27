@@ -273,7 +273,7 @@ def run(
             "--fake-secret",
             help=(
                 "Seed for --operator TYPE=fake. Also ANONYMIZER_FAKE_SECRET. "
-                "Same person always gets the same fake. Default is a built-in constant."
+                "Required when fake is used. Same person always gets the same fake."
             ),
         ),
     ] = None,

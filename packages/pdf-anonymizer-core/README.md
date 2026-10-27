@@ -42,7 +42,7 @@ The core library itself does not load `.env` files. Environment variables must b
 - `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 - `ANONYMIZER_MAPPING_KEY`: Optional passphrase for encrypted mapping files.
-- `ANONYMIZER_FAKE_SECRET`: Optional seed for the `fake` operator.
+- `ANONYMIZER_FAKE_SECRET`: Required seed for the `fake` operator. There is no built-in seed.
 
 ## API Usage
 

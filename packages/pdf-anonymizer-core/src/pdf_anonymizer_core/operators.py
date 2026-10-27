@@ -10,6 +10,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import logging
 import re
 from datetime import date, datetime, timedelta
 from typing import Dict, Iterable, Optional
@@ -17,6 +18,8 @@ from typing import Dict, Iterable, Optional
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from pdf_anonymizer_core.validators import parent_type
+
+logger = logging.getLogger(__name__)
 
 OPERATOR_REPLACE = "replace"
 OPERATOR_MASK = "mask"
@@ -43,9 +46,11 @@ ENCRYPT_AAD = b"pdf-anonymizer-encrypt-v1"
 ENCRYPT_SECRET_MESSAGE = (
     "The encrypt operator needs --encrypt-secret or ANONYMIZER_ENCRYPT_SECRET."
 )
+FAKE_SECRET_MESSAGE = (
+    "The fake operator needs --fake-secret or ANONYMIZER_FAKE_SECRET."
+)
 _ENCRYPT_TOKEN = re.compile(rf"{re.escape(ENCRYPT_PREFIX)}[A-Za-z0-9_-]+")
-
-DEFAULT_FAKE_SECRET = "pdf-anonymizer-fake"
+_hash_low_entropy_warned = False
 
 _ISO_DATE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})")
 _US_ZIP = re.compile(r"^(\d{5})(?:-\d{4})?$")
@@ -192,7 +197,9 @@ def mapping_without_encrypt_plaintexts(mapping: Dict[str, str]) -> Dict[str, str
 
 
 def _fake_seed(secret: str, entity_type: str, base_form: str) -> int:
-    material = f"{secret or DEFAULT_FAKE_SECRET}:{entity_type.upper()}:{base_form}"
+    if not secret:
+        raise ValueError(FAKE_SECRET_MESSAGE)
+    material = f"{secret}:{entity_type.upper()}:{base_form}"
     return int(hashlib.sha256(material.encode("utf-8")).hexdigest()[:16], 16)
 
 
@@ -250,8 +257,30 @@ def fake_value(
 
 
 def hash_value(original: str) -> str:
+    """Unsalted SHA-256 prefix. Short values can be reversed by guessing."""
+    _warn_low_entropy_hash(original)
     digest = hashlib.sha256(original.encode("utf-8")).hexdigest()[:16]
     return f"H_{digest}"
+
+
+def _warn_low_entropy_hash(original: str) -> None:
+    """Warn once when a short value is hashed.
+
+    The digest is not a secret. A 9-digit identifier has few candidates, so a
+    reader can try them all. The warning names the length and not the value.
+    """
+    global _hash_low_entropy_warned
+    if _hash_low_entropy_warned:
+        return
+    compact = "".join(ch for ch in original if ch.isalnum())
+    if len(compact) > 12 and not original.strip().isdigit():
+        return
+    _hash_low_entropy_warned = True
+    logger.warning(
+        "hash wrote an unsalted SHA-256 prefix for a short value (length %s). "
+        "A reader who can guess the candidates can reverse it.",
+        len(original),
+    )
 
 
 def mask_value(original: str, entity_type: str) -> str:

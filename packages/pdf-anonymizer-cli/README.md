@@ -46,7 +46,7 @@ The CLI will automatically load a `.env` file from the current directory or any 
 - `ANTHROPIC_API_KEY`: Required when using Anthropic models.
 - `OLLAMA_HOST`: Optional, defaults to `http://localhost:11434` when using Ollama models.
 - `ANONYMIZER_MAPPING_KEY`: Optional. Same as `--mapping-passphrase` (writes `*.mapping.json.enc`).
-- `ANONYMIZER_FAKE_SECRET`: Optional. Seed for `--operator TYPE=fake`.
+- `ANONYMIZER_FAKE_SECRET`: Required when `--operator` uses `fake`. There is no built-in seed.
 - `ANONYMIZER_ENCRYPT_SECRET`: Optional. Secret for `--operator TYPE=encrypt`.
 
 Example `.env` file:
@@ -96,7 +96,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] \
 - `--mapping-passphrase TEXT`: Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id). Also `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON.
 - `--ephemeral-mapping`: Do not write `data/mappings/`. The vocabulary stays in this process only.
 - `--operator TYPE=op`: How to write a type (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`, `encrypt`). Repeatable. Default is `replace`.
-- `--fake-secret TEXT`: Seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`.
+- `--fake-secret TEXT`: Required seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`.
 - `--encrypt-secret TEXT`: Secret for `encrypt`. Also `ANONYMIZER_ENCRYPT_SECRET`. Required when any type uses `encrypt`.
 - `--risk / --no-risk`: After masking, score identity-clue clumps (default: on). Writes `data/stats/<stem>.risk.json`.
 

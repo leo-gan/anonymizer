@@ -52,6 +52,18 @@ class TestMaskHashGeneralizeShift:
         assert hash_value("Ada") != hash_value("Bob")
         assert hash_value("Ada").startswith("H_")
 
+    def test_hash_warns_once_for_a_short_value(self, caplog) -> None:
+        import pdf_anonymizer_core.operators as ops
+
+        ops._hash_low_entropy_warned = False
+        with caplog.at_level("WARNING", logger="pdf_anonymizer_core.operators"):
+            hash_value("123456789")
+            hash_value("987654321")
+        warnings = [record.getMessage() for record in caplog.records]
+        assert len(warnings) == 1
+        assert "123456789" not in warnings[0]
+        assert "987654321" not in warnings[0]
+
     def test_generalize_date_zip_age(self) -> None:
         assert generalize_value("2019-06-20", "DATE_ISO") == "2019"
         assert generalize_value("02139", "ZIP") == "021**"
@@ -88,6 +100,10 @@ class TestMaskHashGeneralizeShift:
         assert a != d
         assert a != "Ada Lovelace"
         assert " " in a
+
+    def test_fake_without_secret_raises(self) -> None:
+        with pytest.raises(ValueError, match="fake-secret"):
+            fake_value("Ada", "PERSON", "Ada", "")
 
     def test_fake_email_and_phone_shape(self) -> None:
         email = fake_value("ada@old.com", "EMAIL", "ada@old.com", "s")

@@ -738,7 +738,7 @@ Sometimes you want a different mark:
 | `replace` | `PERSON_1` (default) | Reversible stand-ins |
 | `mask` | `****-****-****-1111` | Cards, SSNs, phones (keep a little shape) |
 | `generalize` | `2019`, `021**`, `40-49` | Dates, ZIP codes, ages. A shape it cannot coarsen is masked, not left as written. |
-| `hash` | `H_` plus a short fingerprint | Same value always looks the same, but not readable |
+| `hash` | `H_` plus a short fingerprint | Same value always looks the same. The fingerprint is an unsalted SHA-256 prefix, so a short value such as a ZIP code can be guessed. |
 | `shift` | A nearby date | Dates that must stay dates, not just a year |
 | `fake` | `Jane Alvarez`, `555-0103` | Looks real; same person always gets the same fake |
 | `encrypt` | `ENC1_…` (AES-256-GCM token) | Reversible with a secret; original not stored in the mapping |
@@ -749,8 +749,10 @@ pdf-anonymizer run invoice.pdf \
   --operator DATE=generalize \
   --operator DATE_ISO=generalize
 
-# Invent stable fake names (same person → same fake)
-pdf-anonymizer run notes.pdf --operator PERSON=fake --operator EMAIL=fake
+# Invent stable fake names (same person → same fake). A secret is required.
+pdf-anonymizer run notes.pdf \
+  --operator PERSON=fake --operator EMAIL=fake \
+  --fake-secret 'a long secret'
 
 # Lock emails as tokens (not stored in the mapping file)
 pdf-anonymizer run notes.pdf \

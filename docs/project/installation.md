@@ -108,7 +108,7 @@ ANONYMIZER_MAPPING_KEY="a long secret"
 ANONYMIZER_FAKE_SECRET="another long secret"
 ```
 
-`ANONYMIZER_MAPPING_KEY` and `ANONYMIZER_FAKE_SECRET` are optional. Without them, maps stay plaintext JSON and `fake` uses a built-in constant seed (stable, not private).
+`ANONYMIZER_MAPPING_KEY` is optional. Without it, maps stay plaintext JSON. `ANONYMIZER_FAKE_SECRET` is required when an operator is `fake`. There is no built-in seed.
 
 ---
 
