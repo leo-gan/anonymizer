@@ -3737,7 +3737,7 @@
 <li>Use Markdown-aware splitting (automatic for <code>.pdf</code> and <code>.md</code>). Plain <code>.txt</code> falls back to recursive character splitting.</li>
 <li>Watch the log output: each chunk is logged (<code>Identifying entities in part X/Y...</code>).</li>
 <li>The <code>chunk_overlap</code> (profile-driven) helps the model see context across chunk boundaries for coreference.</li>
-<li>If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors.</li>
+<li>If you hit rate limits, the built-in retry logic with exponential backoff (and jitter) will help on transient errors. When the retries are exhausted, or the provider rejects the key, the command stops and does not write that file.</li>
 </ul>
 <hr />
 <h2 id="hipaa-safe-harbor-coverage-aid">HIPAA Safe Harbor coverage aid<a class="headerlink" href="#hipaa-safe-harbor-coverage-aid" title="Permanent link">&para;</a></h2>
@@ -3778,7 +3778,7 @@
 <tr>
 <td><code>generalize</code></td>
 <td><code>2019</code>, <code>021**</code>, <code>40-49</code></td>
-<td>Dates, ZIP codes, ages</td>
+<td>Dates, ZIP codes, ages. A shape it cannot coarsen is masked, not left as written.</td>
 </tr>
 <tr>
 <td><code>hash</code></td>
