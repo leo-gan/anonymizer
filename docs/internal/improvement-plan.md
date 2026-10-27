@@ -262,7 +262,7 @@ Known code facts to attach to:
 
 - Add operator `fake`.
 - Seed with `hash(secret, base_form, type)` so the same person always gets the same fake.
-- Optional `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. Default secret is a built-in constant (stable, not private).
+- `--fake-secret` / `ANONYMIZER_FAKE_SECRET` is required. A built-in default seed was removed so unpublished fakes are not linkable across documents.
 - Keep mapping original → fake so deanonymize still works.
 
 **Touches:** `operators.py`, `core.py`, CLI, recipes.  

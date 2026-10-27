@@ -33,7 +33,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id, source-file AAD). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 | `--ephemeral-mapping` / `--persist-mapping` | flag | persist | Keep the mapping only in this process. Nothing is written under `data/mappings/`. |
 | `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`, `encrypt`. |
-| `--fake-secret` | `TEXT` | built-in | Seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
+| `--fake-secret` | `TEXT` | none | Required seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
 | `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
 | `--entity-profile` | `hipaa-safe-harbor` | *none* | Coverage aid for HIPAA Safe Harbor identifier classes. **Not a compliance certificate.** |
 | `--mapping-in` | `PATH` | *none* | Seed stand-ins from an existing mapping so the same person stays `PERSON_1` across files. |
@@ -308,7 +308,7 @@ A number that *looks* like an IBAN or a card is still hidden if the extra check-
 
 ### How a type is written
 
-`--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes the mark on the page. Default remains `replace` (`PERSON_1`). Seed `fake` with `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. `encrypt` writes an AES-256-GCM token (`ENC1_…`) and needs `--encrypt-secret` / `ANONYMIZER_ENCRYPT_SECRET`. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).
+`--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes the mark on the page. Default remains `replace` (`PERSON_1`). `fake` needs `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. There is no built-in seed. `hash` is an unsalted SHA-256 prefix: the same input always matches, and a short value can be reversed by trying the candidates. The command warns once when that value is short. `encrypt` writes an AES-256-GCM token (`ENC1_…`) and needs `--encrypt-secret` / `ANONYMIZER_ENCRYPT_SECRET`. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).
 
 ### Linkage-risk score
 

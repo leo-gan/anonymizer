@@ -422,9 +422,14 @@ class AnthropicProvider(LLMProvider):
             if isinstance(max_output_tokens, int) and max_output_tokens > 0
             else DEFAULT_CHARACTERS_TO_ANONYMIZE // 4,
             messages=[{"role": "user", "content": prompt}],
-            stream=True,
         )
-        return response.content[0].text if response.content else ""
+        content = getattr(response, "content", None) or []
+        if not content:
+            raise ValueError("Anthropic response had no message content.")
+        text = getattr(content[0], "text", None)
+        if not text:
+            raise ValueError("Anthropic response had no text block.")
+        return text
 
 
 def get_provider(provider_name: str) -> LLMProvider:
