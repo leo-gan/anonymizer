@@ -20,6 +20,14 @@ This tool hides personal details in documents and can put them back. It is a rev
 | OCR | `--ocr` runs Tesseract when a PDF has pages but no text layer. |
 | Local or remote | [Ollama](https://ollama.com/) on this machine, or Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter. |
 
+## What leaves this machine
+
+The program does not send usage data, and it does not upload logs. The command line writes `app.log` in the working directory.
+
+Document text leaves the machine only in a call to a language-model provider. The default profile is `best-speed`, and its model name is `gemini-2.5-flash`. Without the `ner` extra, a normal run sends each chunk to Google when `GOOGLE_API_KEY` is set. With that extra, `best-speed` uses local span NER and skips the remote call. `--no-llm`, `-p regex-only`, and an `ollama/` model name keep the text on this machine. The first local span-NER run can download model weights from Hugging Face. An install without the `ner` extra does not download a model.
+
+Each GitHub Release includes the wheels and a `SHA256SUMS` file. Compare a downloaded file with that list. The release workflow signs a build attestation for those wheels, which is a signed record that this workflow built them. PyPI stores a publish attestation on each uploaded file.
+
 Operators, locked maps, HTTP, and the rest live in the [docs](https://leo-gan.github.io/anonymizer/).
 
 ## Measured quality

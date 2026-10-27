@@ -4,7 +4,7 @@
 **Audience:** maintainers only
 **Do not publish.** This directory is excluded from the MkDocs / GitHub Pages build (`exclude_docs` in `mkdocs.yml`). Do not link it from `README.md`, `docs/index.md`, or the public nav.
 
-This plan continues [`improvement-plan.md`](improvement-plan.md). Items 1–26 there have shipped (v0.31.0). Item 27 (release hygiene) is absorbed here as item 3. It does not reopen OCR, native PDF, GLiNER, the HTTP service, or table *k*-anonymity as if they were missing. `docs/temp/` describes that older gap list and is not the backlog.
+This plan continues [`improvement-plan.md`](improvement-plan.md). Items 1–26 there have shipped (v0.31.0). Item 27 (release hygiene) is its own change: the written network statement, the `SHA256SUMS` file already on the GitHub Release, and a GitHub build attestation. Item 3 keeps the local-service review. This plan does not reopen OCR, native PDF, GLiNER, the HTTP service, or table *k*-anonymity as if they were missing. `docs/temp/` describes that older gap list and is not the backlog.
 
 The product is a reversible document pseudonymizer. Personal values become typed stand-ins (`PERSON_1`) plus a mapping file. While the map exists, the file is still personal data. HIPAA and GDPR wording stays "aid", not a certificate.
 
@@ -12,7 +12,7 @@ The product is a reversible document pseudonymizer. Personal values become typed
 
 - [ ] 1. Publish NER and careful-LLM scores on the gold corpus
 - [ ] 2. One local round-trip command (`relay`)
-- [ ] 3. Security review of the local service (token, audit, no-telemetry, checksums)
+- [ ] 3. Security review of the local service (token, audit, health version)
 - [ ] 4. Local review desk for span decisions
 - [ ] 5. Clinical and legal profiles, with measured fixtures
 - [ ] 6. Documents people actually have (OCR language, unreadable pages, PDF beside Markdown)
@@ -137,9 +137,9 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 ### 3. Security review of the local service
 
 **Status:** not started
-**Absorbs:** improvement-plan item 27.
+**Absorbs:** nothing from item 27 except the HTTP-page copy of the network statement. Checksums, the PyPI publish attestation, the GitHub build attestation, and the README / recipes paragraphs belong to item 27.
 
-**Why:** `POST /deanonymize` turns stand-ins back into names and has no authentication. A hospital or a bank stops a pilot there. The tool also does not say, in the README, that it does not ship logs off the machine. `/health` reports version `0.26.0` while the package is `0.31.0`.
+**Why:** `POST /deanonymize` turns stand-ins back into names and has no authentication. A hospital or a bank stops a pilot there. `/health` reports version `0.26.0` while the package is `0.31.0`.
 
 **Do**
 
@@ -147,9 +147,9 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - If `--host` is not a loopback address, refuse to start when the token is unset.
 - Loopback with no token keeps today's open behavior, and the process logs one warning at startup. That preserves current `curl` recipes on `127.0.0.1`.
 - Append one JSON line per deanonymize, from the CLI and from HTTP, to `data/stats/audit.log` (mode `0600`). Fields: time, command (`cli` or `http`), restored count, whether a mapping file path was used. Do not write original values, placeholder values, or document text.
-- Add a short no-telemetry paragraph to the root README and to `docs/project/http-service.md`: the process does not send usage data; a cloud model runs only when the user selects one; the audit file stays on disk.
+- Copy the network wording from the root README into `docs/project/http-service.md`. The CLI default profile is `best-speed` (`gemini-2.5-flash`). Without the `ner` extra that run calls Google. With the extra it uses local span NER. Do not write that a cloud model is opt-in for the command line. The HTTP service default remains regex-only. When the audit file exists, say that it stays on disk.
 - Read the API version from installed package metadata. Delete the hardcoded `0.26.0`.
-- In the release workflow, publish SHA-256 checksums for the wheels. Sigstore attestations are welcome if the existing GitHub workflow can do them without a new vendor. Checksums alone close item 27.
+- Do not rebuild checksums or attestations here. v0.31.0 already publishes `SHA256SUMS`, and PyPI already stores a publish attestation. Item 27 adds the GitHub build attestation.
 
 **Do not**
 
@@ -157,9 +157,9 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 - Do not log prompts.
 - Do not require a token on loopback in this pull request. Item 4's review page is the exception: that page must not start without a token.
 
-**Done when:** `tests/test_http_api.py` covers 401, loopback-open, and non-loopback refusal. An audit test asserts the log line has no fixture name in it. README contains the no-telemetry paragraph. `GET /health` returns the core or API package version from metadata.
+**Done when:** `tests/test_http_api.py` covers 401, loopback-open, and non-loopback refusal. An audit test asserts the log line has no fixture name in it. `docs/project/http-service.md` contains the same network paragraph as the root README. `GET /health` returns the core or API package version from metadata.
 
-**Touches:** `app.py`, `cli.py` deanonymize path, `.github/workflows/`, README, `docs/project/http-service.md`, `docs/project/mapping-security.md`.
+**Touches:** `app.py`, `cli.py` deanonymize path, `docs/project/http-service.md`, `docs/project/mapping-security.md`.
 
 **Prerequisite:** none. Item 4 depends on this.
 
@@ -304,6 +304,6 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 
 - Tests cover the new behavior and the unchanged default of `run`, except the PDF extra file in item 6b.
 - `uv run ruff check .` and `uv run pytest` pass.
-- User-facing text goes in recipes, CLI help, or the gold-corpus page. The root README gains only the no-telemetry paragraph in item 3.
+- User-facing text goes in recipes, CLI help, or the gold-corpus page. The root README network paragraph belongs to improvement-plan item 27. Item 3 copies that wording into `docs/project/http-service.md` and does not add a second README essay.
 - This file's progress checkbox is updated when the item merges.
 - Pull-request CI does not gain an API key, a model download, or a network call.

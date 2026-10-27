@@ -4,6 +4,14 @@ This page contains practical, end-to-end examples for common real-world usage pa
 
 Use these recipes as starting points and adapt the commands or code to your environment.
 
+## What the program sends
+
+The program does not send usage data, and it does not upload logs. The command line writes `app.log` in the working directory.
+
+Document text leaves the machine only in a call to a language-model provider. The default profile is `best-speed`, and its model name is `gemini-2.5-flash`. Without the `ner` extra, a normal run sends each chunk to Google when `GOOGLE_API_KEY` is set. With that extra, `best-speed` uses local span NER and skips the remote call. The recipe below, `--no-llm`, and an `ollama/` model name keep the text on this machine. The first local span-NER run can download model weights from Hugging Face. An install without the `ner` extra does not download a model.
+
+Each GitHub Release includes the wheels and a `SHA256SUMS` file. Compare a downloaded file with that list. The release workflow signs a build attestation for those wheels, which is a signed record that this workflow built them. PyPI stores a publish attestation on each uploaded file.
+
 ---
 
 ## Fully Local & Private Anonymization (Ollama)

@@ -1,7 +1,9 @@
 name: Release
 
-# Create a GitHub Release (tag vX.Y.Z) to build both packages, attach
-# wheels + SHA-256 sums, and publish to PyPI.
+# Create a GitHub Release (tag vX.Y.Z) to build the packages, attach
+# wheels and sdists plus SHA-256 sums, sign a build attestation for
+# those files, and publish to PyPI. PyPI trusted publishing already
+# stores a publish attestation on each upload.
 #
 # PyPI uses Trusted Publishing (OIDC). No API token is stored in this repo.
 # One-time setup on each PyPI project (id-extract, pdf-anonymizer-core,
@@ -22,6 +24,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,6 +59,15 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           cat dist/SHA256SUMS >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # Subjects are the distribution files. SHA256SUMS is a copy of
+      # those digests for people who download the GitHub Release.
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
