@@ -28,7 +28,7 @@ PDF Anonymizer (v0.17) is a **reversible document / table pseudonymizer**:
 - HIPAA Safe Harbor **aid**, not a certificate
 - PDF/MD/TXT via `pymupdf4llm` **Markdown export**; CSV/XLSX **per-cell** (not flattened text, not *k*-anonymity)
 - Local Ollama, `--no-llm` / `regex-only`, plus cloud providers
-- Chunked processing claimed to 1GB
+- Text is read into memory and then chunked. The old README claimed a tested 1 GB path. Tables and Word stop at 50 MiB.
 
 It is **not** an anonymity OS, a Tor wrapper, or a statistical disclosure-control engine.
 
