@@ -45,7 +45,7 @@ Items 1, 2, and 3 can merge in any order. Item 4 waits on the token from item 3.
 | NER is optional, model `urchade/gliner_small-v2.1`, labels person / organization / location / address / date | `span_ner.py`. There is no `--ner-model` flag. |
 | Careful prompt asks for identity clues. Speed and cost profiles skip the language model when the `[ner]` extra is installed. | `prompts/detailed.py`, `conf.py` |
 | Task calls and detection calls share `llm_provider.py` (`call(prompt, model_name)`). Detection prompts are not a user task. | `llm_provider.py` |
-| HTTP is text-only, 5,000,000 characters, no authentication. `/health` reports the hardcoded version `0.26.0` while core is `0.31.0`. | `packages/pdf-anonymizer-api/src/pdf_anonymizer_api/app.py` |
+| HTTP is text-only, 5,000,000 characters, no authentication. `/health` reports the hardcoded version `0.26.0` while core is `0.32.0`. | `packages/pdf-anonymizer-api/src/pdf_anonymizer_api/app.py` |
 | Date `shift` uses a different offset per value, derived from `base_form`. Intervals between two dates are not preserved. | `operators.py` `shift_date_value` |
 | HIPAA profile sets year-only dates, ZIP3, and age 90+. | `EntityProfile.HIPAA_SAFE_HARBOR` in `conf.py` |
 | OCR language is fixed at `eng`. An empty scan is already a hard error. | `pdf_ocr.py` |
@@ -139,7 +139,7 @@ Record token counts and parse-failure counts in each baseline. A local model tha
 **Status:** not started
 **Absorbs:** nothing from item 27 except the HTTP-page copy of the network statement. Checksums, the PyPI publish attestation, the GitHub build attestation, and the README / recipes paragraphs belong to item 27.
 
-**Why:** `POST /deanonymize` turns stand-ins back into names and has no authentication. A hospital or a bank stops a pilot there. `/health` reports version `0.26.0` while the package is `0.31.0`.
+**Why:** `POST /deanonymize` turns stand-ins back into names and has no authentication. A hospital or a bank stops a pilot there. `/health` reports version `0.26.0` while the package is `0.32.0`.
 
 **Do**
 
