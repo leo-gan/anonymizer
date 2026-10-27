@@ -2225,6 +2225,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-the-program-sends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the program sends
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fully-local-private-anonymization-ollama" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2787,6 +2798,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-the-program-sends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the program sends
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fully-local-private-anonymization-ollama" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3189,6 +3211,10 @@
 <h1 id="recipes-common-workflows">Recipes &amp; Common Workflows<a class="headerlink" href="#recipes-common-workflows" title="Permanent link">&para;</a></h1>
 <p>This page contains practical, end-to-end examples for common real-world usage patterns with PDF Anonymizer.</p>
 <p>Use these recipes as starting points and adapt the commands or code to your environment.</p>
+<h2 id="what-the-program-sends">What the program sends<a class="headerlink" href="#what-the-program-sends" title="Permanent link">&para;</a></h2>
+<p>The program does not send usage data, and it does not upload logs. The command line writes <code>app.log</code> in the working directory.</p>
+<p>Document text leaves the machine only in a call to a language-model provider. The default profile is <code>best-speed</code>, and its model name is <code>gemini-2.5-flash</code>. Without the <code>ner</code> extra, a normal run sends each chunk to Google when <code>GOOGLE_API_KEY</code> is set. With that extra, <code>best-speed</code> uses local span NER and skips the remote call. The recipe below, <code>--no-llm</code>, and an <code>ollama/</code> model name keep the text on this machine. The first local span-NER run can download model weights from Hugging Face. An install without the <code>ner</code> extra does not download a model.</p>
+<p>Each GitHub Release includes the wheels and a <code>SHA256SUMS</code> file. Compare a downloaded file with that list. The release workflow signs a build attestation for those wheels, which is a signed record that this workflow built them. PyPI stores a publish attestation on each uploaded file.</p>
 <hr />
 <h2 id="fully-local-private-anonymization-ollama">Fully Local &amp; Private Anonymization (Ollama)<a class="headerlink" href="#fully-local-private-anonymization-ollama" title="Permanent link">&para;</a></h2>
 <p>Run everything on your own machine so no document data ever leaves your computer.</p>
