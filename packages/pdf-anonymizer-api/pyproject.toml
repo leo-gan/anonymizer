@@ -1,6 +1,6 @@
 [project]
 name = "pdf-anonymizer-api"
-version = "0.32.0"
+version = "0.33.0"
 description = "Self-hosted local FastAPI HTTP service wrapping pdf-anonymizer-core for reversible PII pseudonymization (no built-in authentication)."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
@@ -32,7 +32,7 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
 ]
 dependencies = [
-    "pdf-anonymizer-core>=0.32.0",
+    "pdf-anonymizer-core>=0.33.0",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
 ]
