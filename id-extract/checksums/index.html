@@ -2393,6 +2393,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2451,6 +2459,118 @@
     
   
     Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/academic-irb-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Academic Research & IRB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/ai-rag-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI & RAG Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/id-extract-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    id-extract in Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/tool-comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Comparison
   
 
     
@@ -3152,7 +3272,7 @@
 <p>Many widely issued identifiers — including U.S. Social Security numbers (<code>SSN_US</code>), U.S. EINs, and most national driver licenses — <strong>have no mathematical check digit</strong>. Their regexes rely solely on format rules (such as excluded SSN area <code>000</code>/<code>666</code> or hyphenation).</p>
 <p>When a national format is short or alphanumeric without fixed punctuation, precision degrades sharply on prose:</p>
 <ul>
-<li>In the 6,761-document benchmark (<a href="../../project/eval-results/#why-the-legal-number-is-not-a-name-leak">Evaluation Results</a>), a broad Canadian driver-license pattern (<code>\b[A-Z0-9]{5,15}\b</code>) fired 1,459 times across 254 European court judgments, rewriting uppercase headings such as <code>PROCEDURE</code> and <code>FACTS</code> into <code>DRIVERS_LICENSE_CA</code>.</li>
+<li>In the 0.31.0 benchmark (<a href="../../project/eval-results/#why-the-legal-number-is-not-a-name-leak">Evaluation Results</a>), a former Canadian driver-license catch-all (<code>\b[A-Z0-9]{5,15}\b</code>) fired 1,459 times across 254 European court judgments, rewriting uppercase headings such as <code>PROCEDURE</code> and <code>FACTS</code> into <code>DRIVERS_LICENSE_CA</code>. Tightening <code>DRIVERS_LICENSE_CA</code> (and the equivalent <code>AU</code>/<code>DE</code>/<code>ES</code>/<code>FR</code>/<code>IT</code> patterns) to require digits eliminated all 2,055 false-positive driver-license hits on those 254 judgments.</li>
 <li>Narrowing country scope via <code>countries=["US", "GB"]</code> (CLI: <code>--countries US,GB</code>) and keeping broad state/provincial patterns opt-in (<code>opt_in=</code>) prevents unrelated national syntaxes from polluting precision.</li>
 </ul>
 <hr />

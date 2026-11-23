@@ -2395,6 +2395,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2453,6 +2461,118 @@
     
   
     Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/academic-irb-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Academic Research & IRB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/ai-rag-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI & RAG Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/id-extract-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    id-extract in Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/tool-comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Comparison
   
 
     
@@ -3180,7 +3300,7 @@
 <li><a href="https://www.agenziaentrate.gov.it/portale/web/guest/schede/istanze/apertura-partita-iva/infogen-apertura-piva">Agenzia delle Entrate — partita IVA</a></li>
 </ul>
 <h2 id="drivers_license_it-patente-di-guida"><code>DRIVERS_LICENSE_IT</code> — Patente di guida<a class="headerlink" href="#drivers_license_it-patente-di-guida" title="Permanent link">&para;</a></h2>
-<p>A coarse 10-character token for an Italian driving-licence number.</p>
+<p>Modern EU-card (<code>U1</code> prefix) and legacy provincial Italian driving-licence shapes.</p>
 <table>
 <thead>
 <tr>
@@ -3195,7 +3315,7 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>10 letters or digits</td>
+<td><code>U1</code> + 8 letters/digits, or 2 letters + 7 digits + letter</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>

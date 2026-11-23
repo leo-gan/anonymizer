@@ -2439,6 +2439,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2497,6 +2505,118 @@
     
   
     Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/academic-irb-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Academic Research & IRB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/ai-rag-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI & RAG Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/id-extract-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    id-extract in Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/tool-comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Comparison
   
 
     
@@ -3237,7 +3357,7 @@
 <li><a href="https://laws-lois.justice.gc.ca/eng/acts/I-3.3/">Income Tax Act (Canada)</a></li>
 </ul>
 <h2 id="drivers_license_ca-driver-licence-province-or-territory"><code>DRIVERS_LICENSE_CA</code> — Driver licence (province or territory)<a class="headerlink" href="#drivers_license_ca-driver-licence-province-or-territory" title="Permanent link">&para;</a></h2>
-<p>Licences are issued by each province or territory. Formats vary. The second alternative in the pattern is very broad.</p>
+<p>Licences are issued by each province or territory. This pattern matches the standard grouped format (<code>A1234-56789-01234</code>). Unhyphenated Ontario licences are available via opt-in key <code>DL_ON_CA</code>.</p>
 <table>
 <thead>
 <tr>
@@ -3252,7 +3372,7 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>Letter + grouped digits, or 5–15 alphanumeric</td>
+<td>Letter + 4–5 digits + hyphen + 5–6 digits + hyphen + 5 digits</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>

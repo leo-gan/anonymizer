@@ -2417,6 +2417,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2475,6 +2483,118 @@
     
   
     Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/academic-irb-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Academic Research & IRB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/ai-rag-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI & RAG Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/id-extract-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    id-extract in Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../project/tool-comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Comparison
   
 
     
@@ -3290,7 +3410,7 @@
 <li><a href="https://ec.europa.eu/taxation_customs/vies/">VIES — validate a VAT number</a></li>
 </ul>
 <h2 id="drivers_license_es-permiso-de-conduccion"><code>DRIVERS_LICENSE_ES</code> — Permiso de conducción<a class="headerlink" href="#drivers_license_es-permiso-de-conduccion" title="Permanent link">&para;</a></h2>
-<p>A coarse 9–10 character token for Spanish driving-licence numbers.</p>
+<p>Spanish driving-licence numbers follow the holder's DNI or NIE structure.</p>
 <table>
 <thead>
 <tr>
@@ -3305,11 +3425,11 @@
 </tr>
 <tr>
 <td><strong>Shape this package looks for</strong></td>
-<td>9–10 letters or digits</td>
+<td>8 digits + letter, or <code>X</code>/<code>Y</code>/<code>Z</code> + 7 digits + letter</td>
 </tr>
 <tr>
 <td><strong>Checksum</strong></td>
-<td>none</td>
+<td>none (use <code>DNI_ES</code> / <code>NIE_ES</code> for mod-23 validation)</td>
 </tr>
 <tr>
 <td><strong>Example (synthetic)</strong></td>
