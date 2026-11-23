@@ -1,3 +1,7 @@
+---
+description: Core privacy definitions (direct vs. quasi-identifiers, anonymization vs. pseudonymization), empirical re-identification attacks, and GDPR/HIPAA/CCPA standards.
+---
+
 # Lecture 1: Problem Statement, Threat Models, and Legal Scope
 
 Data sharing creates a structural tension between **utility** (retaining enough signal for analysis, research, or downstream computation) and **disclosure risk** (preventing an adversary from linking records back to real individuals). This lecture defines the core problem, reviews empirical re-identification attacks, and summarizes the main legal frameworks.
@@ -71,6 +75,14 @@ Disclosure risk arises wherever human records are shared across institutional or
 | **Enterprise & LLM Workflows** | Customer names, employee logins, client accounts | Internal project names, org-chart roles, proprietary code or contract context | SOC 2, internal data governance |
 
 ---
+
+??? note "Exercises"
+    1. **Direct vs. quasi-identifier:** In the sentence *"The lead surgeon who performed the 2024-03-14 liver transplant in Reykjavik signed the discharge summary"*, classify each identifying phrase as direct or quasi-identifier. Why does removing personal names fail to anonymize this sentence?
+    2. **GDPR classification:** A hospital replaces every patient name with `PATIENT_1`, `PATIENT_2`, ... and stores the mapping file in an encrypted vault on a separate server. Under GDPR Art. 4(5) and Recital 26, is the released file *anonymized* or *pseudonymized*?
+
+    ??? note "Solutions"
+        1. There is **no direct identifier** in the sentence. The combination of *occupation* (`lead surgeon`), *specific date* (`2024-03-14`), *rare procedure* (`liver transplant`), and *small geography* (`Reykjavik`) forms a quasi-identifier tuple that almost certainly isolates a single clinician.
+        2. **Pseudonymized.** Because the mapping file exists and permits re-identification, the output remains personal data under GDPR while the controller (or another party with reasonable means) can re-link it.
 
 *Next lecture: [Lecture 2 — Historical Development](history.md).*
 

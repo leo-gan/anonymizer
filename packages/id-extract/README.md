@@ -15,11 +15,13 @@ for hit in extract("ABN 51 824 753 556 and ada@example.com"):
 
 The default is every bundled country. Narrow the set with `countries=["AU", "GB"]`. `UK` is accepted as `GB`. State, provincial, and industry patterns stay off until you pass `opt_in="all"` or a list of keys.
 
-Full guide, including one page per country with official sources:
+Full guide, including check-digit algorithms and one page per country with official sources:
 
 - [id-extract overview](https://leo-gan.github.io/anonymizer/id-extract/)
 - [Install and API](https://leo-gan.github.io/anonymizer/id-extract/api/)
-- [Country catalog](https://leo-gan.github.io/anonymizer/id-extract/countries/)
+- [Check-digit algorithms](https://leo-gan.github.io/anonymizer/id-extract/checksums/)
+- [Country catalog (38 countries)](https://leo-gan.github.io/anonymizer/id-extract/countries/)
 - Example: [Australia (ABN, TFN)](https://leo-gan.github.io/anonymizer/id-extract/countries/au/)
+- [Anonymization Handbook](https://leo-gan.github.io/anonymizer/101/)
 
 A hit means the text looked like that identifier. It is not a legal determination.

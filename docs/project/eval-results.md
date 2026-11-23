@@ -1,3 +1,7 @@
+---
+description: Measured mention F1 and leftover rates for regex-only, local Gemma 4 12B, and Gemini 4 Argon across 6,761 public benchmark documents.
+---
+
 # Evaluation results
 
 These numbers are one run of this package on a public [gold corpus](terminology.md#gold-corpus). They are not a ranking against other products, and they are not a HIPAA or GDPR certificate.

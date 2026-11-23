@@ -1,3 +1,7 @@
+---
+description: Formal definitions of deterministic masking, k-anonymity, l-diversity, t-closeness, differential privacy, synthetic data, and unstructured text de-identification.
+---
+
 # Lecture 3: Formal Models and Methods
 
 Privacy-preserving transformations fall into four families depending on data structure (tabular vs. unstructured text) and whether the guarantee is operational, syntactic, or probabilistic. This lecture defines each family formally and summarizes how unstructured text systems are evaluated.
@@ -104,11 +108,19 @@ Separating direct from quasi-identifiers prevents high recall on frequent locati
 | **$k$-Anonymity / $\ell$-Diversity / $t$-Closeness** | Tabular microdata | Syntactic (given $Q$) | No | ARX Data Anonymizer; clinical/survey table releases |
 | **Differential Privacy** | Aggregate queries, ML | Semantic $(\varepsilon, \delta)$ | No | National censuses, telemetry, DP-SGD training |
 | **Rule + Classical NER** | Unstructured text | Empirical (recall/precision) | Rarely | Microsoft Presidio, spaCy pipelines |
-| **Hybrid Regex + NER / LLM** | Unstructured text & tables | Empirical (benchmark + residual scan) | Yes (with mapping) | `pdf-anonymizer` (Case Study in Lecture 4) |
+| **Hybrid Regex + NER / LLM** | Unstructured text & tables | Empirical (benchmark + residual scan) | Yes (with mapping) | `pdf-anonymizer` ([Lecture 9](how-different.md)) |
 
 ---
 
-*Next lecture: [Lecture 4 — Unstructured Text Case Study](how-different.md).*
+??? note "Exercises"
+    1. **Tabular privacy check:** Suppose a 6-row table has two equivalence classes over $Q = \{\text{ZIP}, \text{Age}\}$: class $E_1$ has 3 rows with diagnoses `{Flu, Flu, Asthma}`, and class $E_2$ has 3 rows with diagnoses `{Flu, Asthma, Migraine}`. What is the maximum $k$ for $k$-anonymity, the maximum $\ell$ for distinct $\ell$-diversity, and the worst-case prosecutor linkage risk?
+    2. **Differential privacy sensitivity:** If a mechanism satisfies $(\varepsilon, 0)$-differential privacy with $\varepsilon = 0.1$, what is the maximum multiplicative ratio $e^{\varepsilon}$ by which adding or removing one individual can change the probability of any output event? What if $\varepsilon = 5$?
+
+    ??? note "Solutions"
+        1. Both classes have $|E_1| = |E_2| = 3$, so the table satisfies **$3$-anonymity** (prosecutor risk $\le 1/3 \approx 33.3\%$). Class $E_1$ has 2 distinct diagnoses and $E_2$ has 3, so the table satisfies distinct **$2$-diversity**.
+        2. For $\varepsilon = 0.1$, $e^{0.1} \approx 1.105$ (at most a $10.5\%$ relative shift). For $\varepsilon = 5$, $e^{5} \approx 148.4$ — a much weaker per-individual bound, illustrating why reporting $\varepsilon$ explicitly matters.
+
+*Next lecture: [Lecture 4 — Attacker Models and Disclosure Risk](risk-and-attackers.md).*
 
 ## References
 

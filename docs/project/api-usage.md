@@ -160,7 +160,7 @@ from pdf_anonymizer_core.prompts import simple, detailed, hipaa
 prompt_text = detailed.prompt_template
 ```
 
-Conceptual discussion and examples appear in [Lecture 4: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
+Conceptual discussion and examples appear in [Lecture 9: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
 
 ---
 

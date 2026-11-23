@@ -1,3 +1,7 @@
+---
+description: Standalone RE2 and check-digit structured identifier detector across 38 countries with official issuing-agency and statutory citations.
+---
+
 # id-extract
 
 `id-extract` finds structured identifiers in text. It returns character offsets. It does not replace text, write a mapping, or open files.
@@ -48,6 +52,7 @@ You do not need `pdf-anonymizer-core` to use this package. The anonymizer depend
 ## Pages in this guide
 
 - [Install and API](api.md)
+- [Check-digit algorithms](checksums.md) — Luhn, ISO 13616 mod-97, Verhoeff, weighted sums, and `TYPE_LIKE` vs. strict-drop policy
 - [Universal identifiers](universal.md) (email, cards, IBAN, VIN, …)
 - [Country catalog](countries/index.md) — one page per ISO-2 plugin
 - [Opt-in identifiers for the United States, Canada, and Mexico](opt-in-us-ca-mx.md) — state, provincial, and industry numbers. Pass `opt_in=` to load them.
