@@ -1,12 +1,6 @@
-# Bonus module
+# The Princess Who Became a Scroll
 
-*A fairy tale about serialization — a short story before the last bell.*
-
-Every tool in this course runs on one quiet idea: you can turn something rich and alive into a flat, ordered description — and turn that description back into the real thing later, somewhere else. That idea has a name. Here it is, in fairy-tale form.
-
----
-
-## The Princess Who Became a Scroll
+*An allegory on serialization, schemas, and the difference between copying and moving.*
 
 The Bridge of Ash let nothing living cross. Not bird, not breath, not girl — only paper, only things that lay flat and still and told the truth about themselves in ink. The Sentinels who guarded it had one rule, and they had never once broken it: *if it has a pulse, it stays on its own side of the river.*
 
@@ -46,9 +40,7 @@ Neither, this tale finds, does anyone who has ever pressed "save" and forgotten 
 
 ---
 
-!!! tip "The technical version, for readers who want it"
-    Turning a living object into an ordered, flat description is **serialization**. Reading that description back into a working object, in the same agreed order, is **deserialization**. The agreed order and field list is the **schema** — Vesna and Kato's scribe had to use the identical one, or the reconstruction breaks.
+!!! note "Technical note"
+    Converting a structured object into an ordered, flat representation is **serialization**; reconstructing an equivalent object by applying the same rules in reverse is **deserialization**. The shared contract defining fields and order is the **schema** — both scribes must agree on it for reconstruction to succeed.
 
-    The twist is a real bug, not just a fairy-tale trick: serializing something usually **copies** its state instead of moving the original. Two objects can be perfectly equal in value — same fields, same fields' values — while being two separate objects in memory. That gap between *"equal"* and *"the same one"* is where a lot of real-world data leaks live: a document gets anonymized and sent out, but the original was never deleted, so now two copies of the truth exist, one safe to share and one that is not. Reversible masking (see [How PDF Anonymizer is Different](how-different.md#reversible-masking-the-mapping-engine)) works the same way this scroll did — a flat, portable stand-in crosses the boundary, while the mapping needed to reconstruct the original stays locked on your side of the river.
-
-[← Previous: How PDF Anonymizer is Different](how-different.md) | [Course Overview](index.md)
+    The privacy implication is operational rather than metaphorical: serialization **copies** state rather than moving it. Two artifacts can be equal in value while existing as independent copies across storage, caches, logs, and memory. Reversible pseudonymization (see [Lecture 4: Unstructured Text Case Study](../101/how-different.md#3-reversible-pseudonymization-and-the-mapping-engine)) relies on managing that boundary explicitly: a stand-in representation crosses the trust boundary, while the mapping required for reconstruction remains controlled locally.

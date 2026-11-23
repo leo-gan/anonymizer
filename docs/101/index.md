@@ -1,45 +1,22 @@
 # Privacy & Anonymization 101
 
-Welcome to **Privacy & Anonymization 101**! This course is designed as a comprehensive entry point for developers, researchers, and data stewards looking to understand the fundamentals of data privacy, contemporary data masking techniques, and how modern generative AI modifies the privacy landscape.
+A concise, four-lecture introduction to statistical disclosure control, formal privacy models, and unstructured text de-identification. No prior background in privacy engineering is assumed.
 
-Data is the lifeblood of modern technology, but sharing it carries immense responsibility. In this short course, you will learn the core concepts of privacy engineering and how to apply them practically.
+Lectures 1–3 cover general concepts from the research literature and privacy law. Lecture 4 examines how this project (`pdf-anonymizer`) applies a specific subset of those methods to documents and spreadsheets — and where its guarantees stop.
 
----
+Canonical product terms (*pseudonymization*, *quasi-identifier*, *leftover*, *gold corpus*) are defined once in [Terminology](../project/terminology.md).
 
-## Course Curriculum
+## Syllabus
 
-Explore the modules below to build a strong foundation in data privacy.
+| Lecture | Topic | Scope |
+|---|---|---|
+| [1. Problem, Threats, and Law](why-anonymization.md) | Why naive redaction fails | Direct vs. quasi-identifiers, re-identification attacks, regulatory definitions, application domains. |
+| [2. Historical Development](history.md) | Evolution of disclosure control | Chronology from 1970s statistical disclosure control to differential privacy and text benchmarks. |
+| [3. Formal Models and Methods](techniques.md) | Privacy mechanisms and metrics | Structural transforms, $k$-anonymity / $\ell$-diversity / $t$-closeness, differential privacy, NLP de-identification, and evaluation metrics. |
+| [4. Unstructured Text Case Study](how-different.md) | System design of `pdf-anonymizer` | Indirect identifiers in prose, span-based reversible pseudonymization, verification reports, and honest scope limits. |
 
-Words such as *pseudonymization*, *quasi-identifier*, *leftover*, and *gold corpus* are defined once on **[Terminology](../project/terminology.md)**.
+Related reading:
 
-### [Why Anonymize?](why-anonymization.md)
-*   **The Foundation of Privacy**: Why raw data cannot simply be shared.
-*   **Legal Ecosystems**: Overview of GDPR, HIPAA, and CCPA.
-*   **The Threat Model**: Understanding data leakage and deanonymization attacks.
-*   **Ethics & Trust**: Cultivating customer trust through privacy-first systems.
-*   **Where It's Needed**: Key sectors including healthcare, finance, research, and generative AI.
-
-### [History](history.md)
-*   **Key Milestones**: From early census methods and *k*-anonymity to differential privacy and LLM-era privacy challenges.
-
-### [Contemporary Techniques & Tools](techniques.md)
-*   **Traditional Methods**: Data masking, tokenization, hashing, and pseudonymization.
-*   **Statistical Privacy**: *k*-anonymity, *l*-diversity, *t*-closeness.
-*   **Advanced Mathematics**: Differential Privacy and Synthetic Data generation.
-*   **Legacy Tooling**: Rule-based (Regex) systems and classical Named Entity Recognition (NER).
-
-### [How PDF Anonymizer is Different](how-different.md)
-*   **Limitations of Legacy Systems**: Why traditional systems fail on complex, unstructured text.
-*   **Identity clues**: Why hiding names is not enough, and how the careful instructions hide phrases like "the CEO of Tesla".
-*   **Reversible Workflows**: Typed stand-ins plus a separate mapping file (optional lock).
-*   **Local Execution**: Combining Ollama with local weights to prevent data from ever leaving your device.
-
-### [Bonus module](fairy-tale.md)
-*   **A fairy tale about serialization**: A princess, a scroll, and why a perfect copy is not a move.
-*   **The technical version**: Serialization, schema, and why the original must stay on your side of the river.
-
-A flag-by-flag list of what the tool can do today is on the [CLI History](../project/cli-usage.md#history) page.
-
----
-
-Let's begin! First, we will explore the fundamental question: [**Why do we need anonymization and deanonymization?**](why-anonymization.md)
+- [Terminology](../project/terminology.md) — project glossary and score definitions.
+- [Evaluation Results](../project/eval-results.md) — measured mention $F_1$ and leftover rates on 6,761 public documents.
+- [Essays](../essays/index.md) — conceptual notes outside the lecture sequence.

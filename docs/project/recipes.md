@@ -1,8 +1,13 @@
 # Recipes & Common Workflows
 
-This page contains practical, end-to-end examples for common real-world usage patterns with PDF Anonymizer.
+Task-oriented CLI and SDK workflows for `pdf-anonymizer`.
 
-Use these recipes as starting points and adapt the commands or code to your environment.
+| Category | Recipes |
+|---|---|
+| **Local, offline, and round-trip** | [What the program sends](#what-the-program-sends) · [Local Ollama](#fully-local-private-anonymization-ollama) · [Regex-only / offline](#regex-only-offline-no-language-model) · [Local span NER](#use-local-span-ner) · [External AI round-trip](#anonymize-send-to-external-ai-service-deanonymize-locally) |
+| **File formats and scale** | [OCR a scanned PDF](#ocr-a-scanned-pdf) · [Write a native PDF](#write-a-native-pdf) · [CSV / Excel rosters (`--k`)](#anonymize-a-csv-or-excel-roster) · [Word `.docx`](#anonymize-a-word-document) · [Very large documents](#processing-very-large-documents) |
+| **Detection and operators** | [Keep/deny lists](#keep-some-phrases-always-hide-others) · [Cross-file stand-ins](#keep-the-same-stand-in-across-files) · [Drop low-score hits](#drop-low-score-hits) · [Checksum `_LIKE` hits](#wrong-looking-numbers-are-not-treated-as-found) · [Entity filter](#anonymize-only-specific-entity-types) · [Identity clues](#hide-identity-clues-not-only-names) · [Country filter](#limit-national-id-regexes-to-some-countries) · [Operators](#choose-how-a-type-is-written-mask-year-hash) · [HIPAA aid](#hipaa-safe-harbor-coverage-aid) · [Span replacement](#replacement-is-by-span-not-a-blind-search) · [Custom regex (SDK)](#advanced-custom-first-stage-regex-sdk-only) |
+| **Verification, eval, and ops** | [Linkage risk](#score-leftover-identity-clumps-linkage-risk) · [Residual check & apply](#check-the-masked-file-for-leftovers) · [Caching & `purge`](#llm-response-caching) · [Profiles & SDK pipeline](#choose-and-override-configuration-profiles) · [Deanonymization stats](#working-with-mapping-files-and-deanonymization-statistics) · [TAB & gold-corpus eval](#score-a-gold-fixture-tab-style-eval) · [Logs & HTTP service](#debugging-logs-observability) |
 
 ## What the program sends
 
@@ -224,9 +229,7 @@ A **recognizer** is one detector that looks at the text. This product runs up to
 
 The score is a ranking hint, not a probability. `0.85` does not mean “85% chance this is PII.” The language model’s JSON is uncalibrated. The table of numbers lives in [Terminology](terminology.md#recognizer-source-and-score).
 
-**Think of it like this.** The regex stage is good at emails and IBANs and weak at names. The language model is the opposite. A deny-list phrase is something you already decided must go. The score lets you say “keep the strong regex hits, drop the shaky look-alikes” without editing prompts.
-
-Default is still accept-all (`--min-confidence 0`). Every hit is written. To hide only the stronger hits:
+Use `--min-confidence` to retain high-confidence structured hits while filtering weaker `_LIKE` matches without editing prompts. Default is accept-all (`--min-confidence 0`). To hide only stronger hits:
 
 ```bash
 pdf-anonymizer run notes.md --no-llm --min-confidence 0.8
@@ -265,9 +268,7 @@ pdf-anonymizer run notes.md -p best-speed --no-llm --ner
 
 `--ner` is implied on `best-speed`, `best-cost`, and `best-quality` once the extra is installed. Speed and cost then skip the language model. Identity clues (“the CEO of Tesla”) stay on the LLM path (`-p best-quality`).
 
-`--no-ner` keeps the previous LLM `best-speed`. `--ner` without the extra is an error.
-
-This is not a flip of the default extra-less install. Item 19’s gold leftover/recall numbers are how a later change would decide to make NER the default even without the extra.
+`--no-ner` keeps the LLM `best-speed` path. `--ner` without the extra is an error. Installing the base package without `[ner]` does not change the default or download model weights; see [Evaluation Results](eval-results.md) for benchmark methodology.
 
 ---
 
@@ -337,7 +338,7 @@ Every native write also wipes `/Info`, XMP, attachments, leftover annotations, a
 
 ## Anonymize a CSV or Excel roster
 
-A roster, export, or clinic list is a table. The same engine walks **cells** and writes a same-format spreadsheet plus the usual mapping. This is the same reversible pseudonymization as a PDF. It is **not** *k*-anonymity: leftover columns are not crowd-hidden.
+A roster, export, or clinic list is a table. By default the engine walks **cells** and writes a same-format spreadsheet plus a mapping file (reversible cell-level pseudonymization; see the optional `--k` subsection below for table-only $k$-anonymity).
 
 CSV works with the base install. Excel (`.xlsx`) needs the extra:
 
@@ -485,11 +486,7 @@ save_results(
 
 ## Wrong-looking numbers are not treated as found
 
-A string of digits can *look* like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.
-
-**Think of it like this.** Shops do not only check that a card has 16 digits. They also run a tiny extra sum (often called a Luhn check) to see if the number was mistyped. Bank accounts (IBAN), vehicle numbers (VIN), and some national IDs have the same kind of extra digit.
-
-The first, fast search still looks only at *shape*. Right after a hit, the tool runs that extra sum when one exists.
+A digit sequence can match the syntax of a card number, IBAN, or national ID while being a typo, order ID, or synthetic placeholder (`1234-5678-9012-3456`). After the RE2 regex pass matches the shape, the detector runs a checksum validator where a standard check digit exists (e.g., Luhn for cards, ISO 13616 mod-97 for IBAN, ISO 3779 for VIN, and selected national IDs):
 
 - If the sum **passes**, the stand-in keeps the real name: `IBAN_1`, `CREDIT_CARD_2`.
 - If the sum **fails**, the number is **still hidden**. The stand-in says so: `IBAN_LIKE_1`, `CREDIT_CARD_LIKE_1`. A mistyped IBAN does not stay on the page.
@@ -533,11 +530,9 @@ See the example file at `packages/pdf-anonymizer-cli/entities.example.txt`.
 
 ## Hide identity clues, not only names
 
-A name is the easy case. A harder case is a sentence that never writes the name, but still points to one person.
+Removing explicit names is insufficient when surrounding prose still isolates one person (for example, replacing `"Ada Lovelace"` while leaving `"the author of the first computer program in the 1840s"`).
 
-**Think of it like this.** If you black out "Ada Lovelace" in a biography, that helps. If the next sentence still says "the person who wrote the first computer program in the 1840s", a careful reader can put the name back. That leftover sentence is an identity clue.
-
-The careful instructions (`detailed`) now ask the language model to find three common shapes of clue:
+The `detailed` prompt asks the language model to detect three common classes of indirect identifiers:
 
 | Everyday sentence | Why it still names someone | What should be hidden |
 |---|---|---|
@@ -563,7 +558,7 @@ pdf-anonymizer run interview-notes.pdf --prompt-name detailed
 
 This is a helper, not a lock. Read the result before you share it.
 
-A longer, slower explanation of the same idea lives in the 101 page [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
+Conceptual background and scope limits appear in [Lecture 4: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
 
 ---
 
@@ -589,11 +584,10 @@ Any scalar override (`model_name`, `prompt_name`, `chunk_size`) takes precedence
 Minimal end-to-end example using the helper that mirrors the CLI:
 
 ```python
-import json
 from pdf_anonymizer_core.conf import get_config_for_profile, ConfigProfile
 from pdf_anonymizer_core.core import anonymize_file
 from pdf_anonymizer_core.prompts import detailed
-from pdf_anonymizer_core.utils import deanonymize_file
+from pdf_anonymizer_core.utils import deanonymize_file, save_results
 
 # 1. Configure like the CLI would
 cfg = get_config_for_profile(ConfigProfile.BEST_SPEED)
@@ -610,18 +604,17 @@ anonymized_text, raw_mapping = anonymize_file(
     max_retry_delay=cfg.max_retry_delay,
 )
 
-# 3. (Optional) Save the artifacts yourself
-with open("contract.anonymized.md", "w", encoding="utf-8") as f:
-    f.write(anonymized_text)
-
-placeholder_to_original = {v: k for k, v in raw_mapping.items()}
-with open("contract.mapping.json", "w", encoding="utf-8") as f:
-    json.dump(placeholder_to_original, f, indent=2)
+# 3. Persist via save_results (writes mapping atomically with mode 0600)
+anonymized_path, mapping_path = save_results(
+    anonymized_text,
+    {v: k for k, v in raw_mapping.items()},
+    "data/contract.pdf",
+)
 
 # 4. Later: restore
 deanonymized_file_path, stats_file_path = deanonymize_file(
-    "contract.anonymized.md",
-    "contract.mapping.json",
+    anonymized_path,
+    mapping_path,
 )
 print("Deanonymized file saved to:", deanonymized_file_path)
 print("Stats file saved to:", stats_file_path)
@@ -812,31 +805,19 @@ pdf-anonymizer verify data/anonymized/notes.anonymized.md
 
 This is a helper, not a lock. Read the report (and the page) before you share.
 
-To hide leftovers from that report (opt-in):
+### Hide leftovers from a residual report
+
+To accept and mask reported leftovers using the span engine (opt-in):
 
 ```bash
+# Hide every leftover listed in the report
 pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all
-```
 
-Or hide them on the same run:
-
-```bash
+# Or hide leftovers immediately during run
 pdf-anonymizer run notes.pdf --apply-residuals
 ```
 
-`--accept` / `--skip` pick which leftovers to hide. On a TTY, `apply` without those flags asks about each one. Native PDF output is not rewritten; apply the Markdown file. See [The apply command](cli-usage.md#the-apply-command-hide-leftovers).
-
----
-
-## Hide leftovers from a residual report
-
-The leftover list is a report. This step is how you accept some of those hits and rewrite the masked page.
-
-```bash
-pdf-anonymizer apply data/stats/notes.residual_pii.json --accept-all
-```
-
-`--accept accept.json` is a JSON list of the leftover strings to hide. `--skip skip.txt` is one phrase per line to leave visible. The mapping file gets the new stand-ins (`EMAIL_2`, …).
+`--accept accept.json` selects specific strings to mask; `--skip skip.txt` leaves listed phrases visible (one phrase per line). On a TTY, `apply` without `--accept-all` or `--accept` prompts interactively. New stand-ins are appended to the mapping file. Native PDF output is not rewritten; apply the Markdown file instead. See [The apply command](cli-usage.md#the-apply-command-hide-leftovers).
 
 ---
 

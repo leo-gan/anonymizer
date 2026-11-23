@@ -1,140 +1,86 @@
-# Why Anonymize?
+# Lecture 1: Problem Statement, Threat Models, and Legal Scope
 
-In the modern digital economy, data is one of the most valuable resources. However, much of this data is deeply personal. As organisations collect, process, and analyze more information, they face a critical question: **How can we extract value from data without violating individual privacy?**
-
-This is where data anonymization and reversible deanonymization become essential.
+Data sharing creates a structural tension between **utility** (retaining enough signal for analysis, research, or downstream computation) and **disclosure risk** (preventing an adversary from linking records back to real individuals). This lecture defines the core problem, reviews empirical re-identification attacks, and summarizes the main legal frameworks.
 
 ---
 
-## What is Anonymization?
+## 1. Anonymization, Pseudonymization, and De-identification
 
-**Data Anonymization** is the process of destroying or modifying personal identifiers in a dataset so that the individuals whom the data describes can no longer be identified, directly or indirectly. Product meanings of *anonymization*, *pseudonymization*, and *PII* are on [Terminology](../project/terminology.md). 
+Three terms are frequently conflated in engineering discussions, although privacy law and literature distinguish them sharply (see also [Terminology](../project/terminology.md)):
 
-Under legal regimes like the European Union's General Data Protection Regulation (GDPR), if a dataset is truly anonymous, it is no longer considered "personal data" and is exempt from strict privacy regulations. This makes anonymization the ultimate goal for safe data sharing and retention.
+- **Direct identifier:** An attribute that identifies an individual on its own (name, email address, Social Security number, account number, medical record number).
+- **Quasi-identifier (indirect identifier):** An attribute that is non-unique in isolation but can isolate an individual when combined with other attributes or external knowledge (date of birth, postal code, sex, occupation, rare event or institutional role).
+- **Irreversible anonymization:** Transforming data so that individuals can no longer be re-identified by any means reasonably likely to be used, including by the original data controller.
+- **Pseudonymization:** Replacing identifiers with stand-ins (tokens, placeholders, or keyed hashes) while retaining separate mapping information that permits re-linking. Because the mapping exists, the output remains **personal data** under regulations such as the EU GDPR.
+- **De-identification:** A general term (prominent in U.S. health law) for removing or transforming identifying attributes to reduce re-identification risk below a specified statutory or statistical threshold.
 
 ```mermaid
-graph TD
-    Raw[Raw Document / PII] -->|Anonymize| Anon[Anonymized Document]
-    Raw -->|Extract Keys| Map[Cryptographic/Secure Mapping File]
-    Anon -->|Downstream System / AI API| Analysis[Unrestricted Processing]
-    Analysis -->|Retrieve Insights| Revert[Process Results]
-    Map -->|Deanonymize| Revert
-    Revert -->|Output| Final[Original / Recovered Document]
+graph LR
+    Raw[Source Document] -->|Detect & Replace| Masked[Pseudonymized Document]
+    Raw -->|Store Separately| Map[Mapping File]
+    Masked -->|External Processing / Analysis| Processed[Processed Output]
+    Processed --> Restore[Local Deanonymization]
+    Map --> Restore
+    Restore --> Final[Recovered Document]
 ```
 
-### Reversible vs. Irreversible Anonymization
-*   **Irreversible Anonymization (Redaction)**: The original values are permanently destroyed. It is highly secure, but it limits downstream utility when you need to follow up or link records back to the source.
-*   **Reversible Anonymization (Masking & Mapping)**: Original PII is replaced with placeholders (e.g., `PERSON_1`, `DATE_2`), and a mapping table is stored separately (plaintext JSON by default; you can lock it as `*.mapping.json.enc`, or never write it with `--ephemeral-mapping`). The masked data can be sent to external entities (like AI models or third-party analysts), and the results can be mapped back to the individuals internally. This is the paradigm used by **PDF Anonymizer**. It is GDPR *pseudonymization* while you still hold the map, not irreversible anonymization.
+*Figure 1. Reversible document pseudonymization. The stand-in document crosses the trust boundary; the mapping key remains controlled locally.*
 
 ---
 
-## The Legal Compliance Landscape
+## 2. Adversary Models and Empirical Failures
 
-Globally, privacy regulation has shifted from a best practice to a strict legal requirement. Failure to comply can result in catastrophic fines and reputational ruin.
+Removing direct identifiers is necessary but rarely sufficient. In practice, re-identification attacks exploit auxiliary datasets and contextual uniqueness:
 
-| Regulation | Scope | Key Focus | Consequences of Violations |
-| :--- | :--- | :--- | :--- |
-| **[GDPR](https://gdpr-info.eu/)** (EU) | General data of EU citizens | Consent, right to be forgotten, strict definition of pseudonymization vs. anonymization. | Fines up to €20M or 4% of global annual turnover, whichever is higher. |
-| **[HIPAA](https://www.hhs.gov/hipaa/for-professionals/privacy/special-topics/de-identification/index.html)** (US) | Protected Health Information (PHI) | Under the HIPAA Safe Harbor method, 18 specific identifiers (names, dates, geographic data) must be removed. | Severe civil and criminal penalties, including prison terms for intentional disclosure. |
-| **[CCPA / CPRA](https://oag.ca.gov/privacy/ccpa)** (US) | California consumer data | Opt-out rights, deletion rights, strict rules on "selling" or "sharing" consumer data. | Civil penalties up to $7,500 per intentional violation; private right of action for data breaches. |
+- **Linkage attacks:** Joining a released dataset with an external public or commercial table on shared quasi-identifiers.
+- **Background-knowledge attacks:** Narrowing candidates using prior facts known about a target (for example, knowing a colleague visited a specific clinic in a given month).
+- **Outlier profiling:** Isolating extreme or uncommon combinations (an unusual age, rare diagnosis, or unique job title within an organization).
+- **Model memorization and extraction:** Recovering verbatim training examples — including personal names, phone numbers, and addresses — from generative language models trained on raw text.[^carlini2021]
 
----
+Two foundational empirical studies established that naive identifier stripping fails on real data:
 
-## The Risks of Deanonymization
+1. **Massachusetts GIC medical records (1997).** The Group Insurance Commission released hospital visit records with names and addresses removed. Latanya Sweeney purchased the Cambridge voter registration list (USD 20) and linked records on three quasi-identifiers — five-digit ZIP code, birth date, and sex — uniquely identifying the medical record of Governor William Weld.[^sweeney2002] Subsequent census analysis showed that 87% of the U.S. population was uniquely identified by those three attributes alone.[^sweeney2000] Later re-examination noted that real-world linkage rates depend on population coverage and sampling assumptions, but the core structural vulnerability remains.[^barthjones2012]
+2. **Netflix Prize dataset (2008).** Netflix published 100 million movie ratings from 500,000 subscribers with subscriber IDs replaced by random numbers. Arvind Narayanan and Vitaly Shmatikov showed that sparse, high-dimensional behavioral records act as quasi-identifiers: knowing just a small number of rated titles and approximate dates from public IMDb profiles sufficed to re-identify individual Netflix users.[^narayanan2008]
 
-One of the most dangerous misconceptions in data sharing is that simple redaction is enough. History is full of **deanonymization attacks** (also known as *re-identification attacks*), where attackers combined "anonymized" datasets with external public databases to identify individuals.
-
-### Famous Deanonymization Failures
-
-!!! warning "Case Study 1: The Netflix Prize Dataset (2007)"
-    Netflix released an anonymized dataset of 100 million movie ratings from 500,000 users to help researchers build better recommendation algorithms. Researchers Arvind Narayanan and Vitaly Shmatikov proved they could identify individual Netflix users by correlating their ratings with public reviews on the Internet Movie Database (IMDb).
-    
-    *   **Source Research**: Narayanan, A., & Shmatikov, V. (2008). *[Robust De-anonymization of Large Sparse Datasets](https://arxiv.org/abs/cs/0610105)*. IEEE Symposium on Security and Privacy.
-
-!!! warning "Case Study 2: Massachusetts GIC Medical Records (1997)"
-    The Group Insurance Commission (GIC) in Massachusetts released "anonymized" health insurance records of state employees. Dr. Latanya Sweeney bought the voter registration list for the city of Cambridge (which contained birthdate, zip code, and gender) for $20. By combining the two databases, she successfully identified the medical records of the Governor of Massachusetts.
-    
-    *   **Source Research**: Sweeney, L. (2000). *[Simple Demographics Often Identify People Uniquely](https://dataprivacylab.org/projects/identifiability/paper1.pdf)*. Carnegie Mellon University, Data Privacy Lab.
-
-### The Threat Vectors
-- **Linkage Attacks**: Combining a masked dataset with another public dataset (e.g. voter registries, social media profiles).
-- **Background Knowledge Attacks**: An attacker knows some details about a specific target in the dataset and uses context clues to isolate them.
-- **Outlier Profiling**: Extreme or unique values (e.g., a patient who is 105 years old) make individuals easy to spot, even if their names are removed.
+Unstructured text amplifies this problem because quasi-identifiers appear in prose rather than fixed table columns. In *"the CFO who replaced John in April met with the Berlin office"*, removing *"John"* leaves an identifying description (*"CFO who started in April"* + *"Berlin office"*) that still isolates one person.
 
 ---
 
-## Why Traditional Redaction is No Longer Sufficient
-In unstructured text (like clinical notes, legal contracts, or corporate emails), PII is rarely just a name or a credit card number. It is woven into the context:
-*   *"The CFO, who recently took over after John's departure in April, met with the representative from the Berlin office."*
-*   Even if "John" is removed, the combination of *"CFO who started in April"* and *"Berlin office"* may narrow down the identity to one person.
+## 3. Legal and Regulatory Frameworks
 
-To tackle this, we need **context-aware anonymization** that understands sentences, relationships, and concepts rather than just matching regex patterns.
+Technical methods do not confer legal compliance by themselves; statutory definitions depend on context, auxiliary data availability, and governance controls.
 
----
-
-## Where Anonymization Is Needed
-
-Data privacy is not a niche requirement. It is a critical operational bottleneck in nearly every sector that deals with human activity. Let's look at the primary industries where data anonymization is essential.
-
-### Healthcare & Life Sciences
-
-Healthcare data contains some of the most sensitive information possible: medical histories, genetic sequences, psychiatric notes, and biometric measurements.
-
-```
-       [Raw Medical Record]
-                |
-     +----------+----------+
-     |                     |
-[Direct PII]          [Indirect PII]
-(Name, SSN, MRN)      (Rare condition, Zip code, Doctor's note details)
-     |                     |
-     +----------+----------+
-                |
-      [Context-Aware Anonymizer]
-                |
-[Safe Health Record for Research]
-```
-
-#### Critical Use Cases
-*   **Clinical Trials**: To develop new drugs and treatments, pharmaceutical companies must share patient trial data with academic partners, regulatory agencies (FDA/EMA), and independent biostatisticians. Patient identity must be fully protected while keeping the clinical outcomes intact.
-*   **Medical Research & Machine Learning**: Building AI diagnostic assistants (e.g. models that detect tumors in medical imaging or notes) requires training datasets comprising millions of patient records. This training cannot use raw patient data without violating regulations like HIPAA and GDPR.
-*   **Electronic Health Record (EHR) Sharing**: Sharing health trends (like tracking epidemics or flu seasons) with public health bodies requires stripping identifying information.
-
-### Finance & FinTech
-
-Financial datasets contain credit card numbers, bank routing information, investment balances, and physical address transaction details.
-
-#### Critical Use Cases
-*   **Fraud Detection Research**: To build models that detect credit card fraud, FinTechs must analyze actual transaction histories. These histories contain precise purchase times, merchant names, and customer details that could expose buying habits.
-*   **Risk Modeling & Credit Scoring**: Banks share loan applicant data with third-party risk analysis companies. Anonymization ensures these audits occur without exposing individual applicants' identity.
-*   **Regulatory Compliance & Auditing**: Financial institutions must verify that their systems comply with regulations like anti-money laundering (AML) without exposing customer accounts to external auditors.
-
-### Academic & Corporate Research
-
-Social scientists, economists, and UX researchers rely on human data to observe trends, run surveys, and validate hypotheses.
-
-#### Critical Use Cases
-*   **Open Science Initiatives**: Academic journals increasingly require researchers to share their raw datasets publicly to ensure reproducibility. Anonymization is required before uploading these datasets to open repositories (e.g. Zenodo or Harvard Dataverse).
-*   **Product Analytics & Surveys**: Companies collect survey feedback containing free-text responses. Users often write their names, emails, or company details in these fields, requiring automated cleaning before internal sharing.
-
-### Generative AI & Large Language Models (LLMs)
-
-The rise of generative AI has introduced a new and massive privacy challenge. When training, fine-tuning, or running inference with LLMs, organizations must ensure they do not expose sensitive data.
-
-!!! info "The AI Privacy Challenge"
-    *   **Model Memorization**: LLMs are known to "memorize" parts of their training data. If PII is present in the training set, a user can prompt the model to leak phone numbers, addresses, or private emails of individuals.
-    *   **Third-Party API Risks**: Sending documents (like customer service chats or legal briefs) to external API providers (e.g. OpenAI or Anthropic) can violate internal compliance policies if those documents contain raw customer data. Masking the PII before sending it to the API is a reliable way to utilize external LLMs safely.
-
-### Sector Summary Table
-
-| Sector | Direct PII to Protect | Indirect/Context PII to Protect | Regulatory Context |
-| :--- | :--- | :--- | :--- |
-| **Healthcare** | Patient Name, SSN, Phone, Medical Record Number. | Doctor's specific style, rare diseases, localized clinics, admission dates. | HIPAA, GDPR, local health acts. |
-| **Finance** | Account Numbers, Credit Card, Owner Name. | Exact transactional timestamps, high-value transfer locations, merchant details. | PCI-DSS, GLBA, GDPR. |
-| **Research** | Respondent Name, Email, IP Address. | Specific job roles, demographic outliers, unique combination of survey answers. | Institutional Review Board (IRB) guidelines. |
-| **Enterprise / AI**| Customer Names, Staff logins, Client companies. | Internal codebase secrets, private project names, internal organizational charts. | SOC2, internal security policies. |
+| Framework | Jurisdiction & Scope | Core Standard for De-identification / Anonymization | Statutory Enforcement |
+|---|---|---|---|
+| **GDPR**[^gdpr] | European Union; personal data of natural persons | Recital 26 requires irreversibility considering all means *reasonably likely to be used*. Art. 4(5) classifies pseudonymization as a security safeguard; pseudonymized data remains personal data. | Administrative fines up to EUR 20M or 4% of global annual turnover. |
+| **HIPAA Privacy Rule**[^hipaa] | United States; Protected Health Information (PHI) | Two statutory paths under 45 CFR § 164.514: **Safe Harbor** (removal of 18 specified identifier classes plus no actual knowledge of identifiability) or **Expert Determination** (documented statistical analysis showing very small risk). | Tiered civil penalties and criminal sanctions for intentional wrongful disclosure. |
+| **CCPA / CPRA**[^ccpa] | California; consumer personal information | De-identified data is excluded only when it cannot reasonably be linked to a consumer and the business maintains technical safeguards and a public commitment not to re-identify. | Civil penalties up to USD 7,500 per intentional violation; private right of action for qualifying breaches. |
 
 ---
 
-**In this course:**  
-[Course Overview](index.md) | [Next: History](history.md)
+## 4. Application Domains
+
+Disclosure risk arises wherever human records are shared across institutional or model boundaries:
+
+| Domain | Typical Direct Identifiers | Typical Quasi-Identifiers / Context Clues | Primary Frameworks |
+|---|---|---|---|
+| **Healthcare** | Patient name, SSN, phone, medical record number | Admission dates, rare diagnoses, small geographic areas, clinician notes | HIPAA, GDPR |
+| **Finance** | Account numbers, PAN / credit card, IBAN, tax ID | Exact transaction timestamps, merchant combinations, transfer amounts | PCI DSS, GLBA, GDPR |
+| **Legal & Government** | Party names, case numbers, national IDs, addresses | Judgment dates, institutional roles, demographics, unique case facts | GDPR, court publication rules |
+| **Academic Research** | Participant name, email, IP address | Survey combinations, demographic outliers, free-text responses | IRB protocols, open-data mandates |
+| **Enterprise & LLM Workflows** | Customer names, employee logins, client accounts | Internal project names, org-chart roles, proprietary code or contract context | SOC 2, internal data governance |
+
+---
+
+*Next lecture: [Lecture 2 — Historical Development](history.md).*
+
+## References
+
+[^carlini2021]: Carlini, N., Tramèr, F., Wallace, E., et al. (2021). *Extracting Training Data from Large Language Models*. Proceedings of the 30th USENIX Security Symposium, 2633–2650. <https://www.usenix.org/conference/usenixsecurity21/presentation/carlini>
+[^sweeney2002]: Sweeney, L. (2002). *$k$-Anonymity: A Model for Protecting Privacy*. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, 10(5), 557–570. <https://doi.org/10.1142/S0218488502001648>
+[^sweeney2000]: Sweeney, L. (2000). *Simple Demographics Often Identify People Uniquely*. Carnegie Mellon University, Data Privacy Lab Working Paper 3. <https://dataprivacylab.org/projects/identifiability/paper1.pdf>
+[^barthjones2012]: Barth-Jones, D. C. (2012). *The 'Re-Identification' of Governor William Weld's Medical Information: A Critical Re-Examination of Health Data Identification Risks and Privacy Protections, Then and Now*. SSRN 2076397. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2076397>
+[^narayanan2008]: Narayanan, A., & Shmatikov, V. (2008). *Robust De-anonymization of Large Sparse Datasets*. IEEE Symposium on Security and Privacy (S&P 2008), 111–125. <https://arxiv.org/abs/cs/0610105>
+[^gdpr]: Regulation (EU) 2016/679 (General Data Protection Regulation), Art. 4(5) and Recital 26. <https://gdpr-info.eu/>
+[^hipaa]: U.S. Department of Health and Human Services (2012). *Guidance Regarding Methods for De-identification of Protected Health Information in Accordance with the HIPAA Privacy Rule*. <https://www.hhs.gov/hipaa/for-professionals/privacy/special-topics/de-identification/index.html>
+[^ccpa]: California Consumer Privacy Act (CCPA) / California Privacy Rights Act (CPRA), Cal. Civ. Code § 1798.100 et seq. <https://oag.ca.gov/privacy/ccpa>

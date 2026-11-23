@@ -1,106 +1,119 @@
-# Contemporary Anonymization Techniques & Tools
+# Lecture 3: Formal Models and Methods
 
-Over the past few decades, computer scientists and statisticians have developed a variety of frameworks to hide identities in datasets. Let's compare these contemporary techniques and review legacy tooling. Short product meanings (*k*-anonymity, differential privacy, synthetic data) are on [Terminology](../project/terminology.md#techniques-this-tool-does-not-apply-to-prose).
-
----
-
-## Traditional & Cryptographic Methods
-
-These are the most common methods used in databases and structured logs.
-
-### A. Data Masking & Redaction
-Replacing characters with a generic symbol (e.g. replacing a Credit Card Number with `XXXX-XXXX-XXXX-1234`).
-
-*   **Pros**: Easy to implement; retains the format of the data.
-*   **Cons**: Completely destroys the masked information. Cannot be reversed.
-
-### B. Hashing & Tokenization
-Passing PII through a cryptographic hash function (e.g., SHA-256) or replacing it with a randomly generated token.
-
-*   **Pros**: Pseudonymized identifiers remain consistent (the same name always produces the same hash).
-*   **Cons**: Subject to dictionary attacks if the salt is weak or missing; does not solve the context leakage problem in free text.
+Privacy-preserving transformations fall into four families depending on data structure (tabular vs. unstructured text) and whether the guarantee is operational, syntactic, or probabilistic. This lecture defines each family formally and summarizes how unstructured text systems are evaluated.
 
 ---
 
-## Statistical Privacy Models
+## 1. Deterministic and Structural Transforms
 
-For structured tables (like Excel or SQL tables), researchers use mathematical parameters to measure privacy strength.
+Applied to individual fields or detected spans without modeling population distributions:
 
-```
-       [Raw Database Table]
-                |
-   +------------+------------+
-   |  k-Anonymity            |  l-Diversity            |  t-Closeness
-   v                         v                         v
-Ensure records match      Ensure sensitive value    Ensure distribution
-at least k-1 others       is diverse in each group  matches global pool
-```
-
-### A. *k*-Anonymity
-A dataset satisfies *k*-anonymity if the information for each person contained in the release cannot be distinguished from at least *k*-1 other individuals whose information also appears in the release.
-
-*   *Example*: If *k*=5, you can only filter the table down to a group of 5 identical rows (e.g. 5 males, aged 30-35, living in zip code 90210).
-
-### B. *l*-Diversity
-An extension of *k*-anonymity. Within each group of *k* matching records, there must be at least *l* distinct values for any sensitive attributes (such as medical diagnosis). This prevents attackers from guessing the truth if every person in that group happens to have the same disease.
-
-### C. *t*-Closeness
-A further extension of *l*-diversity. It requires that the distribution of a sensitive attribute in any group is close to the distribution of the attribute in the entire dataset.
+- **Redaction and masking:** Permanently removing or partially obscuring characters (e.g., `****-****-****-1111`). Irreversible; low downstream linkability.
+- **Generalization and perturbation:** Coarsening precision (exact date $\to$ year, five-digit ZIP $\to$ three-digit prefix, exact age $\to$ age band) or shifting values by an offset. Many-to-one transforms are generally irreversible.
+- **Hashing and keyed tokenization:** Mapping values through a cryptographic digest $H(x)$ or keyed function $\text{HMAC}_K(x)$. Unsalted hashes over small domains (such as ZIP codes or SSNs) are vulnerable to brute-force dictionary reversal.
+- **Reversible pseudonymization:** Replacing each entity with a typed stand-in (`PERSON_1`, `EMAIL_1`) while storing the bijective mapping table separately, optionally encrypted. Preserves referential integrity within a document or corpus; security depends entirely on protecting the mapping.
 
 ---
 
-## Advanced Modern Privacy Paradigms
+## 2. Syntactic Privacy Models for Microdata Tables
 
-For highly sensitive large-scale analytics, companies are moving towards mathematical guarantees.
+Let a microdata table $T$ consist of records partitioned into equivalence classes $E_1, \dots, E_m$ that share identical values across a declared set of quasi-identifier columns $Q$, and let $S$ denote a sensitive attribute (e.g., diagnosis).
 
-### A. Differential Privacy (DP)
-Differential privacy mathematically guarantees that the presence or absence of a single individual in a dataset does not significantly change the outcome of any query run on that dataset.
+### $k$-Anonymity
+A release $T$ satisfies **$k$-anonymity** with respect to $Q$ if every equivalence class contains at least $k$ records:[^samarati1998]
 
-*   **Mechanism**: It works by injecting calculated mathematical "noise" into query results.
-*   **Pros**: Provides a strict mathematical "privacy budget" ($\epsilon$); mathematically immune to linkage attacks.
-*   **Cons**: Extremely complex to configure; can degrade accuracy for small datasets.
+$$
+\forall E \in \{E_1, \dots, E_m\}, \quad |E| \ge k.
+$$
 
-### B. Synthetic Data
-Using machine learning models (like GANs or LLMs) to generate completely artificial datasets that copy the statistical properties of real datasets without containing any real records.
+Under the *prosecutor* attacker model (the adversary knows the target is in $T$ and knows their quasi-identifiers $Q$), the probability of uniquely linking a target to a specific row is bounded by $1 / |E| \le 1 / k$. Enforcement relies on **generalization** (coarsening column values) and **suppression** (replacing outlier cells or rows with `*`).
 
-*   **Pros**: Zero risk of direct re-identification.
-*   **Cons**: Can lose rare correlations; models can memorize and accidentally regenerate real training samples.
+### $\ell$-Diversity
+$k$-Anonymity prevents record linkage but not **attribute disclosure**. If every record in an equivalence class shares the same sensitive value (a *homogeneity attack*), an adversary learns $S$ without needing to distinguish individual rows. A table satisfies **distinct $\ell$-diversity** if every equivalence class contains at least $\ell$ distinct values of $S$ (with stronger entropy and recursive variants also defined in the literature):[^machanavajjhala2006]
 
----
+$$
+\forall E, \quad \bigl|\{r[S] : r \in E\}\bigr| \ge \ell.
+$$
 
-## Legacy Anonymization Software & Libraries
+### $t$-Closeness
+Even when an equivalence class is $\ell$-diverse, skewness or semantic similarity among values can still leak information. A table satisfies **$t$-closeness** if, for every equivalence class $E$, the statistical distance $D(P_E, P_T)$ (typically Earth Mover's Distance) between the distribution $P_E$ of $S$ in $E$ and the global distribution $P_T$ across $T$ is at most $t$:[^li2007]
 
-When developers need to anonymize unstructured text files (PDFs, Word docs, texts), they traditionally turn to these open-source tools:
+$$
+\forall E, \quad D(P_E, P_T) \le t.
+$$
 
-### ARX Data Anonymizer
-A powerful, open-source Java application designed for structuring tabular data. It supports *k*-anonymity, *l*-diversity, *t*-closeness, and differential privacy.
+### Worked Example
 
-*   *Limitation*: Built specifically for structured tables (CSV/databases). It cannot handle raw emails, PDFs, or conversational transcripts.
+Consider a 4-row clinical table with $Q = \{\text{ZIP}, \text{Age}\}$ and $S = \text{Diagnosis}$ after generalizing to 2-anonymity:
 
-### Microsoft Presidio
-A popular Python framework for detecting and redacting PII in unstructured text. It uses a combination of regular expressions (regexes) and classical Named Entity Recognition (NER) models (like Spacy or Hugging Face transformers).
+| Equivalence Class | ZIP | Age | Diagnosis ($S$) |
+|---|---|---|---|
+| $E_1$ | `021**` | `30–39` | Influenza |
+| $E_1$ | `021**` | `30–39` | Influenza |
+| $E_2$ | `021**` | `40–49` | Asthma |
+| $E_2$ | `021**` | `40–49` | Migraine |
 
-*   *How it works*: Regexes look for patterns like emails, phone numbers, or credit card structures. The NER model tags entities like `PERSON`, `LOCATION`, and `DATE`.
-*   *Limitation*: Classical NER models are sensitive to formatting, capitalization, and surrounding phrasing. They struggle when PII is implied rather than explicitly named. For example, in the sentence *"I'm sitting here with the author of the 'Harry Potter' series"*, Presidio might detect nothing, whereas an LLM knows "J.K. Rowling" is implied. PDF Anonymizer's **detailed** instructions now ask for that kind of identity clue on purpose. See [How PDF Anonymizer is Different](how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
-
----
-
-## Technical Comparison Table
-
-| Technique | Data Type | Reversible? | High Utility? | Best For |
-| :--- | :--- | :--- | :--- | :--- |
-| **Masking/Redaction** | Structured / Text | No | Low | Deleting direct identifiers in logs. |
-| **Tokenization** | Structured | Yes (with DB) | High | Payment processors (PCI) & primary keys. |
-| ***k*-Anonymity** | Tabular/Rows | No | Medium | Publicly releasing survey summaries. |
-| **Differential Privacy** | Database Queries| No | High (Aggr) | Large-scale telemetry (e.g. Apple/Google). |
-| **Legacy NER (Presidio)** | Text | No | Medium | Basic preprocessing & filtering. |
-| **LLM-Based Masking** | Unstructured Text | Yes (with Map)| Very High | Complex documents, contracts, medical notes. |
+- Every class has $|E_i| = 2$, so the table satisfies **$2$-anonymity** (prosecutor linkage risk $\le 0.5$).
+- Class $E_1$ has only one distinct diagnosis (`Influenza`), so the table **violates $2$-diversity**: knowing a patient is in `021**` and aged 30–39 discloses their diagnosis with certainty.
 
 ---
 
-**In this project.** PDF Anonymizer is the last row of that table (LLM-based masking with a map). You can also ask it to *mask*, *hash*, *generalize*, or invent a stable *fake* value for a type. It does **not** rewrite a PDF as a *k*-anonymous table or add differential-privacy noise to sentences. How those history-chapter ideas map onto flags is on the [History](history.md#how-this-project-uses-these-ideas-today) page and the [CLI History](../project/cli-usage.md#history).
+## 3. Semantic and Generative Models
+
+### Differential Privacy
+Rather than constraining the released table directly, **differential privacy** bounds the influence of any single individual on the output distribution of a randomized mechanism $\mathcal{M}$.[^dwork2006] Mechanism $\mathcal{M}$ satisfies $(\varepsilon, \delta)$-differential privacy if, for all neighboring datasets $D, D'$ differing in at most one individual's record and all measurable subsets $S$ of outputs:
+
+$$
+\Pr\bigl[\mathcal{M}(D) \in S\bigr] \le e^{\varepsilon}\,\Pr\bigl[\mathcal{M}(D') \in S\bigr] + \delta.
+$$
+
+The parameter $\varepsilon > 0$ is the **privacy budget** (smaller $\varepsilon$ means stronger indistinguishability, typically requiring larger calibrated noise such as Laplace or Gaussian perturbation); $\delta \ge 0$ permits a negligible failure probability ($\delta = 0$ gives pure $\varepsilon$-DP). Unlike syntactic models, differential privacy resists arbitrary auxiliary knowledge and composes mathematically across repeated queries, but it applies naturally to aggregate statistics and ML training rather than verbatim reversible document editing.
+
+### Synthetic Data
+Generative models trained on private records synthesize artificial datasets that approximate the joint distribution of the source without copying real rows. Synthetic data does not automatically guarantee privacy unless trained with a formal mechanism such as DP-SGD, because overfitted models can reproduce training records verbatim.
 
 ---
 
-**In this course:**  
-[← Previous: History](history.md) | [Course Overview](index.md) | [Next: How PDF Anonymizer is Different](how-different.md)
+## 4. Unstructured Text De-identification and Evaluation
+
+Narrative documents (PDFs, clinical notes, legal filings) lack fixed schemas. Practical text de-identification systems combine three layers of detection:
+
+1. **Deterministic patterns and checksums:** Linear-time regular expressions (RE2) paired with algorithmic validators (Luhn for payment cards, ISO 13616 mod-97 for IBAN, national ID check digits). High precision on structured strings; blind to names and prose context.
+2. **Classical and span NER:** Sequence taggers (e.g., spaCy, Microsoft Presidio) and zero-shot span extractors (e.g., GLiNER) detect named entities (`PERSON`, `ORGANIZATION`, `LOCATION`, `DATE`) locally. Sensitive to phrasing and generally unable to detect indirect descriptions without explicit names.
+3. **Contextual LLM detection:** Instruction-tuned language models detect coreferent variations and indirect identifying descriptions (e.g., *"the CEO of Tesla in Austin"*), at higher compute cost and with non-deterministic variance.
+
+### Evaluation Metrics (TAB Framework)
+Following the Text Anonymization Benchmark (Pilán et al., 2022), text systems are evaluated on labeled gold spans using **precision**, **recall**, and **$F_1$**, reported separately for **direct identifiers** and **quasi-identifiers** (and at both mention and entity levels):[^pilan2022]
+
+$$
+\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \qquad
+\text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}, \qquad
+F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}.
+$$
+
+Separating direct from quasi-identifiers prevents high recall on frequent locations or organizations from obscuring missed personal names. In operational audits, recall is complemented by **leftover rate** — the fraction of gold mention strings still visible in clear text after masking.
+
+---
+
+## 5. Summary Comparison
+
+| Method / Tool Class | Data Structure | Formal Guarantee | Reversible? | Representative Tools / Uses |
+|---|---|---|---|---|
+| **Redaction / Masking** | Structured or text | None (heuristic) | No | Log scrubbing, permanent black-box redaction |
+| **Reversible Pseudonymization** | Text, tables, records | None alone (depends on key control) | Yes (with mapping) | External AI workflows, longitudinal linkage |
+| **$k$-Anonymity / $\ell$-Diversity / $t$-Closeness** | Tabular microdata | Syntactic (given $Q$) | No | ARX Data Anonymizer; clinical/survey table releases |
+| **Differential Privacy** | Aggregate queries, ML | Semantic $(\varepsilon, \delta)$ | No | National censuses, telemetry, DP-SGD training |
+| **Rule + Classical NER** | Unstructured text | Empirical (recall/precision) | Rarely | Microsoft Presidio, spaCy pipelines |
+| **Hybrid Regex + NER / LLM** | Unstructured text & tables | Empirical (benchmark + residual scan) | Yes (with mapping) | `pdf-anonymizer` (Case Study in Lecture 4) |
+
+---
+
+*Next lecture: [Lecture 4 — Unstructured Text Case Study](how-different.md).*
+
+## References
+
+[^samarati1998]: Samarati, P., & Sweeney, L. (1998). *Protecting Privacy when Disclosing Information: $k$-Anonymity and Its Enforcement through Generalization and Suppression*. Technical Report SRI-CSL-98-04, SRI International.
+[^machanavajjhala2006]: Machanavajjhala, A., Gehrke, J., Kifer, D., & Venkitasubramaniam, M. (2006). *$\ell$-Diversity: Privacy Beyond $k$-Anonymity*. IEEE ICDE 2006; ACM TKDD, 1(1), 2007.
+[^li2007]: Li, N., Li, T., & Venkatasubramaniam, S. (2007). *$t$-Closeness: Privacy Beyond $k$-Anonymity and $\ell$-Diversity*. IEEE ICDE 2007, 106–115.
+[^dwork2006]: Dwork, C., McSherry, F., Nissim, K., & Smith, A. (2006). *Calibrating Noise to Sensitivity in Private Data Analysis*. TCC 2006, LNCS 3876, 265–284; and Dwork, C., & Roth, A. (2014). *The Algorithmic Foundations of Differential Privacy*. Foundations and Trends in Theoretical Computer Science, 9(3–4), 211–407.
+[^pilan2022]: Pilán, I., Lison, P., Øvrelid, L., Papadopoulou, A., Sánchez, D., & Batet, M. (2022). *The Text Anonymization Benchmark (TAB): A Dedicated Corpus and Evaluation Framework for Text Anonymization*. Computational Linguistics, 48(4), 1053–1101.

@@ -160,7 +160,7 @@ from pdf_anonymizer_core.prompts import simple, detailed, hipaa
 prompt_text = detailed.prompt_template
 ```
 
-A slower, classroom-style explanation is in [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
+Conceptual discussion and examples appear in [Lecture 4: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
 
 ---
 
@@ -224,7 +224,7 @@ You can also pass a custom list for `anonymized_entities` or supply your own `re
 
 ### Advanced: Caching and Full Control
 
-The library caches LLM responses by default (in `data/cache/llm_responses.json`). You can control it directly:
+LLM response caching is **off by default** (cached entries contain both the source chunk and extracted entities). Enable or relocate it explicitly with `configure_cache`:
 
 ```python
 from pdf_anonymizer_core.llm_provider import configure_cache
