@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="High-quality, reversible, context-aware LLM-based PDF, Markdown, and Text anonymizer">
+        <meta name="description" content="Reversible, context-aware document pseudonymizer and structured identifier extractor">
       
       
         <meta name="author" content="Leonid">
@@ -15,10 +15,10 @@
         <link rel="canonical" href="https://leo-gan.github.io/anonymizer/project/recipes/">
       
       
-        <link rel="prev" href="../api-reference/">
+        <link rel="prev" href="../installation/">
       
       
-        <link rel="next" href="../gold-corpus/">
+        <link rel="next" href="../troubleshooting/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Recipes & Common Workflows - 🦉🫥 PDF Anonymizer</title>
+        <title>Recipes & Workflows - PDF Anonymizer</title>
       
     
     
@@ -50,12 +50,14 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
       
     
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -73,7 +75,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -98,10 +100,10 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="🦉🫥 PDF Anonymizer" class="md-header__button md-logo" aria-label="🦉🫥 PDF Anonymizer" data-md-component="logo">
+    <a href="../.." title="PDF Anonymizer" class="md-header__button md-logo" aria-label="PDF Anonymizer" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 6c1.4 0 2.8 1.1 2.8 2.5V11c.6 0 1.2.6 1.2 1.3v3.5c0 .6-.6 1.2-1.3 1.2H9.2c-.6 0-1.2-.6-1.2-1.3v-3.5c0-.6.6-1.2 1.2-1.2V9.5C9.2 8.1 10.6 7 12 7m0 1.2c-.8 0-1.5.5-1.5 1.3V11h3V9.5c0-.8-.7-1.3-1.5-1.3"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m2.8-10V9.5C14.8 8.1 13.4 7 12 7S9.2 8.1 9.2 9.5V11c-.6 0-1.2.6-1.2 1.2v3.5c0 .7.6 1.3 1.2 1.3h5.5c.7 0 1.3-.6 1.3-1.2v-3.5c0-.7-.6-1.3-1.2-1.3m-1.3 0h-3V9.5c0-.8.7-1.3 1.5-1.3s1.5.5 1.5 1.3z"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -112,13 +114,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            🦉🫥 PDF Anonymizer
+            PDF Anonymizer
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Recipes & Common Workflows
+              Recipes & Workflows
             
           </span>
         </div>
@@ -131,7 +133,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
@@ -141,7 +143,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
@@ -255,27 +257,9 @@
           
   
   
+    
+  
   Privacy & Anonymization 101
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../id-extract/" class="md-tabs__link">
-          
-  
-  
-  id-extract
 
         </a>
       </li>
@@ -297,7 +281,53 @@
           
   
   
+    
+  
   Project Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../id-extract/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  id-extract
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../essays/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Essays
 
         </a>
       </li>
@@ -333,13 +363,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="🦉🫥 PDF Anonymizer" class="md-nav__button md-logo" aria-label="🦉🫥 PDF Anonymizer" data-md-component="logo">
+    <a href="../.." title="PDF Anonymizer" class="md-nav__button md-logo" aria-label="PDF Anonymizer" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 6c1.4 0 2.8 1.1 2.8 2.5V11c.6 0 1.2.6 1.2 1.3v3.5c0 .6-.6 1.2-1.3 1.2H9.2c-.6 0-1.2-.6-1.2-1.3v-3.5c0-.6.6-1.2 1.2-1.2V9.5C9.2 8.1 10.6 7 12 7m0 1.2c-.8 0-1.5.5-1.5 1.3V11h3V9.5c0-.8-.7-1.3-1.5-1.3"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m2.8-10V9.5C14.8 8.1 13.4 7 12 7S9.2 8.1 9.2 9.5V11c-.6 0-1.2.6-1.2 1.2v3.5c0 .7.6 1.3 1.2 1.3h5.5c.7 0 1.3-.6 1.3-1.2v-3.5c0-.7-.6-1.3-1.2-1.3m-1.3 0h-3V9.5c0-.8.7-1.3 1.5-1.3s1.5.5 1.5 1.3z"/></svg>
 
     </a>
-    🦉🫥 PDF Anonymizer
+    PDF Anonymizer
   </label>
   
     <div class="md-nav__source">
@@ -391,11 +421,23 @@
   
     
     
-    
-    
-      
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
       
     
     
@@ -403,13 +445,12 @@
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
+          <div class="md-nav__link md-nav__container">
+            <a href="../../101/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -423,8 +464,14 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
@@ -438,20 +485,959 @@
           <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
                 
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../101/" class="md-nav__link">
+      <a href="../../101/why-anonymization/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Course Overview
+    1. Problem, Threats, and Law
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. Historical Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/techniques/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Formal Models and Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../101/how-different/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Unstructured Text Case Study
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Docs
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Project Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes & Workflows
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes & Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-program-sends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the program sends
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fully-local-private-anonymization-ollama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fully Local &amp; Private Anonymization (Ollama)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#regex-only-offline-no-language-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regex-only / offline (no language model)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anonymize-send-to-external-ai-service-deanonymize-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anonymize → Send to External AI / Service → Deanonymize Locally
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anonymize → Send to External AI / Service → Deanonymize Locally">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lock-the-mapping-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lock the mapping file
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keep-some-phrases-always-hide-others" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep some phrases, always hide others
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keep-the-same-stand-in-across-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep the same stand-in across files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-processing-multiple-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Processing Multiple Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drop-low-score-hits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drop low-score hits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-local-span-ner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use local span NER
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocr-a-scanned-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OCR a scanned PDF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#write-a-native-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write a native PDF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anonymize-a-csv-or-excel-roster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anonymize a CSV or Excel roster
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anonymize-a-word-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anonymize a Word document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wrong-looking-numbers-are-not-treated-as-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrong-looking numbers are not treated as found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anonymize-only-specific-entity-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anonymize Only Specific Entity Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hide-identity-clues-not-only-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hide identity clues, not only names
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choose-and-override-configuration-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose and Override Configuration Profiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-the-python-sdk-in-pipelines-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use the Python SDK in Pipelines / Applications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-mapping-files-and-deanonymization-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working with Mapping Files and Deanonymization Statistics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-response-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM Response Caching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#processing-very-large-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Processing Very Large Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hipaa-safe-harbor-coverage-aid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HIPAA Safe Harbor coverage aid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choose-how-a-type-is-written-mask-year-hash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose how a type is written (mask, year, hash)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score-leftover-identity-clumps-linkage-risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Score leftover identity clumps (linkage risk)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-the-masked-file-for-leftovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check the masked file for leftovers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Check the masked file for leftovers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hide-leftovers-from-a-residual-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hide leftovers from a residual report
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limit-national-id-regexes-to-some-countries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limit national-ID regexes to some countries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replacement-is-by-span-not-a-blind-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replacement is by span, not a blind search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score-a-gold-fixture-tab-style-eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Score a gold fixture (TAB-style eval)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gold-corpus-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gold-corpus benchmark
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-custom-first-stage-regex-sdk-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced: Custom First-Stage Regex (SDK only)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-logs-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging, Logs &amp; Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-the-http-service-or-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run the HTTP service (or Docker)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Service & Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference (auto)
   
 
     
@@ -493,6 +1479,74 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design & Evaluation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design & Evaluation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -500,14 +1554,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../101/why-anonymization/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Why Anonymize?
+    Architecture
   
 
     
@@ -528,14 +1582,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../101/history/" class="md-nav__link">
+      <a href="../mapping-security/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    History
+    Mapping Security
   
 
     
@@ -556,14 +1610,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../101/techniques/" class="md-nav__link">
+      <a href="../gold-corpus/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Contemporary Techniques
+    Gold Corpus & Eval
   
 
     
@@ -584,14 +1638,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../101/how-different/" class="md-nav__link">
+      <a href="../eval-results/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    How PDF Anonymizer is Different
+    Evaluation Results
   
 
     
@@ -605,29 +1659,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../101/fairy-tale/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bonus module
-  
-
-    
-  </span>
-  
-  
-
-      </a>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -648,11 +1682,23 @@
   
     
     
-    
-    
-      
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
       
     
     
@@ -660,13 +1706,12 @@
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
+          <div class="md-nav__link md-nav__container">
+            <a href="../../id-extract/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -680,11 +1725,17 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -694,32 +1745,6 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../id-extract/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -764,35 +1789,7 @@
   <span class="md-ellipsis">
     
   
-    Universal identifiers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../id-extract/countries/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Country catalog
+    Universal Identifiers
   
 
     
@@ -820,7 +1817,176 @@
   <span class="md-ellipsis">
     
   
-    Opt-in identifiers (US, CA, MX)
+    Opt-in Identifiers (US, CA, MX)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../id-extract/countries/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Countries
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Countries
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../id-extract/countries/ar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Argentina
   
 
     
@@ -849,34 +2015,6 @@
     
   
     Australia
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../id-extract/countries/ar/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Argentina
   
 
     
@@ -1904,43 +3042,53 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
   
   
-    
   
   
-  
-    
-    
     
     
       
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
-            
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../essays/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
     
   
-    Project Docs
+    Essays
   
 
     
@@ -1948,47 +3096,27 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Project Docs
+    Essays
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
               
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -1997,760 +3125,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../terminology/" class="md-nav__link">
+      <a href="../../essays/fairy-tale/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Terminology
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cli-usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CLI Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    SDK & API Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../http-service/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HTTP service & Docker
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-reference/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Reference (auto)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Recipes & Common Workflows
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Recipes & Common Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-the-program-sends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What the program sends
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fully-local-private-anonymization-ollama" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fully Local &amp; Private Anonymization (Ollama)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#regex-only-offline-no-language-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Regex-only / offline (no language model)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anonymize-send-to-external-ai-service-deanonymize-locally" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anonymize → Send to External AI / Service → Deanonymize Locally
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Anonymize → Send to External AI / Service → Deanonymize Locally">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lock-the-mapping-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lock the mapping file
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keep-some-phrases-always-hide-others" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keep some phrases, always hide others
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keep-the-same-stand-in-across-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keep the same stand-in across files
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#batch-processing-multiple-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Batch Processing Multiple Files
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#drop-low-score-hits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drop low-score hits
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-local-span-ner" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use local span NER
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ocr-a-scanned-pdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OCR a scanned PDF
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#write-a-native-pdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write a native PDF
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anonymize-a-csv-or-excel-roster" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anonymize a CSV or Excel roster
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anonymize-a-word-document" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anonymize a Word document
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wrong-looking-numbers-are-not-treated-as-found" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wrong-looking numbers are not treated as found
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anonymize-only-specific-entity-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anonymize Only Specific Entity Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hide-identity-clues-not-only-names" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hide identity clues, not only names
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choose-and-override-configuration-profiles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choose and Override Configuration Profiles
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-python-sdk-in-pipelines-applications" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use the Python SDK in Pipelines / Applications
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#working-with-mapping-files-and-deanonymization-statistics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Working with Mapping Files and Deanonymization Statistics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#llm-response-caching" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LLM Response Caching
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#processing-very-large-documents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Processing Very Large Documents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hipaa-safe-harbor-coverage-aid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HIPAA Safe Harbor coverage aid
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choose-how-a-type-is-written-mask-year-hash" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choose how a type is written (mask, year, hash)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#score-leftover-identity-clumps-linkage-risk" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Score leftover identity clumps (linkage risk)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#check-the-masked-file-for-leftovers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Check the masked file for leftovers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hide-leftovers-from-a-residual-report" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hide leftovers from a residual report
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limit-national-id-regexes-to-some-countries" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limit national-ID regexes to some countries
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#replacement-is-by-span-not-a-blind-search" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Replacement is by span, not a blind search
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#score-a-gold-fixture-tab-style-eval" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Score a gold fixture (TAB-style eval)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gold-corpus-benchmark" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Gold-corpus benchmark
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advanced-custom-first-stage-regex-sdk-only" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Advanced: Custom First-Stage Regex (SDK only)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#debugging-logs-observability" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Debugging, Logs &amp; Observability
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#run-the-http-service-or-docker" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Run the HTTP service (or Docker)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../gold-corpus/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Gold corpus & eval
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../eval-results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluation results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../mapping-security/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Mapping encryption
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture Design
+    The Princess Who Became a Scroll
   
 
     
@@ -3087,9 +3469,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Check the masked file for leftovers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#hide-leftovers-from-a-residual-report" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3097,6 +3480,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3209,8 +3597,33 @@
 
 
 <h1 id="recipes-common-workflows">Recipes &amp; Common Workflows<a class="headerlink" href="#recipes-common-workflows" title="Permanent link">&para;</a></h1>
-<p>This page contains practical, end-to-end examples for common real-world usage patterns with PDF Anonymizer.</p>
-<p>Use these recipes as starting points and adapt the commands or code to your environment.</p>
+<p>Task-oriented CLI and SDK workflows for <code>pdf-anonymizer</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Recipes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Local, offline, and round-trip</strong></td>
+<td><a href="#what-the-program-sends">What the program sends</a> · <a href="#fully-local-private-anonymization-ollama">Local Ollama</a> · <a href="#regex-only-offline-no-language-model">Regex-only / offline</a> · <a href="#use-local-span-ner">Local span NER</a> · <a href="#anonymize-send-to-external-ai-service-deanonymize-locally">External AI round-trip</a></td>
+</tr>
+<tr>
+<td><strong>File formats and scale</strong></td>
+<td><a href="#ocr-a-scanned-pdf">OCR a scanned PDF</a> · <a href="#write-a-native-pdf">Write a native PDF</a> · <a href="#anonymize-a-csv-or-excel-roster">CSV / Excel rosters (<code>--k</code>)</a> · <a href="#anonymize-a-word-document">Word <code>.docx</code></a> · <a href="#processing-very-large-documents">Very large documents</a></td>
+</tr>
+<tr>
+<td><strong>Detection and operators</strong></td>
+<td><a href="#keep-some-phrases-always-hide-others">Keep/deny lists</a> · <a href="#keep-the-same-stand-in-across-files">Cross-file stand-ins</a> · <a href="#drop-low-score-hits">Drop low-score hits</a> · <a href="#wrong-looking-numbers-are-not-treated-as-found">Checksum <code>_LIKE</code> hits</a> · <a href="#anonymize-only-specific-entity-types">Entity filter</a> · <a href="#hide-identity-clues-not-only-names">Identity clues</a> · <a href="#limit-national-id-regexes-to-some-countries">Country filter</a> · <a href="#choose-how-a-type-is-written-mask-year-hash">Operators</a> · <a href="#hipaa-safe-harbor-coverage-aid">HIPAA aid</a> · <a href="#replacement-is-by-span-not-a-blind-search">Span replacement</a> · <a href="#advanced-custom-first-stage-regex-sdk-only">Custom regex (SDK)</a></td>
+</tr>
+<tr>
+<td><strong>Verification, eval, and ops</strong></td>
+<td><a href="#score-leftover-identity-clumps-linkage-risk">Linkage risk</a> · <a href="#check-the-masked-file-for-leftovers">Residual check &amp; apply</a> · <a href="#llm-response-caching">Caching &amp; <code>purge</code></a> · <a href="#choose-and-override-configuration-profiles">Profiles &amp; SDK pipeline</a> · <a href="#working-with-mapping-files-and-deanonymization-statistics">Deanonymization stats</a> · <a href="#score-a-gold-fixture-tab-style-eval">TAB &amp; gold-corpus eval</a> · <a href="#debugging-logs-observability">Logs &amp; HTTP service</a></td>
+</tr>
+</tbody>
+</table>
 <h2 id="what-the-program-sends">What the program sends<a class="headerlink" href="#what-the-program-sends" title="Permanent link">&para;</a></h2>
 <p>The program does not send usage data, and it does not upload logs. The command line writes <code>app.log</code> in the working directory.</p>
 <p>Document text leaves the machine only in a call to a language-model provider. The default profile is <code>best-speed</code>, and its model name is <code>gemini-2.5-flash</code>. Without the <code>ner</code> extra, a normal run sends each chunk to Google when <code>GOOGLE_API_KEY</code> is set. With that extra, <code>best-speed</code> uses local span NER and skips the remote call. The recipe below, <code>--no-llm</code>, and an <code>ollama/</code> model name keep the text on this machine. The first local span-NER run can download model weights from Hugging Face. An install without the <code>ner</code> extra does not download a model.</p>
@@ -3364,8 +3777,7 @@
 <li><strong><code>score</code></strong> — a number from 0 to 1 that <em>that</em> recognizer assigned.</li>
 </ul>
 <p>The score is a ranking hint, not a probability. <code>0.85</code> does not mean “85% chance this is PII.” The language model’s JSON is uncalibrated. The table of numbers lives in <a href="../terminology/#recognizer-source-and-score">Terminology</a>.</p>
-<p><strong>Think of it like this.</strong> The regex stage is good at emails and IBANs and weak at names. The language model is the opposite. A deny-list phrase is something you already decided must go. The score lets you say “keep the strong regex hits, drop the shaky look-alikes” without editing prompts.</p>
-<p>Default is still accept-all (<code>--min-confidence 0</code>). Every hit is written. To hide only the stronger hits:</p>
+<p>Use <code>--min-confidence</code> to retain high-confidence structured hits while filtering weaker <code>_LIKE</code> matches without editing prompts. Default is accept-all (<code>--min-confidence 0</code>). To hide only stronger hits:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.md<span class="w"> </span>--no-llm<span class="w"> </span>--min-confidence<span class="w"> </span><span class="m">0</span>.8
 </span></code></pre></div>
 <p>On a line such as <code>Pay DE89370400440532013000 or GB00WEST12345698765432</code>:</p>
@@ -3407,8 +3819,7 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.md<span class="w"> </span>-p<span class="w"> </span>best-speed<span class="w"> </span>--no-llm<span class="w"> </span>--ner
 </span></code></pre></div>
 <p><code>--ner</code> is implied on <code>best-speed</code>, <code>best-cost</code>, and <code>best-quality</code> once the extra is installed. Speed and cost then skip the language model. Identity clues (“the CEO of Tesla”) stay on the LLM path (<code>-p best-quality</code>).</p>
-<p><code>--no-ner</code> keeps the previous LLM <code>best-speed</code>. <code>--ner</code> without the extra is an error.</p>
-<p>This is not a flip of the default extra-less install. Item 19’s gold leftover/recall numbers are how a later change would decide to make NER the default even without the extra.</p>
+<p><code>--no-ner</code> keeps the LLM <code>best-speed</code> path. <code>--ner</code> without the extra is an error. Installing the base package without <code>[ner]</code> does not change the default or download model weights; see <a href="../eval-results/">Evaluation Results</a> for benchmark methodology.</p>
 <hr />
 <h2 id="ocr-a-scanned-pdf">OCR a scanned PDF<a class="headerlink" href="#ocr-a-scanned-pdf" title="Permanent link">&para;</a></h2>
 <p>A PDF that is only pictures of pages has no text layer. <code>pymupdf4llm</code> then returns empty Markdown. That used to look like a successful run. It is now a hard error: the CLI exits non-zero and writes no <code>*.anonymized.md</code>.</p>
@@ -3456,7 +3867,7 @@
 </ul>
 <hr />
 <h2 id="anonymize-a-csv-or-excel-roster">Anonymize a CSV or Excel roster<a class="headerlink" href="#anonymize-a-csv-or-excel-roster" title="Permanent link">&para;</a></h2>
-<p>A roster, export, or clinic list is a table. The same engine walks <strong>cells</strong> and writes a same-format spreadsheet plus the usual mapping. This is the same reversible pseudonymization as a PDF. It is <strong>not</strong> <em>k</em>-anonymity: leftover columns are not crowd-hidden.</p>
+<p>A roster, export, or clinic list is a table. By default the engine walks <strong>cells</strong> and writes a same-format spreadsheet plus a mapping file (reversible cell-level pseudonymization; see the optional <code>--k</code> subsection below for table-only <span class="arithmatex">\(k\)</span>-anonymity).</p>
 <p>CSV works with the base install. Excel (<code>.xlsx</code>) needs the extra:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pdf-anonymizer-core[excel]&quot;</span>
 </span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="c1"># or</span>
@@ -3567,9 +3978,7 @@
 </span></code></pre></div>
 <hr />
 <h2 id="wrong-looking-numbers-are-not-treated-as-found">Wrong-looking numbers are not treated as found<a class="headerlink" href="#wrong-looking-numbers-are-not-treated-as-found" title="Permanent link">&para;</a></h2>
-<p>A string of digits can <em>look</em> like a card number, a bank account, or a national ID and still be junk — a version number, an order id, or someone typing 1234-5678-9012-3456 as an example.</p>
-<p><strong>Think of it like this.</strong> Shops do not only check that a card has 16 digits. They also run a tiny extra sum (often called a Luhn check) to see if the number was mistyped. Bank accounts (IBAN), vehicle numbers (VIN), and some national IDs have the same kind of extra digit.</p>
-<p>The first, fast search still looks only at <em>shape</em>. Right after a hit, the tool runs that extra sum when one exists.</p>
+<p>A digit sequence can match the syntax of a card number, IBAN, or national ID while being a typo, order ID, or synthetic placeholder (<code>1234-5678-9012-3456</code>). After the RE2 regex pass matches the shape, the detector runs a checksum validator where a standard check digit exists (e.g., Luhn for cards, ISO 13616 mod-97 for IBAN, ISO 3779 for VIN, and selected national IDs):</p>
 <ul>
 <li>If the sum <strong>passes</strong>, the stand-in keeps the real name: <code>IBAN_1</code>, <code>CREDIT_CARD_2</code>.</li>
 <li>If the sum <strong>fails</strong>, the number is <strong>still hidden</strong>. The stand-in says so: <code>IBAN_LIKE_1</code>, <code>CREDIT_CARD_LIKE_1</code>. A mistyped IBAN does not stay on the page.</li>
@@ -3594,9 +4003,8 @@
 <p>See the example file at <code>packages/pdf-anonymizer-cli/entities.example.txt</code>.</p>
 <hr />
 <h2 id="hide-identity-clues-not-only-names">Hide identity clues, not only names<a class="headerlink" href="#hide-identity-clues-not-only-names" title="Permanent link">&para;</a></h2>
-<p>A name is the easy case. A harder case is a sentence that never writes the name, but still points to one person.</p>
-<p><strong>Think of it like this.</strong> If you black out "Ada Lovelace" in a biography, that helps. If the next sentence still says "the person who wrote the first computer program in the 1840s", a careful reader can put the name back. That leftover sentence is an identity clue.</p>
-<p>The careful instructions (<code>detailed</code>) now ask the language model to find three common shapes of clue:</p>
+<p>Removing explicit names is insufficient when surrounding prose still isolates one person (for example, replacing <code>"Ada Lovelace"</code> while leaving <code>"the author of the first computer program in the 1840s"</code>).</p>
+<p>The <code>detailed</code> prompt asks the language model to detect three common classes of indirect identifiers:</p>
 <table>
 <thead>
 <tr>
@@ -3632,7 +4040,7 @@
 <p><strong>What you should see.</strong> A clue may become <code>PERSON_1</code> (when the model knows the name) or <code>INDIRECT_1</code> (when it does not). Either way, the identifying words should leave the page.</p>
 <p><strong>What you should not expect.</strong> The short instructions (<code>simple</code>, used by <code>best-speed</code> and <code>best-cost</code>) do not hunt for these clues. Vague words such as "the CEO" or "a teacher in Austin" should also stay, because they could be many people.</p>
 <p>This is a helper, not a lock. Read the result before you share it.</p>
-<p>A longer, slower explanation of the same idea lives in the 101 page <a href="../../101/how-different/#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is">How PDF Anonymizer is Different</a>.</p>
+<p>Conceptual background and scope limits appear in <a href="../../101/how-different/#2-indirect-identifiers-in-unstructured-text">Lecture 4: Indirect Identifiers</a>.</p>
 <hr />
 <h2 id="choose-and-override-configuration-profiles">Choose and Override Configuration Profiles<a class="headerlink" href="#choose-and-override-configuration-profiles" title="Permanent link">&para;</a></h2>
 <p>Profiles are the recommended way to select a quality/speed/cost tradeoff (see also the table in the <a href="../cli-usage/">CLI Reference</a>).</p>
@@ -3646,42 +4054,40 @@
 <hr />
 <h2 id="use-the-python-sdk-in-pipelines-applications">Use the Python SDK in Pipelines / Applications<a class="headerlink" href="#use-the-python-sdk-in-pipelines-applications" title="Permanent link">&para;</a></h2>
 <p>Minimal end-to-end example using the helper that mirrors the CLI:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deanonymize_file</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>
-</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="c1"># 1. Configure like the CLI would</span>
-</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>
-</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="c1"># 2. Anonymize</span>
-</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="n">anonymized_text</span><span class="p">,</span> <span class="n">raw_mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
-</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;data/contract.pdf&quot;</span><span class="p">,</span>
-</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
-</span><span id="__span-32-14"><a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
-</span><span id="__span-32-15"><a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-</span><span id="__span-32-16"><a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>    <span class="n">chunk_overlap</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
-</span><span id="__span-32-17"><a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a>    <span class="n">max_retries</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
-</span><span id="__span-32-18"><a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>    <span class="n">base_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">base_retry_delay</span><span class="p">,</span>
-</span><span id="__span-32-19"><a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>    <span class="n">max_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retry_delay</span><span class="p">,</span>
-</span><span id="__span-32-20"><a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a><span class="p">)</span>
-</span><span id="__span-32-21"><a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a>
-</span><span id="__span-32-22"><a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="c1"># 3. (Optional) Save the artifacts yourself</span>
-</span><span id="__span-32-23"><a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="__span-32-24"><a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anonymized_text</span><span class="p">)</span>
-</span><span id="__span-32-25"><a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a>
-</span><span id="__span-32-26"><a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a><span class="n">placeholder_to_original</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-</span><span id="__span-32-27"><a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="__span-32-28"><a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a>    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">placeholder_to_original</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="__span-32-29"><a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a>
-</span><span id="__span-32-30"><a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a><span class="c1"># 4. Later: restore</span>
-</span><span id="__span-32-31"><a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a><span class="n">deanonymized_file_path</span><span class="p">,</span> <span class="n">stats_file_path</span> <span class="o">=</span> <span class="n">deanonymize_file</span><span class="p">(</span>
-</span><span id="__span-32-32"><a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a>    <span class="s2">&quot;contract.anonymized.md&quot;</span><span class="p">,</span>
-</span><span id="__span-32-33"><a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a>    <span class="s2">&quot;contract.mapping.json&quot;</span><span class="p">,</span>
-</span><span id="__span-32-34"><a id="__codelineno-32-34" name="__codelineno-32-34" href="#__codelineno-32-34"></a><span class="p">)</span>
-</span><span id="__span-32-35"><a id="__codelineno-32-35" name="__codelineno-32-35" href="#__codelineno-32-35"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deanonymized file saved to:&quot;</span><span class="p">,</span> <span class="n">deanonymized_file_path</span><span class="p">)</span>
-</span><span id="__span-32-36"><a id="__codelineno-32-36" name="__codelineno-32-36" href="#__codelineno-32-36"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stats file saved to:&quot;</span><span class="p">,</span> <span class="n">stats_file_path</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deanonymize_file</span><span class="p">,</span> <span class="n">save_results</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="c1"># 1. Configure like the CLI would</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="c1"># 2. Anonymize</span>
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="n">anonymized_text</span><span class="p">,</span> <span class="n">raw_mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
+</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;data/contract.pdf&quot;</span><span class="p">,</span>
+</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
+</span><span id="__span-32-14"><a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-32-15"><a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>    <span class="n">chunk_overlap</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
+</span><span id="__span-32-16"><a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>    <span class="n">max_retries</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
+</span><span id="__span-32-17"><a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a>    <span class="n">base_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">base_retry_delay</span><span class="p">,</span>
+</span><span id="__span-32-18"><a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>    <span class="n">max_retry_delay</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_retry_delay</span><span class="p">,</span>
+</span><span id="__span-32-19"><a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a><span class="p">)</span>
+</span><span id="__span-32-20"><a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>
+</span><span id="__span-32-21"><a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="c1"># 3. Persist via save_results (writes mapping atomically with mode 0600)</span>
+</span><span id="__span-32-22"><a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="n">anonymized_path</span><span class="p">,</span> <span class="n">mapping_path</span> <span class="o">=</span> <span class="n">save_results</span><span class="p">(</span>
+</span><span id="__span-32-23"><a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>    <span class="n">anonymized_text</span><span class="p">,</span>
+</span><span id="__span-32-24"><a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a>    <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+</span><span id="__span-32-25"><a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a>    <span class="s2">&quot;data/contract.pdf&quot;</span><span class="p">,</span>
+</span><span id="__span-32-26"><a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a><span class="p">)</span>
+</span><span id="__span-32-27"><a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a>
+</span><span id="__span-32-28"><a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a><span class="c1"># 4. Later: restore</span>
+</span><span id="__span-32-29"><a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a><span class="n">deanonymized_file_path</span><span class="p">,</span> <span class="n">stats_file_path</span> <span class="o">=</span> <span class="n">deanonymize_file</span><span class="p">(</span>
+</span><span id="__span-32-30"><a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a>    <span class="n">anonymized_path</span><span class="p">,</span>
+</span><span id="__span-32-31"><a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a>    <span class="n">mapping_path</span><span class="p">,</span>
+</span><span id="__span-32-32"><a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a><span class="p">)</span>
+</span><span id="__span-32-33"><a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deanonymized file saved to:&quot;</span><span class="p">,</span> <span class="n">deanonymized_file_path</span><span class="p">)</span>
+</span><span id="__span-32-34"><a id="__codelineno-32-34" name="__codelineno-32-34" href="#__codelineno-32-34"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stats file saved to:&quot;</span><span class="p">,</span> <span class="n">stats_file_path</span><span class="p">)</span>
 </span></code></pre></div>
 <p>You can also pass a custom list for <code>anonymized_entities</code> or supply your own <code>regex_patterns</code> dict for the first-stage NER.</p>
 <hr />
@@ -3848,35 +4254,31 @@
 </span><span id="__span-40-11"><a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>pdf-anonymizer<span class="w"> </span>verify<span class="w"> </span>data/anonymized/notes.anonymized.md
 </span></code></pre></div>
 <p>This is a helper, not a lock. Read the report (and the page) before you share.</p>
-<p>To hide leftovers from that report (opt-in):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept-all
+<h3 id="hide-leftovers-from-a-residual-report">Hide leftovers from a residual report<a class="headerlink" href="#hide-leftovers-from-a-residual-report" title="Permanent link">&para;</a></h3>
+<p>To accept and mask reported leftovers using the span engine (opt-in):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="c1"># Hide every leftover listed in the report</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept-all
+</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>
+</span><span id="__span-41-4"><a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="c1"># Or hide leftovers immediately during run</span>
+</span><span id="__span-41-5"><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--apply-residuals
 </span></code></pre></div>
-<p>Or hide them on the same run:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>notes.pdf<span class="w"> </span>--apply-residuals
-</span></code></pre></div>
-<p><code>--accept</code> / <code>--skip</code> pick which leftovers to hide. On a TTY, <code>apply</code> without those flags asks about each one. Native PDF output is not rewritten; apply the Markdown file. See <a href="../cli-usage/#the-apply-command-hide-leftovers">The apply command</a>.</p>
-<hr />
-<h2 id="hide-leftovers-from-a-residual-report">Hide leftovers from a residual report<a class="headerlink" href="#hide-leftovers-from-a-residual-report" title="Permanent link">&para;</a></h2>
-<p>The leftover list is a report. This step is how you accept some of those hits and rewrite the masked page.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>pdf-anonymizer<span class="w"> </span>apply<span class="w"> </span>data/stats/notes.residual_pii.json<span class="w"> </span>--accept-all
-</span></code></pre></div>
-<p><code>--accept accept.json</code> is a JSON list of the leftover strings to hide. <code>--skip skip.txt</code> is one phrase per line to leave visible. The mapping file gets the new stand-ins (<code>EMAIL_2</code>, …).</p>
+<p><code>--accept accept.json</code> selects specific strings to mask; <code>--skip skip.txt</code> leaves listed phrases visible (one phrase per line). On a TTY, <code>apply</code> without <code>--accept-all</code> or <code>--accept</code> prompts interactively. New stand-ins are appended to the mapping file. Native PDF output is not rewritten; apply the Markdown file instead. See <a href="../cli-usage/#the-apply-command-hide-leftovers">The apply command</a>.</p>
 <hr />
 <h2 id="limit-national-id-regexes-to-some-countries">Limit national-ID regexes to some countries<a class="headerlink" href="#limit-national-id-regexes-to-some-countries" title="Permanent link">&para;</a></h2>
 <p>The first, fast search knows ID shapes for 30+ countries. On a US contract that is extra noise: a Polish PESEL or an Indian Aadhaar pattern can fire on a random digit string.</p>
 <p><code>--countries</code> keeps <strong>every universal pattern</strong> (email, phone, URL, card, IBAN, IP, MAC, crypto, VIN, dates, amounts) and only the national IDs for the codes you list.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>--countries<span class="w"> </span>US,GB
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>pdf-anonymizer<span class="w"> </span>run<span class="w"> </span>contract.pdf<span class="w"> </span>--countries<span class="w"> </span>US,GB
 </span></code></pre></div>
 <p>That still finds emails and IBANs. It still finds a US SSN and a UK National Insurance number. It does <strong>not</strong> run the Polish, Indian, or Chinese national-ID patterns.</p>
 <p>Use ISO-2 codes (<code>US</code>, <code>GB</code>, <code>FR</code>, …), comma-separated, any case. Unknown codes stop the run with an error.</p>
 <p><strong>SDK</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span><span class="p">,</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>
-</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="c1"># Same filter the CLI uses</span>
-</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="n">only_us_gb</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
-</span><span id="__span-45-5"><a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a>
-</span><span id="__span-45-6"><a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
-</span><span id="__span-45-7"><a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a><span class="c1"># cfg.regex_patterns is already filtered</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span><span class="p">,</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="c1"># Same filter the CLI uses</span>
+</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="n">only_us_gb</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>
+</span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+</span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="c1"># cfg.regex_patterns is already filtered</span>
 </span></code></pre></div>
 <p>This is a regex-stage setting only. The language model still reads the whole page and can name an ID from another country if the text is clear.</p>
 <hr />
@@ -3888,52 +4290,52 @@
 <h2 id="score-a-gold-fixture-tab-style-eval">Score a gold fixture (TAB-style eval)<a class="headerlink" href="#score-a-gold-fixture-tab-style-eval" title="Permanent link">&para;</a></h2>
 <p>Unit tests check regexes and mappings. They do not tell you “how many real names did we miss?”. Score names are defined on <a href="../terminology/#how-we-measure">Terminology</a>.</p>
 <p><code>tests/eval/</code> is a tiny gold page plus a scorer. It reports mention-level and entity-level precision / recall / F1, split by <strong>direct</strong> identifiers (email, SSN, person) versus <strong>quasi</strong> identifiers (city, date). That split matters: a high score on cities can hide a poor score on names.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="c1"># Run the regex stage on the built-in mini fixture</span>
-</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py
-</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>
-</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="c1"># Or score your own predictions JSON</span>
-</span><span id="__span-46-5"><a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py<span class="w"> </span>--fixture<span class="w"> </span>tests/eval/fixture.json<span class="w"> </span>--predictions<span class="w"> </span>pred.json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># Run the regex stage on the built-in mini fixture</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="c1"># Or score your own predictions JSON</span>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/eval_tab.py<span class="w"> </span>--fixture<span class="w"> </span>tests/eval/fixture.json<span class="w"> </span>--predictions<span class="w"> </span>pred.json
 </span></code></pre></div>
 <p>This is tests and scripts only. It does not change <code>run</code>. It is not a legal privacy proof.</p>
 <hr />
 <h2 id="gold-corpus-benchmark">Gold-corpus benchmark<a class="headerlink" href="#gold-corpus-benchmark" title="Permanent link">&para;</a></h2>
 <p>Goals, sources, metrics, and CI gates are on <strong><a href="../gold-corpus/">Gold corpus &amp; eval</a></strong>. The commands are:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>make<span class="w"> </span>gold-corpus<span class="w">          </span><span class="c1"># download TAB / Presidio / Gretel into data/gold-corpus/</span>
-</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>make<span class="w"> </span>gold-bench<span class="w">           </span><span class="c1"># regex-only baseline (no API key)</span>
-</span><span id="__span-47-3"><a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>make<span class="w"> </span>gold-table<span class="w">           </span><span class="c1"># public eval table</span>
-</span><span id="__span-47-4"><a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>make<span class="w"> </span>test-cov<span class="w">             </span><span class="c1"># PR suite: leftover gate, residual JSON, coverage, fuzz</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>make<span class="w"> </span>gold-corpus<span class="w">          </span><span class="c1"># download TAB / Presidio / Gretel into data/gold-corpus/</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>make<span class="w"> </span>gold-bench<span class="w">           </span><span class="c1"># regex-only baseline (no API key)</span>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>make<span class="w"> </span>gold-table<span class="w">           </span><span class="c1"># public eval table</span>
+</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>make<span class="w"> </span>test-cov<span class="w">             </span><span class="c1"># PR suite: leftover gate, residual JSON, coverage, fuzz</span>
 </span></code></pre></div>
 <p>This is tests and scripts only. It is not a legal privacy proof.</p>
 <hr />
 <h2 id="advanced-custom-first-stage-regex-sdk-only">Advanced: Custom First-Stage Regex (SDK only)<a class="headerlink" href="#advanced-custom-first-stage-regex-sdk-only" title="Permanent link">&para;</a></h2>
 <p>The hybrid approach runs a fast deterministic RE2 (google-re2) regex pass before every LLM call.
 You can supply your own set (or a filtered slice of the built-in collection):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
-</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
-</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
-</span><span id="__span-48-4"><a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>
-</span><span id="__span-48-5"><a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="c1"># Option A: completely custom</span>
-</span><span id="__span-48-6"><a id="__codelineno-48-6" name="__codelineno-48-6" href="#__codelineno-48-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-48-7"><a id="__codelineno-48-7" name="__codelineno-48-7" href="#__codelineno-48-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
-</span><span id="__span-48-8"><a id="__codelineno-48-8" name="__codelineno-48-8" href="#__codelineno-48-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
-</span><span id="__span-48-9"><a id="__codelineno-48-9" name="__codelineno-48-9" href="#__codelineno-48-9"></a>    <span class="c1"># ...</span>
-</span><span id="__span-48-10"><a id="__codelineno-48-10" name="__codelineno-48-10" href="#__codelineno-48-10"></a><span class="p">}</span>
-</span><span id="__span-48-11"><a id="__codelineno-48-11" name="__codelineno-48-11" href="#__codelineno-48-11"></a>
-</span><span id="__span-48-12"><a id="__codelineno-48-12" name="__codelineno-48-12" href="#__codelineno-48-12"></a><span class="c1"># Option B: built-in library, limited to some countries (plus all universal keys)</span>
-</span><span id="__span-48-13"><a id="__codelineno-48-13" name="__codelineno-48-13" href="#__codelineno-48-13"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span>
-</span><span id="__span-48-14"><a id="__codelineno-48-14" name="__codelineno-48-14" href="#__codelineno-48-14"></a>
-</span><span id="__span-48-15"><a id="__codelineno-48-15" name="__codelineno-48-15" href="#__codelineno-48-15"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;FR&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;CN&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">])</span>
-</span><span id="__span-48-16"><a id="__codelineno-48-16" name="__codelineno-48-16" href="#__codelineno-48-16"></a>
-</span><span id="__span-48-17"><a id="__codelineno-48-17" name="__codelineno-48-17" href="#__codelineno-48-17"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
-</span><span id="__span-48-18"><a id="__codelineno-48-18" name="__codelineno-48-18" href="#__codelineno-48-18"></a>
-</span><span id="__span-48-19"><a id="__codelineno-48-19" name="__codelineno-48-19" href="#__codelineno-48-19"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
-</span><span id="__span-48-20"><a id="__codelineno-48-20" name="__codelineno-48-20" href="#__codelineno-48-20"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
-</span><span id="__span-48-21"><a id="__codelineno-48-21" name="__codelineno-48-21" href="#__codelineno-48-21"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
-</span><span id="__span-48-22"><a id="__codelineno-48-22" name="__codelineno-48-22" href="#__codelineno-48-22"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
-</span><span id="__span-48-23"><a id="__codelineno-48-23" name="__codelineno-48-23" href="#__codelineno-48-23"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-</span><span id="__span-48-24"><a id="__codelineno-48-24" name="__codelineno-48-24" href="#__codelineno-48-24"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
-</span><span id="__span-48-25"><a id="__codelineno-48-25" name="__codelineno-48-25" href="#__codelineno-48-25"></a>    <span class="c1"># ... other config fields</span>
-</span><span id="__span-48-26"><a id="__codelineno-48-26" name="__codelineno-48-26" href="#__codelineno-48-26"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymize_file</span>
+</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_for_profile</span><span class="p">,</span> <span class="n">ConfigProfile</span>
+</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">detailed</span>
+</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>
+</span><span id="__span-46-5"><a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="c1"># Option A: completely custom</span>
+</span><span id="__span-46-6"><a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="n">custom_regex</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-46-7"><a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a>    <span class="s2">&quot;EMAIL&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;</span><span class="p">,</span>
+</span><span id="__span-46-8"><a id="__codelineno-46-8" name="__codelineno-46-8" href="#__codelineno-46-8"></a>    <span class="s2">&quot;EMPLOYEE_ID&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\bEMP-\d</span><span class="si">{6}</span><span class="s2">\b&quot;</span><span class="p">,</span>
+</span><span id="__span-46-9"><a id="__codelineno-46-9" name="__codelineno-46-9" href="#__codelineno-46-9"></a>    <span class="c1"># ...</span>
+</span><span id="__span-46-10"><a id="__codelineno-46-10" name="__codelineno-46-10" href="#__codelineno-46-10"></a><span class="p">}</span>
+</span><span id="__span-46-11"><a id="__codelineno-46-11" name="__codelineno-46-11" href="#__codelineno-46-11"></a>
+</span><span id="__span-46-12"><a id="__codelineno-46-12" name="__codelineno-46-12" href="#__codelineno-46-12"></a><span class="c1"># Option B: built-in library, limited to some countries (plus all universal keys)</span>
+</span><span id="__span-46-13"><a id="__codelineno-46-13" name="__codelineno-46-13" href="#__codelineno-46-13"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pdf_anonymizer_core.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_regex_patterns</span>
+</span><span id="__span-46-14"><a id="__codelineno-46-14" name="__codelineno-46-14" href="#__codelineno-46-14"></a>
+</span><span id="__span-46-15"><a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a><span class="n">country_focused</span> <span class="o">=</span> <span class="n">filter_regex_patterns</span><span class="p">([</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;FR&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;CN&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">])</span>
+</span><span id="__span-46-16"><a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a>
+</span><span id="__span-46-17"><a id="__codelineno-46-17" name="__codelineno-46-17" href="#__codelineno-46-17"></a><span class="n">cfg</span> <span class="o">=</span> <span class="n">get_config_for_profile</span><span class="p">(</span><span class="n">ConfigProfile</span><span class="o">.</span><span class="n">BEST_SPEED</span><span class="p">)</span>
+</span><span id="__span-46-18"><a id="__codelineno-46-18" name="__codelineno-46-18" href="#__codelineno-46-18"></a>
+</span><span id="__span-46-19"><a id="__codelineno-46-19" name="__codelineno-46-19" href="#__codelineno-46-19"></a><span class="n">text</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">anonymize_file</span><span class="p">(</span>
+</span><span id="__span-46-20"><a id="__codelineno-46-20" name="__codelineno-46-20" href="#__codelineno-46-20"></a>    <span class="n">file_path</span><span class="o">=</span><span class="s2">&quot;internal-log.txt&quot;</span><span class="p">,</span>
+</span><span id="__span-46-21"><a id="__codelineno-46-21" name="__codelineno-46-21" href="#__codelineno-46-21"></a>    <span class="n">characters_to_anonymize</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+</span><span id="__span-46-22"><a id="__codelineno-46-22" name="__codelineno-46-22" href="#__codelineno-46-22"></a>    <span class="n">prompt_template</span><span class="o">=</span><span class="n">detailed</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">,</span>
+</span><span id="__span-46-23"><a id="__codelineno-46-23" name="__codelineno-46-23" href="#__codelineno-46-23"></a>    <span class="n">model_name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-46-24"><a id="__codelineno-46-24" name="__codelineno-46-24" href="#__codelineno-46-24"></a>    <span class="n">regex_patterns</span><span class="o">=</span><span class="n">country_focused</span><span class="p">,</span>   <span class="c1"># or custom_regex or DEFAULT_REGEX_PATTERNS</span>
+</span><span id="__span-46-25"><a id="__codelineno-46-25" name="__codelineno-46-25" href="#__codelineno-46-25"></a>    <span class="c1"># ... other config fields</span>
+</span><span id="__span-46-26"><a id="__codelineno-46-26" name="__codelineno-46-26" href="#__codelineno-46-26"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>All regex patterns are RE2-safe (linear time, no ReDoS). Entity type keys (upper-cased) become the
 placeholder prefixes (IBAN_3, SSN_US_2, CRYPTO_ETH_1 ...). The LLM stage still runs afterwards and
@@ -3954,16 +4356,16 @@ universals that apply everywhere (credit cards, IBANs used across Europe, crypto
 <hr />
 <h2 id="run-the-http-service-or-docker">Run the HTTP service (or Docker)<a class="headerlink" href="#run-the-http-service-or-docker" title="Permanent link">&para;</a></h2>
 <p>Pipelines that sit in front of a language model often want <code>POST /anonymize</code> rather than a subprocess. Install the extra and bind to this machine:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
-</span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>pdf-anonymizer-api<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pdf-anonymizer-api
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>pdf-anonymizer-api<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
 </span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:8000/anonymize<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;content-type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;text&quot;:&quot;Write to ada@example.com&quot;,&quot;use_llm&quot;:false}&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:8000/anonymize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;content-type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;text&quot;:&quot;Write to ada@example.com&quot;,&quot;use_llm&quot;:false}&#39;</span>
 </span></code></pre></div>
 <p>The response includes <code>entities</code> with <code>source</code> and <code>score</code> so you can see which detector fired. Default <code>use_llm</code> is <code>false</code> on the service (regex-only, no API key). The CLI <code>run</code> command is unchanged.</p>
 <p>Or:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>packages/pdf-anonymizer-api/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>--build
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>packages/pdf-anonymizer-api/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>--build
 </span></code></pre></div>
 <p>Compose publishes <code>127.0.0.1:8000</code> only. There is no authentication. Full request table: <a href="../http-service/">HTTP service and Docker</a>.</p>
 <hr />
@@ -4046,10 +4448,16 @@ universals that apply everywhere (credit cards, IBANs used across Europe, crypto
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.instant", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "navigation.instant", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
       
     
   </body>
