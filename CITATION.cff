@@ -1,7 +1,8 @@
 cff-version: 1.2.0
-title: "Anonymization Handbook & PDF Anonymizer"
+title: "Anonymization Handbook & Anonymizer"
 message: "If you reference this handbook, identifier atlas, benchmarks, or software, please cite it as below."
 type: software
+version: "0.32.0"
 authors:
   - given-names: Leonid Ganeline
     alias: leo-gan
