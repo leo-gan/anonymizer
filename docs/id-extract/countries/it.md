@@ -41,12 +41,12 @@ Italy’s VAT number in intra-Community form: IT plus 11 digits.
 
 ## `DRIVERS_LICENSE_IT` — Patente di guida
 
-A coarse 10-character token for an Italian driving-licence number.
+Modern EU-card (`U1` prefix) and legacy provincial Italian driving-licence shapes.
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_IT` |
-| **Shape this package looks for** | 10 letters or digits |
+| **Shape this package looks for** | `U1` + 8 letters/digits, or 2 letters + 7 digits + letter |
 | **Checksum** | none |
 | **Example (synthetic)** | `U1A2345678` |
 

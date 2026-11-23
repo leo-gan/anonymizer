@@ -72,12 +72,12 @@ The commercial-register number. HRA is used for sole traders and partnerships. H
 
 ## `DRIVERS_LICENSE_DE` — Führerscheinnummer
 
-A coarse 11–12 character token for a German driving-licence number.
+German EU driving-licence number (11–12 characters with issuing-authority digits).
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_DE` |
-| **Shape this package looks for** | 11–12 letters or digits |
+| **Shape this package looks for** | 1 letter/digit + 3 digits + 5–7 letters/digits + trailing digit |
 | **Checksum** | none |
 | **Example (synthetic)** | `B072RRE2I55` |
 

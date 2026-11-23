@@ -79,6 +79,19 @@
         {"text": "+1 646-555-0199", "type": "PHONE", "kind": "direct", "base_form": "+1 646-555-0199"},
         {"text": "2024-02-02", "type": "DATE_ISO", "kind": "quasi", "base_form": "2024-02-02"}
       ]
+    },
+    {
+      "name": "qualitative-interview",
+      "domain": "research",
+      "text": "INTERVIEWER: Thank you for joining on 2025-04-09. PARTICIPANT: I am Samira Patel, pediatric oncology nurse at Mercy General Hospital. Reach me at spatel@research.example or 415-555-0188.",
+      "mentions": [
+        {"text": "2025-04-09", "type": "DATE_ISO", "kind": "quasi", "base_form": "2025-04-09"},
+        {"text": "Samira Patel", "type": "PERSON", "kind": "direct", "base_form": "Samira Patel"},
+        {"text": "pediatric oncology nurse", "type": "JOB_TITLE", "kind": "quasi", "base_form": "pediatric oncology nurse"},
+        {"text": "Mercy General Hospital", "type": "ORGANIZATION", "kind": "quasi", "base_form": "Mercy General Hospital"},
+        {"text": "spatel@research.example", "type": "EMAIL", "kind": "direct", "base_form": "spatel@research.example"},
+        {"text": "415-555-0188", "type": "PHONE", "kind": "direct", "base_form": "415-555-0188"}
+      ]
     }
   ]
 }

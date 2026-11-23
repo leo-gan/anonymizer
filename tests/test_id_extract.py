@@ -40,3 +40,30 @@ def test_offsets_are_in_the_given_string() -> None:
     email = next(item for item in ents if item["type"] == "EMAIL")
     assert text[email["start"] : email["end"]] == email["text"]
     assert email["source"] == "regex"
+
+
+def test_drivers_licenses_do_not_match_uppercase_headings() -> None:
+    headings = (
+        "FACTS PROCEDURE SUMMARY APPENDIX ABSTRACT METHODS RESULTS "
+        "INTERVIEWER PARTICIPANT CONFIDENTIAL INTRODUCTION"
+    )
+    hits = [
+        item
+        for item in extract(headings)
+        if item["type"].startswith("DRIVERS_LICENSE") or item["type"] == "BIC_SWIFT"
+    ]
+    assert hits == []
+
+
+def test_tightened_drivers_license_examples_still_match() -> None:
+    samples = [
+        ("DRIVERS_LICENSE_CA", "A1234-12345-12345", ["CA"]),
+        ("DRIVERS_LICENSE_AU", "12345678", ["AU"]),
+        ("DRIVERS_LICENSE_ES", "12345678Z", ["ES"]),
+        ("DRIVERS_LICENSE_IT", "U1A2345678", ["IT"]),
+        ("DRIVERS_LICENSE_DE", "B072RRE2I55", ["DE"]),
+        ("DRIVERS_LICENSE_FR", "12AB34567890", ["FR"]),
+    ]
+    for expected_type, sample, countries in samples:
+        types = {item["type"] for item in extract(sample, countries=countries)}
+        assert expected_type in types, f"{expected_type} missed on {sample}"

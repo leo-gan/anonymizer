@@ -111,4 +111,5 @@ uv run mkdocs build --strict
 ## Documentation & Citation
 
 - **[Handbook & Full Docs](https://leo-gan.github.io/anonymizer/)** — Lectures, Failure Compendium, Reading List, Identifier Atlas, CLI/SDK/HTTP references, Recipes, Architecture, and Troubleshooting.
+- **Role-Based Guides:** [Academic Research & IRB](https://leo-gan.github.io/anonymizer/project/academic-irb-guide/) · [Tool Comparison](https://leo-gan.github.io/anonymizer/project/tool-comparison/) · [AI & RAG Pipelines](https://leo-gan.github.io/anonymizer/project/ai-rag-guide/) · [`id-extract` in Pipelines](https://leo-gan.github.io/anonymizer/project/id-extract-pipelines/).
 - **Citation:** See [`CITATION.cff`](./CITATION.cff) for machine-readable citation metadata.

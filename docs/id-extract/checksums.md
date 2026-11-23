@@ -27,7 +27,7 @@ Many widely issued identifiers — including U.S. Social Security numbers (`SSN_
 
 When a national format is short or alphanumeric without fixed punctuation, precision degrades sharply on prose:
 
-- In the 6,761-document benchmark ([Evaluation Results](../project/eval-results.md#why-the-legal-number-is-not-a-name-leak)), a broad Canadian driver-license pattern (`\b[A-Z0-9]{5,15}\b`) fired 1,459 times across 254 European court judgments, rewriting uppercase headings such as `PROCEDURE` and `FACTS` into `DRIVERS_LICENSE_CA`.
+- In the 0.31.0 benchmark ([Evaluation Results](../project/eval-results.md#why-the-legal-number-is-not-a-name-leak)), a former Canadian driver-license catch-all (`\b[A-Z0-9]{5,15}\b`) fired 1,459 times across 254 European court judgments, rewriting uppercase headings such as `PROCEDURE` and `FACTS` into `DRIVERS_LICENSE_CA`. Tightening `DRIVERS_LICENSE_CA` (and the equivalent `AU`/`DE`/`ES`/`FR`/`IT` patterns) to require digits eliminated all 2,055 false-positive driver-license hits on those 254 judgments.
 - Narrowing country scope via `countries=["US", "GB"]` (CLI: `--countries US,GB`) and keeping broad state/provincial patterns opt-in (`opt_in=`) prevents unrelated national syntaxes from polluting precision.
 
 ---

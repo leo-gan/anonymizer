@@ -12,5 +12,5 @@ PATTERNS = {
         r"\b(?:[CFGHJKLMNPRTVWXYZ][CFGHJKLMNPRTVWXYZ0-9]{7}\d|T\d{8})\b"
     ),
     "HANDELSREGISTER_DE": r"\bHR[AB]\s*\d{1,6}\b",
-    "DRIVERS_LICENSE_DE": "\\b[A-Z0-9]{11,12}\\b",
+    "DRIVERS_LICENSE_DE": r"\b[A-Z0-9]\d{3}[A-Z0-9]{5,7}\d\b",
 }

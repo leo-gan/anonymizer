@@ -27,12 +27,12 @@ A unique 9-digit number issued by Service Canada. It identifies a person for inc
 
 ## `DRIVERS_LICENSE_CA` — Driver licence (province or territory)
 
-Licences are issued by each province or territory. Formats vary. The second alternative in the pattern is very broad.
+Licences are issued by each province or territory. This pattern matches the standard grouped format (`A1234-56789-01234`). Unhyphenated Ontario licences are available via opt-in key `DL_ON_CA`.
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_CA` |
-| **Shape this package looks for** | Letter + grouped digits, or 5–15 alphanumeric |
+| **Shape this package looks for** | Letter + 4–5 digits + hyphen + 5–6 digits + hyphen + 5 digits |
 | **Checksum** | none |
 | **Example (synthetic)** | `A1234-12345-12345` |
 

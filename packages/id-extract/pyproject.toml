@@ -1,17 +1,49 @@
 [project]
 name = "id-extract"
 version = "0.3.0"
-description = "Extract structured identifiers (IDs, cards, IBAN, email) with RE2 and checksums."
+description = "ReDoS-safe RE2 structured PII and identifier detector across 38 countries with 26 check-digit validators and zero ML dependencies."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
+keywords = [
+    "pii",
+    "privacy",
+    "anonymization",
+    "pseudonymization",
+    "de-identification",
+    "re2",
+    "checksum",
+    "luhn",
+    "iban",
+    "national-id",
+    "gdpr",
+    "hipaa",
+    "compliance",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Legal Industry",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Text Processing",
+]
 dependencies = [
     "google-re2",
 ]
 
 [project.urls]
-repository = "https://github.com/leo-gan/anonymizer"
+Homepage = "https://leo-gan.github.io/anonymizer/id-extract/"
+Documentation = "https://leo-gan.github.io/anonymizer/id-extract/"
+Repository = "https://github.com/leo-gan/anonymizer"
+Issues = "https://github.com/leo-gan/anonymizer/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]

@@ -1,10 +1,10 @@
 {
-  "created": "2026-09-15T18:40:08Z",
+  "created": "2026-11-23T19:48:53Z",
   "package": "id-extract",
   "profile": "extract",
   "countries": "all",
-  "package_version": "0.1.0",
-  "documents": 7,
+  "package_version": "0.3.0",
+  "documents": 8,
   "sources": [
     "domain-pack",
     "mini-tab"
@@ -24,70 +24,70 @@
     "scores": {
       "all": {
         "mention": {
-          "precision": 0.5897435897435898,
-          "recall": 0.5609756097560976,
-          "f1": 0.575,
-          "true_positives": 23,
-          "predicted": 39,
-          "gold": 41
+          "precision": 0.6842105263157895,
+          "recall": 0.5531914893617021,
+          "f1": 0.611764705882353,
+          "true_positives": 26,
+          "predicted": 38,
+          "gold": 47
         },
         "entity": {
-          "precision": 0.7586206896551724,
-          "recall": 0.5365853658536586,
-          "f1": 0.6285714285714286,
-          "true_positives": 22,
-          "predicted": 29,
-          "gold": 41
+          "precision": 0.7575757575757576,
+          "recall": 0.5319148936170213,
+          "f1": 0.625,
+          "true_positives": 25,
+          "predicted": 33,
+          "gold": 47
         }
       },
       "direct": {
         "mention": {
-          "precision": 0.6,
-          "recall": 0.5357142857142857,
-          "f1": 0.5660377358490566,
-          "true_positives": 15,
-          "predicted": 25,
-          "gold": 28
+          "precision": 0.7083333333333334,
+          "recall": 0.5483870967741935,
+          "f1": 0.6181818181818182,
+          "true_positives": 17,
+          "predicted": 24,
+          "gold": 31
         },
         "entity": {
-          "precision": 0.8333333333333334,
-          "recall": 0.5357142857142857,
-          "f1": 0.6521739130434783,
-          "true_positives": 15,
-          "predicted": 18,
-          "gold": 28
+          "precision": 0.85,
+          "recall": 0.5483870967741935,
+          "f1": 0.6666666666666665,
+          "true_positives": 17,
+          "predicted": 20,
+          "gold": 31
         }
       },
       "quasi": {
         "mention": {
           "precision": 1.0,
-          "recall": 0.5384615384615384,
-          "f1": 0.7000000000000001,
-          "true_positives": 7,
-          "predicted": 7,
-          "gold": 13
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "true_positives": 8,
+          "predicted": 8,
+          "gold": 16
         },
         "entity": {
           "precision": 1.0,
-          "recall": 0.5384615384615384,
-          "f1": 0.7000000000000001,
-          "true_positives": 7,
-          "predicted": 7,
-          "gold": 13
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "true_positives": 8,
+          "predicted": 8,
+          "gold": 16
         }
       }
     },
-    "documents": 7,
-    "gold_mentions": 41,
-    "predicted_mentions": 39,
+    "documents": 8,
+    "gold_mentions": 47,
+    "predicted_mentions": 38,
     "structured": {
       "mention": {
-        "precision": 0.5641025641025641,
+        "precision": 0.6578947368421053,
         "recall": 1.0,
-        "f1": 0.7213114754098361,
-        "true_positives": 22,
-        "predicted": 39,
-        "gold": 22
+        "f1": 0.7936507936507937,
+        "true_positives": 25,
+        "predicted": 38,
+        "gold": 25
       }
     }
   },
@@ -97,70 +97,70 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.5882352941176471,
-            "recall": 0.5555555555555556,
-            "f1": 0.5714285714285715,
-            "true_positives": 20,
-            "predicted": 34,
-            "gold": 36
+            "precision": 0.6571428571428571,
+            "recall": 0.5476190476190477,
+            "f1": 0.5974025974025974,
+            "true_positives": 23,
+            "predicted": 35,
+            "gold": 42
           },
           "entity": {
-            "precision": 0.7307692307692307,
-            "recall": 0.5277777777777778,
-            "f1": 0.6129032258064515,
-            "true_positives": 19,
-            "predicted": 26,
-            "gold": 36
+            "precision": 0.7333333333333333,
+            "recall": 0.5238095238095238,
+            "f1": 0.611111111111111,
+            "true_positives": 22,
+            "predicted": 30,
+            "gold": 42
           }
         },
         "direct": {
           "mention": {
-            "precision": 0.6190476190476191,
-            "recall": 0.52,
-            "f1": 0.5652173913043478,
-            "true_positives": 13,
-            "predicted": 21,
-            "gold": 25
+            "precision": 0.6818181818181818,
+            "recall": 0.5357142857142857,
+            "f1": 0.6,
+            "true_positives": 15,
+            "predicted": 22,
+            "gold": 28
           },
           "entity": {
-            "precision": 0.8125,
-            "recall": 0.52,
-            "f1": 0.6341463414634146,
-            "true_positives": 13,
-            "predicted": 16,
-            "gold": 25
+            "precision": 0.8333333333333334,
+            "recall": 0.5357142857142857,
+            "f1": 0.6521739130434783,
+            "true_positives": 15,
+            "predicted": 18,
+            "gold": 28
           }
         },
         "quasi": {
           "mention": {
             "precision": 1.0,
-            "recall": 0.5454545454545454,
-            "f1": 0.7058823529411764,
-            "true_positives": 6,
-            "predicted": 6,
-            "gold": 11
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "true_positives": 7,
+            "predicted": 7,
+            "gold": 14
           },
           "entity": {
             "precision": 1.0,
-            "recall": 0.5454545454545454,
-            "f1": 0.7058823529411764,
-            "true_positives": 6,
-            "predicted": 6,
-            "gold": 11
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "true_positives": 7,
+            "predicted": 7,
+            "gold": 14
           }
         }
       },
-      "documents": 6,
-      "gold_mentions": 36,
-      "predicted_mentions": 34,
+      "documents": 7,
+      "gold_mentions": 42,
+      "predicted_mentions": 35,
       "structured": {
         "mention": {
-          "precision": 0.5588235294117647,
+          "precision": 0.6285714285714286,
           "recall": 1.0,
-          "f1": 0.7169811320754718,
-          "true_positives": 19,
-          "predicted": 34,
-          "gold": 19
+          "f1": 0.7719298245614035,
+          "true_positives": 22,
+          "predicted": 35,
+          "gold": 22
         }
       }
     },
@@ -169,11 +169,11 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.6,
+            "precision": 1.0,
             "recall": 0.6,
-            "f1": 0.6,
+            "f1": 0.7499999999999999,
             "true_positives": 3,
-            "predicted": 5,
+            "predicted": 3,
             "gold": 5
           },
           "entity": {
@@ -187,11 +187,11 @@
         },
         "direct": {
           "mention": {
-            "precision": 0.5,
+            "precision": 1.0,
             "recall": 0.6666666666666666,
-            "f1": 0.5714285714285715,
+            "f1": 0.8,
             "true_positives": 2,
-            "predicted": 4,
+            "predicted": 2,
             "gold": 3
           },
           "entity": {
@@ -224,14 +224,14 @@
       },
       "documents": 1,
       "gold_mentions": 5,
-      "predicted_mentions": 5,
+      "predicted_mentions": 3,
       "structured": {
         "mention": {
-          "precision": 0.6,
+          "precision": 1.0,
           "recall": 1.0,
-          "f1": 0.7499999999999999,
+          "f1": 1.0,
           "true_positives": 3,
-          "predicted": 5,
+          "predicted": 3,
           "gold": 3
         }
       }
@@ -243,19 +243,19 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 1.0,
+            "precision": 0.75,
             "recall": 0.6,
-            "f1": 0.7499999999999999,
+            "f1": 0.6666666666666665,
             "true_positives": 3,
-            "predicted": 3,
+            "predicted": 4,
             "gold": 5
           },
           "entity": {
-            "precision": 1.0,
+            "precision": 0.75,
             "recall": 0.6,
-            "f1": 0.7499999999999999,
+            "f1": 0.6666666666666665,
             "true_positives": 3,
-            "predicted": 3,
+            "predicted": 4,
             "gold": 5
           }
         },
@@ -298,14 +298,14 @@
       },
       "documents": 1,
       "gold_mentions": 5,
-      "predicted_mentions": 3,
+      "predicted_mentions": 4,
       "structured": {
         "mention": {
-          "precision": 1.0,
+          "precision": 0.75,
           "recall": 1.0,
-          "f1": 1.0,
+          "f1": 0.8571428571428571,
           "true_positives": 3,
-          "predicted": 3,
+          "predicted": 4,
           "gold": 3
         }
       }
@@ -387,11 +387,11 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.6,
+            "precision": 1.0,
             "recall": 0.6,
-            "f1": 0.6,
+            "f1": 0.7499999999999999,
             "true_positives": 3,
-            "predicted": 5,
+            "predicted": 3,
             "gold": 5
           },
           "entity": {
@@ -405,11 +405,11 @@
         },
         "direct": {
           "mention": {
-            "precision": 0.5,
+            "precision": 1.0,
             "recall": 0.6666666666666666,
-            "f1": 0.5714285714285715,
+            "f1": 0.8,
             "true_positives": 2,
-            "predicted": 4,
+            "predicted": 2,
             "gold": 3
           },
           "entity": {
@@ -442,14 +442,14 @@
       },
       "documents": 1,
       "gold_mentions": 5,
-      "predicted_mentions": 5,
+      "predicted_mentions": 3,
       "structured": {
         "mention": {
-          "precision": 0.6,
+          "precision": 1.0,
           "recall": 1.0,
-          "f1": 0.7499999999999999,
+          "f1": 1.0,
           "true_positives": 3,
-          "predicted": 5,
+          "predicted": 3,
           "gold": 3
         }
       }
@@ -459,11 +459,11 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.375,
+            "precision": 0.5,
             "recall": 0.5,
-            "f1": 0.42857142857142855,
+            "f1": 0.5,
             "true_positives": 3,
-            "predicted": 8,
+            "predicted": 6,
             "gold": 6
           },
           "entity": {
@@ -477,11 +477,11 @@
         },
         "direct": {
           "mention": {
-            "precision": 0.4,
+            "precision": 0.5,
             "recall": 0.5,
-            "f1": 0.4444444444444445,
+            "f1": 0.5,
             "true_positives": 2,
-            "predicted": 5,
+            "predicted": 4,
             "gold": 4
           },
           "entity": {
@@ -514,14 +514,14 @@
       },
       "documents": 1,
       "gold_mentions": 6,
-      "predicted_mentions": 8,
+      "predicted_mentions": 6,
       "structured": {
         "mention": {
-          "precision": 0.375,
+          "precision": 0.5,
           "recall": 1.0,
-          "f1": 0.5454545454545454,
+          "f1": 0.6666666666666666,
           "true_positives": 3,
-          "predicted": 8,
+          "predicted": 6,
           "gold": 3
         }
       }
@@ -531,11 +531,11 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.5555555555555556,
+            "precision": 0.625,
             "recall": 0.625,
-            "f1": 0.5882352941176471,
+            "f1": 0.625,
             "true_positives": 5,
-            "predicted": 9,
+            "predicted": 8,
             "gold": 8
           },
           "entity": {
@@ -586,14 +586,14 @@
       },
       "documents": 1,
       "gold_mentions": 8,
-      "predicted_mentions": 9,
+      "predicted_mentions": 8,
       "structured": {
         "mention": {
-          "precision": 0.4444444444444444,
+          "precision": 0.5,
           "recall": 1.0,
-          "f1": 0.6153846153846153,
+          "f1": 0.6666666666666666,
           "true_positives": 4,
-          "predicted": 9,
+          "predicted": 8,
           "gold": 4
         }
       }
@@ -675,70 +675,70 @@
       "scores": {
         "all": {
           "mention": {
-            "precision": 0.6,
+            "precision": 0.75,
             "recall": 0.5,
-            "f1": 0.5454545454545454,
-            "true_positives": 3,
-            "predicted": 5,
-            "gold": 6
+            "f1": 0.6,
+            "true_positives": 6,
+            "predicted": 8,
+            "gold": 12
           },
           "entity": {
-            "precision": 0.5,
-            "recall": 0.3333333333333333,
-            "f1": 0.4,
-            "true_positives": 2,
-            "predicted": 4,
-            "gold": 6
+            "precision": 0.7142857142857143,
+            "recall": 0.4166666666666667,
+            "f1": 0.5263157894736842,
+            "true_positives": 5,
+            "predicted": 7,
+            "gold": 12
           }
         },
         "direct": {
           "mention": {
-            "precision": 0.5,
-            "recall": 0.25,
-            "f1": 0.3333333333333333,
-            "true_positives": 1,
-            "predicted": 2,
-            "gold": 4
+            "precision": 0.75,
+            "recall": 0.42857142857142855,
+            "f1": 0.5454545454545454,
+            "true_positives": 3,
+            "predicted": 4,
+            "gold": 7
           },
           "entity": {
-            "precision": 0.5,
-            "recall": 0.25,
-            "f1": 0.3333333333333333,
-            "true_positives": 1,
-            "predicted": 2,
-            "gold": 4
+            "precision": 0.75,
+            "recall": 0.42857142857142855,
+            "f1": 0.5454545454545454,
+            "true_positives": 3,
+            "predicted": 4,
+            "gold": 7
           }
         },
         "quasi": {
           "mention": {
             "precision": 1.0,
-            "recall": 0.5,
-            "f1": 0.6666666666666666,
-            "true_positives": 1,
-            "predicted": 1,
-            "gold": 2
+            "recall": 0.4,
+            "f1": 0.5714285714285715,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 5
           },
           "entity": {
             "precision": 1.0,
-            "recall": 0.5,
-            "f1": 0.6666666666666666,
-            "true_positives": 1,
-            "predicted": 1,
-            "gold": 2
+            "recall": 0.4,
+            "f1": 0.5714285714285715,
+            "true_positives": 2,
+            "predicted": 2,
+            "gold": 5
           }
         }
       },
-      "documents": 1,
-      "gold_mentions": 6,
-      "predicted_mentions": 5,
+      "documents": 2,
+      "gold_mentions": 12,
+      "predicted_mentions": 8,
       "structured": {
         "mention": {
-          "precision": 0.6,
+          "precision": 0.75,
           "recall": 1.0,
-          "f1": 0.7499999999999999,
-          "true_positives": 3,
-          "predicted": 5,
-          "gold": 3
+          "f1": 0.8571428571428571,
+          "true_positives": 6,
+          "predicted": 8,
+          "gold": 6
         }
       }
     }

@@ -1,11 +1,45 @@
 [project]
 name = "pdf-anonymizer-cli"
 version = "0.32.0"
-description = "CLI for a tool to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
+description = "Local-first CLI for reversible pseudonymization and auditing of PDF, Word, Markdown, text, CSV, and Excel files."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
+keywords = [
+    "anonymization",
+    "pseudonymization",
+    "de-identification",
+    "pii",
+    "phi",
+    "pdf",
+    "docx",
+    "cli",
+    "gdpr",
+    "hipaa",
+    "irb",
+    "open-science",
+    "qualitative-research",
+    "ollama",
+    "privacy",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Text Processing :: Linguistic",
+]
 dependencies = [
     "typer",
     "rich",
@@ -13,12 +47,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+google = ["pdf-anonymizer-core[google]"]
+ollama = ["pdf-anonymizer-core[ollama]"]
+huggingface = ["pdf-anonymizer-core[huggingface]"]
+openrouter = ["pdf-anonymizer-core[openrouter]"]
+openai = ["pdf-anonymizer-core[openai]"]
+anthropic = ["pdf-anonymizer-core[anthropic]"]
 excel = ["pdf-anonymizer-core[excel]"]
 docx = ["pdf-anonymizer-core[docx]"]
 ner = ["pdf-anonymizer-core[ner]"]
 
 [project.urls]
-repository = "https://github.com/leo-gan/anonymizer"
+Homepage = "https://leo-gan.github.io/anonymizer/"
+Documentation = "https://leo-gan.github.io/anonymizer/project/cli-usage/"
+Repository = "https://github.com/leo-gan/anonymizer"
+Issues = "https://github.com/leo-gan/anonymizer/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
