@@ -196,8 +196,6 @@ Common problems and how to resolve them.
 
 ---
 
----
-
 ## See Also
 
 - **[Recipes & Common Workflows](recipes.md)** — many of the issues here are demonstrated with working examples.

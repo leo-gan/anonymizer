@@ -4,7 +4,7 @@ This document details the architectural decisions, pipeline workflows, and core 
 
 ---
 
-## monorepo Architecture
+## Monorepo Architecture
 
 PDF Anonymizer separates the underlying processing logic (SDK) from the command-line entry points. This decoupled design ensures the core library can be embedded into server APIs or automated data workflows without bringing along CLI dependencies.
 
@@ -62,10 +62,10 @@ graph TD
 *   A PDF with pages and no text layer is a hard error. `--ocr` runs Tesseract through PyMuPDF and writes word boxes to `*.anonymized.layout.json` so a later native-PDF redact pass can use the same spans. OCR is slower and less accurate than a real text layer.
 *   Optional local span NER (`[ner]` extra, GLiNER on CPU) is the semantic stage for `best-speed` / `best-cost` when installed. `best-quality` may run it first and still calls the LLM for identity clues. No extra keeps the LLM `best-speed` path.
 *   A **recognizer** is one detector (regex, optional local NER, language model, deny-list). Each entity stores `source` (which recognizer) and `score` (that recognizer’s 0–1 hint). Regex checksum failures are `TYPE_LIKE` at 0.55. `--min-confidence` (default 0) can drop weak hits. Scores are not calibrated probabilities. See [Terminology](terminology.md#recognizer-source-and-score).
-*   Optional HTTP service is a **separate package** (`pdf-anonymizer-api`) that calls core only. Dockerfile and compose live in that package and bind `127.0.0.1:8000`. No authentication (item 22).
-*   Residual reports stay report-only unless you opt in: `pdf-anonymizer apply` or `run --apply-residuals` rewrites accepted leftovers with the same span engine (item 23).
+*   Optional HTTP service is a **separate package** (`pdf-anonymizer-api`) that calls core only. Dockerfile and compose live in that package and bind `127.0.0.1:8000`. No authentication.
+*   Residual reports stay report-only unless you opt in: `pdf-anonymizer apply` or `run --apply-residuals` rewrites accepted leftovers with the same span engine.
 *   For Markdown and Text files, standard file reads are executed.
-*   CSV and Excel skip this loader. See [Table path](#table-path-csv--excel).
+*   CSV and Excel skip this loader. See [Table path](#table-path-csv-excel).
 *   Word `.docx` skips this loader. See [Word path](#word-path-docx).
 
 ### Native PDF write
@@ -73,7 +73,7 @@ graph TD
 *   `--output-pdf` opens the source with PyMuPDF, finds each original with `search_for`, adds a redaction annotation, then `apply_redactions`. That excises the old glyphs from the content stream. It is not an overlay-only black box.
 *   The reversible mode writes the stand-in (`EMAIL_1`) into the redaction. `--redact` fills the box black and does not write a stand-in. Deanonymize cannot restore a redacted page.
 *   Every native write sanitizes `/Info`, XMP, embedded files, leftover annotations, and optional-content groups, and saves with `garbage=4` (no incremental `/Prev` history).
-*   Rasterize-and-rebuild is the scan fallback (item 14), not the digital default. Images, form fields, and some vector drawings can still leak. This is not a legal de-identification certificate.
+*   Rasterize-and-rebuild is the scan fallback, not the digital default. Images, form fields, and some vector drawings can still leak. This is not a legal de-identification certificate.
 
 ### Semantic Chunking
 *   Depending on the `--characters-to-anonymize` parameter (default `100,000` characters), the text is sliced into chunks:
@@ -97,7 +97,7 @@ graph TD
 ### LLM Entity Identification
 *   Each chunk is sent to the selected LLM provider along with the chosen prompt.
 *   The LLM returns structured JSON lists of detected entities, specifying their direct text and their base entity type (e.g. `PERSON`, `ORGANIZATION`, `DATE`, `LOCATION`).
-*   The **detailed** prompt also asks for **identity clues**: phrases that point to one person without writing their name. If the model knows who is meant, it uses type `PERSON` and puts the name in `base_form`. If it does not know the name, it uses type `INDIRECT`. The **simple** prompt does not ask for this. See [How PDF Anonymizer is Different](../101/how-different.md#identity-clues-when-the-name-is-missing-but-everyone-still-knows-who-it-is).
+*   The **detailed** prompt also asks for **identity clues**: phrases that point to one person without writing their name. If the model knows who is meant, it uses type `PERSON` and puts the name in `base_form`. If it does not know the name, it uses type `INDIRECT`. The **simple** prompt does not ask for this. See [Lecture 4: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
 
 ### Base Form Consolidation
 To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. John Smith" to the same individual):
@@ -153,7 +153,7 @@ To solve coreference problems (e.g. associating "Dr. Smith", "Smith", and "Dr. J
 *   **Apply** is `replace_entities` on each cell's `search_text` with the same `entity["text"]` list the text engine uses.
 *   **Review flatten** (`v1 | v2 | …`, blank line after every row) is what `anonymize_file` returns for tables. `verify` and `report` score that flatten, not raw CSV bytes.
 *   Excel writes cached values only (no formulas). Charts, comments, headers/footers, validation lists, defined names, and hyperlinks are left as-is.
-*   This is still cell-level pseudonymization. It is not *k*-anonymity.
+*   Default table mode is cell-level pseudonymization. Passing `--k` enables optional table-only $k$-anonymity generalization/suppression (`table_privacy.py`) with prosecutor risk, $\ell$-diversity, and $t$-closeness reporting (`*.table_privacy.json`). That mode applies only to CSV/Excel, not prose documents.
 
 ### Word path (DOCX)
 *   `.docx` never enters `load_and_extract_text_from_file`. `word.load_docx` walks visible paragraph text in the main document, headers, footers, footnotes, endnotes, comments, and glossary parts; apply writes those same nodes. Field codes (`w:instrText`) and external hyperlink targets are separate blocks.

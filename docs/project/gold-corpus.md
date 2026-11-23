@@ -17,7 +17,7 @@ This is not a legal privacy proof and not a HIPAA or GDPR certificate.
 | Measure completeness on public anonymization tests | Competitors publish recall and leak rate. We cannot claim quality on OCR, native PDF, or a later NER stage if leftovers on a gold set never fail a test. |
 | Keep PR CI cheap and deterministic | Cloud API keys are forbidden in PR CI. Regex-only is the gate. A live language model is opt-in. |
 | Fail the build when structured leftovers remain | The product already writes `*.residual_pii.json`. A report that nobody reads is not a gate. |
-| Cover the sectors in [Why Anonymize?](../101/why-anonymization.md) | Healthcare, legal, government, research, finance, and enterprise are the jobs users bring. |
+| Cover the sectors in [Lecture 1: Problem, Threats, and Law](../101/why-anonymization.md) | Healthcare, legal, government, research, finance, and enterprise are the jobs users bring. |
 | Keep the large public files out of git | TAB, Presidio, and Gretel are downloadable. The installer writes them under `data/gold-corpus/`, which git ignores. |
 
 ---
@@ -36,7 +36,7 @@ The catalog is `tests/eval/sources.json`.
 
 | Source | Domain | In git? | Role |
 |---|---|---|---|
-| Mini-tab (`tests/eval/fixture.json`) | general | Yes | Tiny TAB-style fixture from item 13. Always in PR CI. |
+| Mini-tab (`tests/eval/fixture.json`) | general | Yes | Small TAB-style fixture. Always in PR CI. |
 | Domain pack (`tests/eval/domain_pack.json`) | healthcare, legal, government, research, finance, enterprise | Yes | Short labeled pages for the user sectors. Always in PR CI. |
 | [TAB](https://github.com/NorskRegnesentral/text-anonymization-benchmark) | legal | No. Download. | Official `GoldCorpus`: English ECHR court cases. MIT. |
 | [Presidio synth_dataset_v2](https://github.com/microsoft/presidio-research) | general | No. Download. | Public Presidio-class PII eval set. MIT. |
@@ -108,7 +108,7 @@ The large downloaded sets are **not** required in PR CI. If they are present loc
 uv run python scripts/eval_tab.py
 ```
 
-This scores `tests/eval/fixture.json` the same way as item 13. Use it when you only need the scorer, not the public corpus.
+This scores `tests/eval/fixture.json` directly using the TAB-style scorer. Use it when you only need the scorer, not the public corpus.
 
 ---
 
@@ -136,5 +136,4 @@ data/gold-corpus/                    # downloaded files (not in git)
 - [Evaluation results](eval-results.md) — charts for the regex, Gemma 4, and Argon sample runs
 - [Terminology](terminology.md) — leftover, mention, quasi-identifier, TAB
 - [Recipes](recipes.md#gold-corpus-benchmark) — the same commands in the recipe list
-- [Why Anonymize?](../101/why-anonymization.md) — sectors the domain pack covers
-- Improvement-plan item 19 (maintainers only, not on this site)
+- [Lecture 1: Problem, Threats, and Law](../101/why-anonymization.md) — application domains covered by the domain pack

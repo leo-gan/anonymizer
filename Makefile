@@ -39,7 +39,7 @@ docs-serve:
 	uv run mkdocs serve
 
 docs-build:
-	uv run mkdocs build
+	uv run mkdocs build --strict
 
 # -----------------------------
 # Packaging & Publishing

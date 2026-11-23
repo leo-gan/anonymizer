@@ -27,13 +27,16 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |
 | `--anonymized-entities` | `PATH` | *None* | Path to a text file containing custom entities to search for and anonymize. |
 | `--countries` | `TEXT` | *all* | ISO-2 codes for national-ID regexes, comma-separated (`US,GB`). Email, IBAN, cards, and other universal patterns always stay. |
+| `--opt-in` | `TEXT` | *none* | State, provincial, and industry `id-extract` keys, comma-separated (`DL_FL_US,NAM_QC_CA`), or `all` for every selective key. |
+| `--cache` / `--no-cache` | flag | off | Store language-model replies on disk (`data/cache/llm_responses.json`, mode `0600`, 24-hour TTL). Cached entries contain source chunks and extracted entities. |
 | `--verify` / `--no-verify` | flag | on | After masking, scan the result for leftovers (cheap regex). Writes `data/stats/<stem>.residual_pii.json`. Does not change the file unless `--apply-residuals`. |
 | `--verify-llm` | flag | off | Also ask the language model to hunt for leftovers. |
 | `--apply-residuals` | flag | off | After the leftover scan, hide every leftover on this run. Implies `--verify`. |
 | `--mapping-passphrase` | `TEXT` | *none* | Lock the mapping as `*.mapping.json.enc` (AES-256-GCM + Argon2id, source-file AAD). Also read from `ANONYMIZER_MAPPING_KEY`. Default: plaintext JSON. |
 | `--ephemeral-mapping` / `--persist-mapping` | flag | persist | Keep the mapping only in this process. Nothing is written under `data/mappings/`. |
 | `--operator` | `TYPE=op` | `replace` | Repeatable. How to write a type: `replace`, `mask`, `hash`, `generalize`, `shift`, `fake`, `encrypt`. |
-| `--fake-secret` | `TEXT` | none | Required seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
+| `--fake-secret` | `TEXT` | *none* | Required seed for `fake`. Also `ANONYMIZER_FAKE_SECRET`. |
+| `--encrypt-secret` | `TEXT` | *none* | Required secret for `encrypt` (`ENC1_…` AES-256-GCM tokens). Also `ANONYMIZER_ENCRYPT_SECRET`. |
 | `--risk` / `--no-risk` | flag | on | After masking, score identity-clue clumps. Writes `data/stats/<stem>.risk.json`. Does not change the file. |
 | `--entity-profile` | `hipaa-safe-harbor` | *none* | Coverage aid for HIPAA Safe Harbor identifier classes. **Not a compliance certificate.** |
 | `--mapping-in` | `PATH` | *none* | Seed stand-ins from an existing mapping so the same person stays `PERSON_1` across files. |
@@ -84,29 +87,29 @@ You can select a model via the `--model-name` option. PDF Anonymizer can use pre
 
 ### Model Aliases
 
-#### :simple-google: Google (Gemini)
+#### Google (Gemini)
 *   `gemini-2.5-pro`
 *   `gemini-2.5-flash` (Default)
 *   `gemini-2.5-flash-lite`
 
-#### :material-dns: Ollama (Local)
+#### Ollama (Local)
 *   `gemma:7b`
 *   `phi4-mini`
 
-#### :simple-huggingface: Hugging Face
+#### Hugging Face
 *   `openai/gpt-oss-20b`
 *   `mistralai/Mistral-7B-Instruct-v0.1`
 *   `HuggingFaceH4/zephyr-7b-beta`
 
-#### :simple-openai: OpenAI
+#### OpenAI
 *   `gpt-4o`
 *   `gpt-5`
 
-#### :simple-anthropic: Anthropic (Claude)
+#### Anthropic (Claude)
 *   `claude-4-sonet`
 *   `claude-4.5-sonet`
 
-#### :material-cloud-sync: OpenRouter
+#### OpenRouter
 *   `openai/gpt-4o`
 *   `google/gemini-pro`
 
@@ -176,7 +179,8 @@ The `deanonymize` command reads an anonymized document, loads the JSON mapping f
 
 ### Syntax
 ```bash
-pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TEXT] [--source-sha256 HEX]
+pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE \
+  [--mapping-passphrase TEXT] [--source-sha256 HEX] [--encrypt-secret TEXT]
 ```
 
 ### Arguments
@@ -184,10 +188,23 @@ pdf-anonymizer deanonymize ANONYMIZED_FILE MAPPING_FILE [--mapping-passphrase TE
 *   `MAPPING_FILE`: Path to the JSON mapping file (plaintext or `*.mapping.json.enc`).
 *   `--mapping-passphrase`: Required for an encrypted mapping. Also read from `ANONYMIZER_MAPPING_KEY`.
 *   `--source-sha256`: Optional. Expected SHA-256 of the original source document. Rejects a mapping locked for a different file.
+*   `--encrypt-secret`: Required to reverse `--operator TYPE=encrypt` (`ENC1_…`) tokens. Also read from `ANONYMIZER_ENCRYPT_SECRET`.
 
 ### Output Destination
 This command creates a deanonymized version of the file. For example:
 If `ANONYMIZED_FILE` is `data/anonymized/document.anonymized.md`, the output will be saved under `data/deanonymized/document.deanonymized.md`.
+
+---
+
+## The `purge` Command (Remove Local Artifacts)
+
+Removes local files that may contain personal data from prior runs (`data/cache/`, `data/mappings/`, `data/stats/`, and `app.log`). Anonymized and deanonymized output documents are left intact; symlinks are skipped.
+
+```bash
+pdf-anonymizer purge [--root PATH]
+```
+
+*   `--root`: Directory containing `data/` and `app.log` (default: current working directory).
 
 ---
 
@@ -267,110 +284,6 @@ The stats file contains:
 *   `not_found_mappings`: placeholders seen in the text with no corresponding entry in the map (may indicate a corrupted or partial mapping).
 
 These are useful for compliance/audit pipelines. See the [Recipes & Common Workflows](recipes.md) page for more details on working with mappings and stats.
-
----
-
-## History
-
-What the command line can do today, in the order those abilities landed. Default behaviour stayed the same unless you pass a flag. None of this is a legal certificate.
-
-### Identity clues (not only names)
-
-The careful instructions (`--prompt-name detailed`, used by `-p best-quality`) hide phrases that still pick out one person when no name is written — for example "the CEO of Tesla in Austin". Those become `PERSON_1` or `INDIRECT_1`. The short instructions (`simple`, used by `best-speed` and `best-cost`) do not hunt for this.
-
-### Checksums and `_LIKE` labels
-
-A number that *looks* like an IBAN or a card is still hidden if the extra check-digit fails. The stand-in says so: `IBAN_LIKE_1`, `CREDIT_CARD_LIKE_1`. A verified hit stays `IBAN_1`.
-
-### Limit national-ID patterns
-
-`--countries US,GB` keeps every universal pattern (email, IBAN, cards, …) and only the national IDs for those countries.
-
-### Regex-only / offline
-
-`--no-llm` or `-p regex-only` skips the language model. Emails, cards, IBANs, and other structured hits are still hidden (including `_LIKE` checksum failures). Operators, leftover scan, and linkage-risk still run. No API key is required. **Names and identity clues will be missed.** `--verify-llm` is ignored so the process stays offline.
-
-### Leftover check
-
-`run` scans the masked page (unless `--no-verify`) and writes `data/stats/<stem>.residual_pii.json`. `pdf-anonymizer verify` does the same later. `--verify-llm` also asks the language model. The file is not rewritten unless you pass `--apply-residuals` or later run `pdf-anonymizer apply`.
-
-### Encrypt operator
-
-`--operator EMAIL=encrypt --encrypt-secret '…'` writes `ENC1_…` tokens. Deanonymize with the same secret. Those originals are not in the mapping file. See [Change how a type is written](recipes.md#change-how-a-type-is-written).
-
-### Apply leftovers (`apply`)
-
-`pdf-anonymizer apply REPORT.json --accept-all` hides leftovers from a residual report. `--accept` / `--skip` pick which ones. Default `run` stays report-only. See [Hide leftovers from a residual report](recipes.md#hide-leftovers-from-a-residual-report).
-
-### Lock the mapping
-
-`--mapping-passphrase` (or `ANONYMIZER_MAPPING_KEY`) writes `*.mapping.json.enc` instead of plaintext JSON. The lock is AES-256-GCM with Argon2id; the source file hash is bound as AAD. Mapping files are mode `0600`. `deanonymize` needs the same passphrase. `--ephemeral-mapping` writes no mapping file at all. See [Mapping encryption](mapping-security.md).
-
-### How a type is written
-
-`--operator TYPE=mask|hash|generalize|shift|fake|encrypt` changes the mark on the page. Default remains `replace` (`PERSON_1`). `fake` needs `--fake-secret` / `ANONYMIZER_FAKE_SECRET`. There is no built-in seed. `hash` is an unsalted SHA-256 prefix: the same input always matches, and a short value can be reversed by trying the candidates. The command warns once when that value is short. `encrypt` writes an AES-256-GCM token (`ENC1_…`) and needs `--encrypt-secret` / `ANONYMIZER_ENCRYPT_SECRET`. Those originals are not written to the mapping file. Deanonymize with the same secret. Not format-preserving (the token is longer than the original).
-
-### Linkage-risk score
-
-`run` writes `data/stats/<stem>.risk.json` unless `--no-risk`. `pdf-anonymizer report` scores an already-masked file. Report only; the page is not changed.
-
-### HIPAA Safe Harbor coverage aid
-
-`--entity-profile hipaa-safe-harbor` asks for the identifier *classes* that apply to text and writes year-only dates, ZIP3, and ages over 89 as `90+`. **Not a compliance certificate.**
-
-### Same stand-in across files
-
-`--mapping-in existing.mapping.json` seeds `PERSON_1`. Files in one `run` share the growing map.
-
-### Keep-list and deny-list
-
-`--keep-list` leaves listed phrases visible. `--deny-list` hides listed phrases even if detection missed them (`CUSTOM_n`). Keep wins if both lists contain the same phrase.
-
-### Span-based replacement
-
-Replacement is by character interval, not a blind search-and-replace. The longer span wins when two hits overlap (`John Doe` over the inner `John`). No extra flag.
-
-### TAB-style eval harness
-
-`tests/eval/` and `scripts/eval_tab.py` score mention-level and entity-level recall, split by direct identifiers (email, SSN) versus quasi-identifiers (city, date). Tests and scripts only — the product does not change.
-
-### Gold corpus and completeness eval
-
-`scripts/download_gold_corpus.py` installs TAB, Presidio, and Gretel under `data/gold-corpus/` (not in git). `scripts/run_gold_benchmark.py` scores regex-only leftover and recall. PR CI fails if structured leftovers remain on the committed fixtures. See [Gold corpus & eval](gold-corpus.md).
-
-### Scanned PDFs (`--ocr`)
-
-A PDF with pages and no text layer used to look like a successful empty extract. That is now an error. Install Tesseract on PATH and pass `--ocr` to recover words. A sidecar `*.anonymized.layout.json` stores page boxes for a later native-PDF write. See [OCR a scanned PDF](recipes.md#ocr-a-scanned-pdf).
-
-### Per-span confidence (`--min-confidence`)
-
-A **recognizer** is one detector (regex, local NER, language model, or deny-list). Each hit stores `source` (which recognizer) and `score` (that recognizer’s 0–1 hint). `--min-confidence 0.8` drops weaker hits such as `IBAN_LIKE`. Default `0` keeps every hit. These numbers are not calibrated probabilities. Definitions: [Terminology](terminology.md#recognizer-source-and-score). Recipe: [Drop low-score hits](recipes.md#drop-low-score-hits).
-
-### HTTP service
-
-The HTTP process is the separate package `pdf-anonymizer-api`. It is not a CLI command. See [HTTP service and Docker](http-service.md).
-
-### Local span NER (`--ner`)
-
-`pip install "pdf-anonymizer-core[ner]"` (or the CLI extra) installs GLiNER. Then `-p best-speed` and `-p best-cost` use that local model for names and organizations and do **not** call the language model. `-p best-quality` may run NER first and still calls the LLM for identity clues. `--no-ner` keeps today’s LLM path. `--ner` without the extra is an error. See [Use local span NER](recipes.md#use-local-span-ner).
-
-### Native PDF write (`--output-pdf`)
-
-Markdown stays the default. `--output-pdf` also writes `*.anonymized.pdf`: old glyphs are excised, `/Info` and XMP are wiped, attachments are dropped. `--redact` is irreversible (black boxes). Neither mode is a legal de-identification certificate. See [Write a native PDF](recipes.md#write-a-native-pdf).
-
-### CSV and Excel as inputs (cell-level masking)
-
-`pdf-anonymizer run people.csv` and `pdf-anonymizer run roster.xlsx` (with the `[excel]` extra) walk cells and write a same-format spreadsheet plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. This is cell-level pseudonymization, **not** *k*-anonymity. See [Anonymize a CSV or Excel roster](recipes.md#anonymize-a-csv-or-excel-roster).
-
-### Word `.docx` as input
-
-`pdf-anonymizer run letter.docx` (with the `[docx]` extra) walks paragraphs, table cells, headers, footers, footnotes, comments, field codes, and hyperlink targets, then writes `letter.anonymized.docx` plus the usual mapping. Detection and operators are the same engine as PDF/MD/TXT. Legacy `.doc` and macro-enabled `.docm` are rejected. See [Anonymize a Word document](recipes.md#anonymize-a-word-document).
-
-### PII-free files now write output + empty mapping
-
-A run that finds nothing still writes the output file and an empty mapping (`if full_anonymized_text is not None and final_mapping is not None`). That used to look like a failed run for every format, including PDF/MD/TXT.
-
-See [Recipes](recipes.md) for worked examples of each flag.
 
 ---
 

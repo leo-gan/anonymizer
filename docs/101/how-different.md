@@ -1,135 +1,89 @@
-# How PDF Anonymizer is Different
+# Lecture 4: Unstructured Text Case Study — `pdf-anonymizer`
 
-While there are many libraries for data protection, **PDF Anonymizer** is built to bridge the gap between traditional data security and modern generative AI workloads. 
-
-Here is what makes this project different.
+Lectures 1–3 established why tabular models ($k$-anonymity, differential privacy) do not apply directly to narrative documents, and why naive identifier stripping leaves contextual disclosure paths open. This lecture examines how `pdf-anonymizer` instantiates a **reversible hybrid document pseudonymizer**, mapping its design choices back to the concepts from Lectures 1–3 and stating its explicit boundaries.
 
 ---
 
-## Traditional Regex/NER vs. LLM Context Awareness
+## 1. Mapping Theory to System Scope
 
-Traditional text anonymizers (like Microsoft Presidio) use regular expressions for patterns (e.g. emails) and classical Named Entity Recognition (NER) for words (e.g. names). This approach has severe limitations:
+`pdf-anonymizer` is not a general statistical anonymizer and does not issue legal compliance certificates. Its concrete mapping onto Lecture 3 methods is:
 
-*   **Syntax Sensitivity**: A misspelled name or unusual capitalisation (e.g. "sarah connor") can cause a classical NER model to miss the identifier entirely.
-*   **Identity clues (not just names)**: A sentence can point to one real person without ever writing their name. See the full explanation below.
-
-*   **PDF Anonymizer's Advantage**: The careful (`detailed`) instructions now ask the language model to hide those identity clues, not only names, emails, and phone numbers. The faster (`simple`) instructions still look mainly for obvious labels, so they stay cheap.
+| Concept (Lecture 3) | Implementation in `pdf-anonymizer` |
+|---|---|
+| **Deterministic patterns + checksums** | First-stage RE2 library (`id-extract`) covering universal identifiers and 30+ national IDs. Failed checksums (Luhn, IBAN mod-97, VIN, national checks) remain masked as `TYPE_LIKE` (e.g., `IBAN_LIKE_1`) rather than leaking mistyped digits. |
+| **Span NER and LLM detection** | Optional local span NER (GLiNER) for names/organizations, plus multi-provider LLM NER (local Ollama or remote APIs) with `simple`, `detailed`, and `hipaa` prompt templates. |
+| **Reversible pseudonymization** | Span-based replacement (longest-span-wins) producing typed, coreferent placeholders (`PERSON_1`, `PERSON_1.v_1`) and a separate mapping file (`*.mapping.json`, optional AES-256-GCM + Argon2id `*.mapping.json.enc`, or in-memory `--ephemeral-mapping`). |
+| **Operators** | Per-type overrides: `replace` (default), `mask`, `hash`, `generalize`, `shift`, `fake` (seeded), and `encrypt` (`ENC1_…` AES-256-GCM tokens omitted from the mapping file). |
+| **Syntactic table privacy** | Optional CSV/Excel `--k` mode (`table_privacy.py`) that generalizes or suppresses quasi-identifier columns to satisfy $k$-anonymity and reports prosecutor risk, $\ell$-diversity, and $t$-closeness. Not applied to prose PDFs or Word documents. |
+| **Differential privacy / mixnets** | Out of scope. Calibrated query noise is incompatible with reversible prose editing; network anonymity is a transport-layer problem. |
+| **Empirical auditing** | Post-masking residual regex/LLM scan (`*.residual_pii.json`), heuristic linkage-risk report (`*.risk.json`), and a TAB-style gold-corpus evaluation suite (`tests/eval/`). |
 
 ---
 
-## Identity clues: when the name is missing, but everyone still knows who it is
+## 2. Indirect Identifiers in Unstructured Text
 
-Imagine you are asked to hide people in a story. Crossing out every name is a good first step. It is not enough.
+Standard NER pipelines target explicit named spans (`PERSON`, `EMAIL`, `PHONE`). In prose, however, an individual can be uniquely identified without any proper name:
 
-Suppose a classmate writes:
+> *"We scheduled a meeting with the CEO of Tesla at his office in Austin."*
 
-> "We scheduled a meeting with the CEO of Tesla at his office in Austin."
+No personal name appears in the sentence, yet the combination of executive role, named company, and city uniquely identifies a single individual. Similar indirect identifiers include unique creative attribution (*"the author of the Harry Potter series"*) and singular organizational roles (*"Acme Inc.'s only in-house patent counsel"*).
 
-There is no first name and no last name in that sentence. A simple name-finder will miss it. Any reader who follows the news still knows exactly which person is meant.
+The `detailed` prompt (enabled via `-p best-quality` or `--prompt-name detailed`) instructs the model to extract such **identity clues** alongside direct identifiers:
 
-That leftover phrase is an **identity clue**: words that do not *look* like a name, but still pick out one person. See [Terminology](../project/terminology.md#identifiers).
+- When the model resolves the implied person, the phrase is consolidated under that entity's placeholder (`PERSON_1`, `PERSON_1.v_1`).
+- When the referent cannot be named, the phrase is still masked under type `INDIRECT` (e.g., `INDIRECT_1`).
+- Non-identifying generic phrases (*"a teacher in Austin"*, *"the CEO"* without an organization) are left untouched to preserve text utility.
 
-Here are three everyday cases the careful instructions now ask the model to catch:
-
-1. **Job + company + place.** "the CEO of Tesla … in Austin" points to one well-known person. The tool should hide the whole clue (`CEO of Tesla`), and still hide the company and the city if they appear.
-2. **Author of a famous work.** "the author of the 'Harry Potter' series" points to one writer, even if the writer's name is never written.
-3. **A one-of-a-kind role at a named company.** "Acme Inc.'s only in-house patent counsel" may not be a celebrity, but inside that company it still points to one employee. The tool should hide the whole phrase.
-
-### What the tool does with a clue
-
-- If the model **knows the person's name**, it treats the clue as that person. Later, if the real name also appears, both get the same stand-in label (for example `PERSON_1` and `PERSON_1.v_1`).
-- If the model **cannot name the person**, it still hides the phrase and labels it `INDIRECT_1`. The important part is that the identifying words leave the page.
-
-### What it should *not* hide
-
-Vague words are not identity clues. "the CEO" by itself, or "a teacher in Austin", could be many people. The instructions tell the model to leave those alone unless the rest of the sentence makes the person unique.
-
-### How to turn this on
-
-The default `best-speed` profile uses the short instructions, which do **not** hunt for these clues. Use the careful profile when this matters:
+The faster default profile (`best-speed`, using the `simple` prompt) does not search for indirect clues. Neither mode guarantees zero residual leakage; manual review remains necessary for high-stakes releases.
 
 ```bash
+# Enable indirect-identifier detection
 pdf-anonymizer run notes.pdf -p best-quality
-```
 
-Or keep your current profile and only switch the instructions:
-
-```bash
+# Or override only the prompt template
 pdf-anonymizer run notes.pdf --prompt-name detailed
 ```
 
-This is still a helper, not a guarantee. A very unusual clue can be missed. If a document must be safe to share, a person should still read the result.
+---
 
-After `run`, two report files help you look: `*.residual_pii.json` (leftover emails or numbers) and `*.risk.json` (identity-clue clumps such as job + company + place). They do **not** rewrite the page.
+## 3. Reversible Pseudonymization and the Mapping Engine
 
-A flag-by-flag list of what landed is on the [CLI History](../project/cli-usage.md#history) page.
+Permanent redaction (`<REDACTED>`) destroys referential structure, making downstream summarization, translation, or analysis unreliable. Typed placeholders preserve grammatical roles and cross-sentence coreference:
+
+1. **Base-form consolidation:** Coreferent mentions (*"Dr. John Smith"*, *"Dr. Smith"*, *"Smith"*) are grouped under a canonical base form so all variants receive a shared root (`PERSON_1`, `PERSON_1.v_1`).
+2. **Span-based replacement:** Mentions are located by character interval `[start, end)`. Overlapping hits resolve longest-first (`John Doe` takes precedence over inner `John`), and slices are rewritten back-to-front so earlier offsets stay valid.
+3. **Separated key custody:** The masked document can be sent to an external service or analyst while the mapping stays local. For sensitive environments, the mapping can be encrypted with AES-256-GCM + Argon2id bound via AAD to the source file SHA-256 (`--mapping-passphrase` / `ANONYMIZER_MAPPING_KEY`), or kept strictly in memory (`--ephemeral-mapping`). See [Mapping Security](../project/mapping-security.md).
+4. **Audited restoration:** Running `pdf-anonymizer deanonymize` restores base placeholders and `.v_N` variants locally and emits `*.deanonymization_stat.json` recording `unused_mappings` and `not_found_mappings`.
 
 ---
 
-## Reversible Masking (The Mapping Engine)
+## 4. Local Execution and Measured Trade-offs
 
-Many tools simply erase text or replace it with generic masks (like `<REDACTED>`), destroying the structure and utility of the document. 
+Sending raw sensitive documents to a public cloud API solely to anonymize them shifts rather than removes trust exposure. `pdf-anonymizer` supports fully local execution through:
 
-PDF Anonymizer creates **reversible placeholder mappings**:
+- **Offline deterministic pass (`--no-llm` / `-p regex-only`):** Structured identifiers only; zero network calls; misses names and prose context.
+- **Local span NER (`[ner]` extra):** Local CPU GLiNER model for names, organizations, locations, and dates.
+- **Local LLMs (`ollama/...`):** Runs models such as Gemma or Phi locally so document text never leaves the host.
 
-- **Placeholders retain context**: Instead of generic redaction, identifiers are replaced with typed, incremented placeholders (e.g., `PERSON_1`, `ORGANIZATION_2`, `DATE_1`). This preserves the grammar, flow, and structural meaning of the document.
-- **Separate mapping file**: The CLI outputs an anonymized document along with a JSON mapping file (e.g., `document.mapping.json`). You can lock that file as `*.mapping.json.enc` (AES-256-GCM + Argon2id) with a passphrase, or keep the map only in memory (`--ephemeral-mapping`). Default is still plaintext JSON.
-- **Local Deanonymization**: You can send the anonymized document to a third party or public AI service for processing, translation, or analysis. When the results return, you run the CLI's `deanonymize` command locally with the mapping file to restore the original names.
+Empirical trade-offs are published rather than assumed. On a 6,761-document benchmark combining Gretel, Presidio synthetic, TAB court cases, and domain fixtures ([Evaluation Results](../project/eval-results.md)):
 
-```
-[Raw Document] -> [PDF Anonymizer CLI]
-                       |
-        +--------------+--------------+
-        |                             |
- [Anonymized Text]            [JSON Mapping File]
- (Sent to external API/Agent) (Kept in local secure vault)
-        |                             |
-        v                             |
- [AI-Processed Text]                  |
-        |                             |
-        +--------------+--------------+
-                       |
-                       v
-         [Local Deanonymize Command]
-                       |
-            [Final Restored Document]
-```
+- **Regex-only:** mention $F_1 = 0.262$, overall leftover rate $57.6\%$, structured leftover rate $3.9\%$.
+- **RE2 + local Gemma 4 12B (`detailed`):** mention $F_1 = 0.564$, overall leftover rate $24.1\%$, structured leftover rate $0.1\%$, with leftovers under $7\%$ in every domain except TAB legal judgments (where unmasked dates and demographic quasi-identifiers dominate).
 
 ---
 
-## Privacy-First and Cost-Effective
+## 5. Architectural Comparison with Adjacent Tooling
 
-Sending sensitive documents to public cloud APIs to redact them is a security contradiction. 
-
-*   **Local Processing**: PDF Anonymizer supports local LLM deployment out-of-the-box via **Ollama**. You can run models like `gemma` or `phi4-mini` entirely on your workstation. Your sensitive raw documents never leave your local environment.
-*   **Multi-Provider Agility**: If you have access to secure enterprise cloud endpoints, you can easily toggle between providers like **Google Gemini**, **Anthropic Claude**, **OpenAI**, **Hugging Face**, and **OpenRouter** by simply changing a command option and setting your API keys in a `.env` file.
-
----
-
-## Large files
-
-A long document can be larger than one model context window. The tool reads the file into memory, splits the text into chunks, and runs the detectors on each chunk. That split does not stream the file, and it does not keep memory flat as the file grows.
-
-CSV, Excel, and Word are refused above 50 MiB. A measured regex-only run of a 100 MB synthetic text file is recorded on the recipes page. There is no tested 1 GB path.
+| Dimension | Tabular Anonymizers (e.g., ARX) | Rule + Classical NER (e.g., Presidio) | Hybrid Document Pseudonymizer (`pdf-anonymizer`) |
+|---|---|---|---|
+| **Primary input** | Structured relational tables | Unstructured text strings | PDF, Markdown, text, DOCX, CSV, XLSX |
+| **Formal privacy model** | $k$-anonymity, $\ell$-diversity, $t$-closeness, DP | Empirical NER detection | Empirical hybrid detection + optional tabular `--k` aid |
+| **Indirect prose clues** | Not applicable | Generally missed | Supported via `detailed` LLM prompt (`INDIRECT`) |
+| **Checksum validation** | Not applicable | Type-dependent (often dropped on fail) | Failed checksums preserved as `TYPE_LIKE` |
+| **Reversibility** | Irreversible by design | Primarily redaction/replacement | Typed placeholders + optional encrypted mapping |
+| **Local / offline operation** | Yes | Yes | Yes (regex-only, local GLiNER, or local Ollama) |
+| **Memory & scale limits** | Bounded by table size | Streaming possible per record | Text chunked in memory; tables/DOCX capped at 50 MiB |
 
 ---
 
-## Quick Comparison Summary
-
-| Feature | Legacy Regex/NER Tools | Generic Cloud Redactors | PDF Anonymizer |
-| :--- | :--- | :--- | :--- |
-| **Contextual PII detection** | :x: No (Regex/Static) | :wavy_dash: Limited | :white_check_mark: Yes (LLM + identity clues) |
-| **Mistyped numbers** | Often left in the clear | Varies | :white_check_mark: Hidden as `IBAN_LIKE_1` |
-| **Reversibility** | :x: No | :x: No | :white_check_mark: Yes (JSON map; optional lock) |
-| **How a type is written** | Usually one mask | Usually one mask | :white_check_mark: `replace` / `mask` / `hash` / `generalize` / `shift` / `fake` |
-| **Leftover / linkage check** | Rare | Rare | :white_check_mark: Report files only (no auto-rewrite) |
-| **Local Offline Run** | :white_check_mark: Yes | :x: No (Cloud only) | :white_check_mark: Yes (Via local Ollama models) |
-| **Large File Support** | :wavy_dash: High memory usage | :x: Limited by file size limits | :wavy_dash: Text is chunked in memory. Tables and Word stop at 50 MiB. No tested 1 GB path. |
-| **Monorepo Architecture** | :wavy_dash: Often monolithic | :x: Closed source | :white_check_mark: Yes (Separated Core SDK and CLI) |
-
----
-
-Now that you understand the concepts and the value of the PDF Anonymizer project, you are ready to dive into the **[Project Developer Documentation](../project/index.md)** to install and use it.
-
-**In this course:**  
-[← Previous: Contemporary Techniques](techniques.md) | [Course Overview](index.md) | [Next: Bonus module](fairy-tale.md)
+To install and run the software, continue to [Project Documentation](../project/index.md), or return to the [Course Syllabus](index.md).

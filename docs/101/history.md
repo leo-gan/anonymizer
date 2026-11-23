@@ -1,195 +1,75 @@
-# History of Anonymization  
-Data anonymization has evolved over two centuries, from early census privacy methods to modern mathematical guarantees.  
-Key milestones include 19th‐century census de-identification practices, David Chaum’s mix 
-networks (1981) for anonymous communication, 
-Latanya Sweeney’s re-identification of Governor Weld (1997) 
-and the 1998 introduction of *k*-anonymity, and Cynthia Dwork’s 2006 
-formulation of differential privacy. Landmark privacy laws (HIPAA in 2003, EU GDPR in 2018) 
-and regulations codified these ideas. Notable figures include Chaum, Sweeney, Dwork, 
-and Narayanan/Shmatikov, whose Netflix study (2008) highlighted the vulnerability 
-of naive de-identification. Technical advances include *k*-anonymity, *l*-diversity and *t*-closeness (mid-2000s), mix and onion routing (Chaum 1981; Syverson et al. 1996), and differential privacy (2006). However, each method has trade-offs (see Table below): perfect anonymity is impossible without sacrificing utility. Criticisms focus on re-identification risks and privacy/utility trade-offs. The sociotechnical context includes rising data sharing, journalism/activism use of anonymity networks (Tor), and surveillance concerns. Today, anonymization is crucial in data science (health, census, AI), but challenges remain in measuring privacy risk and ensuring compliance. Unresolved questions include balancing data utility and privacy, anonymizing complex data types (e.g. streaming, graphs), and integrating legal standards with technical methods.
+# Lecture 2: Historical Development of Disclosure Control
 
-## Timeline of Anonymization  
-```mermaid
-timeline
-    1850s : U.S. Census begins removing personal data from public reports.
-    1972 : Statistician I.P. Fellegi warns that privacy risks of statistical data are "real".
-    1977 : Tore Dalenius formulates early disclosure control concepts.
-    1981 : David Chaum publishes “Untraceable Electronic Mail…”, introducing mix networks.
-```
-```mermaid
-timeline
-    1996 : NRL researchers publish the first "Onion Routing" design.
-    1997 : Latanya Sweeney re-identifies Gov. William Weld’s anonymized health data (using voter records).
-    1998 : Sweeney & Samarati formalize 'k‑anonymity' (each record indistinguishable among k peers).
-    2003 : U.S. HIPAA Privacy Rule implements “Safe Harbor” de-identification of health records.
-```
-```mermaid
-timeline
-    2004 : EU Article 29 Working Party issues Opinion on anonymization techniques.
-    2006 : Cynthia Dwork and colleagues introduce "Differential Privacy". Machanavajjhala et al. propose 'ℓ-diversity'.
-    2007 : Li et al. propose 't-closeness' for finer privacy guarantees.
-    2008 : Narayanan & Shmatikov de-anonymize the Netflix Prize dataset.
-```
-```mermaid
-timeline
-    2010 : Paul Ohm publishes “Broken Promises of Privacy”, highlighting ease of re-identification.
-    2016 : GDPR adopted (effective 2018) – pseudonymization recognized in law.
-    2020 : 'Differential privacy' used in the US Census and tech products (e.g. Apple).
-    2021–2025: Advances in synthetic data, membership inference attacks, and privacy-preserving ML.  
-```
-
-Key historical themes: governments and statisticians sought to publish useful data without compromising individuals’ privacy. Early census methods (aggregation, noise, suppression) gave way to formal statistical disclosure control (Fellegi 1972, Dalenius 1977). In parallel, cryptographers pursued anonymous communication (Chaum’s mix nets in 1981). The Internet era saw *k*-anonymity (1998) and its extensions (ℓ-diversity, t-closeness) to mitigate linkage attacks, but attacks showed these could fail. Differential privacy (2006) offered a rigorous privacy definition. Laws like HIPAA and GDPR enshrined de-identification standards.
-
-## Influential Figures and Contributions  
-- **David L. Chaum (b.1955):** Introduced mix networks and digital pseudonyms to hide communication metadata. His 1981 ACM paper is a cornerstone of network anonymity. (Later developed evolving protocols like cMix.)  
-- **Latanya Sweeney:** MIT researcher who in 1997 re-identified anonymized medical data of Governor Weld. Co-authored the 1998 paper defining *k*-anonymity. Also introduced ℓ-diversity (2006) to address *k*-anonymity’s weaknesses. Served as lead on many privacy-policy studies and the US Data Privacy Lab.  
-- **Pierangela Samarati:** Alongside Sweeney, formulated *k*-anonymity (1998). Worked on practical algorithms for anonymization (suppression and generalization).  
-- **Cynthia Dwork:** Theoretician who in 2006 co-founded differential privacy. Her definitions and algorithms underpin modern data privacy. She helped bridge theoretical computer science and data policy.  
-- **Arvind Narayanan & Vitaly Shmatikov:** Computer scientists who demonstrated large-scale de-anonymization on real datasets (e.g. Netflix Prize 2008). Their work rigorously quantified privacy risks of publishing high-dimensional data.  
-- **Paul Ohm:** Legal scholar who publicized the failures of anonymization, arguing privacy laws had a false sense of protection. His 2010 law review article spurred policy reevaluation.
-
-Other notable contributors include **Gastwirth** (privacy metrics), **Barth-Jones** (epidemiological privacy analysis), and cryptographers (**Goldschlag**, **Reed**, **Syverson** – onion routing).
-
-## Anonymization Techniques and Breakthroughs  
-Researchers have developed many techniques to protect privacy. Major methods include:
-
-- **Data Removal:** Stripping direct identifiers (names, SSNs). This basic step is necessary but not sufficient alone.
-- **Generalization:** Replacing values with broader categories (e.g. birthdate → year). Used in *k*-anonymity and data masking.
-- **Suppression:** Removing rare or unique attribute values. *k*-anonymity uses suppression to ensure each quasi-identifier tuple repeats ≥*k* times.
-- **Randomization / Noise Addition:** Perturbing values with random noise. Early idea (Fellegi 1972) later formalized as **differential privacy** (DP), which adds calibrated randomness to guarantee mathematical privacy.  
-- **ℓ-Diversity / t-Closeness:** Refinements of *k*-anonymity requiring diversity of sensitive attributes within each equivalence class or closeness to global distribution (circa 2006–2007).  
-- **Data Swapping & Microaggregation:** Shuffling or grouping records so values are exchanged or summarized, maintaining overall distributions.  
-- **Synthetic Data Generation:** Creating artificial data drawn from the same distribution (possibly with DP guarantees) so raw values never released. (Modern work uses ML models like GANs or Bayesian methods).  
-- **Pseudonymization:** Replacing identifiers with consistent pseudonyms (tokens). This allows data linkability for analysis but retains re-identification risk if the key is discovered. GDPR defines it as a safeguard, not true anonymization.  
-- **Cryptographic Methods:** Homomorphic encryption and secure multiparty computation can, in some contexts, allow computation on private data without revealing raw values. These are more nascent in privacy tech.  
-- **Network Anonymity:** For communication privacy, *mix networks* (Chaum 1981) and *onion routing* (1996) hide sender/receiver. Tor (launched 2003) is a low-latency onion router widely used by activists and journalists.
-
-**Technique Comparison:** The table below summarizes key features of representative techniques.
-
-| **Technique**       | **Strengths**                               | **Weaknesses**                                | **Use Cases**                  | **Assumptions/Notes**                                |
-|---------------------|---------------------------------------------|-----------------------------------------------|--------------------------------|-------------------------------------------------------|
-| **k-Anonymity**       | Simple; intuitive group anonymity          | Vulnerable to linkage with quasi-identifiers; fails if classes lack diversity | Tabular data release, HIPAA safe harbor | Assumes adversary only knows quasi-IDs; high-level quasi-ID selection critical. |
-| **ℓ-Diversity**         | Protects against attribute disclosure (insider knowing distribution) | Still fails for skewed or similar sensitive values (homogeneity attacks). | Health records, survey data     | Assumes enough diversity in each group; computationally intensive.   |
-| **t-Closeness**         | Binds distribution of sensitive attribute | May over-generalize, reducing data utility severely; complex to enforce. | Specialized statistical releases | Assumes known global distribution; difficult at high dimensionality. |
-| **Differential Privacy** | Provable: limits any one record’s influence; composition guarantees | Adds noise → utility loss; requires careful privacy budget (ε); technical barriers for practitioners. | Large-scale data analytics, query interfaces (e.g. census) | Assumes formal model of queries; privacy “ε” parameter selection critical. |
-| **Synthetic Data (DP/Synthetic)** | High utility if model captures data; no real data released | Leakage if model overfits; hard to ensure realism; testing privacy is nontrivial. | Machine learning datasets, data sharing for ML | Often uses DP for training; assumes generative model is accurate. |
-| **Pseudonymization** | Allows tracking with unlinkability to real identity (w/o key) | Not truly anonymous: de-pseudonymization possible; considered personal data under GDPR | Longitudinal studies, regime requiring occasional re-link | Assumes secure key storage; legal obligations if key lost. |
-| **Data Masking / Generalization** | Easy to implement (suppression, rounding, binning) | Heuristic; no formal guarantees; vulnerable to modern linkage attacks. | Data warehousing, middleware for testing | Assumes no skilled adversary; often considered “just an obfuscation”. |
-| **Mix/Onion Routing** | Protects metadata (who talks to whom); widely deployed (Tor) | Vulnerable to timing/correlation attacks without cover traffic; needs many participants for strong anonymity. | Anonymous browsing, whistleblowing | Assumes some honest mix nodes; global adversary still a challenge (for mix nets). |
-
-*Table: Comparison of anonymization techniques (strengths, weaknesses, typical uses).*
-
-## Legal, Regulatory and Policy Developments  
-- **OECD Guidelines (1980) & Fair Information Practices:** Early principles for data handling (collection limitation, purpose, security). Though not explicit on anonymization, they set the stage for later laws.  
-- **US Privacy Act (1974):** First U.S. federal law restricting personal data disclosure, requiring agencies to de-identify published records.  
-- **HIPAA Privacy Rule (2003):** Introduced Safe Harbor de-identification standard: removal of 18 identifiers (names, SSNs, full dates, etc.). HIPAA also allows Expert Determination if risk is low (likely infeasible without testing). This was partly motivated by cases like Governor Weld’s re-ID.  
-- **EU Data Protection Directive (1995) & GDPR (2016/2018):** GDPR explicitly recognizes *pseudonymisation* as a safeguard, but defines truly anonymized data as outside the scope of the law. Recital 26 of GDPR notes that data is anonymous if individuals are “no longer identifiable by any means likely reasonably to be used.” The 2014 WP29 Opinion codified this: anonymization requires irreversibly preventing identification, whereas pseudonymization only reduces linkability.  
-- **National Laws:** Germany’s Federal Data Protection Act, UK’s Data Protection Act, and California’s CCPA/CPRA all address de-identification in some form (often as part of data breach rules or consumer privacy rights). California’s CPRA (2023) explicitly permits processing of de-identified data but requires reasonable effort to prevent re-identification.  
-- **Landmark Incidents:** The infamous AOL search data release (2006) and Netflix Prize breach (2008) prompted regulators to scrutinize “anonymized” data releases. Privacy lawsuits (e.g. *Dunbar v. Google* – Wi-Fi data collection, *In re Google Street View*) dealt with data collection, not anonymization per se, but raised public awareness.  
-- **International Treaties:** Council of Europe Convention 108 (1981, updated 2018) addresses data protection globally.  
-- **Regulatory Guidance:** Agencies (HHS, FTC) have issued guidance on de-identification methods. For example, HHS’s 2012 Guidance clarified HIPAA methods. EU’s EDPB and Article 29 Group have released opinions on anonymization techniques, emphasizing context and risk analysis.
-
-Regulations generally treat anonymized data as non-personal only if re-identification risk is negligible. The law often mandates particular methods (e.g. *k*-anonymity as a safe harbor in some settings) or relies on privacy impact assessments.
-
-## Recurring Problems, Criticisms, and Limitations  
-Anonymization methods face inherent tensions:
-
-- **Re-Identification Attacks:** Numerous studies (e.g. the Netflix Prize, AOL search logs) have shown that “removing names and ZIP codes” is insufficient. Modern adversaries can combine datasets (voter rolls, social media, etc.) to deanonymize records. As Paul Ohm noted, researchers can “often ‘reidentify’ or ‘deanonymize’ individuals…with astonishing ease”.  
-- **Privacy vs. Utility Trade-off:** Stronger anonymity usually means less useful data. *k*-anonymity and its variants often generalize data so much that analysis suffers. Differential privacy’s noise addition affects accuracy of statistics. Achieving ε small enough often requires prohibitive noise. Apple’s own implementation of differential privacy (2016) later came under criticism for weak parameters, highlighting the practical challenge.  
-- **Assumptions about the Adversary:** Many models assume limited or noisy background knowledge. Real adversaries may use machine learning and big auxiliary databases. Dalenius’s early formal statement (1977) – that an adversary knowing all but one could infer that one – still haunts privacy researchers.  
-- **Legal Ambiguity:** As the 2014 EU Opinion emphasizes, truly “anonymous” data must consider all means *likely reasonably* used for ID. The bar is fuzzy: what counts as “unlikely”? Cross-border data flows complicate which standards apply.  
-- **Misconceptions:** Many users and organizations overestimate anonymization. The WP29 warned against calling pseudonymization “anonymization”. Outdated regulations (e.g. HIPAA’s Safe Harbor) specify fixed lists of identifiers; however, any unique combination of quasi-identifiers can undermine them.  
-- **Adversarial and ML Attacks:** Advances in machine learning enable new privacy attacks (e.g. membership inference, model inversion). Even differentially private mechanisms can leak information if not properly tuned (composition across queries, hyperparameter data). These raise open research questions.
-
-In summary, **no method guarantees both perfect privacy and full utility**. The literature repeatedly finds that “anonymization [alone] fails” when misapplied.
-
-## Sociotechnical Context and Motivations  
-Privacy concerns have been driven by both social and technical factors:
-
-- **Surveillance and Civil Liberties:** Outcries against government data collection (from FBI's Carnivore to NSA leaks) have fueled demand for anonymity. Technologies like Tor (derived from Onion Routing) are used by journalists, activists (e.g. during Arab Spring), and dissidents to protect sources and speech.  
-- **Big Data and Commerce:** Firms and governments collect vast personal data for analytics. Yet public awareness of data misuse (e.g. Cambridge Analytica 2018) pushes for stronger anonymization in shared datasets. Healthcare research demands sharing sensitive records, spurring methods to enable research without compromising patient privacy.  
-- **Whistleblower and Press Freedoms:** The long journalistic tradition of source confidentiality (Deep Throat in Watergate) extends to digital context. SecureDrop and Tor hidden services allow anonymity. Legal doctrines (First Amendment) parallel data anonymity norms (right to anonymous speech).  
-- **Regulatory Pressures:** New privacy laws (GDPR, CCPA) require data minimization. Compliance encourages anonymizing data whenever possible to avoid strict consent requirements. Pseudonymous identifiers (e.g. user IDs) are often used to track behavior while avoiding “personal data” classification, though GDPR still treats pseudonymous data as personal.  
-- **Ethical AI:** As AI systems train on personal data, concerns arise about models memorizing identities. Differential privacy and federated learning emerged partly to address these new contexts.
-
-Thus, anonymization research is inherently interdisciplinary, involving law, ethics, statistics, computer science, and domain experts. The motivation is not only avoiding legal penalties but building public trust in data practices.
-
-## Modern Applications and Current Challenges  
-Today anonymization techniques are applied widely:
-
-- **Statistical Releases:** National statistics offices (e.g. US Census 2020 used differential privacy to publish summaries), health studies (medical trial data), transport (traffic origin-destination data), and marketing analytics all rely on de-identified datasets.  
-- **Data Sharing Platforms:** Companies and data brokers produce “anonymized” consumer datasets. Cloud services offer DP-enabled analytics tools (Google’s and Microsoft’s DP frameworks).  
-- **Machine Learning:** Privacy-preserving ML (federated learning + DP) aims to train models on decentralized personal data (mobile keyboards, health sensors) without central collection of raw data. Synthetic data generation is touted for training AI when real data is too sensitive.  
-- **Anonymity Networks:** Tor remains the largest privacy network; mixnets are seeing renewed interest (e.g. blockchain coin mixers). Messaging apps (Signal, Session) use mixnet concepts to anonymize source.  
-- **IoT and Mobile:** Geolocation and sensor data anonymization is an active area; researchers study how movement patterns can re-identify users.  
-- **Blockchain and Crypto:** Concepts of anonymity vs pseudonymity apply to cryptocurrencies (privacy coins, mixers) – drawing on Chaum-style techniques.
-
-**Current Challenges:** Achieving the right level of privacy for emerging data types (graph data, text, images) is hard. Differential privacy in deep learning is immature and often yields poor model accuracy. Ensuring transparency (explaining anonymization to users and regulators) is difficult. The cost of wrong anonymization (privacy breaches) can erode trust. Moreover, the rapid pace of data analytics (AI) continuously tests old privacy methods, requiring ongoing research. 
-
-**Open Research Questions:** What formal guarantees best capture real-world privacy harms? How to quantify re-identification risk in complex, high-dimensional data? Can synthetic data reliably replace sensitive datasets? What are ethical standards for anonymization when social norms shift? And how will advances in computing (quantum, ML) change the landscape of breaking privacy protections? 
-
-In conclusion, anonymization remains a dynamic field balancing data utility with privacy protection. Its history shows successive innovations met by new attacks. A “101” survey must recognize that no one-size-fits-all solution exists: each use case requires careful choice of techniques, informed by both technical limits and legal/policy context.
-
-## Charts and Tables  
-
-```mermaid
-graph LR
-    A[Original Sensitive Data] --> B[Data Ingestion / Processing]
-    B --> C[Apply Anonymization]
-    C --> D[Anonymized Data Release]
-    D -->|Attempt Re-ID| E[Attack Simulation]
-    C --> F[Data Utility for Analysis]
-```
-*Figure: Simplified data anonymization process. Identifiers are removed and data is transformed (via noise, suppression, etc.) to produce a released dataset, which is then used by analysts — but remains susceptible to adversarial re-identification attempts.*
-
-```mermaid
-timeline
-    title Timeline of Anonymization Events
-    1981 : Mix Networks (Chaum)  
-    1998 : *k*-Anonymity (Samarati & Sweeney)  
-    2006 : Differential Privacy (Dwork et al.)
-```
-```mermaid
-timeline
-    2008 : Netflix de-anonymization (Narayanan/Shmatikov)
-    2018 : GDPR enforcement (stronger data anonymization rules)
-    2020+ : Wide DP adoption in statistical agencies and tech industry  
-```
-*Figure: Key milestones in anonymization history (see text for details and sources).*
-
-## How this project uses these ideas (today)
-
-This page is a history lesson, not a product spec. The tool you can run (`pdf-anonymizer`) is a **reversible document pseudonymizer**. It hides words in a PDF, Markdown, or text file and keeps a separate map so you can put them back. It is **not** a *k*-anonymity rewriter and it does **not** add differential-privacy noise to prose.
-
-| Idea on this page | What the tool does today |
-|---|---|
-| Data removal (strip names, SSNs) | Hybrid RE2 regex + LLM, then span-based replacement. Mistyped IBANs become `IBAN_LIKE_1`, not leftover digits. |
-| Pseudonymization | Typed stand-ins (`PERSON_1`) plus `*.mapping.json`. Optional AES-256-GCM + Argon2id lock (`*.mapping.json.enc`). |
-| Generalization / suppression | Optional operators: year-only dates, ZIP3, age bands, masks, hashes. Default is still `PERSON_1`. |
-| Synthetic data | Value-level `fake` operator (same person → same invented name). Not a whole-document rewrite. |
-| Cryptographic methods | Optional encrypted mapping file. Not homomorphic encryption. |
-| Re-ID / attack simulation | Leftover regex scan (`*.residual_pii.json`), linkage-risk score (`*.risk.json`), and a TAB-style eval harness in `tests/eval/`. |
-| *k*-anonymity / DP / mixnets | Out of scope as document rewriters. Those models are for tables or networks, not narrative PDFs. |
-
-A flag-by-flag list lives on the [CLI History](../project/cli-usage.md#history) page. Worked examples live in [Recipes](../project/recipes.md).
-
-## References  
-- Chaum, D. *Untraceable Electronic Mail, Return Addresses, and Digital Pseudonyms* (Commun. ACM, 1981).  
-- Samarati, P. & Sweeney, L. (1998). *k-Anonymity and Its Enforcement Through Generalization and Suppression*.  
-- Narayanan, A. & Shmatikov, V. (2008). *Robust De-anonymization of Large Sparse Datasets*.  
-- Dwork, C. (2006). *Differential Privacy*.  
-- Ohm, P. (2009). *Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization*.  
-- Article 29 Data Protection Working Party (2014). *Opinion 05/2014 on Anonymisation Techniques*.  
-- EDPB (2025). *Guidelines on Pseudonymisation*.  
-- Barth-Jones, D. (2012). *“Re-identification” of Governor Weld’s Medical Information* (SSRN).  
-- Kargupta, H. et al. (2003). *On the Privacy-Preserving Properties of Random Data Perturbation*. Proc. IEEE.  
-- Bellovin, S.M. (2019). *Privacy and Synthetic Datasets* (Stanford Law).  
-- Oberski, D.L. & Kreuter, F. (2020). *Differential Privacy and Social Science: An Urgent Puzzle*. Harvard Data Science Review.  
-- Wired (2017). *How One of Apple’s Key Privacy Safeguards Falls Short*.  
-- Additional industry and legal sources: HHS HIPAA Guidance, Tor Project historical archives, etc.  
+Modern data anonymization emerged from the intersection of four distinct traditions: official statistics, cryptographic communication protocols, relational database privacy, and natural language processing. Each generation of defenses was shaped by formal impossibility results or empirical attacks that exposed the limits of earlier heuristics.
 
 ---
 
-**In this course:**  
-[← Previous: Why Anonymize?](why-anonymization.md) | [Course Overview](index.md) | [Next: Contemporary Techniques](techniques.md)
+## 1. Chronology of Key Milestones
+
+| Year | Milestone | Authors / Body | Significance |
+|---|---|---|---|
+| 1972 | Statistical confidentiality warning | I. P. Fellegi[^fellegi1972] | Formalized residual disclosure risks in published statistical tables. |
+| 1977 | Statistical disclosure control (SDC) | T. Dalenius[^dalenius1977] | Stated the foundational desideratum that access to a statistical release should not enable learning anything about an individual that could not be learned without it. |
+| 1981 | Mix networks and digital pseudonyms | D. Chaum[^chaum1981] | Introduced cryptographic unlinkability for communication metadata. |
+| 1996 | Onion routing | D. Goldschlag, M. Reed, & P. Syverson[^onion1996] | Designed layered encryption for low-latency anonymous network routing (later realized in Tor). |
+| 1997–1998 | Governor Weld linkage and $k$-anonymity | P. Samarati & L. Sweeney[^samarati1998] | Demonstrated quasi-identifier linkage on medical microdata and formalized $k$-anonymity via generalization and suppression. |
+| 2003 | HIPAA Privacy Rule enforcement | U.S. HHS | Codified Safe Harbor (18 identifier classes) and Expert Determination for U.S. health records. |
+| 2006 | $\ell$-Diversity | A. Machanavajjhala, J. Gehrke, D. Kifer, & M. Venkitasubramaniam[^machanavajjhala2006] | Addressed homogeneity and background-knowledge attacks against $k$-anonymous tables. |
+| 2006 | Differential privacy | C. Dwork, F. McSherry, K. Nissim, & A. Smith[^dwork2006] | Established a worst-case, adversary-independent mathematical definition of privacy loss ($\varepsilon$) and proved Dalenius's absolute desideratum is generally unachievable with auxiliary information. |
+| 2007 | $t$-Closeness | N. Li, T. Li, & S. Venkatasubramaniam[^li2007] | Bounded the distributional distance between sensitive attributes in each equivalence class and the overall table. |
+| 2008 | Netflix Prize de-anonymization | A. Narayanan & V. Shmatikov[^narayanan2008] | Demonstrated large-scale linkage on high-dimensional sparse records. |
+| 2010 | Legal critique of "anonymization" | P. Ohm[^ohm2010] | Argued that statutory reliance on naive PII removal created false assurance in light of modern linkage attacks. |
+| 2014 | Opinion 05/2014 on Anonymisation Techniques | EU Article 29 Working Party[^wp29_2014] | Evaluated randomization and generalization against singling-out, linkability, and inference; distinguished pseudonymization from true anonymization. |
+| 2018 | GDPR enters into force | European Union | Embedded pseudonymization (Art. 4(5)) and strict anonymization (Recital 26) into binding law. |
+| 2020 | Census disclosure avoidance | U.S. Census Bureau | Deployed differential privacy at national scale for 2020 U.S. Census tabulations, highlighting privacy–utility trade-offs in public statistics.[^oberski2020] |
+| 2022 | Text Anonymization Benchmark (TAB) | I. Pilán et al.[^pilan2022] | Established an annotated legal-text corpus and direct vs. quasi-identifier evaluation methodology for unstructured text. |
+| 2025 | Guidelines 01/2025 on Pseudonymisation | EDPB[^edpb2025] | Clarified technical and organizational conditions for pseudonymization under GDPR. |
+
+---
+
+## 2. Four Eras of Privacy Research
+
+### Era 1: Statistical Disclosure Control (1970s–1980s)
+National statistical agencies needed to publish census tables without exposing individual respondents. Early techniques — cell suppression, rounding, microaggregation, and data swapping — focused on aggregate tables and empirical risk estimates. Dalenius (1977) articulated an idealized goal for statistical confidentiality, which later theoretical work showed cannot hold unconditionally against an adversary with arbitrary auxiliary information.[^dwork2006]
+
+### Era 2: Anonymous Communication (1980s–1990s)
+In parallel with statistical databases, cryptographers studied how to hide communication metadata (who communicates with whom). Chaum's mix networks (1981) and the Naval Research Laboratory's onion routing design (1996) separated message content from routing identity, laying the foundation for modern anonymity networks such as Tor.
+
+### Era 3: Syntactic Tabular Privacy and Re-identification Attacks (1997–2010)
+The growth of electronic health records and commercial datasets shifted attention from aggregate tables to row-level microdata. Samarati and Sweeney (1998) introduced $k$-anonymity to prevent record linkage via quasi-identifiers; Machanavajjhala et al. (2006) introduced $\ell$-diversity and Li et al. (2007) introduced $t$-closeness to mitigate attribute disclosure within equivalence classes. Almost immediately, high-dimensional attacks such as Narayanan and Shmatikov's Netflix study (2008) and Paul Ohm's legal synthesis (2010) showed that syntactic guarantees degrade rapidly as dimensionality grows and auxiliary data proliferates.
+
+### Era 4: Semantic Guarantees and Unstructured Text (2006–Present)
+Differential privacy (Dwork et al., 2006) reframed privacy as a property of the *randomized algorithm* rather than the static output table, providing rigorous composition theorems at the cost of calibrated noise and careful privacy-budget calibration.
+
+Meanwhile, a large fraction of sensitive organizational data resides not in relational tables or aggregate queries, but in **unstructured prose** (clinical notes, court filings, contracts, emails). Because narrative text lacks fixed columns, tabular models do not transfer directly. Modern text de-identification research combines deterministic pattern matching, neural sequence/span models, language-model contextual reasoning, and benchmark-driven residual evaluation (e.g., TAB, Pilán et al., 2022).
+
+---
+
+## 3. Recurring Structural Tensions
+
+Across all four eras, three constraints recur:
+
+1. **Privacy–utility trade-off:** Stronger formal guarantees require either coarser generalization (reducing analytical resolution) or higher noise (degrading accuracy, especially on small groups).
+2. **Adversary assumptions:** Syntactic methods depend on correctly anticipating which attributes an attacker knows externally; high-dimensional records make that assumption fragile.
+3. **Legal versus mathematical definitions:** Statutes ask whether re-identification is *reasonably likely* in context, whereas mathematical criteria bound worst-case leakage under idealized models. Bridging the two requires combining technical controls with governance, access restriction, and empirical auditing.
+
+For formal definitions and side-by-side comparisons of the mechanisms introduced in this chronology, continue to [Lecture 3: Formal Models and Methods](techniques.md).
+
+---
+
+## References
+
+[^fellegi1972]: Fellegi, I. P. (1972). *On the Question of Statistical Confidentiality*. Journal of the American Statistical Association, 67(337), 7–18. <https://doi.org/10.1080/01621459.1972.10481199>
+[^dalenius1977]: Dalenius, T. (1977). *Towards a Methodology for Statistical Disclosure Control*. Statistisk Tidskrift, 15(5), 429–444.
+[^chaum1981]: Chaum, D. (1981). *Untraceable Electronic Mail, Return Addresses, and Digital Pseudonyms*. Communications of the ACM, 24(2), 84–90. <https://doi.org/10.1145/358549.358563>
+[^onion1996]: Goldschlag, D., Reed, M., & Syverson, P. (1996). *Hiding Routing Information*. Information Hiding (IH 1996), LNCS 1174, 137–150. <https://doi.org/10.1007/3-540-61996-8_37>
+[^samarati1998]: Samarati, P., & Sweeney, L. (1998). *Protecting Privacy when Disclosing Information: $k$-Anonymity and Its Enforcement through Generalization and Suppression*. Technical Report SRI-CSL-98-04, SRI International.
+[^machanavajjhala2006]: Machanavajjhala, A., Gehrke, J., Kifer, D., & Venkitasubramaniam, M. (2006). *$\ell$-Diversity: Privacy Beyond $k$-Anonymity*. IEEE ICDE 2006; extended in ACM TKDD, 1(1), 2007. <https://doi.org/10.1145/1217299.1217302>
+[^dwork2006]: Dwork, C. (2006). *Differential Privacy*. ICALP 2006, LNCS 4052, 1–12; and Dwork, C., McSherry, F., Nissim, K., & Smith, A. (2006). *Calibrating Noise to Sensitivity in Private Data Analysis*. TCC 2006, LNCS 3876, 265–284. <https://doi.org/10.1007/11681878_14>
+[^li2007]: Li, N., Li, T., & Venkatasubramaniam, S. (2007). *$t$-Closeness: Privacy Beyond $k$-Anonymity and $\ell$-Diversity*. IEEE ICDE 2007, 106–115. <https://doi.org/10.1109/ICDE.2007.367856>
+[^narayanan2008]: Narayanan, A., & Shmatikov, V. (2008). *Robust De-anonymization of Large Sparse Datasets*. IEEE Symposium on Security and Privacy (S&P 2008), 111–125. <https://arxiv.org/abs/cs/0610105>
+[^ohm2010]: Ohm, P. (2010). *Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization*. UCLA Law Review, 57(6), 1701–1777.
+[^wp29_2014]: Article 29 Data Protection Working Party (2014). *Opinion 05/2014 on Anonymisation Techniques* (WP 216).
+[^oberski2020]: Oberski, D. L., & Kreuter, F. (2020). *Differential Privacy and Social Science: An Urgent Puzzle*. Harvard Data Science Review, 2(1). <https://doi.org/10.1162/99608f92.63a22079>
+[^pilan2022]: Pilán, I., Lison, P., Øvrelid, L., Papadopoulou, A., Sánchez, D., & Batet, M. (2022). *The Text Anonymization Benchmark (TAB): A Dedicated Corpus and Evaluation Framework for Text Anonymization*. Computational Linguistics, 48(4), 1053–1101. <https://doi.org/10.1162/coli_a_00458>
+[^edpb2025]: European Data Protection Board (2025). *Guidelines 01/2025 on Pseudonymisation*. <https://www.edpb.europa.eu/>

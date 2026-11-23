@@ -18,7 +18,7 @@ When a legal text uses the same word differently, that text wins for compliance.
 | **PHI** | Protected health information under US HIPAA. A kind of PII in clinical text. |
 | **Aid, not a certificate** | Flags such as `--entity-profile hipaa-safe-harbor` help you cover identifier classes. They are not a legal certification. |
 
-Longer legal and history context: [Why Anonymize?](../101/why-anonymization.md), [History](../101/history.md), [Techniques](../101/techniques.md).
+Longer legal and history context: [Lecture 1: Problem, Threats, and Law](../101/why-anonymization.md), [Lecture 2: Historical Development](../101/history.md), [Lecture 3: Formal Models and Methods](../101/techniques.md).
 
 ---
 
@@ -61,7 +61,7 @@ Workflows, sources, and commands: [Gold corpus & eval](gold-corpus.md).
 |---|---|
 | **Direct identifier** | A value that names or addresses one person by itself: a name, email, phone, SSN, card, IBAN, account, medical-record number. |
 | **Quasi-identifier** | A value that is weak alone but strong in combination: city, date, job title, organization, age. TAB scores these separately so a high score on cities cannot hide a poor score on names. |
-| **Identity clue** | Words that do not look like a name but still pick out one person, such as “the CEO of Tesla.” The `detailed` prompt asks for these. The `simple` prompt does not. The type is often `INDIRECT`. See [How PDF Anonymizer is Different](../101/how-different.md). |
+| **Identity clue** | Words that do not look like a name but still pick out one person, such as “the CEO of Tesla.” The `detailed` prompt asks for these. The `simple` prompt does not. The type is often `INDIRECT`. See [Lecture 4: Unstructured Text Case Study](../101/how-different.md#2-indirect-identifiers-in-unstructured-text). |
 | **Structured identifier** | A value the regex stage is built to find: email, phone, SSN, card, IBAN, IP, ISO date. Completeness tests treat these as the leftover ceiling. |
 | **`TYPE_LIKE`** | A regex hit that failed a cheap checksum (Luhn, IBAN, VIN, some national IDs). Example: `IBAN_LIKE_1`. It is still hidden so leftover digits do not stay on the page. |
 
@@ -136,25 +136,25 @@ Score names used on a gold-corpus. Workflows: [Gold corpus & eval](gold-corpus.m
 | **Precision** | Of the spans we marked, how many were in the gold labels? |
 | **Recall** | Of the gold labels, how many did we mark? |
 | **F1** | The harmonic mean of precision and recall. One number when you need a single score. |
-| **Public eval table** | Regex-only vs NER vs `detailed` LLM on the same gold set. NER and live LLM are placeholders until those stages exist. |
+| **Public eval table** | Comparison of regex-only, local Gemma 4 (`detailed`), and Gemini 4 Argon on the gold corpus. See [Evaluation Results](eval-results.md). |
 
 ---
 
 ## Techniques this tool does not apply to prose
 
-These words appear in the course and in “we do not do this.” Definitions: [Techniques](../101/techniques.md).
+These words appear in the course and in scope boundaries. Formal definitions: [Lecture 3: Formal Models and Methods](../101/techniques.md).
 
 | Term | In this product |
 |---|---|
-| ***k*-anonymity**, ***ℓ*-diversity**, ***t*-closeness** | Table privacy models. Not used to rewrite PDFs. Cell-level CSV/Excel is still pseudonymization. |
-| **Differential privacy** | Noise on query answers. Not applied to document text. |
-| **Synthetic data** | Whole-document rewrite with fake people. The `fake` operator only replaces a value, with a seed. |
+| **$k$-anonymity**, **$\ell$-diversity**, **$t$-closeness** | Table privacy models. Not used to rewrite prose PDFs or Word documents. Available as an optional aid for CSV/Excel tables via `--k` and `--sensitive-column` (`table_privacy.py`); default table mode stays cell-level pseudonymization. |
+| **Differential privacy** | Noise on aggregate query answers or ML training. Not applied to document text. |
+| **Synthetic data** | Whole-dataset generation with artificial records. The `fake` operator only replaces individual spans using a secret seed. |
 
 ---
 
 ## See also
 
 - [Gold corpus & eval](gold-corpus.md) — workflows that use these measure words
-- [Why Anonymize?](../101/why-anonymization.md) — sectors and legal names
-- [How PDF Anonymizer is Different](../101/how-different.md) — identity clues
+- [Lecture 1: Problem, Threats, and Law](../101/why-anonymization.md) — threat models, domains, and legal definitions
+- [Lecture 4: Unstructured Text Case Study](../101/how-different.md) — indirect identifiers and system scope
 - [Mapping encryption](mapping-security.md) — locked maps

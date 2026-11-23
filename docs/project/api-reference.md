@@ -37,7 +37,7 @@ It reflects the current public surface of `pdf-anonymizer-core`. The hand-writte
 
 ## Prompts
 
-The package ships two ready-to-use prompt templates.
+The package ships three ready-to-use prompt templates.
 
 ::: pdf_anonymizer_core.prompts.detailed
 
@@ -61,9 +61,19 @@ The package ships two ready-to-use prompt templates.
 
 ::: pdf_anonymizer_core.verify
 
+::: pdf_anonymizer_core.apply_residuals
+
 ::: pdf_anonymizer_core.risk
 
+::: pdf_anonymizer_core.table_privacy
+
 ::: pdf_anonymizer_core.mapping_crypto
+
+::: pdf_anonymizer_core.secure_io
+
+::: pdf_anonymizer_core.secure_memory
+
+::: pdf_anonymizer_core.purge
 
 ---
 

@@ -1,5 +1,5 @@
-site_name: 🦉🫥 PDF Anonymizer
-site_description: High-quality, reversible, context-aware LLM-based PDF, Markdown, and Text anonymizer
+site_name: PDF Anonymizer
+site_description: Reversible, context-aware document pseudonymizer and structured identifier extractor
 site_author: Leonid
 site_url: https://leo-gan.github.io/anonymizer/
 repo_name: leo-gan/anonymizer
@@ -9,20 +9,23 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   language: en
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
   palette:
     # Scheme mode: Light
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: teal
+      primary: white
+      accent: indigo
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
     # Scheme mode: Dark
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: teal
+      primary: black
+      accent: indigo
       toggle:
         icon: material/weather-night
         name: Switch to light mode
@@ -30,8 +33,7 @@ theme:
   features:
     - navigation.tabs
     - navigation.tabs.sticky
-    - navigation.sections
-    - navigation.expand
+    - navigation.indexes
     - navigation.instant
     - navigation.top
     - navigation.tracking
@@ -41,7 +43,7 @@ theme:
     - content.code.copy
     - content.code.annotate
   icon:
-    logo: material/shield-lock
+    logo: material/shield-lock-outline
 
 extra:
   social:
@@ -49,9 +51,20 @@ extra:
       link: https://github.com/leo-gan/anonymizer
       name: GitHub Repository
 
+extra_javascript:
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+  - javascripts/katex.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
+
 markdown_extensions:
   - md_in_html
   - admonition
+  - footnotes
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -66,31 +79,8 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true
-  - pymdownx.superfences:
-      # This custom fence tells MkDocs to handle "mermaid" code blocks specially
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-
-plugins:
-  - search
-  - mkdocstrings:
-      handlers:
-        python:
-          paths: [packages/id-extract/src, packages/pdf-anonymizer-core/src, packages/pdf-anonymizer-cli/src, packages/pdf-anonymizer-api/src]
-          options:
-            show_source: true
-            show_root_heading: true
-            heading_level: 2
-            docstring_style: google
-            members_order: alphabetical
-            show_signature_annotations: true
 
 plugins:
   - search
@@ -111,71 +101,80 @@ exclude_docs: |
   /internal/
   /temp/
 
+validation:
+  links:
+    anchors: warn
+
 nav:
   - Home: index.md
   - Privacy & Anonymization 101:
-    - Course Overview: 101/index.md
-    - Terminology: project/terminology.md
-    - Why Anonymize?: 101/why-anonymization.md
-    - History: 101/history.md
-    - Contemporary Techniques: 101/techniques.md
-    - How PDF Anonymizer is Different: 101/how-different.md
-    - Bonus module: 101/fairy-tale.md
-  - id-extract:
-    - Overview: id-extract/index.md
-    - Install and API: id-extract/api.md
-    - Universal identifiers: id-extract/universal.md
-    - Country catalog: id-extract/countries/index.md
-    - Opt-in identifiers (US, CA, MX): id-extract/opt-in-us-ca-mx.md
-    - Australia: id-extract/countries/au.md
-    - Argentina: id-extract/countries/ar.md
-    - Austria: id-extract/countries/at.md
-    - Belgium: id-extract/countries/be.md
-    - Brazil: id-extract/countries/br.md
-    - Canada: id-extract/countries/ca.md
-    - China: id-extract/countries/cn.md
-    - Denmark: id-extract/countries/dk.md
-    - Finland: id-extract/countries/fi.md
-    - France: id-extract/countries/fr.md
-    - Germany: id-extract/countries/de.md
-    - Greece: id-extract/countries/gr.md
-    - Hong Kong: id-extract/countries/hk.md
-    - India: id-extract/countries/in.md
-    - Indonesia: id-extract/countries/id.md
-    - Ireland: id-extract/countries/ie.md
-    - Israel: id-extract/countries/il.md
-    - Italy: id-extract/countries/it.md
-    - Japan: id-extract/countries/jp.md
-    - Malaysia: id-extract/countries/my.md
-    - Mexico: id-extract/countries/mx.md
-    - Netherlands: id-extract/countries/nl.md
-    - New Zealand: id-extract/countries/nz.md
-    - Norway: id-extract/countries/no.md
-    - Poland: id-extract/countries/pl.md
-    - Portugal: id-extract/countries/pt.md
-    - Russia: id-extract/countries/ru.md
-    - Singapore: id-extract/countries/sg.md
-    - South Africa: id-extract/countries/za.md
-    - South Korea: id-extract/countries/kr.md
-    - Spain: id-extract/countries/es.md
-    - Sweden: id-extract/countries/se.md
-    - Switzerland: id-extract/countries/ch.md
-    - Taiwan: id-extract/countries/tw.md
-    - Thailand: id-extract/countries/th.md
-    - Türkiye: id-extract/countries/tr.md
-    - United Kingdom: id-extract/countries/gb.md
-    - United States: id-extract/countries/us.md
+    - 101/index.md
+    - 1. Problem, Threats, and Law: 101/why-anonymization.md
+    - 2. Historical Development: 101/history.md
+    - 3. Formal Models and Methods: 101/techniques.md
+    - 4. Unstructured Text Case Study: 101/how-different.md
   - Project Docs:
-    - Overview: project/index.md
-    - Terminology: project/terminology.md
-    - Installation: project/installation.md
-    - CLI Reference: project/cli-usage.md
-    - SDK & API Usage: project/api-usage.md
-    - HTTP service & Docker: project/http-service.md
-    - API Reference (auto): project/api-reference.md
-    - Recipes & Common Workflows: project/recipes.md
-    - Gold corpus & eval: project/gold-corpus.md
-    - Evaluation results: project/eval-results.md
-    - Mapping encryption: project/mapping-security.md
-    - Troubleshooting: project/troubleshooting.md
-    - Architecture Design: project/architecture.md
+    - project/index.md
+    - Guides:
+      - Installation: project/installation.md
+      - Recipes & Workflows: project/recipes.md
+      - Troubleshooting: project/troubleshooting.md
+    - Reference:
+      - CLI Reference: project/cli-usage.md
+      - Python SDK: project/api-usage.md
+      - HTTP Service & Docker: project/http-service.md
+      - API Reference (auto): project/api-reference.md
+      - Terminology: project/terminology.md
+    - Design & Evaluation:
+      - Architecture: project/architecture.md
+      - Mapping Security: project/mapping-security.md
+      - Gold Corpus & Eval: project/gold-corpus.md
+      - Evaluation Results: project/eval-results.md
+  - id-extract:
+    - id-extract/index.md
+    - Install and API: id-extract/api.md
+    - Universal Identifiers: id-extract/universal.md
+    - Opt-in Identifiers (US, CA, MX): id-extract/opt-in-us-ca-mx.md
+    - Countries:
+      - id-extract/countries/index.md
+      - Argentina: id-extract/countries/ar.md
+      - Australia: id-extract/countries/au.md
+      - Austria: id-extract/countries/at.md
+      - Belgium: id-extract/countries/be.md
+      - Brazil: id-extract/countries/br.md
+      - Canada: id-extract/countries/ca.md
+      - China: id-extract/countries/cn.md
+      - Denmark: id-extract/countries/dk.md
+      - Finland: id-extract/countries/fi.md
+      - France: id-extract/countries/fr.md
+      - Germany: id-extract/countries/de.md
+      - Greece: id-extract/countries/gr.md
+      - Hong Kong: id-extract/countries/hk.md
+      - India: id-extract/countries/in.md
+      - Indonesia: id-extract/countries/id.md
+      - Ireland: id-extract/countries/ie.md
+      - Israel: id-extract/countries/il.md
+      - Italy: id-extract/countries/it.md
+      - Japan: id-extract/countries/jp.md
+      - Malaysia: id-extract/countries/my.md
+      - Mexico: id-extract/countries/mx.md
+      - Netherlands: id-extract/countries/nl.md
+      - New Zealand: id-extract/countries/nz.md
+      - Norway: id-extract/countries/no.md
+      - Poland: id-extract/countries/pl.md
+      - Portugal: id-extract/countries/pt.md
+      - Russia: id-extract/countries/ru.md
+      - Singapore: id-extract/countries/sg.md
+      - South Africa: id-extract/countries/za.md
+      - South Korea: id-extract/countries/kr.md
+      - Spain: id-extract/countries/es.md
+      - Sweden: id-extract/countries/se.md
+      - Switzerland: id-extract/countries/ch.md
+      - Taiwan: id-extract/countries/tw.md
+      - Thailand: id-extract/countries/th.md
+      - Türkiye: id-extract/countries/tr.md
+      - United Kingdom: id-extract/countries/gb.md
+      - United States: id-extract/countries/us.md
+  - Essays:
+    - essays/index.md
+    - The Princess Who Became a Scroll: essays/fairy-tale.md

@@ -1,80 +1,54 @@
 # Project Documentation
 
-Welcome to the technical developer documentation for **PDF Anonymizer**. 
-
-This section covers everything you need to install, run, configure, and extend the codebase. PDF Anonymizer is built as a modular Python monorepo, designed to keep developer tooling lightweight and separate from core business logic.
+Technical reference, guides, and design notes for `pdf-anonymizer`. The repository is structured as a Python monorepo separating structured extraction, core anonymization logic, the CLI wrapper, and an optional HTTP service.
 
 ---
 
-## Monorepo Project Structure
+## Monorepo Layout
 
-The project separates the command-line application from the underlying core library using a monorepo setup:
-
-```
+```text
 anonymizer/
-├── .github/workflows/          # CI/CD & Deploy workflows
-├── data/                       # Local data directory for sample files
-├── docs/                       # MkDocs documentation source files
+├── .github/workflows/          # CI, lint, release, and docs workflows
+├── data/                       # Local data directory for sample inputs and outputs
+├── docs/                       # MkDocs documentation sources
 ├── packages/
-│   ├── id-extract/             # RE2 + checksum detector (placements only)
-│   ├── pdf-anonymizer-core/    # Core SDK package (logic, providers, prompts)
-│   ├── pdf-anonymizer-cli/     # CLI executable wrapper using Typer
-│   └── pdf-anonymizer-api/     # Optional HTTP service (core only)
-├── tests/                      # Global pytest test suite
-├── Makefile                    # Developer shortcut commands
-├── pyproject.toml              # Workspace and dev dependencies config
-└── mkdocs.yml                  # MkDocs site configuration
+│   ├── id-extract/             # RE2 + checksum detector (span placements only)
+│   ├── pdf-anonymizer-core/    # Core SDK (loaders, recognizers, operators, crypto, eval)
+│   ├── pdf-anonymizer-cli/     # Typer CLI wrapper (pdf-anonymizer)
+│   └── pdf-anonymizer-api/     # Optional FastAPI service (depends on core only)
+├── tests/                      # Pytest suite, fuzz tests, and gold-corpus eval harness
+├── Makefile                    # Developer task targets
+├── pyproject.toml              # Workspace and dependency configuration
+└── mkdocs.yml                  # Documentation site configuration
 ```
 
 ---
 
-## The Packages
+## Packages
 
-The project contains four decoupled Python packages inside `packages/`:
-
-### `id-extract`
-Finds structured identifiers with RE2 and checksums. Returns character offsets. It does not replace text. One install ships every country. Pass `countries=` (or CLI `--countries`) to use a subset. Independent guide: [id-extract](../id-extract/index.md), including [one page per country](../id-extract/countries/index.md).
-
-### `pdf-anonymizer-core`
-Contains all the core engines, including:
-
-*   Text extraction from PDF, Markdown, and plain text formats.
-*   Table loaders for CSV (stdlib) and Excel (`.xlsx`, `[excel]` extra): per-cell regex, row-addressed LLM batches, per-cell apply.
-*   Word loader for `.docx` (`[docx]` extra): per-paragraph regex, part-wise flatten, native `.docx` write-back.
-*   Hybrid detection: `id-extract` (RE2 + checksums / `TYPE_LIKE`) plus LLM NER.
-*   LLM router and adapters for various providers (Ollama, Gemini, OpenAI, etc.).
-*   Prompt templates (`simple`, `detailed`, `hipaa`) and identity-clue detection.
-*   Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`).
-*   Span-based replacement, keep/deny gazetteers, optional encrypted maps.
-*   Residual leftover scan, linkage-risk report, TAB-style eval helpers.
-*   Streaming chunk utility to process large text files.
-*   Mapping and restoration engine for deanonymization.
-
-### `pdf-anonymizer-api`
-A FastAPI process that calls `pdf-anonymizer-core` only. It does not import the CLI. Install with `pip install pdf-anonymizer-api`.
-
-### `pdf-anonymizer-cli`
-A CLI tool built on top of `pdf-anonymizer-core` that:
-
-*   Exposes a command-line interface using `Typer` (supporting autocompletion, clean logs, and command help).
-*   Handles loading local `.env` files automatically.
-*   Manages output file paths for anonymized logs and mapping tables.
+- **`id-extract`** — Deterministic RE2 and checksum detector returning character offsets without modifying text. Ships every bundled country; filter at call time via `countries=` or `--countries`. See [id-extract](../id-extract/index.md).
+- **`pdf-anonymizer-core`** — Document loaders (PDF via `pymupdf4llm` or Tesseract OCR, Markdown, plain text, `.docx`, `.csv`, `.xlsx`), hybrid detection (RE2, optional local GLiNER NER, multi-provider LLM router), prompt templates (`simple`, `detailed`, `hipaa`), span-based replacement, per-type operators, optional CSV/Excel $k$-anonymity (`table_privacy`), mapping encryption, residual verification, and linkage-risk reporting.
+- **`pdf-anonymizer-cli`** — `Typer` CLI (`run`, `deanonymize`, `verify`, `report`, `apply`, `purge`) handling `.env` loading and standard output directories.
+- **`pdf-anonymizer-api`** — Optional local FastAPI service depending only on `pdf-anonymizer-core`.
 
 ---
 
-## Getting Started
+## Guide Index
 
-To dive deeper into the technical details, navigate through the following guides:
+### Guides
+- [Installation](installation.md) — Workspace setup, PEP 508 extras, and environment variables.
+- [Recipes & Workflows](recipes.md) — End-to-end CLI and SDK examples for common tasks.
+- [Troubleshooting](troubleshooting.md) — Common failure modes and resolutions.
 
-- **[Terminology](terminology.md)**: One list of product words (pseudonymization, leftover, gold corpus, mention vs entity). Other pages should link here.
-- **[Installation & Setup](installation.md)**: Learn how to set up the development environment using `uv`, manage packages, and define environment variables.
-- **[CLI Reference](cli-usage.md)**: Explore the command-line arguments, options (including `--config-profile`), custom model strings, and usage examples.
-- **[SDK & API Usage](api-usage.md)**: Learn how to import PDF Anonymizer as a Python library in your own applications.
-- **[HTTP service and Docker](http-service.md)**: `POST /anonymize` and the official image. No authentication.
-- **[API Reference (auto)](api-reference.md)**: Living signature reference generated from source docstrings.
-- **[Recipes & Common Workflows](recipes.md)**: Practical end-to-end examples — local Ollama, locked maps, operators, HIPAA aid, keep/deny lists, leftover checks, CSV/Excel rosters, eval harness, batching, caching, and more.
-- **[Gold corpus & eval](gold-corpus.md)**: Why we measure leftover risk, what is in the gold corpus, and the download / benchmark / CI workflows.
-- **[Evaluation results](eval-results.md)**: Charts and tables for the regex, local Gemma 4, and Gemini 4 Argon sample runs.
-- **[Mapping encryption](mapping-security.md)**: Argon2id + AES-256-GCM envelopes, AAD, `0600` writes, ephemeral maps, and the tests that lock those in.
-- **[Troubleshooting](troubleshooting.md)**: Common errors (auth, rate limits, LLM parsing, empty results, large files) and solutions.
-- **[Architecture Design](architecture.md)**: Understand the data flow, prompt styling, LLM adapters, and file splitting mechanisms.
+### Reference
+- [CLI Reference](cli-usage.md) — Subcommands (`run`, `deanonymize`, `verify`, `report`, `apply`, `purge`), flags, profiles, and model aliases.
+- [Python SDK](api-usage.md) — Programmatic entry points for text, tables, Word documents, and restoration.
+- [HTTP Service & Docker](http-service.md) — Local FastAPI endpoints, Docker Compose, and AppArmor profile.
+- [API Reference (auto)](api-reference.md) — Signature reference generated from source docstrings.
+- [Terminology](terminology.md) — Canonical definitions for project terms and recognizer scores.
+
+### Design & Evaluation
+- [Architecture](architecture.md) — Processing pipeline, format-specific paths, and reversal internals.
+- [Mapping Security](mapping-security.md) — Argon2id + AES-256-GCM envelope design, AAD binding, `0600` I/O, and memory hygiene.
+- [Gold Corpus & Eval](gold-corpus.md) — Corpus sources, TAB-style metrics, and CI completeness gates.
+- [Evaluation Results](eval-results.md) — Empirical leftover rates and $F_1$ scores on 6,761 public documents.

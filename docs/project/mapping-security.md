@@ -89,7 +89,7 @@ you cannot change it without breaking the tag.
 
 ### Envelope v1 (what we still read)
 
-The first shipping lock (`feat/encrypted-mapping`, PR #44) used scrypt,
+The initial encrypted-mapping release used scrypt,
 AES-256-GCM, and **no AAD**. Those files still decrypt. We do not write v1
 any more.
 
@@ -229,7 +229,7 @@ There is no later `deanonymize` unless you saved the map yourself.
 | Cipher | AES-256-GCM | ChaCha20-Poly1305, age, nacl | v1 already shipped GCM; one primitive, two envelope versions |
 | KDF | Argon2id (write), scrypt (read v1) | Break v1 files, or keep writing scrypt | Compatibility without leaving the weaker default in place |
 | AAD source | SHA-256 of the *original* file | Hash of the anonymized file | The anonymized file is written at the same time as the map; the original is the stable identity |
-| Cross-document maps | `--mapping-in` does not check AAD | Refuse to seed from another document | Item 10 (consistent placeholders) would break |
+| Cross-document maps | `--mapping-in` does not check AAD | Refuse to seed from another document | Cross-document consistent placeholders would break |
 | Expected hash on deanonymize | Optional `--source-sha256` | Always require the original file | Users often only keep the masked file + the map |
 | File mode | `0600` on mapping files only | Also lock anonymized / deanonymized output | The request is about mapping files; deanonymized output is a separate policy |
 | Memory lock | Best-effort `mlock` + `MADV_DONTDUMP` | Fail closed if `mlock` fails | Unprivileged `RLIMIT_MEMLOCK` is common; failing closed would break `run` |

@@ -43,7 +43,7 @@ A comprehensive documentation site is available at **[leo-gan.github.io/anonymiz
 The documentation includes:
 - **[Anonymization 101](https://leo-gan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
 - **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
-- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference for `run`, `verify`, `report`, and `deanonymize`, plus a [History](https://leo-gan.github.io/anonymizer/project/cli-usage/#history) of what landed.
+- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference for `run`, `deanonymize`, `verify`, `report`, `apply`, and `purge`.
 - **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
 - **[HTTP service & Docker](https://leo-gan.github.io/anonymizer/project/http-service/)**: `POST /anonymize` and the image in `packages/pdf-anonymizer-api`. No authentication.
 - **[API Reference (auto)](https://leo-gan.github.io/anonymizer/project/api-reference/)**: Auto-generated function signatures and details.
