@@ -558,7 +558,7 @@ pdf-anonymizer run interview-notes.pdf --prompt-name detailed
 
 This is a helper, not a lock. Read the result before you share it.
 
-Conceptual background and scope limits appear in [Lecture 4: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
+Conceptual background and scope limits appear in [Lecture 9: Indirect Identifiers](../101/how-different.md#2-indirect-identifiers-in-unstructured-text).
 
 ---
 

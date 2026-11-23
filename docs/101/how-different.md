@@ -1,18 +1,23 @@
-# Lecture 4: Unstructured Text Case Study — `pdf-anonymizer`
+---
+description: Architectural case study mapping anonymization theory (Lectures 1–8) onto pdf-anonymizer's hybrid detection, reversible mapping, file sanitization, and measured benchmarks.
+---
 
-Lectures 1–3 established why tabular models ($k$-anonymity, differential privacy) do not apply directly to narrative documents, and why naive identifier stripping leaves contextual disclosure paths open. This lecture examines how `pdf-anonymizer` instantiates a **reversible hybrid document pseudonymizer**, mapping its design choices back to the concepts from Lectures 1–3 and stating its explicit boundaries.
+# Lecture 9: System Case Study — `pdf-anonymizer`
+
+Lectures 1–8 covered vendor-neutral privacy theory, threat models, file-format leakage, cryptographic hygiene, evaluation benchmarks, and method selection. This final lecture examines how one concrete open-source system — **`pdf-anonymizer`** — instantiates a **reversible hybrid document pseudonymizer**, mapping its design choices back to earlier lectures and stating its explicit boundaries.
 
 ---
 
 ## 1. Mapping Theory to System Scope
 
-`pdf-anonymizer` is not a general statistical anonymizer and does not issue legal compliance certificates. Its concrete mapping onto Lecture 3 methods is:
+`pdf-anonymizer` is not a general statistical anonymizer and does not issue legal compliance certificates. Its concrete mapping onto Lectures 3–7 is:
 
-| Concept (Lecture 3) | Implementation in `pdf-anonymizer` |
+| Concept (Lectures 3–7) | Implementation in `pdf-anonymizer` |
 |---|---|
-| **Deterministic patterns + checksums** | First-stage RE2 library (`id-extract`) covering universal identifiers and 30+ national IDs. Failed checksums (Luhn, IBAN mod-97, VIN, national checks) remain masked as `TYPE_LIKE` (e.g., `IBAN_LIKE_1`) rather than leaking mistyped digits. |
+| **Deterministic patterns + checksums** | First-stage RE2 library (`id-extract`) covering universal identifiers and 38 national catalogs. Failed checks (Luhn, IBAN mod-97, Verhoeff, national checks) remain masked as `TYPE_LIKE` (e.g., `IBAN_LIKE_1`) or are dropped for bare digit runs; see [Check-Digit Algorithms](../id-extract/checksums.md). |
 | **Span NER and LLM detection** | Optional local span NER (GLiNER) for names/organizations, plus multi-provider LLM NER (local Ollama or remote APIs) with `simple`, `detailed`, and `hipaa` prompt templates. |
-| **Reversible pseudonymization** | Span-based replacement (longest-span-wins) producing typed, coreferent placeholders (`PERSON_1`, `PERSON_1.v_1`) and a separate mapping file (`*.mapping.json`, optional AES-256-GCM + Argon2id `*.mapping.json.enc`, or in-memory `--ephemeral-mapping`). |
+| **Reversible pseudonymization** | Span-based replacement (longest-span-wins) producing typed, coreferent placeholders (`PERSON_1`, `PERSON_1.v_1`) and a separate mapping file (`*.mapping.json`, optional AES-256-GCM + Argon2id with source-hash AAD `*.mapping.json.enc`, or in-memory `--ephemeral-mapping`). |
+| **Container sanitization** | Native PDF write (`--output-pdf` / `--redact`) excises glyphs, strips `/Info`, XMP, attachments, and annotations, and compacts without `/Prev` history; `.docx` joins runs and skips `w:del`; `.xlsx` writes cached values only. |
 | **Operators** | Per-type overrides: `replace` (default), `mask`, `hash`, `generalize`, `shift`, `fake` (seeded), and `encrypt` (`ENC1_…` AES-256-GCM tokens omitted from the mapping file). |
 | **Syntactic table privacy** | Optional CSV/Excel `--k` mode (`table_privacy.py`) that generalizes or suppresses quasi-identifier columns to satisfy $k$-anonymity and reports prosecutor risk, $\ell$-diversity, and $t$-closeness. Not applied to prose PDFs or Word documents. |
 | **Differential privacy / mixnets** | Out of scope. Calibrated query noise is incompatible with reversible prose editing; network anonymity is a transport-layer problem. |

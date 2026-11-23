@@ -1,3 +1,7 @@
+---
+description: Short conceptual essays and analogies on serialization, state copying, and privacy engineering.
+---
+
 # Essays
 
 Short conceptual essays and analogies related to data representation, copying, and privacy engineering. These stand apart from the [Privacy & Anonymization 101](../101/index.md) lecture notes and the [Project Docs](../project/index.md).

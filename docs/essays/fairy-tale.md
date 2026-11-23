@@ -1,3 +1,7 @@
+---
+description: An allegory on serialization, schemas, value equality versus object identity, and why copying state creates real-world data leaks.
+---
+
 # The Princess Who Became a Scroll
 
 *An allegory on serialization, schemas, and the difference between copying and moving.*
@@ -43,4 +47,4 @@ Neither, this tale finds, does anyone who has ever pressed "save" and forgotten 
 !!! note "Technical note"
     Converting a structured object into an ordered, flat representation is **serialization**; reconstructing an equivalent object by applying the same rules in reverse is **deserialization**. The shared contract defining fields and order is the **schema** — both scribes must agree on it for reconstruction to succeed.
 
-    The privacy implication is operational rather than metaphorical: serialization **copies** state rather than moving it. Two artifacts can be equal in value while existing as independent copies across storage, caches, logs, and memory. Reversible pseudonymization (see [Lecture 4: Unstructured Text Case Study](../101/how-different.md#3-reversible-pseudonymization-and-the-mapping-engine)) relies on managing that boundary explicitly: a stand-in representation crosses the trust boundary, while the mapping required for reconstruction remains controlled locally.
+    The privacy implication is operational rather than metaphorical: serialization **copies** state rather than moving it. Two artifacts can be equal in value while existing as independent copies across storage, caches, logs, and memory. Reversible pseudonymization (see [Lecture 9: System Case Study](../101/how-different.md#3-reversible-pseudonymization-and-the-mapping-engine)) relies on managing that boundary explicitly: a stand-in representation crosses the trust boundary, while the mapping required for reconstruction remains controlled locally.

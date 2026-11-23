@@ -1,3 +1,7 @@
+---
+description: Developer documentation, CLI and Python SDK references, HTTP service, architecture, mapping encryption design, and evaluation benchmarks for pdf-anonymizer.
+---
+
 # Project Documentation
 
 Technical reference, guides, and design notes for `pdf-anonymizer`. The repository is structured as a Python monorepo separating structured extraction, core anonymization logic, the CLI wrapper, and an optional HTTP service.

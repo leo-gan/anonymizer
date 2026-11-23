@@ -1,5 +1,5 @@
-site_name: PDF Anonymizer
-site_description: Reversible, context-aware document pseudonymizer and structured identifier extractor
+site_name: Anonymization Handbook
+site_description: Open academic handbook on data anonymization, disclosure risk, and document sanitization — with the companion pdf-anonymizer and id-extract Python packages
 site_author: Leonid
 site_url: https://leo-gan.github.io/anonymizer/
 repo_name: leo-gan/anonymizer
@@ -107,32 +107,23 @@ validation:
 
 nav:
   - Home: index.md
-  - Privacy & Anonymization 101:
+  - Handbook:
     - 101/index.md
     - 1. Problem, Threats, and Law: 101/why-anonymization.md
     - 2. Historical Development: 101/history.md
     - 3. Formal Models and Methods: 101/techniques.md
-    - 4. Unstructured Text Case Study: 101/how-different.md
-  - Project Docs:
-    - project/index.md
-    - Guides:
-      - Installation: project/installation.md
-      - Recipes & Workflows: project/recipes.md
-      - Troubleshooting: project/troubleshooting.md
-    - Reference:
-      - CLI Reference: project/cli-usage.md
-      - Python SDK: project/api-usage.md
-      - HTTP Service & Docker: project/http-service.md
-      - API Reference (auto): project/api-reference.md
-      - Terminology: project/terminology.md
-    - Design & Evaluation:
-      - Architecture: project/architecture.md
-      - Mapping Security: project/mapping-security.md
-      - Gold Corpus & Eval: project/gold-corpus.md
-      - Evaluation Results: project/eval-results.md
-  - id-extract:
+    - 4. Attacker Models and Risk: 101/risk-and-attackers.md
+    - 5. Document & File-Format Leakage: 101/document-leakage.md
+    - 6. Pseudonymization & Crypto: 101/pseudonymization-crypto.md
+    - 7. Evaluation & Benchmarks: 101/evaluation-and-benchmarks.md
+    - 8. Choosing a Method: 101/decision-framework.md
+    - 9. Case Study (pdf-anonymizer): 101/how-different.md
+    - Failure Compendium: 101/failure-compendium.md
+    - Reading List & Standards: 101/reading-list.md
+  - Identifier Atlas:
     - id-extract/index.md
     - Install and API: id-extract/api.md
+    - Check-Digit Algorithms: id-extract/checksums.md
     - Universal Identifiers: id-extract/universal.md
     - Opt-in Identifiers (US, CA, MX): id-extract/opt-in-us-ca-mx.md
     - Countries:
@@ -175,6 +166,23 @@ nav:
       - Türkiye: id-extract/countries/tr.md
       - United Kingdom: id-extract/countries/gb.md
       - United States: id-extract/countries/us.md
+  - PDF Anonymizer:
+    - project/index.md
+    - Guides:
+      - Installation: project/installation.md
+      - Recipes & Workflows: project/recipes.md
+      - Troubleshooting: project/troubleshooting.md
+    - Reference:
+      - CLI Reference: project/cli-usage.md
+      - Python SDK: project/api-usage.md
+      - HTTP Service & Docker: project/http-service.md
+      - API Reference (auto): project/api-reference.md
+      - Terminology: project/terminology.md
+    - Design & Evaluation:
+      - Architecture: project/architecture.md
+      - Mapping Security: project/mapping-security.md
+      - Gold Corpus & Eval: project/gold-corpus.md
+      - Evaluation Results: project/eval-results.md
   - Essays:
     - essays/index.md
     - The Princess Who Became a Scroll: essays/fairy-tale.md

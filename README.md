@@ -1,161 +1,114 @@
-# 🦉🫥 PDF Anonymizer
+# Anonymization Handbook & PDF Anonymizer
 
-This tool hides personal details in documents and can put them back. It is a reversible document [pseudonymizer](https://leo-gan.github.io/anonymizer/project/terminology/), not a legal certificate.
-
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square)](https://leo-gan.github.io/anonymizer/)
 [![CI Workflow](https://github.com/leo-gan/anonymizer/actions/workflows/lint.yml/badge.svg)](https://github.com/leo-gan/anonymizer/actions)
 
-| Feature | Meaning |
+An open, academic-style reference on **data anonymization, pseudonymization, and disclosure risk** — paired with a 38-country statute-cited structured identifier atlas (`id-extract`), empirical benchmarks, and a reversible open-source document pseudonymizer (`pdf-anonymizer`).
+
+The software hides personal details in documents and tables and can restore them locally from a mapping file. It is a reversible [pseudonymizer](https://leo-gan.github.io/anonymizer/project/terminology/), not a legal compliance certificate.
+
+---
+
+## The Anonymization Handbook
+
+Read the full documentation site at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**:
+
+- **[Curriculum (Lectures 1–9)](https://leo-gan.github.io/anonymizer/101/)** — Threat models and GDPR/HIPAA/CCPA; historical chronology; $k$-anonymity, $\ell$-diversity, $t$-closeness, and $(\varepsilon, \delta)$-differential privacy; prosecutor/journalist/marketer risk and LLM attacks; PDF/DOCX/spreadsheet leakage surfaces; cryptographic pseudonymization; evaluation benchmarks; method decision framework; and a system case study.
+- **[Compendium of Anonymization Failures](https://leo-gan.github.io/anonymizer/101/failure-compendium/)** — Nine canonical real-world breaches (GIC/Weld, AOL, Netflix, mobility/card metadata, NYC Taxi MD5, PDF overlays, LLM extraction and attribute inference).
+- **[Reading List, Standards & Ecosystem](https://leo-gan.github.io/anonymizer/101/reading-list/)** — Curated guide to ISO/IEC 20889, NIST SP 800-188, NIST SP 800-38G, foundational papers, public corpora, and open-source tools.
+- **[Standards-Aligned Glossary](https://leo-gan.github.io/anonymizer/project/terminology/)** — Cross-standard definitions (ISO/IEC 20889, NIST, GDPR, HIPAA) alongside product terms.
+- **[Identifier Atlas (`id-extract`)](https://leo-gan.github.io/anonymizer/id-extract/)** — 38-country catalog with official agency/statutory citations and [Check-Digit Algorithms](https://leo-gan.github.io/anonymizer/id-extract/checksums/).
+- **[Essays](https://leo-gan.github.io/anonymizer/essays/)** — Short conceptual notes on serialization, copying, and privacy boundaries.
+
+---
+
+## Companion Software Capabilities
+
+| Feature | Summary |
 |---|---|
-| Reversible pseudonymization | Personal values become typed placeholders (`PERSON_1`) plus a mapping file. This is not irreversible anonymization. |
-| Hybrid named-entity recognition | RE2 regular expressions find structured identifiers; a language model finds names. Optional local span NER (GLiNER). |
-| Checksums | A failed Luhn or IBAN check is still hidden as `IBAN_LIKE`, so leftover digits do not stay visible. |
-| Identity clues | The careful profile also hides phrases that pick out one person without a name (quasi-identifiers, type `INDIRECT`). |
-| Leftover measurement | Residual scan after masking. Gold-corpus leftover rate and recall in CI, split like TAB into direct vs quasi identifiers. |
-| Anonymization statistics | After a run, `data/stats/` records leftovers (`*.residual_pii.json`) and linkage-risk clumps (`*.risk.json`). Deanonymize writes unused and missing mapping counts. |
-| Span-based replacement | Replacement is by character interval. The longer span wins when two hits overlap. |
-| File types | PDF, Markdown, plain text, CSV, Excel, and Word (`.docx`). |
-| Country-specific PII | National-ID regexes for 30+ countries (US, CA, GB, ES, IT, FR, IN, CN, and others). `--countries US,GB` keeps only those national IDs. Email, IBAN, and cards always stay. |
-| HIPAA Safe Harbor aid | `--entity-profile hipaa-safe-harbor` covers the 18 identifier classes (year-only dates, ZIP3, age 90+). It is a coverage aid, not a compliance certificate. |
-| OCR | `--ocr` runs Tesseract when a PDF has pages but no text layer. |
-| Local or remote | [Ollama](https://ollama.com/) on this machine, or Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter. |
+| Reversible pseudonymization | Personal values become typed placeholders (`PERSON_1`) plus a separate mapping file (`0600`; optional AES-256-GCM + Argon2id lock or `--ephemeral-mapping`). Not irreversible anonymization. |
+| Hybrid detection | Linear-time RE2 patterns (`id-extract`), optional local span NER (GLiNER), and multi-provider LLMs (local [Ollama](https://ollama.com/) or remote Gemini, OpenAI, Anthropic, Hugging Face, OpenRouter). |
+| Checksums & `_LIKE` labels | 26 registered validators (Luhn, ISO 13616 mod-97, Verhoeff, weighted sums). Failed checks stay masked as `TYPE_LIKE` (e.g., `IBAN_LIKE`) or are dropped for bare digit runs. |
+| Indirect identifiers | The `detailed` prompt (`-p best-quality`) hides identifying prose clues without explicit names (`INDIRECT`). |
+| Operators & table privacy | Per-type operators (`replace`, `mask`, `hash`, `generalize`, `shift`, `fake`, `encrypt`), HIPAA Safe Harbor coverage aid, keep/deny lists, and optional CSV/Excel $k$-anonymity (`--k`). |
+| Multi-format support | PDF (Markdown export, `--ocr` via Tesseract, or sanitized native `--output-pdf` / `--redact`), Markdown, plain text, Word (`.docx`), CSV, and Excel (`.xlsx`). |
+| Verification & auditing | Post-masking residual leftover scan (`verify` / `apply`), linkage-risk report (`report`), deanonymization stats, and `purge` for local artifacts. |
 
-## What leaves this machine
+## What Leaves This Machine
 
-The program does not send usage data, and it does not upload logs. The command line writes `app.log` in the working directory.
+The program does not send usage data and does not upload logs. The CLI writes `app.log` in the working directory.
 
-Document text leaves the machine only in a call to a language-model provider. The default profile is `best-speed`, and its model name is `gemini-2.5-flash`. Without the `ner` extra, a normal run sends each chunk to Google when `GOOGLE_API_KEY` is set. With that extra, `best-speed` uses local span NER and skips the remote call. `--no-llm`, `-p regex-only`, and an `ollama/` model name keep the text on this machine. The first local span-NER run can download model weights from Hugging Face. An install without the `ner` extra does not download a model.
+Document text leaves the machine only during a call to a remote language-model provider. The default profile is `best-speed` (`gemini-2.5-flash`). Without the `ner` extra, a normal run sends each chunk to Google when `GOOGLE_API_KEY` is set. With `[ner]`, `best-speed` uses local span NER and skips the remote call. `--no-llm`, `-p regex-only`, and an `ollama/` model name keep all text on this machine. The first local span-NER run downloads model weights from Hugging Face; an install without `[ner]` downloads no models.
 
-Each GitHub Release includes the wheels and a `SHA256SUMS` file. Compare a downloaded file with that list. The release workflow signs a build attestation for those wheels, which is a signed record that this workflow built them. PyPI stores a publish attestation on each uploaded file.
+Each GitHub Release ships wheels with `SHA256SUMS` and a signed build attestation; PyPI stores a publish attestation on each uploaded file.
 
-Operators, locked maps, HTTP, and the rest live in the [docs](https://leo-gan.github.io/anonymizer/).
+## Measured Quality
 
-## Measured quality
+On 6,761 public documents (Gretel, Presidio synthetic, TAB ECHR court cases, and domain fixtures):
 
-On 6,761 public documents, regex-only leaves 58% of labeled mentions visible (mention F1 0.26). RE2 plus a local Gemma 4 12B model leaves 24% (mention F1 0.56). Emails, cards, and IBANs are almost all hidden. English court cases show a 56% leftover, and that rate is dates and demographic phrases, not names.
+- **Regex-only:** 57.6% leftover rate, mention $F_1$ 0.262, structured leftover 3.9%.
+- **RE2 + local Gemma 4 12B (`detailed`):** 24.1% leftover rate, mention $F_1$ 0.564, structured leftover 0.1%. Leftovers stay under 7% in every domain except TAB legal judgments (56.4%, driven by dates and demographic quasi-identifiers rather than names).
+- **82-document comparison:** Gemini 4 Argon leaves 43.8% vs. Gemma 4's 50.5%, with tighter direct-identifier precision from Gemma.
 
-On the same 82-document sample, Gemini 4 Argon leaves 44% and Gemma leaves 51%. Argon also marks more text that is not a direct identifier. Charts and the source split are on [Evaluation results](https://leo-gan.github.io/anonymizer/project/eval-results/).
+Full tables and charts: **[Evaluation Results](https://leo-gan.github.io/anonymizer/project/eval-results/)**.
 
-## 📖 Documentation
+---
 
-A comprehensive documentation site is available at **[leo-gan.github.io/anonymizer/](https://leo-gan.github.io/anonymizer/)**.
+## Monorepo Packages
 
-The documentation includes:
-- **[Anonymization 101](https://leo-gan.github.io/anonymizer/101/)**: A guide on data anonymization and deanonymization techniques.
-- **[Installation Guide](https://leo-gan.github.io/anonymizer/project/installation/)**: System requirements, package extras, and setup.
-- **[CLI Usage](https://leo-gan.github.io/anonymizer/project/cli-usage/)**: Reference for `run`, `deanonymize`, `verify`, `report`, `apply`, and `purge`.
-- **[API Usage](https://leo-gan.github.io/anonymizer/project/api-usage/)**: Programmatic usage guide for the core SDK.
-- **[HTTP service & Docker](https://leo-gan.github.io/anonymizer/project/http-service/)**: `POST /anonymize` and the image in `packages/pdf-anonymizer-api`. No authentication.
-- **[API Reference (auto)](https://leo-gan.github.io/anonymizer/project/api-reference/)**: Auto-generated function signatures and details.
-- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)**: Practical patterns (local Ollama, external LLM round-trips, batching, profiles, caching, debugging, etc.).
-- **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)**: Common issues and solutions.
-- **[Architecture](https://leo-gan.github.io/anonymizer/project/architecture/)**: Understanding how the anonymizer operates.
+| Package | Role | README |
+|---|---|---|
+| `packages/id-extract` | Standalone RE2 + checksum structured identifier detector (offsets only, 38 countries) | [README](./packages/id-extract/README.md) |
+| `packages/pdf-anonymizer-core` | Core library: loaders, hybrid detection, operators, mapping crypto, table privacy, eval | [README](./packages/pdf-anonymizer-core/README.md) |
+| `packages/pdf-anonymizer-cli` | Typer CLI (`run`, `deanonymize`, `verify`, `report`, `apply`, `purge`) | [README](./packages/pdf-anonymizer-cli/README.md) |
+| `packages/pdf-anonymizer-api` | Optional local FastAPI HTTP service (core only, no authentication) | [README](./packages/pdf-anonymizer-api/README.md) |
 
-## Project Structure
-
-This project is a monorepo containing four packages:
-
-- **`packages/id-extract`**: RE2 + checksum detector for structured identifiers (IDs, cards, IBAN, email). Returns placements. One install ships every country; pass `countries=` (or CLI `--countries`) to use a subset. Standalone docs: [id-extract guide](https://leo-gan.github.io/anonymizer/id-extract/).
-- **`packages/pdf-anonymizer-core`**: The core library containing the anonymization and deanonymization logic. See the [core README](./packages/pdf-anonymizer-core/README.md) for more details.
-- **`packages/pdf-anonymizer-cli`**: A command-line interface for using the anonymizer. See the [CLI README](./packages/pdf-anonymizer-cli/README.md) for detailed usage instructions.
-- **`packages/pdf-anonymizer-api`**: Optional local HTTP service. Depends on core only, not the CLI.
-
-## Development Installation
-
-1.  **Install `uv`**: This project uses `uv` for package management. Follow the [official installation instructions](https://astral.sh/docs/uv#installation).
-
-2.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/leo-gan/anonymizer.git
-    cd anonymizer
-    ```
-
-3.  **Install dependencies**:
-    ```bash
-    uv sync --group dev
-    ```
-
-4.  **Install Ollama (optional)**: If you want to use a local model for anonymization, install [Ollama](https://ollama.com/).
-
-5.  **Set up environment variables**: Create a `.env` file in the root directory of the repository (or in the `packages/pdf-anonymizer-cli` directory) and add the necessary API keys for the providers you want to use. For example:
-    ```env
-    # For Google models
-    GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
-
-    # For OpenAI models
-    OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
-
-    # For Anthropic models
-    ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY"
-
-    # For Hugging Face models
-    HUGGING_FACE_TOKEN="YOUR_HF_TOKEN"
-
-    # For OpenRouter models
-    OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
-
-    # Optional: lock mapping files / seed fake names
-    ANONYMIZER_MAPPING_KEY="a long secret"
-    ANONYMIZER_FAKE_SECRET="another long secret"
-    ```
+---
 
 ## Quick Start
 
-To anonymize a file, run the `pdf-anonymizer` CLI tool using `uv run`:
+Install the development workspace with [uv](https://astral.sh/docs/uv):
 
 ```bash
+git clone https://github.com/leo-gan/anonymizer.git
+cd anonymizer
+uv sync --group dev
+```
+
+Configure API keys in a root `.env` file only if using cloud providers (`GOOGLE_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `HUGGING_FACE_TOKEN`, `OPENROUTER_API_KEY`, or optional `OLLAMA_HOST`, `ANONYMIZER_MAPPING_KEY`, `ANONYMIZER_FAKE_SECRET`, `ANONYMIZER_ENCRYPT_SECRET`).
+
+```bash
+# Default run (best-speed)
 uv run pdf-anonymizer run document.pdf
-```
 
-Commonly you pick a configuration profile with `-p` / `--config-profile` (or let it default to `best-speed`):
-
-```bash
+# Careful profile (also masks indirect identity clues)
 uv run pdf-anonymizer run contract.pdf -p best-quality
-uv run pdf-anonymizer run large-notes.md -p best-cost --model-name "ollama/phi4-mini"
+
+# Fully local with Ollama or offline regex-only
+uv run pdf-anonymizer run notes.md --model-name "ollama/phi4-mini"
+uv run pdf-anonymizer run logs.txt --no-llm
+
+# Restore original values locally
+uv run pdf-anonymizer deanonymize \
+  data/anonymized/document.anonymized.md \
+  data/mappings/document.mapping.json
 ```
 
-`best-quality` uses the careful instructions. Those also hide **identity clues** — phrases that pick out one person even when no name is written (for example "the CEO of Tesla"). The default `best-speed` profile skips that extra hunt so it stays fast.
-
-To deanonymize the file later:
+### Round-Trip Demo & Tests
 
 ```bash
-uv run pdf-anonymizer deanonymize document.anonymized.md document.mapping.json
-```
+# Download an arXiv PDF, inject synthetic PII, anonymize, and verify restoration
+uv run python scripts/prepare_demo_pdf.py
+uv run python scripts/demo_anonymize.py
 
-For detailed command-line options and examples (including all three profiles and overrides), please refer to the [**CLI README**](./packages/pdf-anonymizer-cli/README.md), the [**CLI Usage Docs**](https://leo-gan.github.io/anonymizer/project/cli-usage/), or the **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)** page.
-
-## Demo: Anonymization & Deanonymization Example
-
-To demonstrate the hybrid NER (RE2 regex pre-filter + LLM) and the complete round-trip process on a real document, we have provided a demo script:
-
-1. **Prepare the Demo Document**: This script downloads an open-access arXiv research paper PDF and injects synthetic PII (name, email, phone, IP, SSN) onto the first page:
-   ```bash
-   uv run python scripts/prepare_demo_pdf.py
-   ```
-
-2. **Run the Demo**: This script runs the hybrid NER (fast RE2-based regex for structured PII + LLM semantic stage) on the PDF, anonymizes the PII to structured placeholders, saves the mapping vocabulary, and performs a complete round-trip deanonymization:
-   ```bash
-   uv run python scripts/demo_anonymize.py
-   ```
-
-You will see colorized console logs showing the exact matched entities (including the rich set of regex-detected PII types), the anonymized text, and the fully-reverted deanonymized output.
-
-The built-in regex stage now automatically detects a wide range of additional structured PII (credit cards, IBANs, crypto addresses, VINs, MAC addresses, many country-specific national/tax/driver IDs, etc.) on top of classic items like email/phone/IP/SSN.
-
-## Testing
-
-To run the test suite:
-
-```bash
+# Run test suite and strict docs validation
 uv run pytest
+uv run mkdocs build --strict
 ```
 
 ---
 
-## See Also
+## Documentation & Citation
 
-- **[Documentation Site](https://leo-gan.github.io/anonymizer/)** — Full guides, 101 course, and API reference.
-- **[Core Package README](./packages/pdf-anonymizer-core/README.md)** — SDK details and installation.
-- **[CLI Package README](./packages/pdf-anonymizer-cli/README.md)** — Command-line specifics.
-- **[Recipes & Common Workflows](https://leo-gan.github.io/anonymizer/project/recipes/)** — Practical usage examples.
-- **[Troubleshooting](https://leo-gan.github.io/anonymizer/project/troubleshooting/)** — Solutions to common problems.
+- **[Handbook & Full Docs](https://leo-gan.github.io/anonymizer/)** — Lectures, Failure Compendium, Reading List, Identifier Atlas, CLI/SDK/HTTP references, Recipes, Architecture, and Troubleshooting.
+- **Citation:** See [`CITATION.cff`](./CITATION.cff) for machine-readable citation metadata.

@@ -62,7 +62,7 @@ After a match, a registered extra-digit check may run. For most types a failure 
 
 Types with a check today: `CREDIT_CARD`, `IBAN`, `VIN`, `MEDICAL_NPI_US`, `SIN_CA`, `DNI_ES`, `NIE_ES`, `RESIDENT_ID_CN`, `AADHAAR_IN`, `CPF_BR`, `CODICE_FISCALE_IT`, `PESEL_PL`, `RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`, `DEA_US`, `PERSONALAUSWEIS_DE`, `ACN_AU`, `MEDICARE_AU`, `NHS_GB`, `UEN_SG`, `HETU_FI`, `NATIONAL_ID_TH`, `NATIONAL_ID_TR`, `STEUER_ID_DE`.
 
-`RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`, `ACN_AU`, `MEDICARE_AU`, `NHS_GB`, `UEN_SG`, `NATIONAL_ID_TH`, `NATIONAL_ID_TR`, and `STEUER_ID_DE` drop a failed check. The other checked types keep the hit and add `_LIKE`.
+`RTN_US`, `CUSIP_NNA`, `PHN_BC_CA`, `CLABE_MX`, `ACN_AU`, `MEDICARE_AU`, `NHS_GB`, `UEN_SG`, `NATIONAL_ID_TH`, `NATIONAL_ID_TR`, and `STEUER_ID_DE` drop a failed check. The other checked types keep the hit and add `_LIKE`. See [Check-digit algorithms](checksums.md) for the mathematical details and rationale.
 
 ## Filter used by the anonymizer
 

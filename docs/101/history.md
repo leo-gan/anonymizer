@@ -1,3 +1,7 @@
+---
+description: Chronological development of statistical disclosure control, anonymous communication, syntactic privacy models, differential privacy, and text anonymization benchmarks.
+---
+
 # Lecture 2: Historical Development of Disclosure Control
 
 Modern data anonymization emerged from the intersection of four distinct traditions: official statistics, cryptographic communication protocols, relational database privacy, and natural language processing. Each generation of defenses was shaped by formal impossibility results or empirical attacks that exposed the limits of earlier heuristics.
@@ -52,6 +56,14 @@ Across all four eras, three constraints recur:
 1. **Privacy–utility trade-off:** Stronger formal guarantees require either coarser generalization (reducing analytical resolution) or higher noise (degrading accuracy, especially on small groups).
 2. **Adversary assumptions:** Syntactic methods depend on correctly anticipating which attributes an attacker knows externally; high-dimensional records make that assumption fragile.
 3. **Legal versus mathematical definitions:** Statutes ask whether re-identification is *reasonably likely* in context, whereas mathematical criteria bound worst-case leakage under idealized models. Bridging the two requires combining technical controls with governance, access restriction, and empirical auditing.
+
+??? note "Exercises"
+    1. **Dalenius's desideratum:** Explain in one or two sentences why Dalenius's 1977 ideal — *"access to a statistical release should not allow an attacker to learn anything about an individual that could not be learned without it"* — cannot hold unconditionally when adversaries have auxiliary information.
+    2. **Paradigm shift:** What structural assumption separates Era 3 models ($k$-anonymity, $\ell$-diversity, $t$-closeness) from Era 4 differential privacy?
+
+    ??? note "Solutions"
+        1. Suppose an adversary already knows the auxiliary fact *"Alice is 5 cm taller than the average woman in her cohort."* Learning the exact cohort mean from an aggregate release immediately reveals Alice's height, even if Alice is not in the dataset at all. Differential privacy relaxes Dalenius's goal to bounding only the *marginal* effect of including or excluding Alice's record.
+        2. Era 3 models are **syntactic properties of a static released table** relative to a declared set of quasi-identifiers $Q$; Era 4 differential privacy is a **semantic property of the randomized mechanism** $\mathcal{M}$ itself, independent of what auxiliary attributes the adversary knows.
 
 For formal definitions and side-by-side comparisons of the mechanisms introduced in this chronology, continue to [Lecture 3: Formal Models and Methods](techniques.md).
 

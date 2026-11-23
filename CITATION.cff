@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "Anonymization Handbook & PDF Anonymizer"
+message: "If you reference this handbook, identifier atlas, benchmarks, or software, please cite it as below."
+type: software
+authors:
+  - given-names: Leonid
+    alias: leo-gan
+repository-code: "https://github.com/leo-gan/anonymizer"
+url: "https://leo-gan.github.io/anonymizer/"
+license: MIT
+keywords:
+  - anonymization
+  - pseudonymization
+  - de-identification
+  - statistical-disclosure-control
+  - pii-detection
+  - privacy-engineering

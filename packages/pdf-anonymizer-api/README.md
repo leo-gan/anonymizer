@@ -13,4 +13,4 @@ Docker files live in this package. From the repository root:
 docker compose -f packages/pdf-anonymizer-api/docker-compose.yml up --build
 ```
 
-Docs: [HTTP service and Docker](https://leo-gan.github.io/anonymizer/project/http-service/).
+Docs: [HTTP service and Docker](https://leo-gan.github.io/anonymizer/project/http-service/) · [Anonymization Handbook](https://leo-gan.github.io/anonymizer/101/).

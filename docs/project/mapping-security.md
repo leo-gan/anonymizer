@@ -1,3 +1,7 @@
+---
+description: Cryptographic design note for mapping file protection — Argon2id KDF, AES-256-GCM authenticated encryption, source-hash AAD binding, atomic 0600 writes, and memory zeroization.
+---
+
 # Mapping encryption and file security
 
 This page is the design note for how vocabulary / entity-mapping files are
