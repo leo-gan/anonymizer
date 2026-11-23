@@ -1,6 +1,6 @@
 [project]
 name = "pdf-anonymizer-cli"
-version = "0.32.0"
+version = "0.33.0"
 description = "Local-first CLI for reversible pseudonymization and auditing of PDF, Word, Markdown, text, CSV, and Excel files."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
@@ -43,7 +43,7 @@ classifiers = [
 dependencies = [
     "typer",
     "rich",
-    "pdf-anonymizer-core>=0.32.0",
+    "pdf-anonymizer-core>=0.33.0",
 ]
 
 [project.optional-dependencies]
