@@ -4,6 +4,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
+from urllib.parse import urlparse
 
 import typer
 from dotenv import load_dotenv
@@ -89,6 +90,16 @@ def load_environment() -> None:
     env_path = Path(__file__).parent.parent.parent / ".env"
     if env_path.exists():
         load_dotenv(env_path)
+
+
+_LOCAL_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
+
+
+def _is_local_ollama_host(host: Optional[str]) -> bool:
+    if not host:
+        return True
+    parsed = urlparse(host if "://" in host else f"http://{host}")
+    return (parsed.hostname or "").lower() in _LOCAL_HOSTS
 
 
 @app.command()
@@ -205,6 +216,16 @@ def run(
                 "Checksums, country filter, operators, leftover scan, and "
                 "risk still run. Names and identity clues will be missed. "
                 "Same as -p regex-only. Default: use the model."
+            ),
+        ),
+    ] = False,
+    offline: Annotated[
+        bool,
+        typer.Option(
+            "--offline",
+            help=(
+                "Fail closed if the resolved configuration would call a "
+                "remote model provider or non-localhost OLLAMA_HOST."
             ),
         ),
     ] = False,
@@ -495,6 +516,23 @@ def run(
 
     if use_llm:
         provider_name, _ = get_provider_and_model_name(config.model_name)
+        if offline:
+            if provider_name != "ollama":
+                logging.error(
+                    "--offline refuses remote provider %r (%s). "
+                    "Use --no-llm, --ner, or --model-name 'ollama/...'.",
+                    provider_name,
+                    config.model_name,
+                )
+                sys.exit(1)
+            ollama_host = os.getenv("OLLAMA_HOST")
+            if not _is_local_ollama_host(ollama_host):
+                logging.error(
+                    "--offline refuses non-local OLLAMA_HOST %r. "
+                    "Point OLLAMA_HOST to localhost or unset it.",
+                    ollama_host,
+                )
+                sys.exit(1)
         if provider_name == "google":
             if "gemini" in config.model_name and not os.getenv("GOOGLE_API_KEY"):
                 logging.error(

@@ -5,7 +5,7 @@ CODE = "CA"
 PATTERNS = {
     # A personal SIN does not begin with 0 or 8. Temporary SINs begin with 9.
     "SIN_CA": r"\b[1-79]\d{2}-\d{3}-\d{3}\b",
-    "DRIVERS_LICENSE_CA": "\\b[A-Z]\\d{4,5}-\\d{5,6}-\\d{5}\\b|\\b[A-Z0-9]{5,15}\\b",
+    "DRIVERS_LICENSE_CA": r"\b[A-Z]\d{4,5}-\d{5,6}-\d{5}\b",
     # CRA program account: 9-digit BN + program letters + 4-digit reference.
     "PROGRAM_ACCOUNT_CA": "\\b\\d{9}\\s?(?:RT|RP|RC|RM|RZ|RR|RG)\\s?\\d{4}\\b",
     "DIN_CA": "\\bDIN\\s?\\d{8}\\b",

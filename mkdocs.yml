@@ -170,6 +170,10 @@ nav:
     - project/index.md
     - Guides:
       - Installation: project/installation.md
+      - Academic Research & IRB: project/academic-irb-guide.md
+      - AI & RAG Pipelines: project/ai-rag-guide.md
+      - id-extract in Pipelines: project/id-extract-pipelines.md
+      - Tool Comparison: project/tool-comparison.md
       - Recipes & Workflows: project/recipes.md
       - Troubleshooting: project/troubleshooting.md
     - Reference:

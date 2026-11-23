@@ -41,6 +41,10 @@ anonymizer/
 
 ### Guides
 - [Installation](installation.md) — Workspace setup, PEP 508 extras, and environment variables.
+- [Academic Research & IRB](academic-irb-guide.md) — 100% local workflow for qualitative transcripts, survey tables, IRB protocols, and Open Science archiving.
+- [AI & RAG Pipelines](ai-rag-guide.md) — In-memory Python round-trips and local Docker sidecar integration for LLM workflows.
+- [`id-extract` in Pipelines](id-extract-pipelines.md) — ReDoS-safe structured PII scanning in logs, CI gates, and Microsoft Presidio.
+- [Tool Comparison](tool-comparison.md) — Neutral comparison against Textwash, ARX, Microsoft Presidio, `spaCy`, and MAT2.
 - [Recipes & Workflows](recipes.md) — End-to-end CLI and SDK examples for common tasks.
 - [Troubleshooting](troubleshooting.md) — Common failure modes and resolutions.
 

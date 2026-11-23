@@ -126,3 +126,74 @@ class TestRegexOnlyProfile:
             cfg = get_config_for_profile(profile)
             assert cfg.use_llm is True
             assert cfg.enable_cache is False
+
+
+class TestOfflineGuard:
+    def test_offline_refuses_remote_provider(self, tmp_path, monkeypatch) -> None:
+        from typer.testing import CliRunner
+
+        from pdf_anonymizer_cli.cli import app
+
+        sample = tmp_path / "note.txt"
+        sample.write_text("Contact ada@example.com", encoding="utf-8")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+        result = CliRunner().invoke(
+            app, ["run", str(sample), "--offline", "--no-ner"]
+        )
+        assert result.exit_code == 1
+        assert not (tmp_path / "data" / "anonymized" / "note.anonymized.md").exists()
+
+    def test_offline_refuses_non_local_ollama_host(self, tmp_path, monkeypatch) -> None:
+        from typer.testing import CliRunner
+
+        from pdf_anonymizer_cli.cli import app
+
+        sample = tmp_path / "note.txt"
+        sample.write_text("Contact ada@example.com", encoding="utf-8")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("OLLAMA_HOST", "https://ollama.remote.example:11434")
+        result = CliRunner().invoke(
+            app,
+            ["run", str(sample), "--offline", "--no-ner", "--model-name", "ollama/phi4-mini"],
+        )
+        assert result.exit_code == 1
+
+    def test_offline_allows_no_llm_mode(self, tmp_path, monkeypatch) -> None:
+        from typer.testing import CliRunner
+
+        from pdf_anonymizer_cli.cli import app
+
+        sample = tmp_path / "note.txt"
+        sample.write_text("INTERVIEWER: Contact ada@example.com", encoding="utf-8")
+        monkeypatch.chdir(tmp_path)
+        result = CliRunner().invoke(
+            app, ["run", str(sample), "--offline", "--no-llm"]
+        )
+        assert result.exit_code == 0
+        out = (tmp_path / "data" / "anonymized" / "note.anonymized.txt").read_text(
+            encoding="utf-8"
+        )
+        assert "INTERVIEWER:" in out
+        assert "ada@example.com" not in out
+        assert "EMAIL_1" in out
+
+    def test_offline_allows_localhost_ollama(self, tmp_path, monkeypatch, mocker) -> None:
+        from typer.testing import CliRunner
+
+        from pdf_anonymizer_cli.cli import app
+
+        sample = tmp_path / "note.txt"
+        sample.write_text("Contact ada@example.com", encoding="utf-8")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+        mock_anon = mocker.patch(
+            "pdf_anonymizer_cli.cli.anonymize_file",
+            return_value=("Contact EMAIL_1", {"ada@example.com": "EMAIL_1"}),
+        )
+        result = CliRunner().invoke(
+            app,
+            ["run", str(sample), "--offline", "--no-ner", "--model-name", "ollama/phi4-mini"],
+        )
+        assert result.exit_code == 0
+        mock_anon.assert_called_once()

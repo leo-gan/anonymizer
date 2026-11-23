@@ -22,6 +22,7 @@ pdf-anonymizer run FILE_PATH [FILE_PATH ...] [OPTIONS]
 | :--- | :--- | :--- | :--- |
 | `--config-profile` / `-p` | `best-quality` \| `best-speed` \| `best-cost` \| `regex-only` | `best-speed` | Predefined bundle of model, prompt, chunk size, overlap, and retry settings (see below). `regex-only` skips the language model. |
 | `--no-llm` | flag | off | Skip the language model. Only the RE2 regex stage runs. Names and identity clues will be missed. Same as `-p regex-only`. |
+| `--offline` | flag | off | Fail closed if the resolved configuration would call a remote model provider or non-localhost `OLLAMA_HOST`. |
 | `--characters-to-anonymize` | `INTEGER` | `100000` | The character size of each chunk sent to the LLM (overrides profile). |
 | `--prompt-name` | `simple` \| `detailed` | `detailed` | Instruction style sent to the language model (overrides profile). `detailed` also hides identity clues. `simple` does not. |
 | `--model-name` | `TEXT` | `gemini-2.5-flash` | The identifier of the model to execute (overrides profile). |

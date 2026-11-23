@@ -43,12 +43,12 @@ A personal reference number in the Australian tax and superannuation systems. Th
 
 ## `DRIVERS_LICENSE_AU` — Driver licence (state and territory)
 
-A licence to drive is issued by each state or territory, not by the Commonwealth. Formats differ. This pattern is a broad 8–10 character token and will over-match.
+A licence to drive is issued by each state or territory, not by the Commonwealth. Formats differ.
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_AU` |
-| **Shape this package looks for** | 8–10 letters or digits |
+| **Shape this package looks for** | 8–10 digits, or 1 letter + 7–9 digits |
 | **Checksum** | none |
 | **Example (synthetic)** | `12345678` |
 

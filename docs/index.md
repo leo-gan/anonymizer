@@ -23,6 +23,16 @@ The core reference track is vendor-neutral and grounded in peer-reviewed researc
 
 ---
 
+## Start by Role
+
+| Audience | Recommended Entry Points |
+|---|---|
+| **Academic & IRB Researchers / Educators** | [Handbook Curriculum](101/index.md) · [Academic Research & IRB Workflow](project/academic-irb-guide.md) · [Tool Comparison](project/tool-comparison.md) · [Evaluation Results](project/eval-results.md) |
+| **AI & RAG Engineers** | [AI & RAG Pipelines](project/ai-rag-guide.md) · [Python SDK](project/api-usage.md) · [HTTP Service & Docker](project/http-service.md) · [Mapping Security](project/mapping-security.md) |
+| **Data, Fintech & Security Engineers** | [id-extract in Pipelines](project/id-extract-pipelines.md) · [38-Country Identifier Atlas](id-extract/index.md) · [Check-Digit Algorithms](id-extract/checksums.md) |
+
+---
+
 ## 2. Companion Open-Source Software
 
 This repository also ships two modular Python tools that serve as a practical reference implementation and empirical testbed for the concepts in the handbook. Neither tool is a legal compliance certificate.

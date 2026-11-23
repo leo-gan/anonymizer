@@ -48,9 +48,9 @@ pdf-anonymizer run document.pdf
 # Careful profile (also masks indirect identity clues)
 pdf-anonymizer run contract.pdf -p best-quality
 
-# Fully local with Ollama or offline regex-only
-pdf-anonymizer run notes.md -p best-cost --model-name "ollama/phi4-mini"
-pdf-anonymizer run logs.txt --no-llm
+# Fully local with Ollama (fail-closed via --offline) or regex-only
+pdf-anonymizer run notes.md -p best-cost --model-name "ollama/phi4-mini" --offline
+pdf-anonymizer run logs.txt --no-llm --offline
 
 # Country filter, operators, keep/deny lists, and encrypted mapping
 pdf-anonymizer run notes.pdf contract.pdf \

@@ -73,13 +73,13 @@ Intra-Community form ES + the national tax identifier.
 
 ## `DRIVERS_LICENSE_ES` — Permiso de conducción
 
-A coarse 9–10 character token for Spanish driving-licence numbers.
+Spanish driving-licence numbers follow the holder's DNI or NIE structure.
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_ES` |
-| **Shape this package looks for** | 9–10 letters or digits |
-| **Checksum** | none |
+| **Shape this package looks for** | 8 digits + letter, or `X`/`Y`/`Z` + 7 digits + letter |
+| **Checksum** | none (use `DNI_ES` / `NIE_ES` for mod-23 validation) |
 | **Example (synthetic)** | `12345678Z` |
 
 **Official sources**

@@ -58,12 +58,12 @@ A structural pattern for common French passport numbers.
 
 ## `DRIVERS_LICENSE_FR` — Permis de conduire
 
-A coarse 12-character token for the French driving licence number.
+French driving-licence number (12 digits or 2-digit prefix + 2 letters + 5–8 digits).
 
 | | |
 |---|---|
 | **Package type** | `DRIVERS_LICENSE_FR` |
-| **Shape this package looks for** | 12 letters or digits |
+| **Shape this package looks for** | 12 digits, or 2 digits + 2 letters + 5–8 digits |
 | **Checksum** | none |
 | **Example (synthetic)** | `12AB34567890` |
 

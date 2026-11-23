@@ -1,11 +1,44 @@
 [project]
 name = "pdf-anonymizer-core"
 version = "0.32.0"
-description = "A core library to anonymize PDF, Markdown, plain text, CSV, Excel, and Word files using LLMs."
+description = "Reversible, context-aware document and table pseudonymizer (RE2, local GLiNER NER, and local/remote LLMs) for PDF, DOCX, CSV, XLSX, Markdown, and text."
 authors = [{ name = "Leonid Ganeline", email = "leo.gan.57@gmail.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
+keywords = [
+    "anonymization",
+    "pseudonymization",
+    "de-identification",
+    "pii",
+    "phi",
+    "pdf",
+    "docx",
+    "gdpr",
+    "hipaa",
+    "irb",
+    "privacy",
+    "redaction",
+    "llm",
+    "ollama",
+    "k-anonymity",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Text Processing :: Linguistic",
+]
 dependencies = [
     "id-extract>=0.3.0",
     "python-dotenv",
@@ -27,7 +60,10 @@ docx = ["python-docx>=1.1"]
 ner = ["gliner>=0.2.13"]
 
 [project.urls]
-repository = "https://github.com/leo-gan/anonymizer"
+Homepage = "https://leo-gan.github.io/anonymizer/"
+Documentation = "https://leo-gan.github.io/anonymizer/project/api-usage/"
+Repository = "https://github.com/leo-gan/anonymizer"
+Issues = "https://github.com/leo-gan/anonymizer/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
